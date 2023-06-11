@@ -41,10 +41,10 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('holis'),
+            const Text('PipeTracker'),
             TextField(
               decoration: const InputDecoration(
-                hintText: 'username',
+                hintText: 'Nombre del usuario',
               ),
               controller: usernameController,
             ),
