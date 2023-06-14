@@ -1,63 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
-import 'package:gtau_app_front/screens/LoginScreen.dart';
-import 'package:flutter/widgets.dart';
+import 'package:gtau_app_front/screens/ProfileScreen.dart';
 
-class NavigationWeb extends StatelessWidget {
-  final bool isLoggedIn;
-
-  NavigationWeb({required this.isLoggedIn});
+class BottomNavigation extends StatefulWidget {
+  const BottomNavigation({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Navigator(
-      pages: [
-        if (isLoggedIn) ...[
-          MaterialPage(child: HomeScreen(), key: ValueKey('home')),
-          //MaterialPage(child: TaskCreationPage(), key: ValueKey('create-task')),
-          // Otras rutas aquí
-          RedirectPage(path: '*', redirectTo: '/home'),
-        ] else ...[
-          RedirectPage(path: '*', redirectTo: '/login'),
-        ],
-        MaterialPage(child: LoginScreen(), key: ValueKey('login')),
-        MaterialPage(child: NotFoundPage(), key: ValueKey('not-found')),
-      ],
-      onPopPage: (route, result) {
-        if (!route.didPop(result)) {
-          return false;
-        }
-
-        // Handle pop logic here
-
-        return true;
-      },
-    );
-  }
+  State<BottomNavigation> createState() => _BottomNavigationState();
 }
 
-class RedirectPage extends Page {
-  final String redirectTo;
+class _BottomNavigationState extends State<BottomNavigation> {
+  int myCurrentIndex = 0;
 
-  RedirectPage({required String path, required this.redirectTo})
-      : super(key: ValueKey(path));
+  List screens = [HomeScreen(), ProfileScreen(), ProfileScreen()];
 
-  @override
-  Route createRoute(BuildContext context) {
-    return MaterialPageRoute(
-      settings: this,
-      builder: (BuildContext context) => Container(),
-    );
-  }
-}
-
-class NotFoundPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text('NOT FOUND'),
-      ),
-    );
+        bottomNavigationBar: BottomNavigationBar(
+            currentIndex: myCurrentIndex,
+            onTap: (value) {
+              setState(() {
+                myCurrentIndex = value;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Inicio',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.search),
+                label: 'Buscar',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Perfil',
+              )
+            ]),
+        body: screens[myCurrentIndex]);
   }
 }

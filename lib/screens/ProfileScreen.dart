@@ -5,14 +5,7 @@ import 'package:provider/provider.dart';
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    final appContextProvider = Provider.of<AppContextProvider>(context);
-    final bool isLoggedIn = appContextProvider.appContext.isLoggedIn;
-    final void Function(bool) setIsLoggedIn = appContextProvider.setIsLoggedIn;
-
-    void handleLogOutPress() {
-      setIsLoggedIn(false);
-    }
+    void handleLogOutPress() {}
 
     return Scaffold(
       body: SafeArea(
@@ -20,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 32,
               backgroundImage: NetworkImage(
                   'https://randomuser.me/api/portraits/men/36.jpg'),
@@ -29,7 +22,7 @@ class ProfileScreen extends StatelessWidget {
               'Operario123',
               style: Theme.of(context).textTheme.headline3,
             ),
-            Divider(
+            const Divider(
               color: Colors.grey,
               thickness: 1,
               indent: 20,
