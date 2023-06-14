@@ -30,8 +30,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 label: 'Inicio',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.search),
-                label: 'Buscar',
+                icon: Icon(Icons.add),
+                label: 'Registrar',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),

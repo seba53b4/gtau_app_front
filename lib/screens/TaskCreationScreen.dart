@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class TaskCreationScreen extends StatefulWidget {
@@ -67,8 +68,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 36.0),
-              const Text(
-                'CreateTaskPage_title',
+              Text(
+                AppLocalizations.of(context)!.createTaskPage_title,
                 style: TextStyle(fontSize: 32.0),
               ),
               const SizedBox(height: 20.0),

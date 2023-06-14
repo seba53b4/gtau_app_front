@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/widgets/tas_list_item.dart';
+import 'package:gtau_app_front/widgets/task_list_item.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
