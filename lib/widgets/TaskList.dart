@@ -3,22 +3,23 @@ import 'package:gtau_app_front/widgets/tas_list_item.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class TaskList extends StatefulWidget {
+  const TaskList({super.key});
+
   @override
   _TaskListComponentState createState() => _TaskListComponentState();
 }
 
 class _TaskListComponentState extends State<TaskList> {
   List<Map<String, String>> tasks = [];
-  TextEditingController _searchController = TextEditingController();
- 
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
+
   String search = '';
   @override
   void initState() {
@@ -31,7 +32,8 @@ class _TaskListComponentState extends State<TaskList> {
       final response = await http.get(Uri.parse('http://localhost:3000/tasks'));
       final data = json.decode(response.body);
       setState(() {
-        tasks = List<Map<String, String>>.from(data);
+        tasks = List<Map<String, String>>.from(
+            data.map((item) => Map<String, String>.from(item)));
       });
     } catch (error) {
       // Handle error
@@ -66,14 +68,12 @@ class _TaskListComponentState extends State<TaskList> {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Container(
-      margin: EdgeInsets.only(bottom: 132),
+      margin: const EdgeInsets.only(bottom: 132),
       child: Column(
         children: [
           TextField(
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'PlaceHolder',
             ),
             onChanged: updateSearch,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/providers/app_context.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     void handleLogOutPress() {}
@@ -20,7 +21,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             Text(
               'Operario123',
-              style: Theme.of(context).textTheme.headline3,
+              style: Theme.of(context).textTheme.displaySmall,
             ),
             const Divider(
               color: Colors.grey,
@@ -29,12 +30,12 @@ class ProfileScreen extends StatelessWidget {
               endIndent: 20,
             ),
             Container(
-              margin: EdgeInsets.symmetric(vertical: 10),
+              margin: const EdgeInsets.symmetric(vertical: 10),
               width: 200,
               child: ElevatedButton(
                 onPressed: handleLogOutPress,
                 style: ElevatedButton.styleFrom(
-                  primary: Color.fromRGBO(78, 116, 289, 1),
+                  backgroundColor: const Color.fromRGBO(78, 116, 289, 1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(3),
                   ),

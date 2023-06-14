@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
+import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 
 class NavigationWeb extends StatefulWidget {
   const NavigationWeb({super.key});
@@ -12,7 +13,13 @@ class NavigationWeb extends StatefulWidget {
 class _NavigationWeb extends State<NavigationWeb> {
   int myCurrentIndex = 0;
 
-  List screens = [HomeScreen(), ProfileScreen(), ProfileScreen()];
+  List screens = [
+    const HomeScreen(),
+    TaskCreationScreen(
+      type: '',
+    ),
+    const ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -20,21 +27,21 @@ class _NavigationWeb extends State<NavigationWeb> {
         body: Row(
       children: [
         NavigationRail(
-          destinations: [
+          destinations: const [
             NavigationRailDestination(
               icon: Icon(Icons.home),
               label: Text('Inicio'),
             ),
             NavigationRailDestination(
-              icon: Icon(Icons.search),
-              label: Text('Buscar'),
+              icon: Icon(Icons.add),
+              label: Text('Agregar tareas'),
             ),
             NavigationRailDestination(
               icon: Icon(Icons.person),
               label: Text('Perfil'),
             ),
           ],
-          selectedIndex: 0, // Índice seleccionado inicialmente
+          selectedIndex: myCurrentIndex, // Índice seleccionado inicialmente
           onDestinationSelected: (int index) {
             setState(() {
               myCurrentIndex = index;
