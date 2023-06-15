@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/models/user_state.dart';
 import 'package:gtau_app_front/navigation/navigation.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
+import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 
 class LoginScreen extends StatelessWidget {
@@ -16,6 +19,13 @@ class LoginScreen extends StatelessWidget {
       print('Username and/or password fields are empty');
     } else {
       print('Logging in $username');
+
+      final userStateProvider = Provider.of<UserProvider>(context, listen: false);
+      userStateProvider.updateUserState(UserState(
+        username: username,
+        isLoggedIn: true,
+        jwt: 'jwt-here',
+      ));
 
       if (kIsWeb) {
         Navigator.pushReplacement(

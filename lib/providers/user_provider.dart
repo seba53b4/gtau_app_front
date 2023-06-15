@@ -1,0 +1,18 @@
+import 'package:flutter/foundation.dart';
+import '../models/user_state.dart';
+
+class UserProvider with ChangeNotifier {
+  UserState? _userState;
+
+  UserState? get userState => _userState;
+
+  void updateUserState(UserState userState) {
+    _userState = userState;
+    notifyListeners();
+  }
+
+  void logout(){
+    _userState?.reset();
+    notifyListeners();
+  }
+}
