@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:gtau_app_front/providers/app_context.dart';
+import 'package:gtau_app_front/navigation/navigation.dart';
+import 'package:gtau_app_front/navigation/navigation_web.dart';
 
 
 class LoginScreen extends StatelessWidget {
@@ -15,8 +16,18 @@ class LoginScreen extends StatelessWidget {
       print('Username and/or password fields are empty');
     } else {
       print('Logging in $username');
-      final appContextProvider = Provider.of<AppContextProvider>(context, listen: false);
-      appContextProvider.setIsLoggedIn(true);
+
+      if (kIsWeb) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const NavigationWeb()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const BottomNavigation()),
+        );
+      }
     }
   }
 
@@ -30,9 +41,6 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final appContextProvider = Provider.of<AppContextProvider>(context);
-    final appContext = appContextProvider.appContext;
 
     return Scaffold(
       body: Container(

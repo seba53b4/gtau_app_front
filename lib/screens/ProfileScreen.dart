@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -6,7 +7,12 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void handleLogOutPress() {}
+    void handleLogOutPress() {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(

@@ -4,6 +4,7 @@ import 'package:gtau_app_front/navigation/navigation.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/screens/LoginScreen.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,17 +13,12 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      // Navegación para web
-      return const MaterialApp(
+      return MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: NavigationWeb());
-    } else {
-      // Navegación para mobile
-      return const MaterialApp(
-        home: BottomNavigation(),
+          home: LoginScreen()
       );
     }
-  }
 }
+
+
