@@ -80,17 +80,17 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     selectedIndex = index;
                   });
                 },
-                children: const [
-                  Text('CreateTaskPage_scheduled'),
-                  Text('CreateTaskPage_inspection'),
+                children: [
+                  Text(AppLocalizations.of(context)!.createTaskPage_scheduled),
+                  Text(AppLocalizations.of(context)!.createTaskPage_inspection),
                 ],
               ),
               const SizedBox(height: 20.0),
               if (selectedIndex == 1)
                 Column(
                   children: [
-                    const Text(
-                      'CreateTaskPage_numberWorkTitle',
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_numberWorkTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -99,8 +99,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'CreateTaskPage_startDateTitle',
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_startDateTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     InkWell(
@@ -128,8 +128,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ),
                     ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'CreateTaskPage_selectUbicationTitle',
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_selectUbicationTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     SizedBox(
@@ -152,8 +152,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         ],
                       ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'CreateTaskPage_assignedUserTitle',
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_assignedUserTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     DropdownButton<String>(
@@ -184,7 +184,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     SizedBox(height: 10.0),
                     Text(
-                      'CreateTaskPage_orderServiceNumberTitle',
+                      AppLocalizations.of(context)!.createTaskPage_orderServiceNumberTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -197,13 +197,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       },
                     ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'CreateTaskPage_solicitantTitle',
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_solicitantTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
-                      decoration: const InputDecoration(
-                        hintText: 'default_placeHolderInputText',
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (value) {
@@ -213,14 +213,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       },
                     ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'CreateTaskPage_contactTitle',
+                    Text(
+                    AppLocalizations.of(context)!.createTaskPage_contactTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
-                      decoration: const InputDecoration(
-                        hintText: 'default_placeHolderInputText',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -233,13 +233,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               if (selectedIndex == 0)
                 Column(
                   children: [
-                    const Text(
-                      'CreateTaskPage_scheduled',
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_scheduled,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
-                      decoration: const InputDecoration(
-                        hintText: 'default_placeHolderInputText',
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (value) {
@@ -251,14 +251,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   ],
                 ),
               const SizedBox(height: 10.0),
-              const Text(
-                'default_descriptionTitle',
+              Text(
+                AppLocalizations.of(context)!.default_descriptionTitle,
                 style: TextStyle(fontSize: 24.0),
               ),
               TextFormField(
-                decoration: const InputDecoration(
-                  hintText: 'default_descriptionPlaceholder',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.default_descriptionPlaceholder,
+                  border: const OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -269,7 +269,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: handleSubmit,
-                child: const Text('CreateTaskPage_submitButton'),
+                child: Text(AppLocalizations.of(context)!.createTaskPage_submitButton),
               ),
             ],
           ),
