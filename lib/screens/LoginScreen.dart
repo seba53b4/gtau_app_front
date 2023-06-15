@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/models/user_state.dart';
+import 'package:gtau_app_front/navigation/navigation.dart';
+import 'package:gtau_app_front/navigation/navigation_web.dart';
+import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:gtau_app_front/providers/app_context.dart';
 
 
 class LoginScreen extends StatelessWidget {
@@ -15,8 +19,25 @@ class LoginScreen extends StatelessWidget {
       print('Username and/or password fields are empty');
     } else {
       print('Logging in $username');
-      final appContextProvider = Provider.of<AppContextProvider>(context, listen: false);
-      appContextProvider.setIsLoggedIn(true);
+
+      final userStateProvider = Provider.of<UserProvider>(context, listen: false);
+      userStateProvider.updateUserState(UserState(
+        username: username,
+        isLoggedIn: true,
+        jwt: 'jwt-here',
+      ));
+
+      if (kIsWeb) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const NavigationWeb()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const BottomNavigation()),
+        );
+      }
     }
   }
 
@@ -31,9 +52,6 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final appContextProvider = Provider.of<AppContextProvider>(context);
-    final appContext = appContextProvider.appContext;
-
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(16.0),
@@ -41,10 +59,10 @@ class LoginScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('holis'),
+            const Text('PipeTracker'),
             TextField(
               decoration: const InputDecoration(
-                hintText: 'username',
+                hintText: 'Nombre del usuario',
               ),
               controller: usernameController,
             ),
