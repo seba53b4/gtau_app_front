@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 
 class LoginScreen extends StatelessWidget {
@@ -20,10 +22,10 @@ class LoginScreen extends StatelessWidget {
   Future<bool> fetchAuth(String username, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8083/auth/realms/gtau/protocol/openid-connect/token'),
+        Uri.parse(dotenv.get('API_AUTH', fallback: 'NOT_FOUND')),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic Z3RhdS1jbGllbnQ6JDdXZE43Qk54MmFkSkV5Mjg1d0oyNSMm',
+          'Authorization': "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
         },
         body: {
           'grant_type': 'password',
@@ -90,6 +92,7 @@ class LoginScreen extends StatelessWidget {
       setUserData(context, isLoggedIn, username, jwt);
       goToNav(context);
     }
+    //goToNav(context);
   }
 
   void onForgotPressed() {
