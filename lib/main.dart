@@ -13,7 +13,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<UserProvider>(
-          create: (_) => UserProvider(),
+          create: (context) => UserProvider(),
         ),
       ],
       child: MyApp(),

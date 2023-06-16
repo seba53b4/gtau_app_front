@@ -11,6 +11,8 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool? get isUserDataEmpty => _userState?.isUserDataEmpty;
+
   void logout(){
     _userState?.reset();
     notifyListeners();
