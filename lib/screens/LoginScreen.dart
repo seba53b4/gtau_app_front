@@ -92,7 +92,6 @@ class LoginScreen extends StatelessWidget {
       setUserData(context, isLoggedIn, username, jwt);
       goToNav(context);
     }
-    //goToNav(context);
   }
 
   void onForgotPressed() {
