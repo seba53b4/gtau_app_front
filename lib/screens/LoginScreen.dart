@@ -7,6 +7,7 @@ import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 
 
 class LoginScreen extends StatelessWidget {
@@ -15,27 +16,6 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   late String jwt = '';
-
-  Future<bool> fetchAuthMock(String username, String password) async {
-    try {
-      final response = await http.get(Uri.parse('http://localhost:3000/users'));
-      final data = json.decode(response.body);
-
-      if (data is List) {
-        for (var user in data) {
-          if (user['username'] == username && user['password'] == password) {
-            print('Usuario y contraseña válidos');
-            return true;
-          }
-        }
-      }
-      print('contraseña incorrecta');
-      return false;
-    } catch (error) {
-      print(error);
-      throw Exception('Error al obtener los datos');
-    }
-  }
 
   Future<bool> fetchAuth(String username, String password) async {
     try {
@@ -56,13 +36,18 @@ class LoginScreen extends StatelessWidget {
       final data = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        // La solicitud fue exitosa
         print('Usuario y contraseña válidos');
-        jwt = data.jwt;
+        jwt = data['access_token'];
         return true;
       } else {
-        // La solicitud no fue exitosa
         print('Contraseña incorrecta');
+        Fluttertoast.showToast(
+          msg: "Usuario y/o contraseña incorrectos",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.grey,
+          textColor: Colors.white,
+        );
         return false;
       }
     } catch (error) {
@@ -100,7 +85,7 @@ class LoginScreen extends StatelessWidget {
     final String username = usernameController.text;
     final String password = passwordController.text;
 
-    bool isLoggedIn = await fetchAuthMock(username, password);
+    bool isLoggedIn = await fetchAuth(username, password);
     if (context.mounted && isLoggedIn) {
       setUserData(context, isLoggedIn, username, jwt);
       goToNav(context);
