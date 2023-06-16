@@ -21,5 +21,9 @@ class UserState {
     isLoggedIn = false;
     jwt = null;
   }
+
+  bool get isUserDataEmpty {
+    return username == null && isLoggedIn == false && jwt == null;
+  }
 }
 
