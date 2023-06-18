@@ -58,13 +58,14 @@ class LoginScreen extends StatelessWidget {
     }
   }
 
-  void setUserData(BuildContext context, bool isLoggedIn, String username, String jwt) {
+  void setUserData(BuildContext context, bool isLoggedIn, String username, String jwt, bool isAdmin) {
     if (isLoggedIn) {
       final userStateProvider = context.read<UserProvider>();
       userStateProvider.updateUserState(UserState(
         username: username,
         isLoggedIn: true,
         jwt: jwt,
+        isAdmin: isAdmin
       ));
     }
   }
@@ -89,9 +90,10 @@ class LoginScreen extends StatelessWidget {
 
     bool isLoggedIn = await fetchAuth(username, password);
     if (context.mounted && isLoggedIn) {
-      setUserData(context, isLoggedIn, username, jwt);
+      setUserData(context, isLoggedIn, username, jwt, username == 'gtau-admin' ? true: false);
       goToNav(context);
     }
+    //goToNav(context);
   }
 
   void onForgotPressed() {

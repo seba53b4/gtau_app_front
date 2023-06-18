@@ -36,12 +36,11 @@
     // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = null;
   </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=TU_CLAVE_DE_API"></script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
-  <script>
+<script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
@@ -54,6 +53,16 @@
           });
         }
       });
+    });
+
+    // Loading GOOGLE_API_KEY from dotenv property
+    document.addEventListener("google-maps-api-key-loaded", function (e){
+      var googleapis = e.detail.GOOGLE_API_KEY;
+      var script = document.createElement('script');
+      script.src = "https://maps.googleapis.com/maps/api/js?key=" + googleapis + "&callback=initMap";
+      script.defer = true;
+      script.async = true;
+      document.head.appendChild(script);
     });
   </script>
 </body>
