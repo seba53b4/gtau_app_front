@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
+import 'package:provider/provider.dart';
 
 class NavigationWeb extends StatefulWidget {
   const NavigationWeb({super.key});
@@ -15,32 +17,56 @@ class _NavigationWeb extends State<NavigationWeb> {
 
   List screens = [
     const HomeScreen(),
-    TaskCreationScreen(
-      type: '',
-    ),
     const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
+
+    final userStateProvider = Provider.of<UserProvider>(context, listen: false);
+    late List<NavigationRailDestination> optionsNav;
+    if (userStateProvider.isAdmin!) {
+      optionsNav = [
+        const NavigationRailDestination(
+          icon: Icon(Icons.home),
+          label: Text('Inicio'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.add),
+          label: Text('Agregar tareas'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.person),
+          label: Text('Perfil'),
+        ),
+      ];
+      screens = [
+        const HomeScreen(),
+        TaskCreationScreen(
+          type: '',
+        ),
+        const ProfileScreen(),
+      ];
+    } else {
+      optionsNav = [
+        const NavigationRailDestination(
+          icon: Icon(Icons.home),
+          label: Text('Inicio'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.person),
+          label: Text('Perfil'),
+        ),
+      ];
+
+
+    }
+
     return Scaffold(
         body: Row(
       children: [
         NavigationRail(
-          destinations: const [
-            NavigationRailDestination(
-              icon: Icon(Icons.home),
-              label: Text('Inicio'),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.add),
-              label: Text('Agregar tareas'),
-            ),
-            NavigationRailDestination(
-              icon: Icon(Icons.person),
-              label: Text('Perfil'),
-            ),
-          ],
+          destinations: optionsNav,
           selectedIndex: myCurrentIndex, // Índice seleccionado inicialmente
           onDestinationSelected: (int index) {
             setState(() {

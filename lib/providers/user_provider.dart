@@ -17,4 +17,7 @@ class UserProvider with ChangeNotifier {
     _userState?.reset();
     notifyListeners();
   }
+  bool? get getIsLoggedIn => _userState?.getIsLoggedIn;
+
+  bool? get isAdmin => _userState?.isAdmin;
 }
