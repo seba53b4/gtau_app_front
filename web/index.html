@@ -54,8 +54,8 @@
         }
       });
     });
-  </script>
-  <script>
+
+    // Loading GOOGLE_API_KEY from dotenv property
     document.addEventListener("google-maps-api-key-loaded", function (e){
       var googleapis = e.detail.GOOGLE_API_KEY;
       var script = document.createElement('script');
