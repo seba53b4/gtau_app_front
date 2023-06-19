@@ -85,8 +85,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<void> onLogInPressed(BuildContext context) async {
-    final String username = usernameController.text;
-    final String password = passwordController.text;
+    final String username = "gtau-oper";//usernameController.text;
+    final String password = "123";//passwordController.text;
 
     bool isLoggedIn = await fetchAuth(username, password);
     if (context.mounted && isLoggedIn) {
