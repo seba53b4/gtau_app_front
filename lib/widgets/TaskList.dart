@@ -20,7 +20,7 @@ class TaskList extends StatefulWidget {
 class _TaskListComponentState extends State<TaskList> {
   List<Task> tasks = [];
   int page = 0;
-  int size = 2;
+  int size = 10;
 
   final TextEditingController _searchController = TextEditingController();
 

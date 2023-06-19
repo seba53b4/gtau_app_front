@@ -85,15 +85,14 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<void> onLogInPressed(BuildContext context) async {
-    final String username = "gtau-oper";//usernameController.text;
-    final String password = "123";//passwordController.text;
+    final String username = usernameController.text;
+    final String password = passwordController.text;
 
     bool isLoggedIn = await fetchAuth(username, password);
     if (context.mounted && isLoggedIn) {
       setUserData(context, isLoggedIn, username, jwt, username == 'gtau-admin' ? true: false);
       goToNav(context);
     }
-    //goToNav(context);
   }
 
   void onForgotPressed() {
