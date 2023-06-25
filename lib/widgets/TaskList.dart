@@ -40,7 +40,7 @@ class _TaskListComponentState extends State<TaskList> {
 
   void changeValue() {
     setState(() {
-      page += 1; // Cambiar el valor de la variable
+      page += 1;
     });
   }
 
@@ -59,13 +59,13 @@ class _TaskListComponentState extends State<TaskList> {
           headers: {'Content-Type': 'application/json', 'Authorization': "BEARER $token"});
 
       if (response.statusCode == 200) {
-        print('Se obtuvieron tareas ${widget.status}');
         final data = json.decode(response.body);
         final content = data['content'];
 
         tasks = content.map<Task>((taskData) {
           return Task(
             id: taskData['id'],
+            status: taskData['status'],
             inspectionType: taskData['inspectionType'],
             workNumber: taskData['workNumber'],
             addDate: DateTime.parse(taskData['addDate']),
@@ -89,7 +89,7 @@ class _TaskListComponentState extends State<TaskList> {
       } else {
         print('No se pudieron traer datos ${widget.status}');
         Fluttertoast.showToast(
-          msg: "Usuario y/o contraseña incorrectos",
+          msg: "No se pudieron obtener datos",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.CENTER,
           backgroundColor: Colors.grey,
@@ -111,9 +111,7 @@ class _TaskListComponentState extends State<TaskList> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
 
-    int paginated = 0;
     return Container(
       margin: const EdgeInsets.only(bottom: 132),
       child: Column(

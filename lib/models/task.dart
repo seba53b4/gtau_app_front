@@ -1,6 +1,7 @@
 
 class Task {
   late int? id;
+  late String? status;
   late String? inspectionType;
   late String? workNumber;
   late DateTime? addDate;
@@ -16,6 +17,9 @@ class Task {
 
   int? get getId => id;
   set setId(int? value) => id = value;
+
+  int? get getStatus => id;
+  set setStatus(int? value) => id = value;
 
   String? get getInspectionType => inspectionType;
   set setInspectionType(String? value) => inspectionType = value;
@@ -55,6 +59,7 @@ class Task {
 
   Task({
     required this.id,
+    required this.status,
     required this.inspectionType,
     required this.workNumber,
     required this.addDate,
