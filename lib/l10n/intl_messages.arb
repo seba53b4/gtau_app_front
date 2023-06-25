@@ -3,6 +3,7 @@
     "greeting": "¡Hola mundo!",
     "searchPlaceHolder": "Ingrese su búsqueda...",
     "createTaskPage_title" : "Creación de tarea",
+    "createTaskPage_titleOnEdit": "Editar tarea",
     "createTaskPage_scheduled" : "Programada",
     "createTaskPage_inspection" : "Inspección",
     "createTaskPage_submitButton": "Agregar",
@@ -21,5 +22,10 @@
     "passwordPlaceholder": "Password",
     "loginButton": "Log In",
     "frgtPasswordButton": "Forgot Password?",
-    "clkHere": "Click Here"
+    "clkHere": "Click Here",
+    "dialogWarning": "Advertencia",
+    "dialogAcceptButton": "Aceptar",
+    "dialogCancelButton": "Cancelar",
+    "dialogContent": "¿Está seguro de realizar esta acción?"
+
 }

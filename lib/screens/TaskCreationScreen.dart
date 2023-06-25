@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import '../models/task.dart';
+import '../widgets/common/customDialog.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -22,7 +24,6 @@ class TaskCreationScreen extends StatefulWidget {
 
 class _TaskCreationScreenState extends State<TaskCreationScreen> {
   late Task task;
-  final inputName = TextEditingController();
   late DateTime startDate;
   late DateTime releasedDate;
   int selectedIndex = 0;
@@ -44,6 +45,23 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   String numOrder = "";
 
+  void reset(){
+    descriptionController.text = '';
+    numWorkController.text = '';
+    locationController.text = '';
+    scheduledNumberController.text = '';
+    contactController.text = '';
+    applicantController.text = '';
+    userAssignedController.text = '';
+    lengthController.text = '';
+    materialController.text = '';
+    observationsController.text = '';
+    conclusionsController.text = '';
+    addDateController.text = '';
+    releasedDateController.text = '';
+    userAssigned = "not-assigned";
+
+  }
 
   Future<bool> fetchTask() async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
@@ -75,26 +93,76 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           );
 
            numWorkController.text = task.workNumber!;
-           inputName.text = "HOlis";
            descriptionController.text = task.description!;
            applicantController.text = task.applicant!;
            locationController.text = task.location!;
            userAssignedController.text = task.user!;
-           lengthController.text = task.length!;
-           materialController.text = task.material!;
-           conclusionsController.text = task.conclusions!;
-           observationsController.text = task.observations!;
+           lengthController.text = task.length ?? '';
+           materialController.text = task.material ?? '';
+           conclusionsController.text = task.conclusions ?? '';
+           observationsController.text = task.observations ?? '';
            startDate = task.addDate!;
            if (task.releasedDate != null) {
+             releasedDate = task.releasedDate!;
              releasedDateController.text = DateFormat(formatDate).format(task.releasedDate!).toString();
            }
            addDateController.text = DateFormat(formatDate).format(task.addDate!).toString();
 
         });
-
+        showCustomMessageDialog(
+            context: context,
+            messageType: DialogMessageType.success,
+            onAcceptPressed: (){
+            }
+        );
         return true;
       } else {
         print('No se pudieron traer datos}');
+        showCustomMessageDialog(
+            context: context,
+            messageType: DialogMessageType.error,
+            onAcceptPressed: (){
+            }
+        );
+        return false;
+      }
+    } catch (error) {
+      print(error);
+      throw Exception('Error al obtener los datos');
+    }
+  }
+
+  Future<bool> createTask(Map<String, dynamic> body)  async {
+    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+
+    try {
+      final baseUrl = Uri.parse(dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND'));
+      final String jsonBody = jsonEncode(body);
+
+      final response = await http.post(
+          baseUrl,
+          headers: {'Content-Type': 'application/json', 'Authorization': "BEARER $token"},
+          body: jsonBody
+      );
+
+      if (response.statusCode == 201) {
+        print('Tarea ha sido creada correctamente');
+        showCustomMessageDialog(
+            context: context,
+            messageType: DialogMessageType.success,
+            onAcceptPressed: (){
+            }
+        );
+        return true;
+      } else {
+        print(response.body);
+        showCustomMessageDialog(
+            context: context,
+            messageType: DialogMessageType.error,
+            onAcceptPressed: (){
+            }
+        );
+        print('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
@@ -105,7 +173,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<bool> updateTask(Map<String, dynamic> body)  async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
-
 
     try {
       final baseUrl = dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND');
@@ -121,10 +188,22 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
       if (response.statusCode == 200) {
         print('Tarea ha sido actualizada correctamente');
+        showCustomMessageDialog(
+          context: context,
+          messageType: DialogMessageType.success,
+          onAcceptPressed: (){
+          }
+        );
         return true;
       } else {
         print(response.body);
         print('No se pudieron traer datos');
+        showCustomMessageDialog(
+            context: context,
+            messageType: DialogMessageType.error,
+            onAcceptPressed: (){
+            }
+        );
         return false;
       }
     } catch (error) {
@@ -144,15 +223,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
 
-
-
   Future<void> initializeTask() async {
     await fetchTask();
   }
 
   @override
   void dispose() {
-    inputName.dispose();
     descriptionController.dispose();
     numWorkController.dispose();
     locationController.dispose();
@@ -185,23 +261,55 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     setState(() {
       startDate = date;
     });
+    addDateController.text = DateFormat(formatDate).format(date);
+  }
+
+  void handleReleasedDateChange(DateTime dateReleased){
+    setState(() {
+      releasedDate = dateReleased;
+    });
+    releasedDateController.text = DateFormat(formatDate).format(dateReleased);
   }
 
   void handleSubmit() {
     if (selectedIndex == 1) {
-      print('Nro Trabajo: ${numWorkController.text}' +
-          'Fecha Ingreso: ${DateFormat(formatDate).format(startDate)}' +
-          'Ubicacion: ${locationController.text}' +
-          'Usuario asignado: $userAssigned' +
-          'Orden Servicio: $numOrder ' +
-          'Solicitante: ${applicantController.text} ');
+      showCustomDialog(
+        context: context,
+        title: AppLocalizations.of(context)!.dialogWarning,
+        content: AppLocalizations.of(context)!.dialogContent,
+        onDisablePressed: () {
+          Navigator.of(context).pop();
+        },
+        onEnablePressed: () {
+          handleAcceptOnShowDialogCreateTask();
+          Navigator.of(context).pop();
+        },
+        acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+        cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+      );
+
     } else {
       print('Programada: ${scheduledNumberController.text} Descripcion: ${descriptionController.text}');
     }
   }
 
-  Map<String, dynamic> createBodyToUpdate(){
+  Map<String, dynamic> createBodyToCreate(){
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    final Map<String, dynamic> requestBody = {
+      "status": "PENDING",
+      "inspectionType": "inspectionType Default",
+      "workNumber": numWorkController.text,
+      "addDate": addDateUpdated,
+      "applicant": applicantController.text,
+      "location": locationController.text,
+      "description": descriptionController.text,
+      "user": userAssigned,
+    };
+    return requestBody;
+  }
+
+  Map<String, dynamic> createBodyToUpdate(){
+     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
      final Map<String, dynamic> requestBody = {
       "status": task.status,
       "inspectionType": task.inspectionType,
@@ -210,32 +318,49 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "applicant": applicantController.text,
       "location": locationController.text,
       "description": descriptionController.text,
-      "releasedDate": task.releasedDate == null ? null : formattedDateToUpdate(addDateController.text),
+      "releasedDate": formattedDateToUpdate(releasedDateController.text),
       "user": userAssignedController.text,
       "length": lengthController.text,
       "material": materialController.text,
       "observations": observationsController.text,
       "conclusions": conclusionsController.text
-      // "status": "DOING",
-      // "inspectionType": "Inspection Type 5",
-      // "workNumber": "Work Number 5",
-      // "addDate": "2023-06-13T00:00:00.000+00:00",
-      // "applicant": "Applicant 13",
-      // "location": "Location 13",
-      // "description": "Description 13",
-      // "releasedDate": null,
-      // "user": "gtau-oper",
-      // "length": "Length 13",
-      // "material": "Material 13",
-      // "observations": "Observations 13",
-      // "conclusions": "Conclusions 13"
     };
      return requestBody;
   }
 
-  void handleEditTask () async {
+  void handleAcceptOnShowDialogEditTask () async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
-    await updateTask(requestBody);
+    bool isUpdated = await updateTask(requestBody);
+    if (isUpdated) {
+      reset();
+    }
+  }
+
+
+  void handleAcceptOnShowDialogCreateTask () async {
+    Map<String, dynamic> requestBody = createBodyToCreate();
+    bool isUpdated = await createTask(requestBody);
+    if (isUpdated) {
+      reset();
+    }
+  }
+
+  void handleEditTask () {
+    showCustomDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.dialogWarning,
+      content: AppLocalizations.of(context)!.dialogContent,
+      onDisablePressed: () {
+        Navigator.of(context).pop();
+      },
+      onEnablePressed: () {
+        handleAcceptOnShowDialogEditTask();
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
   }
 
   void handleCancel() {
@@ -253,7 +378,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
             children: [
               const SizedBox(height: 36.0),
               Text(
-                widget.detail ? "Editar Tarea" : AppLocalizations.of(context)!.createTaskPage_title,
+                widget.detail ? AppLocalizations.of(context)!.createTaskPage_titleOnEdit : AppLocalizations.of(context)!.createTaskPage_title,
                 style: TextStyle(fontSize: 32.0),
               ),
               const SizedBox(height: 20.0),
@@ -321,10 +446,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     if (widget.detail)
                     const SizedBox(height: 10.0),
+                    if (widget.detail)
                     Text(
                       'Fecha de Realización',
                       style: TextStyle(fontSize: 24.0),
                     ),
+                    if (widget.detail)
                     InkWell(
                       onTap: () async {
                         final DateTime? pickedDate = await showDatePicker(
@@ -334,7 +461,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           lastDate: DateTime(2100),
                         );
                         if (pickedDate != null) {
-                          handleStartDateChange(pickedDate);
+                          handleReleasedDateChange(pickedDate);
                         }
                       },
                       child: IgnorePointer(
@@ -380,8 +507,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           child: Text('Elija una opción'),
                         ),
                         DropdownMenuItem<String>(
-                          value: 'operario1',
-                          child: Text('Operario A'),
+                          value: 'gtau-oper',
+                          child: Text('gtau-oper'),
                         ),
                         DropdownMenuItem<String>(
                           value: 'operario2',
