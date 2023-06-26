@@ -1,6 +1,9 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
@@ -28,6 +31,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   late DateTime releasedDate;
   int selectedIndex = 0;
   String userAssigned = "not-assigned";
+  late String taskStatus = 'PENDING';
   final descriptionController = TextEditingController();
   final numWorkController = TextEditingController();
   final locationController = TextEditingController();
@@ -59,7 +63,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     conclusionsController.text = '';
     addDateController.text = '';
     releasedDateController.text = '';
-    userAssigned = "not-assigned";
+    setState(() {
+      userAssigned = "not-assigned";
+    });
 
   }
 
@@ -102,6 +108,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
            conclusionsController.text = task.conclusions ?? '';
            observationsController.text = task.observations ?? '';
            startDate = task.addDate!;
+           taskStatus = task.status!;
            if (task.releasedDate != null) {
              releasedDate = task.releasedDate!;
              releasedDateController.text = DateFormat(formatDate).format(task.releasedDate!).toString();
@@ -109,21 +116,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
            addDateController.text = DateFormat(formatDate).format(task.addDate!).toString();
 
         });
-        showCustomMessageDialog(
-            context: context,
-            messageType: DialogMessageType.success,
-            onAcceptPressed: (){
-            }
-        );
         return true;
       } else {
         print('No se pudieron traer datos}');
-        showCustomMessageDialog(
-            context: context,
-            messageType: DialogMessageType.error,
-            onAcceptPressed: (){
-            }
-        );
         return false;
       }
     } catch (error) {
@@ -147,21 +142,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
       if (response.statusCode == 201) {
         print('Tarea ha sido creada correctamente');
-        showCustomMessageDialog(
-            context: context,
-            messageType: DialogMessageType.success,
-            onAcceptPressed: (){
-            }
-        );
+        showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         print(response.body);
-        showCustomMessageDialog(
-            context: context,
-            messageType: DialogMessageType.error,
-            onAcceptPressed: (){
-            }
-        );
+        showMessageDialog(DialogMessageType.error);
         print('No se pudieron traer datos');
         return false;
       }
@@ -188,28 +173,27 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
       if (response.statusCode == 200) {
         print('Tarea ha sido actualizada correctamente');
-        showCustomMessageDialog(
-          context: context,
-          messageType: DialogMessageType.success,
-          onAcceptPressed: (){
-          }
-        );
+        showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         print(response.body);
         print('No se pudieron traer datos');
-        showCustomMessageDialog(
-            context: context,
-            messageType: DialogMessageType.error,
-            onAcceptPressed: (){
-            }
-        );
+        showMessageDialog(DialogMessageType.error);
         return false;
       }
     } catch (error) {
       print(error);
       throw Exception('Error al obtener los datos');
     }
+  }
+
+  void showMessageDialog(DialogMessageType type){
+    showCustomMessageDialog(
+        context: context,
+        messageType: type,
+        onAcceptPressed: (){
+        }
+    );
   }
 
   String formattedDateToUpdate(String dateString){
@@ -311,14 +295,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   Map<String, dynamic> createBodyToUpdate(){
      late String addDateUpdated = formattedDateToUpdate(addDateController.text);
      final Map<String, dynamic> requestBody = {
-      "status": task.status,
+      "status": taskStatus,
       "inspectionType": task.inspectionType,
       "workNumber": numWorkController.text,
       "addDate": addDateUpdated,
       "applicant": applicantController.text,
       "location": locationController.text,
       "description": descriptionController.text,
-      "releasedDate": formattedDateToUpdate(releasedDateController.text),
+      "releasedDate": releasedDate.isNull ? formattedDateToUpdate(releasedDateController.text): null,
       "user": userAssignedController.text,
       "length": lengthController.text,
       "material": materialController.text,
@@ -415,6 +399,27 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ),
                       controller: numWorkController,
                     ),
+                    const SizedBox(height: 10.0),
+
+                    if (widget.detail)
+                      const Text(
+                        'Estado',
+                        style: TextStyle(fontSize: 24.0),
+                      ),
+                      DropdownButton<String>(
+                        value: taskStatus,
+                        onChanged: (String? value) {
+                          setState(() {
+                            taskStatus = value!;
+                          });
+                        },
+                        items: TaskStatus.values.map((TaskStatus status) {
+                          return DropdownMenuItem<String>(
+                            value: status.value,
+                            child: Text(status.value),
+                          );
+                        }).toList(),
+                      ),
                     const SizedBox(height: 10.0),
                     Text(
                       AppLocalizations.of(context)!.createTaskPage_startDateTitle,

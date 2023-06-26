@@ -20,3 +20,18 @@ extension TaskStatusExtension on TaskStatus {
     }
   }
 }
+
+TaskStatus getTaskStatusFromString(String statusString) {
+  switch (statusString) {
+    case 'DOING':
+      return TaskStatus.Doing;
+    case 'DONE':
+      return TaskStatus.Done;
+    case 'BLOCKED':
+      return TaskStatus.Blocked;
+    case 'PENDING':
+      return TaskStatus.Pending;
+    default:
+      throw Exception('Invalid status string: $statusString');
+  }
+}
