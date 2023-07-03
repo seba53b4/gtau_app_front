@@ -58,31 +58,42 @@ class RegUserScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Crear un nuevo usuario'),
+            const SizedBox(height: 50),
+            const Text('Crear un nuevo usuario',
+             style: TextStyle(
+                  color: Color.fromARGB(255, 54, 54, 54),
+                  fontSize: 16,
+                ),
+            ),
+            const SizedBox(height: 25),
             TextField(
               decoration: const InputDecoration(
                 hintText: 'Alias/apodo del usuario',
               ),
               controller: usernameController,
             ),
+            const SizedBox(height: 10),
             TextField(
               decoration: const InputDecoration(
                 hintText: 'Nombre del usuario',
               ),
               controller: firstnameController,
             ),
+            const SizedBox(height: 10),
             TextField(
               decoration: const InputDecoration(
                 hintText: 'Apellido del usuario',
               ),
               controller: lastnameController,
             ),
+            const SizedBox(height: 10),
             TextField(
               decoration: const InputDecoration(
                 hintText: 'Email del usuario',
               ),
               controller: emailController,
             ),
+            const SizedBox(height: 10),
             TextField(
               decoration: const InputDecoration(
                 hintText: 'Contraseña',
@@ -90,6 +101,7 @@ class RegUserScreen extends StatelessWidget {
               controller: passwordController,
               obscureText: true,
             ),
+            const SizedBox(height: 10),
             TextField(
               decoration: const InputDecoration(
                 hintText: 'Confirme la contraseña',
@@ -97,6 +109,7 @@ class RegUserScreen extends StatelessWidget {
               controller: passwordConfirmController,
               obscureText: true,
             ),
+            const SizedBox(height: 25),
             ElevatedButton(
               onPressed: () => onRegUserPressed(context),
               child: const Text('Siguiente'),
