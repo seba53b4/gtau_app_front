@@ -1,4 +1,3 @@
-import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,8 +26,8 @@ class TaskCreationScreen extends StatefulWidget {
 
 class _TaskCreationScreenState extends State<TaskCreationScreen> {
   late Task task;
-  late DateTime startDate;
-  late DateTime releasedDate;
+  late DateTime? startDate;
+  late DateTime? releasedDate;
   int selectedIndex = 0;
   String userAssigned = "not-assigned";
   late String taskStatus = 'PENDING';
@@ -302,7 +301,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "applicant": applicantController.text,
       "location": locationController.text,
       "description": descriptionController.text,
-      "releasedDate": releasedDate.isNull ? formattedDateToUpdate(releasedDateController.text): null,
+      "releasedDate": releasedDate == null ? formattedDateToUpdate(releasedDateController.text): null,
       "user": userAssignedController.text,
       "length": lengthController.text,
       "material": materialController.text,
@@ -429,7 +428,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       onTap: () async {
                         final DateTime? pickedDate = await showDatePicker(
                           context: context,
-                          initialDate: startDate,
+                          initialDate: startDate!,
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2100),
                         );
@@ -461,7 +460,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       onTap: () async {
                         final DateTime? pickedDate = await showDatePicker(
                           context: context,
-                          initialDate: releasedDate,
+                          initialDate: releasedDate!,
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2100),
                         );
