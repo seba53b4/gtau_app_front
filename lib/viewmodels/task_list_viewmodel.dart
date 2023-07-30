@@ -124,4 +124,20 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateTask(String token, int idTask, Map<String, dynamic> body)  async {
+
+    try {
+      final response = await _taskService.updateTask(token, idTask, body);
+      if (response.statusCode == 200) {
+        print('Tarea ha sido actualizada correctamente');
+        return true;
+      } else {
+        print('No se pudieron traer datos');
+        return false;
+      }
+    } catch (error) {
+      print(error);
+      throw Exception('Error al obtener los datos');
+    }
+  }
 }

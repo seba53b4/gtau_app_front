@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -59,6 +61,24 @@ class TaskService {
     } catch (error){
       if (kDebugMode) {
         print('Error in fetchTask: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<http.Response> updateTask(String token, int idTask, Map<String, dynamic> body) async {
+    try {
+      final url = Uri.parse('$baseUrl/$idTask');
+      final String jsonBody = jsonEncode(body);
+      final response = await http.put(
+          url,
+          headers: _getHeaders(token),
+          body: jsonBody
+      );
+      return response;
+    } catch (error){
+      if (kDebugMode) {
+        print('Error in updateTask: $error');
       }
       rethrow;
     }

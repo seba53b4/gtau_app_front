@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -19,7 +18,8 @@ class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
   bool detail = false;
   int? idTask = 0;
-  TaskCreationScreen({required this.type, this.detail = false, this.idTask = 0});
+  TaskCreationScreen(
+      {required this.type, this.detail = false, this.idTask = 0});
 
   @override
   _TaskCreationScreenState createState() => _TaskCreationScreenState();
@@ -49,7 +49,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   String numOrder = "";
 
-  void reset(){
+  void reset() {
     descriptionController.text = '';
     numWorkController.text = '';
     locationController.text = '';
@@ -66,57 +66,61 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     setState(() {
       userAssigned = "not-assigned";
     });
-
   }
 
-  Future<bool> fetchTask() async {
+  Future<bool> _fetchTask() async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
 
     try {
-      final responseTask = await taskListViewModel.fetchTask(token, widget.idTask!);
+      final responseTask =
+          await taskListViewModel.fetchTask(token, widget.idTask!);
 
-      if (responseTask != null){
+      if (responseTask != null) {
         setState(() {
           task = responseTask;
         });
       }
-       numWorkController.text = task.workNumber!;
-       descriptionController.text = task.description!;
-       applicantController.text = task.applicant!;
-       locationController.text = task.location!;
-       userAssignedController.text = task.user!;
-       lengthController.text = task.length ?? '';
-       materialController.text = task.material ?? '';
-       conclusionsController.text = task.conclusions ?? '';
-       observationsController.text = task.observations ?? '';
-       startDate = task.addDate!;
-       taskStatus = task.status!;
-       if (task.releasedDate != null) {
-         releasedDate = task.releasedDate!;
-         releasedDateController.text = DateFormat(formatDate).format(task.releasedDate!).toString();
-       }
-       addDateController.text = DateFormat(formatDate).format(task.addDate!).toString();
-       return true;
-
+      numWorkController.text = task.workNumber!;
+      descriptionController.text = task.description!;
+      applicantController.text = task.applicant!;
+      locationController.text = task.location!;
+      userAssignedController.text = task.user!;
+      lengthController.text = task.length ?? '';
+      materialController.text = task.material ?? '';
+      conclusionsController.text = task.conclusions ?? '';
+      observationsController.text = task.observations ?? '';
+      startDate = task.addDate!;
+      taskStatus = task.status!;
+      if (task.releasedDate != null) {
+        releasedDate = task.releasedDate!;
+        releasedDateController.text =
+            DateFormat(formatDate).format(task.releasedDate!).toString();
+      }
+      addDateController.text =
+          DateFormat(formatDate).format(task.addDate!).toString();
+      return true;
     } catch (error) {
       print(error);
       throw Exception('Error al obtener los datos');
     }
   }
 
-  Future<bool> createTask(Map<String, dynamic> body)  async {
+  Future<bool> _createTask(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
 
     try {
-      final baseUrl = Uri.parse(dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND'));
+      final baseUrl =
+          Uri.parse(dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND'));
       final String jsonBody = jsonEncode(body);
 
-      final response = await http.post(
-          baseUrl,
-          headers: {'Content-Type': 'application/json', 'Authorization': "BEARER $token"},
-          body: jsonBody
-      );
+      final response = await http.post(baseUrl,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "BEARER $token"
+          },
+          body: jsonBody);
 
       if (response.statusCode == 201) {
         print('Tarea ha sido creada correctamente');
@@ -134,27 +138,21 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
   }
 
-  Future<bool> updateTask(Map<String, dynamic> body)  async {
+  Future<bool> _updateTask(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
 
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+
     try {
-      final baseUrl = dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND');
-      final url = Uri.parse('$baseUrl/${widget.idTask}');
+      final response =
+          await taskListViewModel.updateTask(token!, widget.idTask!, body);
 
-      final String jsonBody = jsonEncode(body);
-
-      final response = await http.put(
-          url,
-          headers: {'Content-Type': 'application/json', 'Authorization': "BEARER $token"},
-          body: jsonBody
-      );
-
-      if (response.statusCode == 200) {
+      if (response) {
         print('Tarea ha sido actualizada correctamente');
         showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        print(response.body);
         print('No se pudieron traer datos');
         showMessageDialog(DialogMessageType.error);
         return false;
@@ -165,17 +163,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
   }
 
-  void showMessageDialog(DialogMessageType type){
+  void showMessageDialog(DialogMessageType type) {
     showCustomMessageDialog(
-        context: context,
-        messageType: type,
-        onAcceptPressed: (){
-        }
-    );
+        context: context, messageType: type, onAcceptPressed: () {});
   }
 
-  String formattedDateToUpdate(String dateString){
-
+  String formattedDateToUpdate(String dateString) {
     DateFormat inputFormat = DateFormat(formatDate);
     DateTime date = inputFormat.parse(dateString);
 
@@ -184,9 +177,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     return formattedDate;
   }
 
-
   Future<void> initializeTask() async {
-    await fetchTask();
+    await _fetchTask();
   }
 
   @override
@@ -210,7 +202,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.detail){
+    if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
       initializeTask();
@@ -226,7 +218,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     addDateController.text = DateFormat(formatDate).format(date);
   }
 
-  void handleReleasedDateChange(DateTime dateReleased){
+  void handleReleasedDateChange(DateTime dateReleased) {
     setState(() {
       releasedDate = dateReleased;
     });
@@ -249,13 +241,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
       );
-
     } else {
-      print('Programada: ${scheduledNumberController.text} Descripcion: ${descriptionController.text}');
+      print(
+          'Programada: ${scheduledNumberController.text} Descripcion: ${descriptionController.text}');
     }
   }
 
-  Map<String, dynamic> createBodyToCreate(){
+  Map<String, dynamic> createBodyToCreate() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": "PENDING",
@@ -270,9 +262,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     return requestBody;
   }
 
-  Map<String, dynamic> createBodyToUpdate(){
-     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
-     final Map<String, dynamic> requestBody = {
+  Map<String, dynamic> createBodyToUpdate() {
+    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    final Map<String, dynamic> requestBody = {
       "status": taskStatus,
       "inspectionType": task.inspectionType,
       "workNumber": numWorkController.text,
@@ -280,34 +272,35 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "applicant": applicantController.text,
       "location": locationController.text,
       "description": descriptionController.text,
-      "releasedDate": releasedDate == null ? formattedDateToUpdate(releasedDateController.text): null,
+      "releasedDate": releasedDate == null
+          ? formattedDateToUpdate(releasedDateController.text)
+          : null,
       "user": userAssignedController.text,
       "length": lengthController.text,
       "material": materialController.text,
       "observations": observationsController.text,
       "conclusions": conclusionsController.text
     };
-     return requestBody;
+    return requestBody;
   }
 
-  void handleAcceptOnShowDialogEditTask () async {
+  void handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
-    bool isUpdated = await updateTask(requestBody);
+    bool isUpdated = await _updateTask(requestBody);
     if (isUpdated) {
       reset();
     }
   }
 
-
-  void handleAcceptOnShowDialogCreateTask () async {
+  void handleAcceptOnShowDialogCreateTask() async {
     Map<String, dynamic> requestBody = createBodyToCreate();
-    bool isUpdated = await createTask(requestBody);
+    bool isUpdated = await _createTask(requestBody);
     if (isUpdated) {
       reset();
     }
   }
 
-  void handleEditTask () {
+  void handleEditTask() {
     showCustomDialog(
       context: context,
       title: AppLocalizations.of(context)!.dialogWarning,
@@ -331,7 +324,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -342,7 +336,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
             children: [
               const SizedBox(height: 36.0),
               Text(
-                widget.detail ? AppLocalizations.of(context)!.createTaskPage_titleOnEdit : AppLocalizations.of(context)!.createTaskPage_title,
+                widget.detail
+                    ? AppLocalizations.of(context)!.createTaskPage_titleOnEdit
+                    : AppLocalizations.of(context)!.createTaskPage_title,
                 style: TextStyle(fontSize: 32.0),
               ),
               const SizedBox(height: 20.0),
@@ -357,8 +353,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         });
                       },
                       children: [
-                        Text(AppLocalizations.of(context)!.createTaskPage_scheduled),
-                        Text(AppLocalizations.of(context)!.createTaskPage_inspection),
+                        Text(AppLocalizations.of(context)!
+                            .createTaskPage_scheduled),
+                        Text(AppLocalizations.of(context)!
+                            .createTaskPage_inspection),
                       ],
                     ),
                     const SizedBox(height: 10.0),
@@ -369,40 +367,42 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 Column(
                   children: [
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_numberWorkTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_numberWorkTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
+                        hintText: AppLocalizations.of(context)!
+                            .default_placeHolderInputText,
                         border: OutlineInputBorder(),
                       ),
                       controller: numWorkController,
                     ),
                     const SizedBox(height: 10.0),
-
                     if (widget.detail)
                       const Text(
                         'Estado',
                         style: TextStyle(fontSize: 24.0),
                       ),
-                      DropdownButton<String>(
-                        value: taskStatus,
-                        onChanged: (String? value) {
-                          setState(() {
-                            taskStatus = value!;
-                          });
-                        },
-                        items: TaskStatus.values.map((TaskStatus status) {
-                          return DropdownMenuItem<String>(
-                            value: status.value,
-                            child: Text(status.value),
-                          );
-                        }).toList(),
-                      ),
+                    DropdownButton<String>(
+                      value: taskStatus,
+                      onChanged: (String? value) {
+                        setState(() {
+                          taskStatus = value!;
+                        });
+                      },
+                      items: TaskStatus.values.map((TaskStatus status) {
+                        return DropdownMenuItem<String>(
+                          value: status.value,
+                          child: Text(status.value),
+                        );
+                      }).toList(),
+                    ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_startDateTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_startDateTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     InkWell(
@@ -429,105 +429,109 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         ),
                       ),
                     ),
+                    if (widget.detail) const SizedBox(height: 10.0),
                     if (widget.detail)
-                    const SizedBox(height: 10.0),
+                      Text(
+                        'Fecha de Realización',
+                        style: TextStyle(fontSize: 24.0),
+                      ),
                     if (widget.detail)
-                    Text(
-                      'Fecha de Realización',
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                    if (widget.detail)
-                    InkWell(
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: releasedDate!,
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null) {
-                          handleReleasedDateChange(pickedDate);
-                        }
-                      },
-                      child: IgnorePointer(
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'Select Date and Time',
+                      InkWell(
+                        onTap: () async {
+                          final DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: releasedDate!,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            handleReleasedDateChange(pickedDate);
+                          }
+                        },
+                        child: IgnorePointer(
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              hintText: 'Select Date and Time',
+                            ),
+                            //initialValue:  DateFormat('dd-MM-yyyy').format(startDate),
+                            controller: releasedDateController,
+                            enabled: false,
+                            readOnly: true,
                           ),
-                          //initialValue:  DateFormat('dd-MM-yyyy').format(startDate),
-                          controller: releasedDateController,
-                          enabled: false,
-                          readOnly: true,
                         ),
                       ),
-                    ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_selectUbicationTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_selectUbicationTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
-                          border: OutlineInputBorder(),
-                        ),
-                        controller: locationController,
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .default_placeHolderInputText,
+                        border: OutlineInputBorder(),
                       ),
+                      controller: locationController,
+                    ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_assignedUserTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_assignedUserTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     if (!widget.detail)
-                    DropdownButton<String>(
-                      value: userAssigned,
-                      onChanged: (String? value) {
-                        setState(() {
-                          userAssigned = value!;
-                        });
-                      },
-                      items: const [
-                        DropdownMenuItem<String>(
-                          value: 'not-assigned',
-                          child: Text('Elija una opción'),
-                        ),
-                        DropdownMenuItem<String>(
-                          value: 'gtau-oper',
-                          child: Text('gtau-oper'),
-                        ),
-                        DropdownMenuItem<String>(
-                          value: 'operario2',
-                          child: Text('Operario B'),
-                        ),
-                        DropdownMenuItem<String>(
-                          value: 'operario3',
-                          child: Text('Operario C'),
-                        ),
-                      ],
-                    ),
+                      DropdownButton<String>(
+                        value: userAssigned,
+                        onChanged: (String? value) {
+                          setState(() {
+                            userAssigned = value!;
+                          });
+                        },
+                        items: const [
+                          DropdownMenuItem<String>(
+                            value: 'not-assigned',
+                            child: Text('Elija una opción'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'gtau-oper',
+                            child: Text('gtau-oper'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'operario2',
+                            child: Text('Operario B'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: 'operario3',
+                            child: Text('Operario C'),
+                          ),
+                        ],
+                      ),
                     SizedBox(height: 10.0),
                     if (widget.detail)
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
-                        border: OutlineInputBorder(),
+                      TextFormField(
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!
+                              .default_placeHolderInputText,
+                          border: OutlineInputBorder(),
+                        ),
+                        controller: userAssignedController,
                       ),
-                      controller: userAssignedController,
-                    ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_solicitantTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_solicitantTitle,
                       style: TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
+                        hintText: AppLocalizations.of(context)!
+                            .default_placeHolderInputText,
                         border: OutlineInputBorder(),
                       ),
                       controller: applicantController,
                     ),
                     const SizedBox(height: 10.0)
-
                   ],
                 ),
               if (selectedIndex == 0)
@@ -539,7 +543,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     TextFormField(
                       decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.default_placeHolderInputText,
+                        hintText: AppLocalizations.of(context)!
+                            .default_placeHolderInputText,
                         border: OutlineInputBorder(),
                       ),
                       controller: scheduledNumberController,
@@ -553,14 +558,15 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               ),
               TextFormField(
                 decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.default_descriptionPlaceholder,
+                  hintText: AppLocalizations.of(context)!
+                      .default_descriptionPlaceholder,
                   border: const OutlineInputBorder(),
                 ),
                 controller: descriptionController,
               ),
               if (widget.detail)
                 Container(
-                  child:Column(
+                  child: Column(
                     children: [
                       const SizedBox(height: 10.0),
                       Text(
@@ -569,7 +575,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ),
                       TextFormField(
                         decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.default_descriptionPlaceholder,
+                          hintText: AppLocalizations.of(context)!
+                              .default_descriptionPlaceholder,
                           border: const OutlineInputBorder(),
                         ),
                         controller: lengthController,
@@ -581,7 +588,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ),
                       TextFormField(
                         decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.default_descriptionPlaceholder,
+                          hintText: AppLocalizations.of(context)!
+                              .default_descriptionPlaceholder,
                           border: const OutlineInputBorder(),
                         ),
                         controller: materialController,
@@ -593,7 +601,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ),
                       TextFormField(
                         decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.default_descriptionPlaceholder,
+                          hintText: AppLocalizations.of(context)!
+                              .default_descriptionPlaceholder,
                           border: const OutlineInputBorder(),
                         ),
                         controller: observationsController,
@@ -605,7 +614,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ),
                       TextFormField(
                         decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.default_descriptionPlaceholder,
+                          hintText: AppLocalizations.of(context)!
+                              .default_descriptionPlaceholder,
                           border: const OutlineInputBorder(),
                         ),
                         controller: conclusionsController,
@@ -625,12 +635,17 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           backgroundColor: Colors.red,
                         ),
                         onPressed: handleCancel,
-                        child: Text(AppLocalizations.of(context)!.buttonCancelLabel),
+                        child: Text(
+                            AppLocalizations.of(context)!.buttonCancelLabel),
                       ),
                     const SizedBox(width: 10.0),
                     ElevatedButton(
                       onPressed: widget.detail ? handleEditTask : handleSubmit,
-                      child: widget.detail ? Text(AppLocalizations.of(context)!.buttonAcceptLabel) : Text(AppLocalizations.of(context)!.createTaskPage_submitButton),
+                      child: widget.detail
+                          ? Text(
+                              AppLocalizations.of(context)!.buttonAcceptLabel)
+                          : Text(AppLocalizations.of(context)!
+                              .createTaskPage_submitButton),
                     ),
                   ],
                 ),
