@@ -6,6 +6,7 @@ import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
+import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
 import 'package:http/http.dart' as http;
@@ -63,7 +64,7 @@ class TaskListItem extends StatelessWidget {
         Navigator.of(context).pop();
       },
       onEnablePressed: () {
-        _deleteTask(context);
+        _deleteTask(context, task.id!);
         Navigator.of(context).pop();
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
@@ -71,29 +72,18 @@ class TaskListItem extends StatelessWidget {
     );
   }
 
-  Future<bool> _deleteTask(BuildContext context) async {
-    final token = context.read<UserProvider>().getToken;
-    try {
-      final baseUrl = Uri.parse(dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND'));
-      final url = Uri.parse('$baseUrl/${task.id}');
-      final response = await http.delete(
-        url,
-        headers: {'Content-Type': 'application/json', 'Authorization': "BEARER $token"},
-      );
+  Future<bool> _deleteTask(BuildContext context, int id) async {
 
-      if (response.statusCode == 204) {
+    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    bool result = await taskListViewModel.deleteTask(context, id);
+      if (result) {
         print('Tarea ha sido eliminada correctamente');
         showCustomMessageDialog(context: context, messageType: DialogMessageType.success, onAcceptPressed: () {});
         return true;
       } else {
-        print(response.body);
         showCustomMessageDialog(context: context, messageType: DialogMessageType.error, onAcceptPressed: () {});
         print('No se pudo eliminar la tarea');
         return false;
       }
-    } catch (error) {
-      print(error);
-      throw Exception('Error al eliminar la tarea');
-    }
   }
 }
