@@ -26,6 +26,9 @@
     "dialogWarning": "Advertencia",
     "dialogAcceptButton": "Aceptar",
     "dialogCancelButton": "Cancelar",
-    "dialogContent": "¿Está seguro de realizar esta acción?"
-
+    "dialogContent": "¿Está seguro de realizar esta acción?",
+    "taskListEditButtonLabel": "Editar",
+    "taskListDeleteButtonLabel": "Eliminar",
+    "buttonCancelLabel": "Cancelar",
+    "buttonAcceptLabel": "Aceptar"
 }
