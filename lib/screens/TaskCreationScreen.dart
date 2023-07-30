@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import '../models/task.dart';
+import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 
 class TaskCreationScreen extends StatefulWidget {
@@ -70,56 +71,34 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<bool> fetchTask() async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+
     try {
-      final baseUrl = dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND');
-      final url = Uri.parse('$baseUrl/${widget.idTask}');
+      final responseTask = await taskListViewModel.fetchTask(token, widget.idTask!);
 
-      final response = await http.get(url,
-          headers: {'Content-Type': 'application/json', 'Authorization': "BEARER $token"});
-
-      if (response.statusCode == 200) {
-        final taskData = json.decode(response.body);
+      if (responseTask != null){
         setState(() {
-          task = Task(
-            id: taskData['id'],
-            status: taskData['status'],
-            inspectionType: taskData['inspectionType'],
-            workNumber: taskData['workNumber'],
-            addDate: DateTime.parse(taskData['addDate']),
-            applicant: taskData['applicant'],
-            location: taskData['location'],
-            description: taskData['description'],
-            releasedDate: taskData['releasedDate'] != null ? DateTime.parse(taskData['releasedDate']) : null,
-            user: taskData['user'],
-            length: taskData['length'],
-            material: taskData['material'],
-            observations: taskData['observations'],
-            conclusions: taskData['conclusions'],
-          );
-
-           numWorkController.text = task.workNumber!;
-           descriptionController.text = task.description!;
-           applicantController.text = task.applicant!;
-           locationController.text = task.location!;
-           userAssignedController.text = task.user!;
-           lengthController.text = task.length ?? '';
-           materialController.text = task.material ?? '';
-           conclusionsController.text = task.conclusions ?? '';
-           observationsController.text = task.observations ?? '';
-           startDate = task.addDate!;
-           taskStatus = task.status!;
-           if (task.releasedDate != null) {
-             releasedDate = task.releasedDate!;
-             releasedDateController.text = DateFormat(formatDate).format(task.releasedDate!).toString();
-           }
-           addDateController.text = DateFormat(formatDate).format(task.addDate!).toString();
-
+          task = responseTask;
         });
-        return true;
-      } else {
-        print('No se pudieron traer datos}');
-        return false;
       }
+       numWorkController.text = task.workNumber!;
+       descriptionController.text = task.description!;
+       applicantController.text = task.applicant!;
+       locationController.text = task.location!;
+       userAssignedController.text = task.user!;
+       lengthController.text = task.length ?? '';
+       materialController.text = task.material ?? '';
+       conclusionsController.text = task.conclusions ?? '';
+       observationsController.text = task.observations ?? '';
+       startDate = task.addDate!;
+       taskStatus = task.status!;
+       if (task.releasedDate != null) {
+         releasedDate = task.releasedDate!;
+         releasedDateController.text = DateFormat(formatDate).format(task.releasedDate!).toString();
+       }
+       addDateController.text = DateFormat(formatDate).format(task.addDate!).toString();
+       return true;
+
     } catch (error) {
       print(error);
       throw Exception('Error al obtener los datos');
@@ -352,6 +331,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(

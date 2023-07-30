@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -80,6 +81,46 @@ class TaskListViewModel extends ChangeNotifier {
     } catch (error) {
       print(error);
       throw Exception('Error al eliminar la tarea');
+    }
+  }
+
+  Future<Task?> fetchTask(token, int idTask) async {
+    try {
+
+      final response = await _taskService.fetchTask(token, idTask);
+
+      if (response.statusCode == 200) {
+        final taskData = json.decode(response.body);
+
+         Task task = Task(
+            id: taskData['id'],
+            status: taskData['status'],
+            inspectionType: taskData['inspectionType'],
+            workNumber: taskData['workNumber'],
+            addDate: DateTime.parse(taskData['addDate']),
+            applicant: taskData['applicant'],
+            location: taskData['location'],
+            description: taskData['description'],
+            releasedDate: taskData['releasedDate'] != null ? DateTime.parse(taskData['releasedDate']) : null,
+            user: taskData['user'],
+            length: taskData['length'],
+            material: taskData['material'],
+            observations: taskData['observations'],
+            conclusions: taskData['conclusions'],
+          );
+
+        return task;
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
     }
   }
 
