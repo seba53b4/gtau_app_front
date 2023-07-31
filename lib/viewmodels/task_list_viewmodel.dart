@@ -17,47 +17,19 @@ class TaskListViewModel extends ChangeNotifier {
   int page = 0;
   int size = 10;
 
-  Future<void> initializeTasks(BuildContext context, String status) async {
-    await fetchTasksFromUser(context, status);
+  Future<List<Task>?> initializeTasks(BuildContext context, String status) async {
+   return await fetchTasksFromUser(context, status);
   }
 
-  Future<bool> fetchTasksFromUser(BuildContext context, String status) async {
+  Future<List<Task>?> fetchTasksFromUser(BuildContext context, String status) async {
     final token = context.read<UserProvider>().getToken;
     final user = context.read<UserProvider>().userName;
     try {
 
-      final response = await _taskService.getTasks(token!,user!,page,size,status);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final content = data['content'];
-
-        _tasks = content.map<Task>((taskData) {
-          return Task(
-            id: taskData['id'],
-            status: taskData['status'],
-            inspectionType: taskData['inspectionType'],
-            workNumber: taskData['workNumber'],
-            addDate: DateTime.parse(taskData['addDate']),
-            applicant: taskData['applicant'],
-            location: taskData['location'],
-            description: taskData['description'],
-            releasedDate: taskData['releasedDate'] != null ? DateTime.parse(taskData['releasedDate']) : null,
-            user: taskData['user'],
-            length: taskData['length'],
-            material: taskData['material'],
-            observations: taskData['observations'],
-            conclusions: taskData['conclusions'],
-          );
-        }).toList();
-
-        notifyListeners();
-
-        return true;
-      } else {
-        print('No se pudieron traer datos $status');
-        return false;
-      }
+      final responseListTask = await _taskService.getTasks(token!,user!,page,size,status);
+      _tasks = responseListTask!;
+      notifyListeners();
+      return responseListTask;
     } catch (error) {
       print(error);
       throw Exception('Error al obtener los datos');
@@ -69,13 +41,12 @@ class TaskListViewModel extends ChangeNotifier {
     try {
       final response = await _taskService.deleteTask(token!, id);
 
-      if (response.statusCode == 204) {
+      if (response) {
         print('Tarea ha sido eliminada correctamente');
         notifyListeners();
         return true;
       } else {
         print('No se pudo eliminar la tarea');
-        print(response.statusCode);
         return false;
       }
     } catch (error) {
@@ -87,29 +58,10 @@ class TaskListViewModel extends ChangeNotifier {
   Future<Task?> fetchTask(token, int idTask) async {
     try {
 
-      final response = await _taskService.fetchTask(token, idTask);
-
-      if (response.statusCode == 200) {
-        final taskData = json.decode(response.body);
-
-         Task task = Task(
-            id: taskData['id'],
-            status: taskData['status'],
-            inspectionType: taskData['inspectionType'],
-            workNumber: taskData['workNumber'],
-            addDate: DateTime.parse(taskData['addDate']),
-            applicant: taskData['applicant'],
-            location: taskData['location'],
-            description: taskData['description'],
-            releasedDate: taskData['releasedDate'] != null ? DateTime.parse(taskData['releasedDate']) : null,
-            user: taskData['user'],
-            length: taskData['length'],
-            material: taskData['material'],
-            observations: taskData['observations'],
-            conclusions: taskData['conclusions'],
-          );
-
-        return task;
+      final responseTask = await _taskService.fetchTask(token, idTask);
+      if (responseTask != null) {
+        notifyListeners();
+        return responseTask;
       } else {
         if (kDebugMode) {
           print('No se pudieron traer datos');
@@ -128,8 +80,9 @@ class TaskListViewModel extends ChangeNotifier {
 
     try {
       final response = await _taskService.updateTask(token, idTask, body);
-      if (response.statusCode == 200) {
+      if (response) {
         print('Tarea ha sido actualizada correctamente');
+        notifyListeners();
         return true;
       } else {
         print('No se pudieron traer datos');
@@ -144,11 +97,10 @@ class TaskListViewModel extends ChangeNotifier {
   Future<bool> createTask(String token, Map<String, dynamic> body) async {
 
     try {
-
       final response = await _taskService.createTask(token, body);
-
-      if (response.statusCode == 201) {
+      if (response) {
         print('Tarea ha sido creada correctamente');
+        notifyListeners();
         return true;
       } else {
         print('No se pudieron traer datos');
