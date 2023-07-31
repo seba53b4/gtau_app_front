@@ -93,7 +93,6 @@ class LoginScreen extends StatelessWidget {
       setUserData(context, isLoggedIn, username, jwt, username == 'gtau-admin' ? true: false);
       goToNav(context);
     }
-    //goToNav(context);
   }
 
   void onForgotPressed() {
