@@ -34,7 +34,7 @@ class _TaskListComponentState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
     final taskListViewModel = Provider.of<TaskListViewModel>(context);
-    final tasks = taskListViewModel.tasks;
+    final tasks = taskListViewModel.tasks[widget.status];
 
     return Container(
       margin: const EdgeInsets.only(bottom: 132),
@@ -49,9 +49,9 @@ class _TaskListComponentState extends State<TaskList> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: tasks.length,
+              itemCount: tasks?.length,
               itemBuilder: (context, index) {
-                final task = tasks[index];
+                final task = tasks?[index];
                 return TaskListItem(task: task);
               },
             ),

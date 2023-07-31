@@ -1,9 +1,6 @@
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/services/task_service.dart';
 import 'package:provider/provider.dart';
@@ -11,13 +8,21 @@ import '../providers/user_provider.dart';
 
 class TaskListViewModel extends ChangeNotifier {
   final TaskService _taskService = TaskService();
-  List<Task> _tasks = [];
-  List<Task> get tasks => _tasks;
+  final Map<String, List<Task>> _tasks = {
+    "DOING": [],
+    "DONE": [],
+    "PENDING": [],
+    "BLOCKED": []
+  };
+  Map<String, List<Task>> get tasks => _tasks;
 
   int page = 0;
   int size = 10;
 
   Future<List<Task>?> initializeTasks(BuildContext context, String status) async {
+   // if (_tasks[status]!.isNotEmpty){
+   //   return _tasks[status];
+   // }
    return await fetchTasksFromUser(context, status);
   }
 
@@ -27,7 +32,7 @@ class TaskListViewModel extends ChangeNotifier {
     try {
 
       final responseListTask = await _taskService.getTasks(token!,user!,page,size,status);
-      _tasks = responseListTask!;
+      _tasks[status] = responseListTask!;
       notifyListeners();
       return responseListTask;
     } catch (error) {

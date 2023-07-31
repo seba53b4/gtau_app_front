@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'dart:convert';
 
 import '../models/task.dart';
 import '../viewmodels/task_list_viewmodel.dart';
@@ -19,7 +15,7 @@ class TaskCreationScreen extends StatefulWidget {
   bool detail = false;
   int? idTask = 0;
   TaskCreationScreen(
-      {required this.type, this.detail = false, this.idTask = 0});
+      {super.key, required this.type, this.detail = false, this.idTask = 0});
 
   @override
   _TaskCreationScreenState createState() => _TaskCreationScreenState();
@@ -239,7 +235,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   Map<String, dynamic> createBodyToCreate() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
-      "status": "PENDING",
+      "status": taskStatus,
       "inspectionType": "inspectionType Default",
       "workNumber": numWorkController.text,
       "addDate": addDateUpdated,
@@ -487,8 +483,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             child: Text('gtau-oper'),
                           ),
                           DropdownMenuItem<String>(
-                            value: 'operario2',
-                            child: Text('Operario B'),
+                            value: 'gtau-admin',
+                            child: Text('gtau-oper'),
                           ),
                           DropdownMenuItem<String>(
                             value: 'operario3',
@@ -496,13 +492,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           ),
                         ],
                       ),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     if (widget.detail)
                       TextFormField(
                         decoration: InputDecoration(
                           hintText: AppLocalizations.of(context)!
                               .default_placeHolderInputText,
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                         controller: userAssignedController,
                       ),
@@ -510,13 +506,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     Text(
                       AppLocalizations.of(context)!
                           .createTaskPage_solicitantTitle,
-                      style: TextStyle(fontSize: 24.0),
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context)!
                             .default_placeHolderInputText,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       controller: applicantController,
                     ),
@@ -528,13 +524,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   children: [
                     Text(
                       AppLocalizations.of(context)!.createTaskPage_scheduled,
-                      style: TextStyle(fontSize: 24.0),
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context)!
                             .default_placeHolderInputText,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       controller: scheduledNumberController,
                     ),
@@ -543,7 +539,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               const SizedBox(height: 10.0),
               Text(
                 AppLocalizations.of(context)!.default_descriptionTitle,
-                style: TextStyle(fontSize: 24.0),
+                style: const TextStyle(fontSize: 24.0),
               ),
               TextFormField(
                 decoration: InputDecoration(
@@ -554,67 +550,65 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 controller: descriptionController,
               ),
               if (widget.detail)
-                Container(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10.0),
-                      const Text(
-                        'Longitud',
-                        style: TextStyle(fontSize: 24.0),
+                Column(
+                  children: [
+                    const SizedBox(height: 10.0),
+                    const Text(
+                      'Longitud',
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .default_descriptionPlaceholder,
+                        border: const OutlineInputBorder(),
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!
-                              .default_descriptionPlaceholder,
-                          border: const OutlineInputBorder(),
-                        ),
-                        controller: lengthController,
+                      controller: lengthController,
+                    ),
+                    const SizedBox(height: 10.0),
+                    const Text(
+                      'Material',
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .default_descriptionPlaceholder,
+                        border: const OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 10.0),
-                      const Text(
-                        'Material',
-                        style: TextStyle(fontSize: 24.0),
+                      controller: materialController,
+                    ),
+                    const SizedBox(height: 10.0),
+                    const Text(
+                      'Observaciones',
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .default_descriptionPlaceholder,
+                        border: const OutlineInputBorder(),
                       ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!
-                              .default_descriptionPlaceholder,
-                          border: const OutlineInputBorder(),
-                        ),
-                        controller: materialController,
+                      controller: observationsController,
+                    ),
+                    const SizedBox(height: 10.0),
+                    const Text(
+                      'Conclusiones',
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .default_descriptionPlaceholder,
+                        border: const OutlineInputBorder(),
                       ),
-                      const SizedBox(height: 10.0),
-                      const Text(
-                        'Observaciones',
-                        style: TextStyle(fontSize: 24.0),
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!
-                              .default_descriptionPlaceholder,
-                          border: const OutlineInputBorder(),
-                        ),
-                        controller: observationsController,
-                      ),
-                      const SizedBox(height: 10.0),
-                      const Text(
-                        'Conclusiones',
-                        style: TextStyle(fontSize: 24.0),
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!
-                              .default_descriptionPlaceholder,
-                          border: const OutlineInputBorder(),
-                        ),
-                        controller: conclusionsController,
-                      ),
-                    ],
-                  ),
+                      controller: conclusionsController,
+                    ),
+                  ],
                 ),
               Container(
                 height: 50.0,
-                margin: EdgeInsets.symmetric(vertical: 20.0),
+                margin: const EdgeInsets.symmetric(vertical: 20.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

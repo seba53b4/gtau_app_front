@@ -1,6 +1,5 @@
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -9,10 +8,9 @@ import '../providers/user_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
-import 'package:http/http.dart' as http;
 
 class TaskListItem extends StatelessWidget {
-  final Task task;
+  final Task? task;
 
   const TaskListItem({Key? key, required this.task}) : super(key: key);
 
@@ -25,8 +23,8 @@ class TaskListItem extends StatelessWidget {
       contentPadding: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       tileColor: Colors.white,
-      subtitle: Text('${task.inspectionType}'),
-      title: Text('${task.getWorkNumber}'),
+      subtitle: Text('${task!.inspectionType}'),
+      title: Text('${task!.getWorkNumber}'),
       leading: const Icon(Icons.check),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -35,7 +33,7 @@ class TaskListItem extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => TaskCreationScreen(detail: true, idTask: task.getId, type: 'inspection',)),
+                MaterialPageRoute(builder: (context) => TaskCreationScreen(detail: true, idTask: task!.getId, type: 'inspection',)),
               );
             },
             child: Text(AppLocalizations.of(context)!.taskListEditButtonLabel),
@@ -64,7 +62,7 @@ class TaskListItem extends StatelessWidget {
         Navigator.of(context).pop();
       },
       onEnablePressed: () {
-        _deleteTask(context, task.id!);
+        _deleteTask(context, task!.id!);
         Navigator.of(context).pop();
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
