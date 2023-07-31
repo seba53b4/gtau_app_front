@@ -84,5 +84,23 @@ class TaskService {
     }
   }
 
+  Future<http.Response> createTask(String token, Map<String, dynamic> body) async {
+
+    try {
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse(baseUrl);
+      final response = await http.post(
+          url,
+          headers: _getHeaders(token),
+          body: jsonBody);
+
+        return response;
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in createTask: $error');
+      }
+      rethrow;
+    }
+  }
 
 }

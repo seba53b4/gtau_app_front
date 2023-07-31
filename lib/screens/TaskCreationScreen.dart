@@ -109,25 +109,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<bool> _createTask(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
-
+    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
     try {
-      final baseUrl =
-          Uri.parse(dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND'));
-      final String jsonBody = jsonEncode(body);
-
-      final response = await http.post(baseUrl,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': "BEARER $token"
-          },
-          body: jsonBody);
-
-      if (response.statusCode == 201) {
+      final response = await taskListViewModel.createTask(token!, body);
+      if (response) {
         print('Tarea ha sido creada correctamente');
         showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        print(response.body);
         showMessageDialog(DialogMessageType.error);
         print('No se pudieron traer datos');
         return false;
@@ -431,7 +420,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     if (widget.detail) const SizedBox(height: 10.0),
                     if (widget.detail)
-                      Text(
+                      const Text(
                         'Fecha de Realización',
                         style: TextStyle(fontSize: 24.0),
                       ),
@@ -569,7 +558,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 10.0),
-                      Text(
+                      const Text(
                         'Longitud',
                         style: TextStyle(fontSize: 24.0),
                       ),
@@ -582,7 +571,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         controller: lengthController,
                       ),
                       const SizedBox(height: 10.0),
-                      Text(
+                      const Text(
                         'Material',
                         style: TextStyle(fontSize: 24.0),
                       ),
@@ -595,7 +584,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         controller: materialController,
                       ),
                       const SizedBox(height: 10.0),
-                      Text(
+                      const Text(
                         'Observaciones',
                         style: TextStyle(fontSize: 24.0),
                       ),
@@ -608,7 +597,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         controller: observationsController,
                       ),
                       const SizedBox(height: 10.0),
-                      Text(
+                      const Text(
                         'Conclusiones',
                         style: TextStyle(fontSize: 24.0),
                       ),

@@ -140,4 +140,24 @@ class TaskListViewModel extends ChangeNotifier {
       throw Exception('Error al obtener los datos');
     }
   }
+
+  Future<bool> createTask(String token, Map<String, dynamic> body) async {
+
+    try {
+
+      final response = await _taskService.createTask(token, body);
+
+      if (response.statusCode == 201) {
+        print('Tarea ha sido creada correctamente');
+        return true;
+      } else {
+        print('No se pudieron traer datos');
+        return false;
+      }
+    } catch (error) {
+      print(error);
+      throw Exception('Error al obtener los datos');
+    }
+  }
+
 }
