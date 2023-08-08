@@ -22,7 +22,7 @@ class UserProvider with ChangeNotifier {
   bool? get isAdmin => _userState?.isAdmin;
 
   String? get getToken{
-    return _userState?.jwt;
+    return _userState?.authData?.accessToken;
   }
 
   String? get userName => _userState?.getUsername;
