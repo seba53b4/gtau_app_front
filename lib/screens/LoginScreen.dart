@@ -1,14 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/models/auth_data.dart';
 import 'package:gtau_app_front/models/user_state.dart';
 import 'package:gtau_app_front/navigation/navigation.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 
@@ -17,30 +16,16 @@ class LoginScreen extends StatelessWidget {
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  late String jwt = '';
+  late AuthData? authData;
 
-  Future<bool> fetchAuth(String username, String password) async {
+  Future<AuthData?> _fetchAuth(BuildContext context, String username, String password) async {
+
     try {
-      final response = await http.post(
-        Uri.parse(dotenv.get('API_AUTH', fallback: 'NOT_FOUND')),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
-        },
-        body: {
-          'grant_type': 'password',
-          'username': username,
-          'password': password,
-          'scope': 'openid profile roles',
-        },
-      );
+      final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+      final responseAuthData = await authViewModel.fetchAuth(username, password);
 
-      final data = json.decode(response.body);
-
-      if (response.statusCode == 200) {
-        print('Usuario y contraseña válidos');
-        jwt = data['access_token'];
-        return true;
+      if (responseAuthData != null) {
+        return responseAuthData;
       } else {
         print('Contraseña incorrecta');
         Fluttertoast.showToast(
@@ -50,7 +35,7 @@ class LoginScreen extends StatelessWidget {
           backgroundColor: Colors.grey,
           textColor: Colors.white,
         );
-        return false;
+        return null;
       }
     } catch (error) {
       print(error);
@@ -58,13 +43,14 @@ class LoginScreen extends StatelessWidget {
     }
   }
 
-  void setUserData(BuildContext context, bool isLoggedIn, String username, String jwt) {
+  void setUserData(BuildContext context, bool isLoggedIn, String username, AuthData authData, bool isAdmin) {
     if (isLoggedIn) {
       final userStateProvider = context.read<UserProvider>();
       userStateProvider.updateUserState(UserState(
         username: username,
         isLoggedIn: true,
-        jwt: jwt,
+        authData: authData,
+        isAdmin: isAdmin
       ));
     }
   }
@@ -87,19 +73,15 @@ class LoginScreen extends StatelessWidget {
     final String username = usernameController.text;
     final String password = passwordController.text;
 
-    bool isLoggedIn = await fetchAuth(username, password);
-    if (context.mounted && isLoggedIn) {
-      setUserData(context, isLoggedIn, username, jwt);
+    AuthData? authData = await _fetchAuth(context, username, password);
+    if (context.mounted && authData != null) {
+      setUserData(context, true, username, authData, username == 'gtau-admin' ? true: false);
       goToNav(context);
     }
   }
 
   void onForgotPressed() {
     print('Wrong');
-  }
-
-  bool isEmpty(String str) {
-    return (str == null || str.isEmpty);
   }
 
   @override

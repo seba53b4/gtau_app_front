@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/widgets/task_list_item.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:provider/provider.dart';
+import '../viewmodels/task_list_viewmodel.dart';
 
 class TaskList extends StatefulWidget {
-  const TaskList({super.key});
+  final String status;
+  const TaskList({Key? key, required this.status}) : super(key: key);
 
   @override
   _TaskListComponentState createState() => _TaskListComponentState();
 }
 
 class _TaskListComponentState extends State<TaskList> {
-  List<Map<String, String>> tasks = [];
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -20,54 +20,22 @@ class _TaskListComponentState extends State<TaskList> {
     super.dispose();
   }
 
-  String search = '';
   @override
   void initState() {
     super.initState();
-    fetchData();
-  }
-
-  void fetchData() async {
-    try {
-      final response = await http.get(Uri.parse('http://localhost:3000/tasks'));
-      final data = json.decode(response.body);
-      setState(() {
-        tasks = List<Map<String, String>>.from(
-            data.map((item) => Map<String, String>.from(item)));
-      });
-    } catch (error) {
-      // Handle error
-      setState(() {
-        tasks = [
-          {
-            'taskID': '1',
-            'type': 'Programada',
-            'title': 'Programada Zona 1',
-          },
-          {
-            'taskID': '2',
-            'type': 'Programada',
-            'title': 'Programada Zona 2',
-          },
-          {
-            'taskID': '3',
-            'type': 'Puntual',
-            'title': 'Puntual Padron 2312',
-          },
-          // Add more sample tasks as needed
-        ];
-      });
-    }
+    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.initializeTasks(context, widget.status);
   }
 
   void updateSearch(String search) {
-    setState(() {
-      this.search = search;
-    });
+    // Lógica de filtrado según la búsqueda
   }
 
   @override
   Widget build(BuildContext context) {
+    final taskListViewModel = Provider.of<TaskListViewModel>(context);
+    final tasks = taskListViewModel.tasks[widget.status];
+
     return Container(
       margin: const EdgeInsets.only(bottom: 132),
       child: Column(
@@ -81,14 +49,10 @@ class _TaskListComponentState extends State<TaskList> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: tasks.length,
+              itemCount: tasks?.length,
               itemBuilder: (context, index) {
-                final task = tasks[index];
-                return TaskListItem(
-                  id: task['taskID']!,
-                  type: task['type']!,
-                  title: task['title']!,
-                );
+                final task = tasks?[index];
+                return TaskListItem(task: task);
               },
             ),
           ),
