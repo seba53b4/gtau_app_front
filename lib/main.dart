@@ -12,7 +12,9 @@ import "package:universal_html/html.dart" as html;
 
 
 Future<void> main() async {
-  await dotenv.load();
+  await dotenv.load(
+    fileName: kIsWeb ? '.env.web' : '.env.mobile',
+  );
   if (kIsWeb){
     html.document.dispatchEvent(html.CustomEvent("google-maps-api-key-loaded", detail: {"GOOGLE_API_KEY": dotenv.env['GOOGLE_API_KEY'] }));
   }
