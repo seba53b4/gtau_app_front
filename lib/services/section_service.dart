@@ -32,8 +32,9 @@ class SectionService {
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        return jsonResponse.map<Section>((line) {
-          List<dynamic> multiLineCoordinates = line['coordinates'];
+        return jsonResponse.map<Section>((section) {
+          Map<String, dynamic> geoJson = section['geoJSON'];
+          List<dynamic> multiLineCoordinates = geoJson['coordinates'];
 
           List<LatLng> latLngList = [];
 
@@ -46,7 +47,7 @@ class SectionService {
           }
 
           Polyline polyline = Polyline(
-            polylineId: PolylineId(line.hashCode.toString()),
+            polylineId: PolylineId(section.hashCode.toString()),
             points: latLngList,
             color: Colors.red,
             width: 5,

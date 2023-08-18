@@ -53,7 +53,7 @@ class _MapComponentState extends State<MapComponent> {
 
   Future<List<Section>?> fetchPolylines(String token) async{
     final sectionViewModel = Provider.of<SectionViewModel>(context, listen: false);
-    List<Section>? sections = await sectionViewModel.fetchSectionsByRadius(token, 578749.243946988, 6139126.744661644, 1250);
+    List<Section>? sections = await sectionViewModel.fetchSectionsByRadius(token, -34.88648, -56.13854, 500);
     return sections;
   }
 
