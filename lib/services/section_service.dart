@@ -47,14 +47,14 @@ class SectionService {
           }
 
           Polyline polyline = Polyline(
-            polylineId: PolylineId(section.hashCode.toString()),
+            polylineId: PolylineId(section['ogcFid'].toString()),
             points: latLngList,
             color: Colors.red,
             width: 5,
             consumeTapEvents: true
           );
 
-          return Section(line: polyline);
+          return Section(ogcFid: section['ogcFid'], line: polyline, tipoTra: section['tipoTra']);
         }).toList();
 
       } else {
