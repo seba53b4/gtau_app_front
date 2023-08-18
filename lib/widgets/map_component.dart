@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
-import 'package:gtau_app_front/widgets/sectionDetail.dart';
 import 'package:provider/provider.dart';
 
 import '../models/section_data.dart';
