@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
+import 'package:gtau_app_front/screens/MapScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class _NavigationWeb extends State<NavigationWeb> {
 
   List screens = [
     const HomeScreen(),
+    const MapScreen(),
     const ProfileScreen(),
   ];
 
@@ -36,6 +38,10 @@ class _NavigationWeb extends State<NavigationWeb> {
           label: Text('Agregar tareas'),
         ),
         const NavigationRailDestination(
+          icon: Icon(Icons.map),
+          label: Text('Mapa'),
+        ),
+        const NavigationRailDestination(
           icon: Icon(Icons.person),
           label: Text('Perfil'),
         ),
@@ -45,6 +51,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         TaskCreationScreen(
           type: '',
         ),
+        const MapScreen(),
         const ProfileScreen(),
       ];
     } else {
@@ -52,6 +59,10 @@ class _NavigationWeb extends State<NavigationWeb> {
         const NavigationRailDestination(
           icon: Icon(Icons.home),
           label: Text('Inicio'),
+        ),
+        const NavigationRailDestination(
+          icon: Icon(Icons.map),
+          label: Text('Mapa'),
         ),
         const NavigationRailDestination(
           icon: Icon(Icons.person),
