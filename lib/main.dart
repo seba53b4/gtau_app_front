@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -11,7 +12,9 @@ import "package:universal_html/html.dart" as html;
 
 
 Future<void> main() async {
-  await dotenv.load();
+  await dotenv.load(
+    fileName: kIsWeb ? '.env.web' : '.env.mobile',
+  );
   if (kIsWeb){
     html.document.dispatchEvent(html.CustomEvent("google-maps-api-key-loaded", detail: {"GOOGLE_API_KEY": dotenv.env['GOOGLE_API_KEY'] }));
   }
@@ -27,6 +30,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<AuthViewModel>(
           create: (context) => AuthViewModel(),
+        ),
+        ChangeNotifierProvider<SectionViewModel>(
+          create: (context) => SectionViewModel(),
         ),
       ],
       child: MyApp(),
