@@ -50,6 +50,7 @@ class SectionService {
             points: latLngList,
             color: Colors.red,
             width: 5,
+            consumeTapEvents: true
           );
 
           return Section(line: polyline);

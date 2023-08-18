@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
+import 'package:gtau_app_front/widgets/sectionDetail.dart';
 import 'package:provider/provider.dart';
 
 import '../models/section_data.dart';
@@ -17,6 +18,10 @@ class _MapComponentState extends State<MapComponent> {
   String? errorMsg;
   MapType _currentMapType = MapType.satellite;
   Set<Polyline> polylines = {};
+  bool isSectionDetailsVisible = false;
+  PolylineId selectedPolylineId = PolylineId('');
+  Color selectedPolylineColor = Colors.greenAccent;
+  Color defaultPolylineColor = Colors.redAccent;
 
   @override
   void initState() {
@@ -49,22 +54,33 @@ class _MapComponentState extends State<MapComponent> {
 
   Future<List<Section>?> fetchPolylines(String token) async{
     final sectionViewModel = Provider.of<SectionViewModel>(context, listen: false);
-    List<Section>? sections = await sectionViewModel.fetchSectionsByRadius(token, 578749.243946988, 6139126.744661644, 200);
+    List<Section>? sections = await sectionViewModel.fetchSectionsByRadius(token, 578749.243946988, 6139126.744661644, 1250);
     return sections;
   }
 
 
-  Set<Polyline> getPolylines(List<Section>? sections){
-
-    if (sections != null){
+  Set<Polyline> getPolylines(List<Section>? sections) {
+    if (sections != null) {
       Set<Polyline> setPol = {};
-      for (var section in sections){
-        setPol.add(section.line);
+      for (var section in sections) {
+        Polyline pol = section.line.copyWith(
+          colorParam: selectedPolylineId == section.line.polylineId
+              ? selectedPolylineColor
+              : defaultPolylineColor,
+          onTapParam: () {
+            Set<Polyline> updatedPolylines = getPolylines(sections);
+            setState(() {
+              isSectionDetailsVisible = !isSectionDetailsVisible;
+              selectedPolylineId = section.line.polylineId;
+              polylines = updatedPolylines;
+            });
+          },
+        );
+        setPol.add(pol);
       }
       return setPol;
     } else {
-      List<Polyline> list = [];
-      return list.toSet();
+      return {};
     }
   }
 
@@ -95,6 +111,17 @@ class _MapComponentState extends State<MapComponent> {
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
           ),
+          // GestureDetector(
+          //   onTap: () {
+          //   },
+          //   child: AbsorbPointer(
+          //     absorbing: isSectionDetailsVisible,
+          //     child: MapSectionDetailsOverlay(
+          //       isVisible: isSectionDetailsVisible,
+          //       selectedPolylineId: selectedPolylineId,
+          //     ),
+          //   ),
+          // ),
           Positioned(
             bottom: 14,
             left: 16,

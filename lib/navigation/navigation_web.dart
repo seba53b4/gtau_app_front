@@ -18,6 +18,7 @@ class _NavigationWeb extends State<NavigationWeb> {
 
   List screens = [
     const HomeScreen(),
+    const MapScreen(),
     const ProfileScreen(),
   ];
 
