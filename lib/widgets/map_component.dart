@@ -52,7 +52,13 @@ class _MapComponentState extends State<MapComponent> {
 
       Position currentPosition = await Geolocator.getCurrentPosition();
       setState(() {
-        location = LatLng(currentPosition.latitude, currentPosition.longitude);
+        final locationGPS = LatLng(currentPosition.latitude, currentPosition.longitude);
+        final Marker newMarker = Marker(
+          markerId: const MarkerId('tapped_location'),
+          position: locationGPS,
+        );
+        location = locationGPS;
+        markers.add(newMarker);
       });
 
       // Actualiza la cámara del mapa para centrarse en la ubicación actual
@@ -136,7 +142,7 @@ class _MapComponentState extends State<MapComponent> {
               if (locationManual) {
                 setState(() {
                   final Marker newMarker = Marker(
-                    markerId: const MarkerId('tapped_location'),
+                    markerId: const MarkerId('tapped_location_manual'),
                     position: latLng,
                   );
 
@@ -154,18 +160,10 @@ class _MapComponentState extends State<MapComponent> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _currentMapType = MapType.normal;
+                      _currentMapType = _currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
                     });
                   },
-                  child: Text("Normal"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _currentMapType = MapType.satellite;
-                    });
-                  },
-                  child: Text("Satelital"),
+                  child: _currentMapType == MapType.normal ? Text("Normal") : Text("Satelite"),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -175,13 +173,13 @@ class _MapComponentState extends State<MapComponent> {
                       polylines = updatedPolylines;
                     });
                   },
-                  child: Text("Fetch Tramos"),
+                  child: const Text("Fetch Tramos"),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     getCurrentLocation();
                   },
-                  child: Text("Obtener Ubicación"),
+                  child: const Text("Obtener Ubicación"),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -192,7 +190,7 @@ class _MapComponentState extends State<MapComponent> {
                       locationManual = !locationManual;
                     });
                   },
-                  child: Text("Seleccionar Ubicación"),
+                  child: const Text("Seleccionar Ubicación"),
                 ),
                 ElevatedButton(
                   onPressed: () {
