@@ -323,6 +323,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   Widget build(BuildContext context) {
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -458,6 +459,49 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     if (widget.detail)
                       const SizedBox(height: 10.0),
                     MapModal(),
+                    Consumer<SelectedItemsProvider>(
+                      builder: (context, selectedItemsProvider, child) {
+                        final selectedPolylines = selectedItemsProvider.selectedPolylines.toList();
+
+                        return selectedPolylines.isNotEmpty
+                            ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Selected Polylines:',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 10),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  for (var polylineId in selectedPolylines)
+                                    Container(
+                                      margin: EdgeInsets.all(8),
+                                      padding: EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(polylineId.value),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                            : const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Selected Polylines:',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                          ],
+                        );
+                      },
+                    ),
                     const SizedBox(height: 10.0),
                     Text(
                       AppLocalizations.of(context)!

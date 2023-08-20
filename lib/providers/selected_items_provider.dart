@@ -68,6 +68,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _selectedCaptaciones.clear();
     _selectedSections.clear();
     _selectedRegistros.clear();
+    notifyListeners();
   }
 
   void reset(){

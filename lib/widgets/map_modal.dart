@@ -46,12 +46,33 @@ void _showMapModal(BuildContext context) {
                 child: const MapComponent(isModal: true),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cerrar'),
-              ),
+              Container(
+                height: 50,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        onPressed: () {
+                          final selectedItemsProvider = context.read<SelectedItemsProvider>();
+                          selectedItemsProvider.clearAllSelections();
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cerrar'),
+                      ),
+                      const SizedBox(width: 10.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Aceptar'),
+                      ),
+                    ]
+                ),
+              )
+
             ],
           ),
         ),
