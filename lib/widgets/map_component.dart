@@ -145,7 +145,7 @@ class _MapComponentState extends State<MapComponent> {
                     markerId: const MarkerId('tapped_location_manual'),
                     position: latLng,
                   );
-
+                  markers.clear();
                   markers.add(newMarker);
                   location = LatLng(latLng.latitude, latLng.longitude);
                 });
