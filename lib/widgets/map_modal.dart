@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/selected_items_provider.dart';
 
 
 void _showMapModal(BuildContext context) {
@@ -10,14 +13,14 @@ void _showMapModal(BuildContext context) {
     context: context,
     barrierDismissible: false,
     barrierLabel: "Modal",
-    transitionDuration: Duration(milliseconds: 200),
+    transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (_, __, ___) {
       return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.white,
             centerTitle: true,
             leading: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.close,
                   color: Colors.black,
                   size: 12,
@@ -26,29 +29,28 @@ void _showMapModal(BuildContext context) {
                   Navigator.pop(context);
                 }
             ),
-            title: Text(
+            title: const Text(
               "Modal",
               style: TextStyle(color: Colors.black87, fontFamily: 'Overpass', fontSize: 20),
             ),
             elevation: 0.0
         ),
-       // backgroundColor: Colors.white.withOpacity(0.90),
         body: Container(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
                 height: modalHeight,
-                child: MapComponent(),
+                child: const MapComponent(isModal: true),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('Cerrar'),
+                child: const Text('Cerrar'),
               ),
             ],
           ),
@@ -60,13 +62,17 @@ void _showMapModal(BuildContext context) {
 
 
 class MapModal extends StatelessWidget {
+  const MapModal({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    selectedItemsProvider.activateMultipleSelection();
     return ElevatedButton(
         onPressed: () {
           _showMapModal(context);
         },
-        child: Text('Open Modal'),
+        child: const Text('Open Modal'),
       );
   }
 }

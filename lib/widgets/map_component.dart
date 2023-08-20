@@ -11,6 +11,9 @@ import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 
 class MapComponent extends StatefulWidget {
+  final bool isModal;
+  const MapComponent({super.key, this.isModal = false});
+
   @override
   _MapComponentState createState() => _MapComponentState();
 }
@@ -93,28 +96,39 @@ class _MapComponentState extends State<MapComponent> {
     return sections;
   }
 
+  void _onTapParamBehavior(Section section, List<Section>? sections ) {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    selectedItemsProvider.toggleSectionSelected(section.line.polylineId);
+    setState(() {
+      if (widget.isModal) {
+        if (selectedPolylines.contains(section.line.polylineId)) {
+          selectedPolylines.remove(section.line.polylineId);
+        } else {
+          selectedPolylines.add(section.line.polylineId);
+        }
+      }
+      polylines = getPolylines(sections);
+    });
+  }
+
+  Color _onColorParamBehavior(Section section){
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    return selectedItemsProvider.isSectionSelected(section.line.polylineId)
+            ? selectedPolylineColor
+            : defaultPolylineColor;
+  }
+
+
 
   Set<Polyline> getPolylines(List<Section>? sections) {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
 
     if (sections != null) {
       Set<Polyline> setPol = {};
       for (var section in sections) {
         Polyline pol = section.line.copyWith(
-          colorParam: selectedItemsProvider.isSectionSelected(section.line.polylineId)
-              ? selectedPolylineColor
-              : defaultPolylineColor,
+          colorParam: _onColorParamBehavior(section),
           onTapParam: () {
-            selectedItemsProvider.toggleSectionSelected(section.line.polylineId);
-            setState(() {
-              isSectionDetailsVisible = !isSectionDetailsVisible;
-              if (selectedPolylines.contains(section.line.polylineId)) {
-                selectedPolylines.remove(section.line.polylineId);
-              } else {
-                selectedPolylines.add(section.line.polylineId);
-              }
-              polylines = getPolylines(sections);
-            });
+            _onTapParamBehavior(section, sections);
           },
         );
         setPol.add(pol);
@@ -193,7 +207,7 @@ class _MapComponentState extends State<MapComponent> {
                     backgroundColor: (locationManual) ? selectedButtonColor : defaultButtonColor ,
                   ),
                   onPressed: () {
-                    selectedItemsProvider.clearAll();
+                    selectedItemsProvider.clearAllSelections();
                     setState(() {
                       polylines = {};
                       locationManual = !locationManual;

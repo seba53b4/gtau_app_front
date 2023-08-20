@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/task.dart';
+import '../providers/selected_items_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/map_modal.dart';
@@ -223,6 +224,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         },
         onEnablePressed: () {
           handleAcceptOnShowDialogCreateTask();
+          resetSelectionOnMap();
           Navigator.of(context).pop();
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
@@ -297,6 +299,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       },
       onEnablePressed: () {
         handleAcceptOnShowDialogEditTask();
+        resetSelectionOnMap();
         Navigator.of(context).pop();
         Navigator.of(context).pop();
       },
@@ -305,24 +308,21 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     );
   }
 
-  void handleCancel() {
-    Navigator.of(context).pop();
+  void resetSelectionOnMap(){
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    selectedItemsProvider.reset();
   }
 
-  // void _showMapModal(BuildContext context) {
-  //   showModalBottomSheet(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return MapModal();
-  //     },
-  //   );
-  // }
+  void handleCancel() {
+    resetSelectionOnMap();
+    Navigator.of(context).pop();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
