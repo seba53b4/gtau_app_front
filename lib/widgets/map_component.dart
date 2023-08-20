@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +25,7 @@ class _MapComponentState extends State<MapComponent> {
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   bool isSectionDetailsVisible = false;
-  PolylineId selectedPolylineId = PolylineId('');
+  Set<PolylineId> selectedPolylines = {};
   Color selectedPolylineColor = Colors.greenAccent;
   Color defaultPolylineColor = Colors.redAccent;
   Color selectedButtonColor = Colors.green;
@@ -94,19 +95,25 @@ class _MapComponentState extends State<MapComponent> {
 
 
   Set<Polyline> getPolylines(List<Section>? sections) {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+
     if (sections != null) {
       Set<Polyline> setPol = {};
       for (var section in sections) {
         Polyline pol = section.line.copyWith(
-          colorParam: selectedPolylineId == section.line.polylineId
+          colorParam: selectedItemsProvider.isSectionSelected(section.line.polylineId)
               ? selectedPolylineColor
               : defaultPolylineColor,
           onTapParam: () {
-            Set<Polyline> updatedPolylines = getPolylines(sections);
+            selectedItemsProvider.toggleSectionSelected(section.line.polylineId);
             setState(() {
               isSectionDetailsVisible = !isSectionDetailsVisible;
-              selectedPolylineId = section.line.polylineId;
-              polylines = updatedPolylines;
+              if (selectedPolylines.contains(section.line.polylineId)) {
+                selectedPolylines.remove(section.line.polylineId);
+              } else {
+                selectedPolylines.add(section.line.polylineId);
+              }
+              polylines = getPolylines(sections);
             });
           },
         );
@@ -121,7 +128,7 @@ class _MapComponentState extends State<MapComponent> {
   @override
   Widget build(BuildContext context) {
     final token = context.read<UserProvider>().getToken;
-
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return Scaffold(
       body: Stack(
         children: [
@@ -145,7 +152,7 @@ class _MapComponentState extends State<MapComponent> {
                     markerId: const MarkerId('tapped_location_manual'),
                     position: latLng,
                   );
-
+                  markers.clear();
                   markers.add(newMarker);
                   location = LatLng(latLng.latitude, latLng.longitude);
                 });
@@ -186,7 +193,9 @@ class _MapComponentState extends State<MapComponent> {
                     backgroundColor: (locationManual) ? selectedButtonColor : defaultButtonColor ,
                   ),
                   onPressed: () {
+                    selectedItemsProvider.clearAll();
                     setState(() {
+                      polylines = {};
                       locationManual = !locationManual;
                     });
                   },

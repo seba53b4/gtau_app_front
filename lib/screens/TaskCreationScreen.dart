@@ -3,12 +3,14 @@ import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:gtau_app_front/widgets/map_component.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/task.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
+import '../widgets/map_modal.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -307,6 +309,15 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     Navigator.of(context).pop();
   }
 
+  // void _showMapModal(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return MapModal();
+  //     },
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     final taskListViewModel =
@@ -438,13 +449,15 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             decoration: const InputDecoration(
                               hintText: 'Select Date and Time',
                             ),
-                            //initialValue:  DateFormat('dd-MM-yyyy').format(startDate),
                             controller: releasedDateController,
                             enabled: false,
                             readOnly: true,
                           ),
                         ),
                       ),
+                    if (widget.detail)
+                      const SizedBox(height: 10.0),
+                    MapModal(),
                     const SizedBox(height: 10.0),
                     Text(
                       AppLocalizations.of(context)!

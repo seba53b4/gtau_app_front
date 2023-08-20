@@ -1,11 +1,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/models/task.dart';
-import 'package:gtau_app_front/services/task_service.dart';
-import 'package:provider/provider.dart';
 import '../models/section_data.dart';
-import '../providers/user_provider.dart';
 import '../services/section_service.dart';
 
 class SectionViewModel extends ChangeNotifier {
