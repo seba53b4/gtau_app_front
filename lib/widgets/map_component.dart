@@ -28,12 +28,12 @@ class _MapComponentState extends State<MapComponent> {
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   bool isSectionDetailsVisible = false;
-  Set<PolylineId> selectedPolylines = {};
   Color selectedPolylineColor = Colors.greenAccent;
   Color defaultPolylineColor = Colors.redAccent;
   Color selectedButtonColor = Colors.green;
   Color defaultButtonColor = Colors.primaries.first;
   bool locationManual = false;
+  static const double zoom = 15;
   late Completer<GoogleMapController> _mapController;
 
   @override
@@ -71,7 +71,7 @@ class _MapComponentState extends State<MapComponent> {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(currentPosition.latitude, currentPosition.longitude),
-            zoom: 15,
+            zoom: zoom,
           ),
         ),
       );
@@ -99,16 +99,6 @@ class _MapComponentState extends State<MapComponent> {
   void _onTapParamBehavior(Section section, List<Section>? sections ) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.toggleSectionSelected(section.line.polylineId);
-    setState(() {
-      if (widget.isModal) {
-        if (selectedPolylines.contains(section.line.polylineId)) {
-          selectedPolylines.remove(section.line.polylineId);
-        } else {
-          selectedPolylines.add(section.line.polylineId);
-        }
-      }
-      polylines = getPolylines(sections);
-    });
   }
 
   Color _onColorParamBehavior(Section section){
@@ -129,6 +119,9 @@ class _MapComponentState extends State<MapComponent> {
           colorParam: _onColorParamBehavior(section),
           onTapParam: () {
             _onTapParamBehavior(section, sections);
+            setState(() {
+              polylines = getPolylines(sections);
+            });
           },
         );
         setPol.add(pol);
@@ -142,7 +135,6 @@ class _MapComponentState extends State<MapComponent> {
   @override
   Widget build(BuildContext context) {
     final token = context.read<UserProvider>().getToken;
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return Scaffold(
       body: Stack(
         children: [
@@ -150,7 +142,7 @@ class _MapComponentState extends State<MapComponent> {
             mapType: _currentMapType,
             initialCameraPosition: const CameraPosition(
               target: initLocation,
-              zoom: 15,
+              zoom: zoom,
             ),
             polylines: polylines,
             markers: markers,
@@ -207,7 +199,6 @@ class _MapComponentState extends State<MapComponent> {
                     backgroundColor: (locationManual) ? selectedButtonColor : defaultButtonColor ,
                   ),
                   onPressed: () {
-                    selectedItemsProvider.clearAllSelections();
                     setState(() {
                       polylines = {};
                       locationManual = !locationManual;
