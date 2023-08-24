@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:http/http.dart' as http;
 
@@ -47,6 +48,7 @@ class TaskService {
             material: taskData['material'],
             observations: taskData['observations'],
             conclusions: taskData['conclusions'],
+            sections: _parseSectionsFromResponse(taskData['tramos'])
           );
         }).toList();
       } else {
@@ -59,6 +61,18 @@ class TaskService {
       }
       rethrow;
     }
+  }
+
+  Set<PolylineId> _parseSectionsFromResponse(dynamic sections){
+    List<int> sectionsList = List<int>.from(sections);
+    Set<PolylineId> returnSections = {};
+
+    for (int section in sectionsList) {
+      String sectionString = section.toString();
+      PolylineId polylineId = PolylineId(sectionString);
+      returnSections.add(polylineId);
+    }
+    return returnSections;
   }
 
   Future<bool> deleteTask(String token, int id) async {
@@ -103,6 +117,7 @@ class TaskService {
           material: taskData['material'],
           observations: taskData['observations'],
           conclusions: taskData['conclusions'],
+          sections: _parseSectionsFromResponse(taskData['tramos'])
         );
 
       } else {

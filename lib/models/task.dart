@@ -1,4 +1,6 @@
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class Task {
   late int? id;
   late String? status;
@@ -14,10 +16,10 @@ class Task {
   late String? material;
   late String? observations;
   late String? conclusions;
-  late List<String>? sections;
+  late Set<PolylineId>? sections;
 
-  List<String>? get getSections => sections;
-  set setSections(List<String>? value) => sections = value;
+  Set<PolylineId>? get getSections => sections;
+  set setSections(Set<PolylineId>? value) => sections = value;
 
   int? get getId => id;
   set setId(int? value) => id = value;
@@ -76,5 +78,6 @@ class Task {
     required this.material,
     required this.observations,
     required this.conclusions,
+    required this.sections
   });
 }

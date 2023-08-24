@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -75,6 +76,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         Provider.of<TaskListViewModel>(context, listen: false);
 
     try {
+      final selectedItemsProvider = context.read<SelectedItemsProvider>();
       final responseTask =
           await taskListViewModel.fetchTask(token, widget.idTask!);
 
@@ -83,6 +85,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           task = responseTask;
         });
       }
+
+      selectedItemsProvider.setSections(task.sections);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -101,6 +105,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       }
       addDateController.text =
           DateFormat(formatDate).format(task.addDate!).toString();
+
       return true;
     } catch (error) {
       print(error);
@@ -327,9 +332,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(

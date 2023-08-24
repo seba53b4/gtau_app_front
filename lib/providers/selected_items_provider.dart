@@ -30,6 +30,13 @@ class SelectedItemsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setSections(Set<PolylineId>? sections){
+    if (sections != null) {
+      _selectedSections = sections;
+      notifyListeners();
+    }
+  }
+
   bool isSectionSelected(PolylineId polylineId) {
     return _selectedSections.contains(polylineId);
   }
