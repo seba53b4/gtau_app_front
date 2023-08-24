@@ -30,5 +30,12 @@
     "taskListEditButtonLabel": "Editar",
     "taskListDeleteButtonLabel": "Eliminar",
     "buttonCancelLabel": "Cancelar",
-    "buttonAcceptLabel": "Aceptar"
+    "buttonAcceptLabel": "Aceptar",
+    "map_component_normal_view": "Normal",
+    "map_component_sattelite_view": "Satelite",
+    "map_component_fetch_sections": "Obtener tramos",
+    "map_component_get_location": "Obtener ubicación",
+    "map_component_select_location": "Seleccionar ubicación"
+
+
 }
