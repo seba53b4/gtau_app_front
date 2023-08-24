@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
@@ -253,6 +255,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Map<String, dynamic> createBodyToUpdate() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    final selectedSections = context.read<SelectedItemsProvider>().selectedPolylines;
+    final List<String> listSelectedSections = selectedSections.map((polylineId) => polylineId.value).toList();
+
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
       "inspectionType": task.inspectionType,
@@ -268,7 +273,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "length": lengthController.text,
       "material": materialController.text,
       "observations": observationsController.text,
-      "conclusions": conclusionsController.text
+      "conclusions": conclusionsController.text,
+      "tramos": listSelectedSections
     };
     return requestBody;
   }

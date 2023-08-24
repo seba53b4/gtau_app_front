@@ -14,6 +14,10 @@ class Task {
   late String? material;
   late String? observations;
   late String? conclusions;
+  late List<String>? sections;
+
+  List<String>? get getSections => sections;
+  set setSections(List<String>? value) => sections = value;
 
   int? get getId => id;
   set setId(int? value) => id = value;

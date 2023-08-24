@@ -132,7 +132,7 @@ class TaskService {
         print('Tarea ha sido actualizada correctamente');
         return true;
       } else {
-        print('No se pudieron traer datos');
+        print('Error en update de tarea');
         return false;
       }
     } catch (error){
