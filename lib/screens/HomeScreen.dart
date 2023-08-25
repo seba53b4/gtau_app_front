@@ -68,12 +68,12 @@ class _HomeScreenState extends State<HomeScreen> {
               future: Future.delayed(const Duration(microseconds: 2)),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: SizedBox(
-                      width: 60, // Tamaño personalizado
-                      height: 60, // Tamaño personalizado
+                      width: 60,
+                      height: 60,
                       child: CircularProgressIndicator(
-                        strokeWidth: 6, // Grosor personalizado
+                        strokeWidth: 6,
                       ),
                     ),
                   );
