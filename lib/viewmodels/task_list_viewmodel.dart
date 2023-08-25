@@ -16,8 +16,15 @@ class TaskListViewModel extends ChangeNotifier {
   };
   Map<String, List<Task>> get tasks => _tasks;
 
+
   int page = 0;
   int size = 10;
+
+  void clearLists() {
+    for (var key in _tasks.keys) {
+      _tasks[key]?.clear();
+    }
+  }
 
   Future<List<Task>?> initializeTasks(BuildContext context, String status, String? user) async {
    // if (_tasks[status]!.isNotEmpty){

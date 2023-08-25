@@ -4,7 +4,8 @@ import 'package:gtau_app_front/widgets/TaskList.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskStatusDashboard extends StatefulWidget {
-  const TaskStatusDashboard({Key? key});
+  final String? userName;
+  const TaskStatusDashboard({Key? key, this.userName});
 
   @override
   _TaskStatusDashboard createState() => _TaskStatusDashboard();
@@ -36,7 +37,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
           ),
         ),
         body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
+          duration: const Duration(milliseconds: 10),
           child: _buildTabContent(),
         ),
       ),);
@@ -49,25 +50,25 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
         return FadeTransition(
           key: const ValueKey<int>(0),
           opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Pending.value)),
+          child: SafeArea(child: TaskList(status: TaskStatus.Pending.value, userName: widget.userName)),
         );
       case 1:
         return FadeTransition(
           key: const ValueKey<int>(1),
           opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Doing.value)),
+          child: SafeArea(child: TaskList(status: TaskStatus.Doing.value, userName: widget.userName)),
         );
       case 2:
         return FadeTransition(
           key: const ValueKey<int>(2),
           opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Blocked.value)),
+          child: SafeArea(child: TaskList(status: TaskStatus.Blocked.value, userName: widget.userName)),
         );
       case 3:
         return FadeTransition(
           key: const ValueKey<int>(3),
           opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Done.value)),
+          child: SafeArea(child: TaskList(status: TaskStatus.Done.value, userName: widget.userName)),
         );
       default:
         return Container();
