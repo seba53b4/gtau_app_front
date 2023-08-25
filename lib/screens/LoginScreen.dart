@@ -8,6 +8,7 @@ import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 
@@ -20,6 +21,11 @@ class LoginScreen extends StatelessWidget {
 
   Future<AuthData?> _fetchAuth(BuildContext context, String username, String password) async {
 
+    if (username.isEmpty || password.isEmpty){
+      _showWrongCredentialsToast(context);
+      return null;
+    }
+
     try {
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
       final responseAuthData = await authViewModel.fetchAuth(username, password);
@@ -28,19 +34,23 @@ class LoginScreen extends StatelessWidget {
         return responseAuthData;
       } else {
         print('Contraseña incorrecta');
-        Fluttertoast.showToast(
-          msg: "Usuario y/o contraseña incorrectos",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          backgroundColor: Colors.grey,
-          textColor: Colors.white,
-        );
+        _showWrongCredentialsToast(context);
         return null;
       }
     } catch (error) {
       print(error);
       throw Exception('Error al obtener los datos');
     }
+  }
+
+  _showWrongCredentialsToast(BuildContext context){
+    Fluttertoast.showToast(
+      msg: AppLocalizations.of(context)!.toast_warning_wrong_credentials,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.grey,
+      textColor: Colors.white,
+    );
   }
 
   void setUserData(BuildContext context, bool isLoggedIn, String username, AuthData authData, bool isAdmin) {
@@ -95,28 +105,28 @@ class LoginScreen extends StatelessWidget {
           children: [
             const Text('PipeTracker'),
             TextField(
-              decoration: const InputDecoration(
-                hintText: 'Nombre del usuario',
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.default_input_username_hint,
               ),
               controller: usernameController,
             ),
             TextField(
-              decoration: const InputDecoration(
-                hintText: 'Ingresa la password',
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context)!.default_input_password_hint,
               ),
               controller: passwordController,
               obscureText: true,
             ),
             ElevatedButton(
               onPressed: () => onLogInPressed(context),
-              child: const Text('Login button'),
+              child: Text(AppLocalizations.of(context)!.default_login_button),
             ),
             ElevatedButton(
               onPressed: onForgotPressed,
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.grey),
               ),
-              child: const Text('Olvidaste la password'),
+              child: Text(AppLocalizations.of(context)!.default_forgot_password),
             ),
           ],
         ),

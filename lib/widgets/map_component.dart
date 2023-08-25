@@ -3,13 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 
 class MapComponent extends StatefulWidget {
+  final bool isModal;
+  const MapComponent({super.key, this.isModal = false});
+
   @override
   _MapComponentState createState() => _MapComponentState();
 }
@@ -24,12 +28,12 @@ class _MapComponentState extends State<MapComponent> {
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   bool isSectionDetailsVisible = false;
-  PolylineId selectedPolylineId = PolylineId('');
   Color selectedPolylineColor = Colors.greenAccent;
   Color defaultPolylineColor = Colors.redAccent;
   Color selectedButtonColor = Colors.green;
   Color defaultButtonColor = Colors.primaries.first;
   bool locationManual = false;
+  static const double zoom = 15;
   late Completer<GoogleMapController> _mapController;
 
   @override
@@ -67,7 +71,7 @@ class _MapComponentState extends State<MapComponent> {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(currentPosition.latitude, currentPosition.longitude),
-            zoom: 15,
+            zoom: zoom,
           ),
         ),
       );
@@ -92,21 +96,31 @@ class _MapComponentState extends State<MapComponent> {
     return sections;
   }
 
+  void _onTapParamBehavior(Section section, List<Section>? sections ) {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    selectedItemsProvider.toggleSectionSelected(section.line.polylineId);
+  }
+
+  Color _onColorParamBehavior(Section section){
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    return selectedItemsProvider.isSectionSelected(section.line.polylineId)
+            ? selectedPolylineColor
+            : defaultPolylineColor;
+  }
+
+
 
   Set<Polyline> getPolylines(List<Section>? sections) {
+
     if (sections != null) {
       Set<Polyline> setPol = {};
       for (var section in sections) {
         Polyline pol = section.line.copyWith(
-          colorParam: selectedPolylineId == section.line.polylineId
-              ? selectedPolylineColor
-              : defaultPolylineColor,
+          colorParam: _onColorParamBehavior(section),
           onTapParam: () {
-            Set<Polyline> updatedPolylines = getPolylines(sections);
+            _onTapParamBehavior(section, sections);
             setState(() {
-              isSectionDetailsVisible = !isSectionDetailsVisible;
-              selectedPolylineId = section.line.polylineId;
-              polylines = updatedPolylines;
+              polylines = getPolylines(sections);
             });
           },
         );
@@ -121,7 +135,6 @@ class _MapComponentState extends State<MapComponent> {
   @override
   Widget build(BuildContext context) {
     final token = context.read<UserProvider>().getToken;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -129,7 +142,7 @@ class _MapComponentState extends State<MapComponent> {
             mapType: _currentMapType,
             initialCameraPosition: const CameraPosition(
               target: initLocation,
-              zoom: 15,
+              zoom: zoom,
             ),
             polylines: polylines,
             markers: markers,
@@ -163,7 +176,7 @@ class _MapComponentState extends State<MapComponent> {
                       _currentMapType = _currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
                     });
                   },
-                  child: _currentMapType == MapType.normal ? Text("Normal") : Text("Satelite"),
+                  child: _currentMapType == MapType.normal ? Text(AppLocalizations.of(context)!.map_component_normal_view) : Text(AppLocalizations.of(context)!.map_component_sattelite_view),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -173,13 +186,13 @@ class _MapComponentState extends State<MapComponent> {
                       polylines = updatedPolylines;
                     });
                   },
-                  child: const Text("Fetch Tramos"),
+                  child: Text(AppLocalizations.of(context)!.map_component_fetch_sections),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     getCurrentLocation();
                   },
-                  child: const Text("Obtener Ubicación"),
+                  child: Text(AppLocalizations.of(context)!.map_component_get_location),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -187,10 +200,11 @@ class _MapComponentState extends State<MapComponent> {
                   ),
                   onPressed: () {
                     setState(() {
+                      polylines = {};
                       locationManual = !locationManual;
                     });
                   },
-                  child: const Text("Seleccionar Ubicación"),
+                  child: Text(AppLocalizations.of(context)!.map_component_select_location),
                 ),
                 ElevatedButton(
                   onPressed: () {
