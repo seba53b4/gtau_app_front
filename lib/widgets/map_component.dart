@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -187,6 +188,7 @@ class _MapComponentState extends State<MapComponent> {
                       ),
                   ),
                 ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   onPressed: () async {
                     List<Section>? newSections = await fetchPolylines(token!);
@@ -206,6 +208,7 @@ class _MapComponentState extends State<MapComponent> {
                   ),
                 ),
                 ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   onPressed: () {
                     getCurrentLocation();
@@ -221,6 +224,7 @@ class _MapComponentState extends State<MapComponent> {
                     ),
                   ),
                 ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: (locationManual) ? selectedButtonColor : defaultButtonColor ,
@@ -242,6 +246,7 @@ class _MapComponentState extends State<MapComponent> {
                     ),
                   ),
                 ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
