@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/models/task_status.dart';
-import 'package:gtau_app_front/widgets/TaskList.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
@@ -11,67 +9,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+  void updateSearch(String search) {
+    // Lógica de filtrado según la búsqueda
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      initialIndex: 1,
-     child: Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0,
-        bottom: TabBar(
-          tabs: [
-             Tab(text: AppLocalizations.of(context)!.task_status_pendingTitle),
-             Tab(text: AppLocalizations.of(context)!.task_status_doingTitle),
-             Tab(text: AppLocalizations.of(context)!.task_status_blockedTitle),
-             Tab(text: AppLocalizations.of(context)!.task_status_doneTitle),
-          ],
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-        ),
-      ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        child: _buildTabContent(),
-      ),
-    ),);
-
-  }
-
-  Widget _buildTabContent() {
-    switch (_currentIndex) {
-      case 0:
-        return FadeTransition(
-          key: const ValueKey<int>(0),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Pending.value)),
-        );
-      case 1:
-        return FadeTransition(
-          key: const ValueKey<int>(1),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Doing.value)),
-        );
-      case 2:
-        return FadeTransition(
-          key: const ValueKey<int>(2),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Blocked.value)),
-        );
-      case 3:
-        return FadeTransition(
-          key: const ValueKey<int>(3),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Done.value)),
-        );
-      default:
-        return Container();
-    }
+    return const TaskStatusDashboard();
+    // return SizedBox(
+    //   width: 500,
+    //   height: 300,
+    //   child: Column(
+    //     children: [
+    //       TextField(
+    //         decoration: const InputDecoration(
+    //           hintText: 'Ingrese un nombre de usuario',
+    //         ),
+    //         onChanged: updateSearch,
+    //         controller: _searchController,
+    //       ),
+    //       const TaskStatusDashboard(),
+    //     ],
+    //   ),
+    // );
   }
 }
 

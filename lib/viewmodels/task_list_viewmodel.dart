@@ -19,19 +19,26 @@ class TaskListViewModel extends ChangeNotifier {
   int page = 0;
   int size = 10;
 
-  Future<List<Task>?> initializeTasks(BuildContext context, String status) async {
+  Future<List<Task>?> initializeTasks(BuildContext context, String status, String? user) async {
    // if (_tasks[status]!.isNotEmpty){
    //   return _tasks[status];
    // }
-   return await fetchTasksFromUser(context, status);
+   return await fetchTasksFromUser(context, status, user);
   }
 
-  Future<List<Task>?> fetchTasksFromUser(BuildContext context, String status) async {
+  Future<List<Task>?> fetchTasksFromUser(BuildContext context, String status, String? user) async {
     final token = context.read<UserProvider>().getToken;
-    final user = context.read<UserProvider>().userName;
+    String? userName;
+    if (user == null) {
+      userName = context
+          .read<UserProvider>()
+          .userName;
+    } else {
+      userName = user;
+    }
     try {
 
-      final responseListTask = await _taskService.getTasks(token!,user!,page,size,status);
+      final responseListTask = await _taskService.getTasks(token!,userName!,page,size,status);
       _tasks[status] = responseListTask!;
       notifyListeners();
       return responseListTask;

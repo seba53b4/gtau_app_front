@@ -5,30 +5,19 @@ import '../viewmodels/task_list_viewmodel.dart';
 
 class TaskList extends StatefulWidget {
   final String status;
-  const TaskList({Key? key, required this.status}) : super(key: key);
+  final String? user;
+  const TaskList({Key? key, required this.status, this.user}) : super(key: key);
 
   @override
   _TaskListComponentState createState() => _TaskListComponentState();
 }
 
 class _TaskListComponentState extends State<TaskList> {
-  final TextEditingController _searchController = TextEditingController();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
   @override
   void initState() {
     super.initState();
     final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
-    taskListViewModel.initializeTasks(context, widget.status);
-  }
-
-  void updateSearch(String search) {
-    // Lógica de filtrado según la búsqueda
+    taskListViewModel.initializeTasks(context, widget.status, widget.user);
   }
 
   @override
@@ -40,13 +29,7 @@ class _TaskListComponentState extends State<TaskList> {
       margin: const EdgeInsets.only(bottom: 132),
       child: Column(
         children: [
-          TextField(
-            decoration: const InputDecoration(
-              hintText: 'PlaceHolder',
-            ),
-            onChanged: updateSearch,
-            controller: _searchController,
-          ),
+          // Sin campo de búsqueda
           Expanded(
             child: ListView.builder(
               itemCount: tasks?.length,
