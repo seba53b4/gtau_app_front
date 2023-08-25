@@ -53,5 +53,8 @@
     "task_status_doneTitle" : "Terminadas",
     "task_status_blockedTitle" : "Terminadas",
     "task_status_doingTitle" : "En curso",
-    "elementsTitle": "Elementos Registrados:"
+    "elementsTitle": "Elementos Registrados:",
+    "map_modal_add_elements_button": "Añadir elementos",
+    "map_modal_add_elements_title": "Añadir elementos"
+
 }

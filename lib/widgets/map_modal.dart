@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../providers/selected_items_provider.dart';
 
@@ -12,7 +13,7 @@ void _showMapModal(BuildContext context) {
   showGeneralDialog(
     context: context,
     barrierDismissible: false,
-    barrierLabel: "Modal",
+    barrierLabel: "Map Modal",
     transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (_, __, ___) {
       return Scaffold(
@@ -29,9 +30,9 @@ void _showMapModal(BuildContext context) {
                   Navigator.pop(context);
                 }
             ),
-            title: const Text(
-              "Modal",
-              style: TextStyle(color: Colors.black87, fontFamily: 'Overpass', fontSize: 20),
+            title: Text(
+              AppLocalizations.of(context)!.map_modal_add_elements_title,
+              style: const TextStyle(color: Colors.black87, fontFamily: 'Overpass', fontSize: 20),
             ),
             elevation: 0.0
         ),
@@ -46,7 +47,7 @@ void _showMapModal(BuildContext context) {
                 child: const MapComponent(isModal: true),
               ),
               const SizedBox(height: 16),
-              Container(
+              SizedBox(
                 height: 50,
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -60,14 +61,14 @@ void _showMapModal(BuildContext context) {
                           selectedItemsProvider.clearAllSelections();
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Cerrar'),
+                        child: Text(AppLocalizations.of(context)!.buttonCancelLabel),
                       ),
                       const SizedBox(width: 10.0),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Aceptar'),
+                        child: Text(AppLocalizations.of(context)!.buttonAcceptLabel),
                       ),
                     ]
                 ),
@@ -93,7 +94,7 @@ class MapModal extends StatelessWidget {
         onPressed: () {
           _showMapModal(context);
         },
-        child: const Text('Open Modal'),
+        child: Text(AppLocalizations.of(context)!.map_modal_add_elements_button),
       );
   }
 }
