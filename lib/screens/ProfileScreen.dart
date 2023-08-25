@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -51,8 +52,8 @@ class ProfileScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
-                child: const Text(
-                  'Log out',
+                child: Text(
+                  AppLocalizations.of(context)!.default_logout_button,
                   style: TextStyle(color: Colors.white),
                 ),
               ),

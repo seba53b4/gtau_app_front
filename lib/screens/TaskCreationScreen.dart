@@ -1,12 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
-import 'package:gtau_app_front/widgets/map_component.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -345,7 +343,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 widget.detail
                     ? AppLocalizations.of(context)!.createTaskPage_titleOnEdit
                     : AppLocalizations.of(context)!.createTaskPage_title,
-                style: TextStyle(fontSize: 32.0),
+                style: const TextStyle(fontSize: 32.0),
               ),
               const SizedBox(height: 20.0),
               if (!widget.detail)
@@ -375,21 +373,21 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     Text(
                       AppLocalizations.of(context)!
                           .createTaskPage_numberWorkTitle,
-                      style: TextStyle(fontSize: 24.0),
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context)!
                             .default_placeHolderInputText,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       controller: numWorkController,
                     ),
                     const SizedBox(height: 10.0),
                     if (widget.detail)
-                      const Text(
-                        'Estado',
-                        style: TextStyle(fontSize: 24.0),
+                      Text(
+                        AppLocalizations.of(context)!.editTaskPage_statusTitle,
+                        style: const TextStyle(fontSize: 24.0),
                       ),
                     DropdownButton<String>(
                       value: taskStatus,
@@ -409,7 +407,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     Text(
                       AppLocalizations.of(context)!
                           .createTaskPage_startDateTitle,
-                      style: TextStyle(fontSize: 24.0),
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     InkWell(
                       onTap: () async {
@@ -425,8 +423,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       },
                       child: IgnorePointer(
                         child: TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'Select Date and Time',
+                          decoration: InputDecoration(
+                            hintText: AppLocalizations.of(context)!.default_datepicker_hint,
                           ),
                           //initialValue:  DateFormat('dd-MM-yyyy').format(startDate),
                           controller: addDateController,
@@ -437,9 +435,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     if (widget.detail) const SizedBox(height: 10.0),
                     if (widget.detail)
-                      const Text(
-                        'Fecha de Realización',
-                        style: TextStyle(fontSize: 24.0),
+                      Text(
+                        AppLocalizations.of(context)!.createTaskPage_realizationDateTitle,
+                        style: const TextStyle(fontSize: 24.0),
                       ),
                     if (widget.detail)
                       InkWell(
@@ -456,8 +454,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         },
                         child: IgnorePointer(
                           child: TextFormField(
-                            decoration: const InputDecoration(
-                              hintText: 'Select Date and Time',
+                            decoration: InputDecoration(
+                              hintText: AppLocalizations.of(context)!.default_datepicker_hint,
                             ),
                             controller: releasedDateController,
                             enabled: false,
@@ -477,18 +475,18 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Selected Polylines:',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              AppLocalizations.of(context)!.elementsTitle,
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
                                 children: [
                                   for (var polylineId in selectedPolylines)
                                     Container(
-                                      margin: EdgeInsets.all(8),
-                                      padding: EdgeInsets.all(8),
+                                      margin: const EdgeInsets.all(8),
+                                      padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(8),
@@ -500,12 +498,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ),
                           ],
                         )
-                            : const Column(
+                            : Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Selected Polylines:',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  AppLocalizations.of(context)!.elementsTitle,
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                 ),
                           ],
                         );
@@ -515,13 +513,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     Text(
                       AppLocalizations.of(context)!
                           .createTaskPage_selectUbicationTitle,
-                      style: TextStyle(fontSize: 24.0),
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
                         hintText: AppLocalizations.of(context)!
                             .default_placeHolderInputText,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       controller: locationController,
                     ),
@@ -529,7 +527,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     Text(
                       AppLocalizations.of(context)!
                           .createTaskPage_assignedUserTitle,
-                      style: TextStyle(fontSize: 24.0),
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     if (!widget.detail)
                       DropdownButton<String>(
@@ -539,20 +537,20 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             userAssigned = value!;
                           });
                         },
-                        items: const [
+                        items: [
                           DropdownMenuItem<String>(
                             value: 'not-assigned',
-                            child: Text('Elija una opción'),
+                            child: Text(AppLocalizations.of(context)!.default_dropdown_label),
                           ),
-                          DropdownMenuItem<String>(
+                          const DropdownMenuItem<String>(
                             value: 'gtau-oper',
                             child: Text('gtau-oper'),
                           ),
-                          DropdownMenuItem<String>(
+                          const DropdownMenuItem<String>(
                             value: 'gtau-admin',
                             child: Text('gtau-oper'),
                           ),
-                          DropdownMenuItem<String>(
+                          const DropdownMenuItem<String>(
                             value: 'operario3',
                             child: Text('Operario C'),
                           ),
@@ -619,9 +617,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 Column(
                   children: [
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'Longitud',
-                      style: TextStyle(fontSize: 24.0),
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_longitudeTitle,
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
@@ -632,9 +630,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       controller: lengthController,
                     ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'Material',
-                      style: TextStyle(fontSize: 24.0),
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_materialTitle,
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
@@ -645,9 +643,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       controller: materialController,
                     ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'Observaciones',
-                      style: TextStyle(fontSize: 24.0),
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_observationsTitle,
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(
@@ -658,9 +656,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       controller: observationsController,
                     ),
                     const SizedBox(height: 10.0),
-                    const Text(
-                      'Conclusiones',
-                      style: TextStyle(fontSize: 24.0),
+                    Text(
+                      AppLocalizations.of(context)!.createTaskPage_conclusionsTitle,
+                      style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
                       decoration: InputDecoration(

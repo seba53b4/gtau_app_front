@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/widgets/TaskList.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
@@ -21,11 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         toolbarHeight: 0,
         bottom: TabBar(
-          tabs: const [
-             Tab(text: 'Pendientes'),
-             Tab(text: 'En curso'),
-             Tab(text: 'Bloqueadas'),
-             Tab(text: 'Terminadas'),
+          tabs: [
+             Tab(text: AppLocalizations.of(context)!.task_status_pendingTitle),
+             Tab(text: AppLocalizations.of(context)!.task_status_doingTitle),
+             Tab(text: AppLocalizations.of(context)!.task_status_blockedTitle),
+             Tab(text: AppLocalizations.of(context)!.task_status_doneTitle),
           ],
           onTap: (index) {
             setState(() {
