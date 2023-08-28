@@ -6,49 +6,50 @@ import '../viewmodels/task_list_viewmodel.dart';
 class TaskList extends StatefulWidget {
   final String status;
   final String? userName;
-  const TaskList({Key? key, required this.status, this.userName}) : super(key: key);
+  const TaskList({Key? key, required this.status, this.userName})
+      : super(key: key);
 
   @override
   _TaskListComponentState createState() => _TaskListComponentState();
 }
 
 class _TaskListComponentState extends State<TaskList> {
-
   @override
   void initState() {
     super.initState();
-    clearLists(); // Limpia las listas antes de cargar los datos
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
-    taskListViewModel.initializeTasks(context, widget.status, widget.userName);
+    clearLists();
   }
 
   void clearLists() {
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    final taskListViewModel =
+    Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearLists();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final taskListViewModel = Provider.of<TaskListViewModel>(context);
-    final tasks = taskListViewModel.tasks[widget.status];
-
     return Container(
       margin: const EdgeInsets.only(bottom: 132),
-      child: Column(
+      child: Consumer<TaskListViewModel>(
+        builder: (context, taskListViewModel, child) {
+          taskListViewModel.initializeTasks(
+              context, widget.status, widget.userName);
+          final tasks = taskListViewModel.tasks[widget.status];
 
-        children: [
-          // Sin campo de búsqueda
-          Expanded(
-            child: ListView.builder(
-              itemCount: tasks?.length,
-              itemBuilder: (context, index) {
-                final task = tasks?[index];
-                return TaskListItem(task: task);
-              },
-            ),
-          ),
-        ],
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: tasks?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    final task = tasks?[index];
+                    return TaskListItem(task: task!);
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
