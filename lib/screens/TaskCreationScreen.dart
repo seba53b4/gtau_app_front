@@ -242,6 +242,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToCreate() {
+    final selectedSections = context.read<SelectedItemsProvider>().selectedPolylines;
+    final List<String> listSelectedSections = selectedSections.map((polylineId) => polylineId.value).toList();
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -252,6 +254,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "location": locationController.text,
       "description": descriptionController.text,
       "user": userAssigned,
+      "tramos": listSelectedSections
     };
     return requestBody;
   }
