@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/models/task_status.dart';
-import 'package:gtau_app_front/widgets/TaskList.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
@@ -11,67 +15,77 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
+  String _enteredUsername = '';
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _updateSearch(String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(seconds: 2), () {
+      setState(() {
+        _enteredUsername = value;
+      });
+    });
+  }
+
+  void _updateSearchByEnter(String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    setState(() {
+      _enteredUsername = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      initialIndex: 1,
-     child: Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0,
-        bottom: TabBar(
-          tabs: [
-             Tab(text: AppLocalizations.of(context)!.task_status_pendingTitle),
-             Tab(text: AppLocalizations.of(context)!.task_status_doingTitle),
-             Tab(text: AppLocalizations.of(context)!.task_status_blockedTitle),
-             Tab(text: AppLocalizations.of(context)!.task_status_doneTitle),
-          ],
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-        ),
-      ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        child: _buildTabContent(),
-      ),
-    ),);
+    final isAdmin = context.read<UserProvider>().isAdmin;
 
-  }
-
-  Widget _buildTabContent() {
-    switch (_currentIndex) {
-      case 0:
-        return FadeTransition(
-          key: const ValueKey<int>(0),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Pending.value)),
-        );
-      case 1:
-        return FadeTransition(
-          key: const ValueKey<int>(1),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Doing.value)),
-        );
-      case 2:
-        return FadeTransition(
-          key: const ValueKey<int>(2),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Blocked.value)),
-        );
-      case 3:
-        return FadeTransition(
-          key: const ValueKey<int>(3),
-          opacity: const AlwaysStoppedAnimation(1.0),
-          child: SafeArea(child: TaskList(status: TaskStatus.Done.value)),
-        );
-      default:
-        return Container();
-    }
+    return isAdmin!
+        ? Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextFormField(
+              controller: _searchController,
+              onChanged: _updateSearch,
+              onFieldSubmitted: _updateSearchByEnter,
+              decoration: InputDecoration(
+                labelText: 'Ingrese un nombre de usuario',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: Future.delayed(const Duration(microseconds: 2)),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 6,
+                      ),
+                    ),
+                  );
+                } else {
+                  return TaskStatusDashboard(userName: _enteredUsername);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    )
+        : TaskStatusDashboard();
   }
 }
-

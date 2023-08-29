@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -166,9 +167,9 @@ class _MapComponentState extends State<MapComponent> {
             },
           ),
           Positioned(
-            bottom: 14,
+            bottom: 80,
             left: 16,
-            child: Row(
+            child: Column(
               children: [
                 ElevatedButton(
                   onPressed: () {
@@ -176,8 +177,18 @@ class _MapComponentState extends State<MapComponent> {
                       _currentMapType = _currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
                     });
                   },
-                  child: _currentMapType == MapType.normal ? Text(AppLocalizations.of(context)!.map_component_normal_view) : Text(AppLocalizations.of(context)!.map_component_sattelite_view),
+                  child: Tooltip(
+                    message: AppLocalizations.of(context)!.map_component_map_view_tooltip,
+                    preferBelow: false,
+                    verticalOffset: 14,
+                    waitDuration: const Duration(milliseconds: 1000),
+                    child: Icon(
+                      _currentMapType == MapType.normal ? Icons.map : Icons.satellite,
+                        color: Colors.white,
+                      ),
+                  ),
                 ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   onPressed: () async {
                     List<Section>? newSections = await fetchPolylines(token!);
@@ -186,14 +197,34 @@ class _MapComponentState extends State<MapComponent> {
                       polylines = updatedPolylines;
                     });
                   },
-                  child: Text(AppLocalizations.of(context)!.map_component_fetch_sections),
+                  child: Tooltip(
+                  message: AppLocalizations.of(context)!.map_component_fetch_elements,
+                  preferBelow: false,
+                  verticalOffset: 14,
+                  waitDuration: const Duration(milliseconds: 1000),
+                  child: const Icon(
+                    Icons.area_chart_outlined,
+                    color: Colors.white,
+                  ),
                 ),
+                ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   onPressed: () {
                     getCurrentLocation();
                   },
-                  child: Text(AppLocalizations.of(context)!.map_component_get_location),
+                  child: Tooltip(
+                    message: AppLocalizations.of(context)!.map_component_get_location,
+                    preferBelow: false,
+                    verticalOffset: 14,
+                    waitDuration: const Duration(milliseconds: 1000),
+                    child: const Icon(
+                      Icons.my_location,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: (locationManual) ? selectedButtonColor : defaultButtonColor ,
@@ -204,15 +235,31 @@ class _MapComponentState extends State<MapComponent> {
                       locationManual = !locationManual;
                     });
                   },
-                  child: Text(AppLocalizations.of(context)!.map_component_select_location),
+                  child: Tooltip(
+                    message: AppLocalizations.of(context)!.map_component_select_location,
+                    preferBelow: false,
+                    verticalOffset: 14,
+                    waitDuration: const Duration(milliseconds: 1000),
+                    child: const Icon(
+                      Icons.location_pin,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
                       distanceSelected = (distanceSelected + 1) % distances.length;
                     });
                   },
-                  child: Text(distances[distanceSelected].toString()),
+                  child: Tooltip(
+                    message:  AppLocalizations.of(context)!.map_component_diameter_tooltip,
+                    preferBelow: false,
+                    verticalOffset: 14,
+                    waitDuration: const Duration(milliseconds: 1000),
+                    child: Text(distances[distanceSelected].toString()),
+                  ),
                 ),
               ],
             ),
