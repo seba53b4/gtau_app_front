@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 import 'package:provider/provider.dart';
 

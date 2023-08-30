@@ -5,8 +5,7 @@ import '../viewmodels/task_list_viewmodel.dart';
 
 class TaskList extends StatefulWidget {
   final String status;
-  final String? userName;
-  const TaskList({Key? key, required this.status, this.userName})
+  const TaskList({Key? key, required this.status})
       : super(key: key);
 
   @override
@@ -17,13 +16,6 @@ class _TaskListComponentState extends State<TaskList> {
   @override
   void initState() {
     super.initState();
-    clearLists();
-  }
-
-  void clearLists() {
-    final taskListViewModel =
-    Provider.of<TaskListViewModel>(context, listen: false);
-    taskListViewModel.clearLists();
   }
 
   @override
@@ -32,8 +24,6 @@ class _TaskListComponentState extends State<TaskList> {
       margin: const EdgeInsets.only(bottom: 132),
       child: Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
-          taskListViewModel.initializeTasks(
-              context, widget.status, widget.userName);
           final tasks = taskListViewModel.tasks[widget.status];
 
           return Column(

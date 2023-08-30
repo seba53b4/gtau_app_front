@@ -27,9 +27,6 @@ class TaskListViewModel extends ChangeNotifier {
   }
 
   Future<List<Task>?> initializeTasks(BuildContext context, String status, String? user) async {
-   // if (_tasks[status]!.isNotEmpty){
-   //   return _tasks[status];
-   // }
    return await fetchTasksFromUser(context, status, user);
   }
 
