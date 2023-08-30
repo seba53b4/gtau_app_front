@@ -70,6 +70,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   void updateTaskListState(status) async {
     final userName = Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.clearListByStatus(status);
     await taskListViewModel.initializeTasks(context, status, userName);
   }
 
