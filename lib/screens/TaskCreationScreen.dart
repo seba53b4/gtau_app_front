@@ -233,7 +233,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         onEnablePressed: () {
           handleAcceptOnShowDialogCreateTask();
           resetSelectionOnMap();
-          updateTaskList();
           Navigator.of(context).pop();
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,

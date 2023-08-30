@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
             child: FutureBuilder(
-              future: Future.delayed(const Duration(microseconds: 2)),
+              future: Future.delayed(const Duration(microseconds: 20)),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
