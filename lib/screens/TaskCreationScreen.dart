@@ -264,6 +264,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Map<String, dynamic> createBodyToUpdate() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String? releasedDateSelected = releasedDateController.text.isNotEmpty ? formattedDateToUpdate(releasedDateController.text) : null;
     final selectedSections = context.read<SelectedItemsProvider>().selectedPolylines;
     final List<String> listSelectedSections = selectedSections.map((polylineId) => polylineId.value).toList();
 
@@ -275,9 +276,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "applicant": applicantController.text,
       "location": locationController.text,
       "description": descriptionController.text,
-      "releasedDate": releasedDate == null
-          ? formattedDateToUpdate(releasedDateController.text)
-          : null,
+      "releasedDate": releasedDateSelected,
       "user": userAssignedController.text,
       "length": lengthController.text,
       "material": materialController.text,
@@ -473,7 +472,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ),
                             controller: releasedDateController,
                             enabled: false,
-                            readOnly: true,
                           ),
                         ),
                       ),
