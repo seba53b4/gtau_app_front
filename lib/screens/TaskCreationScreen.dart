@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
+import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/map_modal.dart';
@@ -32,6 +33,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   int selectedIndex = 0;
   String userAssigned = "not-assigned";
   late String taskStatus = 'PENDING';
+  late String initStatus = 'PENDING';
   final descriptionController = TextEditingController();
   final numWorkController = TextEditingController();
   final locationController = TextEditingController();
@@ -96,6 +98,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       observationsController.text = task.observations ?? '';
       startDate = task.addDate!;
       taskStatus = task.status!;
+      initStatus = task.status!;
       if (task.releasedDate != null) {
         releasedDate = task.releasedDate!;
         releasedDateController.text =
@@ -291,6 +294,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    updateTaskList();
   }
 
   void handleAcceptOnShowDialogCreateTask() async {
@@ -299,6 +303,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    updateTaskList();
+  }
+
+  void updateTaskList() async{
+    final userName = Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    await taskListViewModel.initializeTasks(context, initStatus, userName);
   }
 
   void handleEditTask() {
