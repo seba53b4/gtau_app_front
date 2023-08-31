@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
+import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
@@ -28,6 +29,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<UserProvider>(
           create: (context) => UserProvider(),
+        ),
+        ChangeNotifierProvider<TaskFilterProvider>(
+          create: (context) => TaskFilterProvider(),
         ),
         ChangeNotifierProvider<TaskListViewModel>(
           create: (context) => TaskListViewModel(),
