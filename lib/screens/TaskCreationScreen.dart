@@ -13,6 +13,7 @@ import '../providers/selected_items_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/map_modal.dart';
+import '../widgets/user_image.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -328,6 +329,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   }
 
+  String imageUrl='';
+
   @override
   Widget build(BuildContext context) {
 
@@ -613,6 +616,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 ),
                 controller: descriptionController,
               ),
+              UserImage(
+                onFileChanged: (imageUrl) {
+                  setState(() {
+                    this.imageUrl=imageUrl;
+                  });
+                },
+              ),
               if (widget.detail)
                 Column(
                   children: [
@@ -667,6 +677,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         border: const OutlineInputBorder(),
                       ),
                       controller: conclusionsController,
+                    ),
+                    UserImage(
+                      onFileChanged: (imageUrl) {
+                        setState(() {
+                          this.imageUrl=imageUrl;
+                        });
+                      },
                     ),
                   ],
                 ),
