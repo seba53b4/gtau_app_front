@@ -4,24 +4,47 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 
+double calculateDistance(LatLng point1, LatLng point2) {
+  final double dx = point1.latitude - point2.latitude;
+  final double dy = point1.longitude - point2.longitude;
+  final double distance = sqrt(dx * dx + dy * dy);
+  return distance;
+}
+
+List<LatLng> getLargePolylineOnSection(List<LatLng> points){
+
+  List<LatLng> ret = [];
+  double maxLength = 0;
+  for (int i = 0; i < points.length-1; i++) {
+    final dist = calculateDistance(points[i], points[i+1]);
+    if(dist > maxLength){
+      maxLength = dist;
+      ret.clear();
+      ret.add(points[i]);
+      ret.add(points[i+1]);
+    }
+  }
+
+  return ret;
+
+}
+
 Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
 
   Set<Polyline> ret = {};
   const Color arrowColor = Colors.lightBlue;
   const int arrowWidth = 3;
-  
+
   try{
     LatLng init, end;
-    switch (points.length) {
-      case 2:
-        init = points.first;
-        end = points.last;
-      case 3:
-        init = points.elementAt(1);
-        end = points.elementAt(2);
-      default:
-        init = points.elementAt(2);
-        end = points.elementAt(3);
+
+    if (points.length == 2){
+      init = points.first;
+      end = points.last;
+    } else {
+      List<LatLng> pointsOfArrow = getLargePolylineOnSection(points);
+      init = pointsOfArrow.first;
+      end = pointsOfArrow.last;
     }
 
     // Calcula el punto medio de la línea principal
