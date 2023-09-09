@@ -144,7 +144,7 @@ class _MapComponentState extends State<MapComponent> {
           },
         );
         setPol.add(pol);
-        setPol.addAll(polylineArrows(section.line.points.first,section.line.points.last, section.line.polylineId));
+        setPol.addAll(polylineArrows(section.line.points, section.line.polylineId));
       }
       return setPol;
     } else {
