@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SelectedItemsProvider with ChangeNotifier {
-
   bool _multipleItemsSelected = false;
   bool get multipleItemsSelected => _multipleItemsSelected;
 
@@ -12,10 +11,10 @@ class SelectedItemsProvider with ChangeNotifier {
   Set<MarkerId> _selectedRegistros = {};
   Set<MarkerId> get selectedRegistros => _selectedRegistros;
 
-  Set<MarkerId> _selectedCaptaciones = {};
-  Set<MarkerId> get selectedCaptaciones => _selectedCaptaciones;
+  Set<CircleId> _selectedCaptaciones = {};
+  Set<CircleId> get selectedCaptaciones => _selectedCaptaciones;
 
-  void activateMultipleSelection(){
+  void activateMultipleSelection() {
     _multipleItemsSelected = true;
   }
 
@@ -30,7 +29,7 @@ class SelectedItemsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSections(Set<PolylineId>? sections){
+  void setSections(Set<PolylineId>? sections) {
     if (sections != null) {
       _selectedSections = sections;
       notifyListeners();
@@ -56,31 +55,30 @@ class SelectedItemsProvider with ChangeNotifier {
     return _selectedRegistros.contains(markerId);
   }
 
-  void toggleCaptacionSelected(MarkerId markerId) {
-    if (_selectedCaptaciones.contains(markerId)) {
-      _selectedCaptaciones.remove(markerId);
+  void toggleCaptacionSelected(CircleId circleId) {
+    if (_selectedCaptaciones.contains(circleId)) {
+      _selectedCaptaciones.remove(circleId);
     } else {
       if (_selectedCaptaciones.isEmpty || _multipleItemsSelected) {
-        _selectedCaptaciones.add(markerId);
+        _selectedCaptaciones.add(circleId);
       }
     }
     notifyListeners();
   }
 
-  bool isCaptacionSelected(MarkerId markerId) {
-    return _selectedCaptaciones.contains(markerId);
+  bool isCaptacionSelected(CircleId circleId) {
+    return _selectedCaptaciones.contains(circleId);
   }
 
-  void clearAllSelections(){
+  void clearAllSelections() {
     _selectedCaptaciones.clear();
     _selectedSections.clear();
     _selectedRegistros.clear();
     notifyListeners();
   }
 
-  void reset(){
+  void reset() {
     clearAllSelections();
     _multipleItemsSelected = false;
   }
-
 }
