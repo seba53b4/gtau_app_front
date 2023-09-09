@@ -141,7 +141,7 @@ class _MapComponentState extends State<MapComponent> {
   void _onTapParamBehaviorCatchment(
       Catchment catchment, List<Catchment>? catchments) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.toggleCaptacionSelected(catchment.point.circleId);
+    selectedItemsProvider.toggleCatchmentSelected(catchment.point.circleId);
   }
 
   Color _onColorParamBehaviorSection(Section section) {
@@ -153,7 +153,7 @@ class _MapComponentState extends State<MapComponent> {
 
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isCaptacionSelected(catchment.point.circleId)
+    return selectedItemsProvider.isCatchmentSelected(catchment.point.circleId)
         ? selectedPolylineColor
         : catchment.point.strokeColor;
   }

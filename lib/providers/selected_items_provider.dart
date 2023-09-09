@@ -3,16 +3,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SelectedItemsProvider with ChangeNotifier {
   bool _multipleItemsSelected = false;
+
   bool get multipleItemsSelected => _multipleItemsSelected;
 
   Set<PolylineId> _selectedSections = {};
+
   Set<PolylineId> get selectedPolylines => _selectedSections;
 
   Set<MarkerId> _selectedRegistros = {};
+
   Set<MarkerId> get selectedRegistros => _selectedRegistros;
 
-  Set<CircleId> _selectedCaptaciones = {};
-  Set<CircleId> get selectedCaptaciones => _selectedCaptaciones;
+  Set<CircleId> _selectedCatchment = {};
+
+  Set<CircleId> get selectedCatchment => _selectedCatchment;
 
   void activateMultipleSelection() {
     _multipleItemsSelected = true;
@@ -55,23 +59,23 @@ class SelectedItemsProvider with ChangeNotifier {
     return _selectedRegistros.contains(markerId);
   }
 
-  void toggleCaptacionSelected(CircleId circleId) {
-    if (_selectedCaptaciones.contains(circleId)) {
-      _selectedCaptaciones.remove(circleId);
+  void toggleCatchmentSelected(CircleId circleId) {
+    if (_selectedCatchment.contains(circleId)) {
+      _selectedCatchment.remove(circleId);
     } else {
-      if (_selectedCaptaciones.isEmpty || _multipleItemsSelected) {
-        _selectedCaptaciones.add(circleId);
+      if (_selectedCatchment.isEmpty || _multipleItemsSelected) {
+        _selectedCatchment.add(circleId);
       }
     }
     notifyListeners();
   }
 
-  bool isCaptacionSelected(CircleId circleId) {
-    return _selectedCaptaciones.contains(circleId);
+  bool isCatchmentSelected(CircleId circleId) {
+    return _selectedCatchment.contains(circleId);
   }
 
   void clearAllSelections() {
-    _selectedCaptaciones.clear();
+    _selectedCatchment.clear();
     _selectedSections.clear();
     _selectedRegistros.clear();
     notifyListeners();
