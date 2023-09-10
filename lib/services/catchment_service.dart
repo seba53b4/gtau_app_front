@@ -49,7 +49,11 @@ class CatchmentService {
               strokeColor: Colors.pink,
               fillColor: Colors.black);
 
-          return Catchment(ogcFid: catchment['ogcFid'], point: circle);
+          return Catchment(
+              ogcFid: catchment['ogcFid'],
+              tipo: catchment['tipo'],
+              tipoboca: catchment['tipBoca'],
+              point: circle);
         }).toList();
       } else {
         return null;

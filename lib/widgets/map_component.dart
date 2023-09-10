@@ -94,44 +94,26 @@ class _MapComponentState extends State<MapComponent> {
   Future<List<Section>?> fetchPolylines(String token) async {
     final sectionViewModel =
         Provider.of<SectionViewModel>(context, listen: false);
-    List<Section>? sections;
-    if (location != null) {
-      sections = await sectionViewModel.fetchSectionsByRadius(
-          token,
-          location!.latitude,
-          location!.longitude,
-          int.parse(distances[distanceSelected]));
-    } else {
-      sections = await sectionViewModel.fetchSectionsByRadius(
-          token,
-          initLocation.latitude,
-          initLocation.longitude,
-          int.parse(distances[distanceSelected]));
-    }
-
-    return sections;
+    LatLng? finalLocation = getFinalLocation();
+    return await sectionViewModel.fetchSectionsByRadius(
+        token,
+        finalLocation!.latitude,
+        finalLocation!.longitude,
+        int.parse(distances[distanceSelected]));
   }
 
   Future<List<Catchment>?> fetchCircles(String token) async {
     final catchmentViewModel =
         Provider.of<CatchmentViewModel>(context, listen: false);
-    List<Catchment>? catchments;
-    if (location != null) {
-      catchments = await catchmentViewModel.fetchSectionsByRadius(
-          token,
-          location!.latitude,
-          location!.longitude,
-          int.parse(distances[distanceSelected]));
-    } else {
-      catchments = await catchmentViewModel.fetchSectionsByRadius(
-          token,
-          initLocation.latitude,
-          initLocation.longitude,
-          int.parse(distances[distanceSelected]));
-    }
-
-    return catchments;
+    LatLng? finalLocation = getFinalLocation();
+    return await catchmentViewModel.fetchSectionsByRadius(
+        token,
+        finalLocation!.latitude,
+        finalLocation!.longitude,
+        int.parse(distances[distanceSelected]));
   }
+
+  LatLng? getFinalLocation() => (location != null) ? location : initLocation;
 
   void _onTapParamBehaviorSection(Section section, List<Section>? sections) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
@@ -199,7 +181,7 @@ class _MapComponentState extends State<MapComponent> {
     if (catchments != null) {
       Set<Circle> setCir = {};
       for (var catchment in catchments) {
-        Circle pol = catchment.point.copyWith(
+        Circle circle = catchment.point.copyWith(
           centerParam: catchment.point.center,
           radiusParam: catchment.point.radius,
           strokeWidthParam: catchment.point.strokeWidth,
@@ -211,7 +193,7 @@ class _MapComponentState extends State<MapComponent> {
             });
           },
         );
-        setCir.add(pol);
+        setCir.add(circle);
       }
       return setCir;
     } else {
@@ -284,15 +266,20 @@ class _MapComponentState extends State<MapComponent> {
                 if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
                 ElevatedButton(
                   onPressed: () async {
-                    List<Section>? newSections = await fetchPolylines(token!);
-                    Set<Polyline> updatedPolylines = getPolylines(newSections);
+                    Future<List<Section>?> asyncNewSections =
+                        fetchPolylines(token!);
+                    Future<List<Catchment>?> asyncNewCatchments =
+                        fetchCircles(token);
 
-                    List<Catchment>? newCatchments = await fetchCircles(token!);
-                    Set<Circle> updatedCircles = getCircles(newCatchments);
-
-                    setState(() {
-                      polylines = updatedPolylines;
-                      circles = updatedCircles;
+                    asyncNewSections.then((fetchedSections) {
+                      setState(() {
+                        polylines = getPolylines(fetchedSections);
+                      });
+                    });
+                    asyncNewCatchments.then((fetchedCatchments) {
+                      setState(() {
+                        circles = getCircles(fetchedCatchments);
+                      });
                     });
                   },
                   child: Tooltip(
