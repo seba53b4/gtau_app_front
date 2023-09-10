@@ -1,20 +1,19 @@
 import 'dart:core';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gtau_app_front/models/point_data.dart';
+import 'package:gtau_app_front/models/point_type_enum.dart';
 
-class Catchment {
-  late final int ogcFid;
+class Catchment extends PointData {
   late final double? gid;
   late final int? elemRed;
   late final String? tipo;
-  late final String? tipoboca;
+  late final int? tipoboca;
   late final double? latC;
   late final double? lonC;
   late final String? datoObra;
-  final Circle point;
 
   Catchment(
-      {required this.ogcFid,
+      {required super.ogcFid,
       this.gid,
       this.elemRed,
       required this.tipo,
@@ -22,5 +21,6 @@ class Catchment {
       this.latC,
       this.lonC,
       this.datoObra,
-      required this.point});
+      required super.point})
+      : super(type: PointType.catchment);
 }

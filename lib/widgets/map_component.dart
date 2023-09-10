@@ -6,8 +6,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/catchment_data.dart';
+import 'package:gtau_app_front/models/register_data.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -102,11 +104,24 @@ class _MapComponentState extends State<MapComponent> {
         int.parse(distances[distanceSelected]));
   }
 
-  Future<List<Catchment>?> fetchCircles(String token) async {
+  Future<List<Catchment>?> fetchCatchmentsCircles(String token) async {
     final catchmentViewModel =
         Provider.of<CatchmentViewModel>(context, listen: false);
+
     LatLng? finalLocation = getFinalLocation();
-    return await catchmentViewModel.fetchSectionsByRadius(
+    return await catchmentViewModel.fetchCatchmentsByRadius(
+        token,
+        finalLocation!.latitude,
+        finalLocation!.longitude,
+        int.parse(distances[distanceSelected]));
+  }
+
+  Future<List<Register>?> fetchRegistersCircles(String token) async {
+    final registerViewModel =
+        Provider.of<RegisterViewModel>(context, listen: false);
+
+    LatLng? finalLocation = getFinalLocation();
+    return await registerViewModel.fetchRegistersByRadius(
         token,
         finalLocation!.latitude,
         finalLocation!.longitude,
@@ -126,6 +141,12 @@ class _MapComponentState extends State<MapComponent> {
     selectedItemsProvider.toggleCatchmentSelected(catchment.point.circleId);
   }
 
+  void _onTapParamBehaviorRegister(
+      Register register, List<Register>? registers) {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    selectedItemsProvider.toggleCatchmentSelected(register.point.circleId);
+  }
+
   Color _onColorParamBehaviorSection(Section section) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isSectionSelected(section.line.polylineId)
@@ -138,6 +159,13 @@ class _MapComponentState extends State<MapComponent> {
     return selectedItemsProvider.isCatchmentSelected(catchment.point.circleId)
         ? selectedPolylineColor
         : catchment.point.strokeColor;
+  }
+
+  Color _onColorParamBehaviorRegister(Register register) {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    return selectedItemsProvider.isCatchmentSelected(register.point.circleId)
+        ? selectedPolylineColor
+        : register.point.strokeColor;
   }
 
   void _getMarkers() {
@@ -177,9 +205,10 @@ class _MapComponentState extends State<MapComponent> {
     }
   }
 
-  Set<Circle> getCircles(List<Catchment>? catchments) {
+  Set<Circle> getCircles(
+      List<Catchment>? catchments, List<Register>? registers) {
+    Set<Circle> setCir = {};
     if (catchments != null) {
-      Set<Circle> setCir = {};
       for (var catchment in catchments) {
         Circle circle = catchment.point.copyWith(
           centerParam: catchment.point.center,
@@ -189,7 +218,24 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () {
             _onTapParamBehaviorCatchment(catchment, catchments);
             setState(() {
-              circles = getCircles(catchments);
+              circles = getCircles(catchments, registers);
+            });
+          },
+        );
+        setCir.add(circle);
+      }
+    }
+    if (registers != null) {
+      for (var register in registers) {
+        Circle circle = register.point.copyWith(
+          centerParam: register.point.center,
+          radiusParam: register.point.radius,
+          strokeWidthParam: register.point.strokeWidth,
+          strokeColorParam: _onColorParamBehaviorRegister(register),
+          onTapParam: () {
+            _onTapParamBehaviorRegister(register, registers);
+            setState(() {
+              circles = getCircles(catchments, registers);
             });
           },
         );
@@ -268,8 +314,10 @@ class _MapComponentState extends State<MapComponent> {
                   onPressed: () async {
                     Future<List<Section>?> asyncNewSections =
                         fetchPolylines(token!);
+                    Future<List<Register>?> asyncNewRegisters =
+                        fetchRegistersCircles(token);
                     Future<List<Catchment>?> asyncNewCatchments =
-                        fetchCircles(token);
+                        fetchCatchmentsCircles(token);
 
                     asyncNewSections.then((fetchedSections) {
                       setState(() {
@@ -277,8 +325,11 @@ class _MapComponentState extends State<MapComponent> {
                       });
                     });
                     asyncNewCatchments.then((fetchedCatchments) {
-                      setState(() {
-                        circles = getCircles(fetchedCatchments);
+                      asyncNewRegisters.then((fetchedRegisters) {
+                        setState(() {
+                          circles =
+                              getCircles(fetchedCatchments, fetchedRegisters);
+                        });
                       });
                     });
                   },
