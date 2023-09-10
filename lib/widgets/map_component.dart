@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
@@ -10,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
+import '../utils/map_functions.dart';
 
 class MapComponent extends StatefulWidget {
   final bool isModal;
@@ -28,6 +32,7 @@ class _MapComponentState extends State<MapComponent> {
   MapType _currentMapType = MapType.satellite;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
+  Set<Marker> markersGPS = {};
   bool isSectionDetailsVisible = false;
   Color selectedPolylineColor = Colors.greenAccent;
   Color defaultPolylineColor = Colors.redAccent;
@@ -63,7 +68,7 @@ class _MapComponentState extends State<MapComponent> {
           position: locationGPS,
         );
         location = locationGPS;
-        markers.add(newMarker);
+        markersGPS.add(newMarker);
       });
 
       // Actualiza la cámara del mapa para centrarse en la ubicación actual
@@ -109,7 +114,20 @@ class _MapComponentState extends State<MapComponent> {
             : defaultPolylineColor;
   }
 
+  void _getMarkers() {
 
+    setState(() {
+      markers.clear();
+      markers.addAll(markersGPS);
+    });
+  }
+
+  void _clearMarkers(){
+    setState(() {
+      markers.clear();
+      markersGPS.clear();
+    });
+  }
 
   Set<Polyline> getPolylines(List<Section>? sections) {
 
@@ -126,6 +144,7 @@ class _MapComponentState extends State<MapComponent> {
           },
         );
         setPol.add(pol);
+        setPol.addAll(polylineArrows(section.line.points, section.line.polylineId));
       }
       return setPol;
     } else {
@@ -159,8 +178,9 @@ class _MapComponentState extends State<MapComponent> {
                     markerId: const MarkerId('tapped_location_manual'),
                     position: latLng,
                   );
-                  markers.clear();
-                  markers.add(newMarker);
+                  markersGPS.clear();
+                  markersGPS.add(newMarker);
+                  _getMarkers();
                   location = LatLng(latLng.latitude, latLng.longitude);
                 });
               }
@@ -212,6 +232,7 @@ class _MapComponentState extends State<MapComponent> {
                 ElevatedButton(
                   onPressed: () {
                     getCurrentLocation();
+                    _getMarkers();
                   },
                   child: Tooltip(
                     message: AppLocalizations.of(context)!.map_component_get_location,
