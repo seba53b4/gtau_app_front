@@ -144,7 +144,7 @@ class _MapComponentState extends State<MapComponent> {
   void _onTapParamBehaviorRegister(
       Register register, List<Register>? registers) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.toggleCatchmentSelected(register.point.circleId);
+    selectedItemsProvider.toggleRegistroSelected(register.point.circleId);
   }
 
   Color _onColorParamBehaviorSection(Section section) {
@@ -163,7 +163,7 @@ class _MapComponentState extends State<MapComponent> {
 
   Color _onColorParamBehaviorRegister(Register register) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isCatchmentSelected(register.point.circleId)
+    return selectedItemsProvider.isRegistroSelected(register.point.circleId)
         ? selectedPolylineColor
         : register.point.strokeColor;
   }
