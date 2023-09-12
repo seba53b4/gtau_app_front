@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 class UserImage extends StatefulWidget{
 
-  final Function(String imageUrl) onFileChanged;
+  final Function(File file) onFileChanged;
 
   UserImage({
     required this.onFileChanged,
@@ -24,27 +25,27 @@ class _UserImageState extends State<UserImage>{
 
   final ImagePicker _picker = ImagePicker();
 
-  String? imageUrl;
+  File? imageFile;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if(imageUrl == null)
+        if(imageFile == null)
           Icon(Icons.image, size:60, color:Colors.blue, semanticLabel: 'No image have been uploaded',),
         
-        if(imageUrl != null)
+        if(imageFile != null)
           InkWell(
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap:() => _selectPhoto(),
             child: Container(
-              width: 80,
-              height: 80,
-              decoration: const BoxDecoration(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: NetworkImage('https://googleflutter.com/sample_image.jpg'),
+                  image: FileImage(imageFile!),
                   fit: BoxFit.fill
                 ),
               ),
@@ -55,7 +56,7 @@ class _UserImageState extends State<UserImage>{
             onTap:()  => _selectPhoto(),
             child: Padding(
               padding:EdgeInsets.all(8.0),
-              child:Text(imageUrl != null ? 'Change Photo' : 'Select Photo',
+              child:Text(imageFile != null ? 'Change Photo' : 'Select Photo',
               style:TextStyle(color:Colors.blue, fontWeight: FontWeight.bold),),
             ),
           )
@@ -83,19 +84,22 @@ class _UserImageState extends State<UserImage>{
   }
 
   Future _pickImage(ImageSource source) async{
-    final pickedFile = await _picker.pickImage(source: source, imageQuality: 50); 
-    if (pickedFile == null) {
-      return; 
+    try{
+      final pickedFile = await _picker.pickImage(source: source, imageQuality: 50); 
+      if (pickedFile == null) {
+        return; 
+      }
+      var temporaryfile = File(pickedFile.path);
+      /*var file = await ImageCropper().cropImage(sourcePath: pickedFile.path , aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1));
+      if (file == null) {
+        return; 
+      } */
+      /*temporaryfile = await compressImage(temporaryfile.path, 35);*/
+      setState((){imageFile = temporaryfile;});
+      widget.onFileChanged(imageFile!);
+    }on PlatformException catch (e){
+      print('Failed to pick image: $e');
     }
-    var file = File(pickedFile.path);
-    /*var file = await ImageCropper().cropImage(sourcePath: pickedFile.path , aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1));
-    if (file == null) {
-      return; 
-    } */
-    file = await compressImage(file.path, 35);
-
-    setState((){imageUrl='https://googleflutter.com/sample_image.jpg';});
-    widget.onFileChanged('https://googleflutter.com/sample_image.jpg');
   }
 
   Future<File> compressImage(String path, int quality) async{

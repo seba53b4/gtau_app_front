@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task_status.dart';
@@ -329,7 +330,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   }
 
-  String imageUrl='';
+  File? imageFile=null;
 
   @override
   Widget build(BuildContext context) {
@@ -617,9 +618,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 controller: descriptionController,
               ),
               UserImage(
-                onFileChanged: (imageUrl) {
+                onFileChanged: (imageFile) {
                   setState(() {
-                    this.imageUrl=imageUrl;
+                    this.imageFile=imageFile;
                   });
                 },
               ),
@@ -679,9 +680,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       controller: conclusionsController,
                     ),
                     UserImage(
-                      onFileChanged: (imageUrl) {
+                      onFileChanged: (imageFile) {
                         setState(() {
-                          this.imageUrl=imageUrl;
+                          this.imageFile=imageFile;
                         });
                       },
                     ),
