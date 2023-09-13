@@ -10,9 +10,9 @@ class SelectedItemsProvider with ChangeNotifier {
 
   Set<PolylineId> get selectedPolylines => _selectedSections;
 
-  Set<CircleId> _selectedRegistros = {};
+  Set<CircleId> _selectedRegisters = {};
 
-  Set<CircleId> get selectedRegistros => _selectedRegistros;
+  Set<CircleId> get selectedRegisters => _selectedRegisters;
 
   Set<CircleId> _selectedCatchment = {};
 
@@ -45,18 +45,18 @@ class SelectedItemsProvider with ChangeNotifier {
   }
 
   void toggleRegistroSelected(CircleId circleId) {
-    if (_selectedRegistros.contains(circleId)) {
-      _selectedRegistros.remove(circleId);
+    if (_selectedRegisters.contains(circleId)) {
+      _selectedRegisters.remove(circleId);
     } else {
-      if (_selectedRegistros.isEmpty || _multipleItemsSelected) {
-        _selectedRegistros.add(circleId);
+      if (_selectedRegisters.isEmpty || _multipleItemsSelected) {
+        _selectedRegisters.add(circleId);
       }
     }
     notifyListeners();
   }
 
   bool isRegistroSelected(CircleId circleId) {
-    return _selectedRegistros.contains(circleId);
+    return _selectedRegisters.contains(circleId);
   }
 
   void toggleCatchmentSelected(CircleId circleId) {
@@ -77,7 +77,7 @@ class SelectedItemsProvider with ChangeNotifier {
   void clearAllSelections() {
     _selectedCatchment.clear();
     _selectedSections.clear();
-    _selectedRegistros.clear();
+    _selectedRegisters.clear();
     notifyListeners();
   }
 

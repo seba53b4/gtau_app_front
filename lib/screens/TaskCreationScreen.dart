@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_maps_flutter_platform_interface/src/types/polyline.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
@@ -257,7 +256,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         selectedCatchments.map((circleId) => circleId.value).toList();
 
     final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegistros;
+        context.read<SelectedItemsProvider>().selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
 
@@ -292,7 +291,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
     final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegistros;
+        context.read<SelectedItemsProvider>().selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
 
@@ -515,9 +514,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         final selectedSections =
                             selectedItemsProvider.selectedPolylines.toList();
                         final selectedCatchments =
-                            selectedItemsProvider.selectedPolylines.toList();
+                            selectedItemsProvider.selectedCatchment.toList();
                         final selectedRegisters =
-                            selectedItemsProvider.selectedPolylines.toList();
+                            selectedItemsProvider.selectedRegisters.toList();
 
                         return selectedSections.isNotEmpty
                             ? Column(
