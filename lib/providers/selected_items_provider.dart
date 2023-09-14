@@ -2,20 +2,23 @@ import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SelectedItemsProvider with ChangeNotifier {
-
   bool _multipleItemsSelected = false;
+
   bool get multipleItemsSelected => _multipleItemsSelected;
 
   Set<PolylineId> _selectedSections = {};
+
   Set<PolylineId> get selectedPolylines => _selectedSections;
 
-  Set<MarkerId> _selectedRegistros = {};
-  Set<MarkerId> get selectedRegistros => _selectedRegistros;
+  Set<CircleId> _selectedRegisters = {};
 
-  Set<MarkerId> _selectedCaptaciones = {};
-  Set<MarkerId> get selectedCaptaciones => _selectedCaptaciones;
+  Set<CircleId> get selectedRegisters => _selectedRegisters;
 
-  void activateMultipleSelection(){
+  Set<CircleId> _selectedCatchment = {};
+
+  Set<CircleId> get selectedCatchment => _selectedCatchment;
+
+  void activateMultipleSelection() {
     _multipleItemsSelected = true;
   }
 
@@ -30,7 +33,7 @@ class SelectedItemsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSections(Set<PolylineId>? sections){
+  void setSections(Set<PolylineId>? sections) {
     if (sections != null) {
       _selectedSections = sections;
       notifyListeners();
@@ -41,46 +44,45 @@ class SelectedItemsProvider with ChangeNotifier {
     return _selectedSections.contains(polylineId);
   }
 
-  void toggleRegistroSelected(MarkerId markerId) {
-    if (_selectedRegistros.contains(markerId)) {
-      _selectedRegistros.remove(markerId);
+  void toggleRegistroSelected(CircleId circleId) {
+    if (_selectedRegisters.contains(circleId)) {
+      _selectedRegisters.remove(circleId);
     } else {
-      if (_selectedRegistros.isEmpty || _multipleItemsSelected) {
-        _selectedRegistros.add(markerId);
+      if (_selectedRegisters.isEmpty || _multipleItemsSelected) {
+        _selectedRegisters.add(circleId);
       }
     }
     notifyListeners();
   }
 
-  bool isRegistroSelected(MarkerId markerId) {
-    return _selectedRegistros.contains(markerId);
+  bool isRegistroSelected(CircleId circleId) {
+    return _selectedRegisters.contains(circleId);
   }
 
-  void toggleCaptacionSelected(MarkerId markerId) {
-    if (_selectedCaptaciones.contains(markerId)) {
-      _selectedCaptaciones.remove(markerId);
+  void toggleCatchmentSelected(CircleId circleId) {
+    if (_selectedCatchment.contains(circleId)) {
+      _selectedCatchment.remove(circleId);
     } else {
-      if (_selectedCaptaciones.isEmpty || _multipleItemsSelected) {
-        _selectedCaptaciones.add(markerId);
+      if (_selectedCatchment.isEmpty || _multipleItemsSelected) {
+        _selectedCatchment.add(circleId);
       }
     }
     notifyListeners();
   }
 
-  bool isCaptacionSelected(MarkerId markerId) {
-    return _selectedCaptaciones.contains(markerId);
+  bool isCatchmentSelected(CircleId circleId) {
+    return _selectedCatchment.contains(circleId);
   }
 
-  void clearAllSelections(){
-    _selectedCaptaciones.clear();
+  void clearAllSelections() {
+    _selectedCatchment.clear();
     _selectedSections.clear();
-    _selectedRegistros.clear();
+    _selectedRegisters.clear();
     notifyListeners();
   }
 
-  void reset(){
+  void reset() {
     clearAllSelections();
     _multipleItemsSelected = false;
   }
-
 }
