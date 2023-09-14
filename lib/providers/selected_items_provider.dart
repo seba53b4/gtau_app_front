@@ -10,9 +10,9 @@ class SelectedItemsProvider with ChangeNotifier {
 
   Set<PolylineId> get selectedPolylines => _selectedSections;
 
-  Set<MarkerId> _selectedRegistros = {};
+  Set<CircleId> _selectedRegisters = {};
 
-  Set<MarkerId> get selectedRegistros => _selectedRegistros;
+  Set<CircleId> get selectedRegisters => _selectedRegisters;
 
   Set<CircleId> _selectedCatchment = {};
 
@@ -44,19 +44,19 @@ class SelectedItemsProvider with ChangeNotifier {
     return _selectedSections.contains(polylineId);
   }
 
-  void toggleRegistroSelected(MarkerId markerId) {
-    if (_selectedRegistros.contains(markerId)) {
-      _selectedRegistros.remove(markerId);
+  void toggleRegistroSelected(CircleId circleId) {
+    if (_selectedRegisters.contains(circleId)) {
+      _selectedRegisters.remove(circleId);
     } else {
-      if (_selectedRegistros.isEmpty || _multipleItemsSelected) {
-        _selectedRegistros.add(markerId);
+      if (_selectedRegisters.isEmpty || _multipleItemsSelected) {
+        _selectedRegisters.add(circleId);
       }
     }
     notifyListeners();
   }
 
-  bool isRegistroSelected(MarkerId markerId) {
-    return _selectedRegistros.contains(markerId);
+  bool isRegistroSelected(CircleId circleId) {
+    return _selectedRegisters.contains(circleId);
   }
 
   void toggleCatchmentSelected(CircleId circleId) {
@@ -77,7 +77,7 @@ class SelectedItemsProvider with ChangeNotifier {
   void clearAllSelections() {
     _selectedCatchment.clear();
     _selectedSections.clear();
-    _selectedRegistros.clear();
+    _selectedRegisters.clear();
     notifyListeners();
   }
 

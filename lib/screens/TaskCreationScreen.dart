@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +17,7 @@ class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
   bool detail = false;
   int? idTask = 0;
+
   TaskCreationScreen(
       {super.key, required this.type, this.detail = false, this.idTask = 0});
 
@@ -116,7 +115,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<bool> _createTask(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
     try {
       final response = await taskListViewModel.createTask(token!, body);
       if (response) {
@@ -245,8 +245,21 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToCreate() {
-    final selectedSections = context.read<SelectedItemsProvider>().selectedPolylines;
-    final List<String> listSelectedSections = selectedSections.map((polylineId) => polylineId.value).toList();
+    final selectedSections =
+        context.read<SelectedItemsProvider>().selectedPolylines;
+    final List<String> listSelectedSections =
+        selectedSections.map((polylineId) => polylineId.value).toList();
+
+    final selectedCatchments =
+        context.read<SelectedItemsProvider>().selectedCatchment;
+    final List<String> listSelectedCatchments =
+        selectedCatchments.map((circleId) => circleId.value).toList();
+
+    final selectedRegisters =
+        context.read<SelectedItemsProvider>().selectedRegisters;
+    final List<String> listSelectedRegisters =
+        selectedRegisters.map((circleId) => circleId.value).toList();
+
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -257,16 +270,30 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "location": locationController.text,
       "description": descriptionController.text,
       "user": userAssigned,
-      "tramos": listSelectedSections
+      "tramos": listSelectedSections,
+      "captaciones": listSelectedCatchments,
+      "registros": listSelectedRegisters
     };
     return requestBody;
   }
 
   Map<String, dynamic> createBodyToUpdate() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
-    late String? releasedDateSelected = releasedDateController.text.isNotEmpty ? formattedDateToUpdate(releasedDateController.text) : null;
-    final selectedSections = context.read<SelectedItemsProvider>().selectedPolylines;
-    final List<String> listSelectedSections = selectedSections.map((polylineId) => polylineId.value).toList();
+    late String? releasedDateSelected = releasedDateController.text.isNotEmpty
+        ? formattedDateToUpdate(releasedDateController.text)
+        : null;
+    final selectedSections =
+        context.read<SelectedItemsProvider>().selectedPolylines;
+    final List<String> listSelectedSections =
+        selectedSections.map((polylineId) => polylineId.value).toList();
+    final selectedCatchments =
+        context.read<SelectedItemsProvider>().selectedCatchment;
+    final List<String> listSelectedCatchments =
+        selectedCatchments.map((circleId) => circleId.value).toList();
+    final selectedRegisters =
+        context.read<SelectedItemsProvider>().selectedRegisters;
+    final List<String> listSelectedRegisters =
+        selectedRegisters.map((circleId) => circleId.value).toList();
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -282,7 +309,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "material": materialController.text,
       "observations": observationsController.text,
       "conclusions": conclusionsController.text,
-      "tramos": listSelectedSections
+      "tramos": listSelectedSections,
+      "captaciones": listSelectedCatchments,
+      "registros": listSelectedRegisters
     };
     return requestBody;
   }
@@ -305,9 +334,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     updateTaskList();
   }
 
-  void updateTaskList() async{
-    final userName = Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+  void updateTaskList() async {
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
     await taskListViewModel.initializeTasks(context, initStatus, userName);
   }
 
@@ -330,7 +361,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     );
   }
 
-  void resetSelectionOnMap(){
+  void resetSelectionOnMap() {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.reset();
   }
@@ -338,12 +369,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   void handleCancel() {
     resetSelectionOnMap();
     Navigator.of(context).pop();
-
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -437,7 +466,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       child: IgnorePointer(
                         child: TextFormField(
                           decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!.default_datepicker_hint,
+                            hintText: AppLocalizations.of(context)!
+                                .default_datepicker_hint,
                           ),
                           //initialValue:  DateFormat('dd-MM-yyyy').format(startDate),
                           controller: addDateController,
@@ -449,7 +479,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     if (widget.detail) const SizedBox(height: 10.0),
                     if (widget.detail)
                       Text(
-                        AppLocalizations.of(context)!.createTaskPage_realizationDateTitle,
+                        AppLocalizations.of(context)!
+                            .createTaskPage_realizationDateTitle,
                         style: const TextStyle(fontSize: 24.0),
                       ),
                     if (widget.detail)
@@ -468,57 +499,72 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         child: IgnorePointer(
                           child: TextFormField(
                             decoration: InputDecoration(
-                              hintText: AppLocalizations.of(context)!.default_datepicker_hint,
+                              hintText: AppLocalizations.of(context)!
+                                  .default_datepicker_hint,
                             ),
                             controller: releasedDateController,
                             enabled: false,
                           ),
                         ),
                       ),
-                    if (widget.detail)
-                      const SizedBox(height: 10.0),
+                    if (widget.detail) const SizedBox(height: 10.0),
                     MapModal(),
                     Consumer<SelectedItemsProvider>(
                       builder: (context, selectedItemsProvider, child) {
-                        final selectedPolylines = selectedItemsProvider.selectedPolylines.toList();
+                        final selectedSections =
+                            selectedItemsProvider.selectedPolylines.toList();
+                        final selectedCatchments =
+                            selectedItemsProvider.selectedCatchment.toList();
+                        final selectedRegisters =
+                            selectedItemsProvider.selectedRegisters.toList();
 
-                        return selectedPolylines.isNotEmpty
+                        return selectedSections.isNotEmpty
                             ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)!.elementsTitle,
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 10),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  for (var polylineId in selectedPolylines)
-                                    Container(
-                                      margin: const EdgeInsets.all(8),
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(polylineId.value),
+                                  Text(
+                                    AppLocalizations.of(context)!.elementsTitle,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        Text("tramos: "),
+                                        for (var sectionId in selectedSections)
+                                          EntityIdContainer(
+                                              id: sectionId.value),
+                                        const SizedBox(height: 10),
+                                        Text("captaciones: "),
+                                        for (var catchmentId
+                                            in selectedCatchments)
+                                          EntityIdContainer(
+                                              id: catchmentId.value),
+                                        const SizedBox(height: 10),
+                                        Text("registros: "),
+                                        for (var registerId
+                                            in selectedRegisters)
+                                          EntityIdContainer(
+                                              id: registerId.value),
+                                      ],
                                     ),
+                                  ),
                                 ],
-                              ),
-                            ),
-                          ],
-                        )
+                              )
                             : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)!.elementsTitle,
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                          ],
-                        );
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!.elementsTitle,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              );
                       },
                     ),
                     const SizedBox(height: 10.0),
@@ -552,7 +598,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         items: [
                           DropdownMenuItem<String>(
                             value: 'not-assigned',
-                            child: Text(AppLocalizations.of(context)!.default_dropdown_label),
+                            child: Text(AppLocalizations.of(context)!
+                                .default_dropdown_label),
                           ),
                           const DropdownMenuItem<String>(
                             value: 'gtau-oper',
@@ -630,7 +677,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   children: [
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_longitudeTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_longitudeTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -643,7 +691,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_materialTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_materialTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -656,7 +705,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_observationsTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_observationsTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -669,7 +719,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_conclusionsTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_conclusionsTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -713,6 +764,28 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class EntityIdContainer extends StatelessWidget {
+  const EntityIdContainer({
+    super.key,
+    required this.id,
+  });
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(id),
     );
   }
 }

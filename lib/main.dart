@@ -8,6 +8,7 @@ import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +46,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<CatchmentViewModel>(
           create: (context) => CatchmentViewModel(),
+        ),
+        ChangeNotifierProvider<RegisterViewModel>(
+          create: (context) => RegisterViewModel(),
         ),
       ],
       child: MyApp(),

@@ -11,7 +11,7 @@ class CatchmentViewModel extends ChangeNotifier {
 
   List<Catchment> get catchments => _catchments;
 
-  Future<List<Catchment>?> fetchSectionsByRadius(
+  Future<List<Catchment>?> fetchCatchmentsByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
       final responseListSection = await _catchmentService
