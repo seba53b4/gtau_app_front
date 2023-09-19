@@ -86,6 +86,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       }
 
       selectedItemsProvider.setSections(task.sections);
+      selectedItemsProvider.setCatchments(task.catchments);
+      selectedItemsProvider.setRegisters(task.registers);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -251,7 +253,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         selectedSections.map((polylineId) => polylineId.value).toList();
 
     final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchment;
+        context.read<SelectedItemsProvider>().selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
 
@@ -287,7 +289,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
     final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchment;
+        context.read<SelectedItemsProvider>().selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
     final selectedRegisters =
@@ -514,7 +516,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         final selectedSections =
                             selectedItemsProvider.selectedPolylines.toList();
                         final selectedCatchments =
-                            selectedItemsProvider.selectedCatchment.toList();
+                            selectedItemsProvider.selectedCatchments.toList();
                         final selectedRegisters =
                             selectedItemsProvider.selectedRegisters.toList();
 
