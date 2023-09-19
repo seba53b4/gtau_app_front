@@ -14,9 +14,9 @@ class SelectedItemsProvider with ChangeNotifier {
 
   Set<CircleId> get selectedRegisters => _selectedRegisters;
 
-  Set<CircleId> _selectedCatchment = {};
+  Set<CircleId> _selectedCatchments = {};
 
-  Set<CircleId> get selectedCatchment => _selectedCatchment;
+  Set<CircleId> get selectedCatchments => _selectedCatchments;
 
   void activateMultipleSelection() {
     _multipleItemsSelected = true;
@@ -36,6 +36,20 @@ class SelectedItemsProvider with ChangeNotifier {
   void setSections(Set<PolylineId>? sections) {
     if (sections != null) {
       _selectedSections = sections;
+      notifyListeners();
+    }
+  }
+
+  void setCatchments(Set<CircleId>? catchments) {
+    if (catchments != null) {
+      _selectedCatchments = catchments;
+      notifyListeners();
+    }
+  }
+
+  void setRegisters(Set<CircleId>? registers) {
+    if (registers != null) {
+      _selectedRegisters = registers;
       notifyListeners();
     }
   }
@@ -60,22 +74,22 @@ class SelectedItemsProvider with ChangeNotifier {
   }
 
   void toggleCatchmentSelected(CircleId circleId) {
-    if (_selectedCatchment.contains(circleId)) {
-      _selectedCatchment.remove(circleId);
+    if (_selectedCatchments.contains(circleId)) {
+      _selectedCatchments.remove(circleId);
     } else {
-      if (_selectedCatchment.isEmpty || _multipleItemsSelected) {
-        _selectedCatchment.add(circleId);
+      if (_selectedCatchments.isEmpty || _multipleItemsSelected) {
+        _selectedCatchments.add(circleId);
       }
     }
     notifyListeners();
   }
 
   bool isCatchmentSelected(CircleId circleId) {
-    return _selectedCatchment.contains(circleId);
+    return _selectedCatchments.contains(circleId);
   }
 
   void clearAllSelections() {
-    _selectedCatchment.clear();
+    _selectedCatchments.clear();
     _selectedSections.clear();
     _selectedRegisters.clear();
     notifyListeners();
