@@ -8,9 +8,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
+import '../utils/boxes.dart';
+import '../utils/imagesbundle.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/map_modal.dart';
@@ -134,6 +137,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<bool> _updateTask(Map<String, dynamic> body) async {
+    await Hive.initFlutter();
+    Hive.registerAdapter(ImageBundleAdapter());
+
+    boxImages = await Hive.openBox<ImageBundle>('imagesBox');
+
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
 
     final taskListViewModel =
