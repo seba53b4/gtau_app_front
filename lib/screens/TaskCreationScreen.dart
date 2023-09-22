@@ -1,14 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
@@ -23,6 +22,7 @@ class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
   bool detail = false;
   int? idTask = 0;
+
   TaskCreationScreen(
       {super.key, required this.type, this.detail = false, this.idTask = 0});
 
@@ -118,7 +118,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<bool> _createTask(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
     try {
       final response = await taskListViewModel.createTask(token!, body);
       if (response) {
@@ -137,7 +138,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<bool> _updateTask(Map<String, dynamic> body) async {
-    await Hive.initFlutter();
     Hive.registerAdapter(ImageBundleAdapter());
 
     boxImages = await Hive.openBox<ImageBundle>('imagesBox');
@@ -209,6 +209,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
       initializeTask();
+      Hive.initFlutter().then((value) => null);
     } else {
       startDate = DateTime.now();
     }
@@ -268,8 +269,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Map<String, dynamic> createBodyToUpdate() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
-    final selectedSections = context.read<SelectedItemsProvider>().selectedPolylines;
-    final List<String> listSelectedSections = selectedSections.map((polylineId) => polylineId.value).toList();
+    final selectedSections =
+        context.read<SelectedItemsProvider>().selectedPolylines;
+    final List<String> listSelectedSections =
+        selectedSections.map((polylineId) => polylineId.value).toList();
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -327,7 +330,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     );
   }
 
-  void resetSelectionOnMap(){
+  void resetSelectionOnMap() {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.reset();
   }
@@ -335,14 +338,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   void handleCancel() {
     resetSelectionOnMap();
     Navigator.of(context).pop();
-
   }
 
-  File? imageFile=null;
+  File? imageFile = null;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -436,7 +437,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       child: IgnorePointer(
                         child: TextFormField(
                           decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!.default_datepicker_hint,
+                            hintText: AppLocalizations.of(context)!
+                                .default_datepicker_hint,
                           ),
                           //initialValue:  DateFormat('dd-MM-yyyy').format(startDate),
                           controller: addDateController,
@@ -448,7 +450,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     if (widget.detail) const SizedBox(height: 10.0),
                     if (widget.detail)
                       Text(
-                        AppLocalizations.of(context)!.createTaskPage_realizationDateTitle,
+                        AppLocalizations.of(context)!
+                            .createTaskPage_realizationDateTitle,
                         style: const TextStyle(fontSize: 24.0),
                       ),
                     if (widget.detail)
@@ -467,7 +470,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         child: IgnorePointer(
                           child: TextFormField(
                             decoration: InputDecoration(
-                              hintText: AppLocalizations.of(context)!.default_datepicker_hint,
+                              hintText: AppLocalizations.of(context)!
+                                  .default_datepicker_hint,
                             ),
                             controller: releasedDateController,
                             enabled: false,
@@ -475,50 +479,57 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           ),
                         ),
                       ),
-                    if (widget.detail)
-                      const SizedBox(height: 10.0),
+                    if (widget.detail) const SizedBox(height: 10.0),
                     MapModal(),
                     Consumer<SelectedItemsProvider>(
                       builder: (context, selectedItemsProvider, child) {
-                        final selectedPolylines = selectedItemsProvider.selectedPolylines.toList();
+                        final selectedPolylines =
+                            selectedItemsProvider.selectedPolylines.toList();
 
                         return selectedPolylines.isNotEmpty
                             ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)!.elementsTitle,
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 10),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  for (var polylineId in selectedPolylines)
-                                    Container(
-                                      margin: const EdgeInsets.all(8),
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(polylineId.value),
+                                  Text(
+                                    AppLocalizations.of(context)!.elementsTitle,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        for (var polylineId
+                                            in selectedPolylines)
+                                          Container(
+                                            margin: const EdgeInsets.all(8),
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(polylineId.value),
+                                          ),
+                                      ],
                                     ),
+                                  ),
                                 ],
-                              ),
-                            ),
-                          ],
-                        )
+                              )
                             : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)!.elementsTitle,
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                          ],
-                        );
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!.elementsTitle,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              );
                       },
                     ),
                     const SizedBox(height: 10.0),
@@ -552,7 +563,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         items: [
                           DropdownMenuItem<String>(
                             value: 'not-assigned',
-                            child: Text(AppLocalizations.of(context)!.default_dropdown_label),
+                            child: Text(AppLocalizations.of(context)!
+                                .default_dropdown_label),
                           ),
                           const DropdownMenuItem<String>(
                             value: 'gtau-oper',
@@ -628,7 +640,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               UserImage(
                 onFileChanged: (imageFile) {
                   setState(() {
-                    this.imageFile=imageFile;
+                    this.imageFile = imageFile;
                   });
                 },
               ),
@@ -637,7 +649,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   children: [
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_longitudeTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_longitudeTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -650,7 +663,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_materialTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_materialTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -663,7 +677,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_observationsTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_observationsTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -676,7 +691,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                     const SizedBox(height: 10.0),
                     Text(
-                      AppLocalizations.of(context)!.createTaskPage_conclusionsTitle,
+                      AppLocalizations.of(context)!
+                          .createTaskPage_conclusionsTitle,
                       style: const TextStyle(fontSize: 24.0),
                     ),
                     TextFormField(
@@ -690,7 +706,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     UserImage(
                       onFileChanged: (imageFile) {
                         setState(() {
-                          this.imageFile=imageFile;
+                          this.imageFile = imageFile;
                         });
                       },
                     ),
