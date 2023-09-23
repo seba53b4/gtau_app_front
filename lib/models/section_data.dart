@@ -1,9 +1,10 @@
-
 import 'dart:core';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Section {
   late final int ogcFid;
+  late final int? gid;
   late final String? tipoSec;
   late final String? tipoTra;
   late final int? elemRed;
@@ -18,24 +19,24 @@ class Section {
   late final DateTime? year;
   late final String? descTramo;
   late final String? descSeccion;
-  final Polyline line;
+  late final Polyline? line;
 
-  Section({
-    required this.ogcFid,
-    required this.line,
-    this.tipoSec,
-    this.tipoTra,
-    this.elemRed,
-    this.dim1,
-    this.dim2,
-    this.zArriba,
-    this.zAbajo,
-    this.longitud,
-    this.latC,
-    this.lonC,
-    this.datoObra,
-    this.year,
-    this.descTramo,
-    this.descSeccion
-  });
+  Section(
+      {required this.ogcFid,
+      this.line,
+      this.gid,
+      this.tipoSec,
+      this.tipoTra,
+      this.elemRed,
+      this.dim1,
+      this.dim2,
+      this.zArriba,
+      this.zAbajo,
+      this.longitud,
+      this.latC,
+      this.lonC,
+      this.datoObra,
+      this.year,
+      this.descTramo,
+      this.descSeccion});
 }

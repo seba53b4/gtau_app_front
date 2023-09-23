@@ -69,6 +69,44 @@ class SectionService {
     }
   }
 
+  Future<Section?> fetchSectionById(String token, int sectionId) async {
+    try {
+      final url = Uri.parse('$baseUrl/tramos/$sectionId');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return Section(
+            ogcFid: jsonResponse['ogcFid'],
+            zAbajo: jsonResponse['zabajo'],
+            longitud: jsonResponse['longitud'],
+            latC: jsonResponse['latc'],
+            lonC: jsonResponse['lonc'],
+            year: DateTime(jsonResponse['anio'] as int, 1, 1),
+            gid: jsonResponse['gid'],
+            elemRed: jsonResponse['elemred'],
+            dim1: jsonResponse['dim1'],
+            dim2: jsonResponse['dim2'],
+            zArriba: jsonResponse['zarriba'],
+            tipoSec: jsonResponse['tiposec'],
+            tipoTra: jsonResponse['tipotra'],
+            datoObra: jsonResponse['datoObra'],
+            descSeccion: jsonResponse['descSecci'],
+            descTramo: jsonResponse['descTramo'],
+            line: null);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener tramos: $error');
+      }
+      rethrow;
+    }
+  }
+
   SectionColor getPolylineColor(String tipotra) {
     try {
       return SectionColor.values.byName(tipotra.toLowerCase());

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/widgets/common/section_detail.dart';
 
 typedef void OnCloseCallback();
 
@@ -20,23 +20,7 @@ void showElementModal(BuildContext context, OnCloseCallback onClose) {
           ),
         ),
         content: SingleChildScrollView(
-          child: Container(
-            margin:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-            child: Column(
-              children: [
-                TextFormField(
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!
-                        .default_placeHolderInputText,
-                    border: const OutlineInputBorder(),
-                  ),
-                  controller: numWorkController,
-                ),
-                const SizedBox(height: 10.0),
-              ],
-            ),
-          ),
+          child: SectionDetail(),
         ),
         actions: <Widget>[
           TextButton(

@@ -11,6 +11,7 @@ import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/section_detail.dart';
 import 'package:provider/provider.dart';
 
 import '../models/section_data.dart';
@@ -46,7 +47,7 @@ class _MapComponentState extends State<MapComponent> {
   static const double zoom = 15;
   late Completer<GoogleMapController> _mapController;
   bool viewDetailElementInfo = false;
-  double mapHeight = 300.0;
+  double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
 
@@ -145,11 +146,14 @@ class _MapComponentState extends State<MapComponent> {
 
   void _onTapParamBehaviorSection(Section section, List<Section>? sections) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.toggleSectionSelected(section.line.polylineId);
+
+    selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
     if (kIsWeb) {
+      final sectionViewModel = context.read<SectionViewModel>();
+      final token = context.read<UserProvider>().getToken;
+      sectionViewModel.fetchSectionById(token!, section.ogcFid);
       setState(() {
         viewDetailElementInfo = true;
-        // Lógica para ajustar el ancho del mapa en función del ancho de la pantalla
       });
     }
   }
@@ -168,9 +172,9 @@ class _MapComponentState extends State<MapComponent> {
 
   Color _onColorParamBehaviorSection(Section section) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isSectionSelected(section.line.polylineId)
+    return selectedItemsProvider.isSectionSelected(section.line!.polylineId)
         ? selectedPolylineColor
-        : section.line.color;
+        : section.line!.color;
   }
 
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
@@ -205,7 +209,7 @@ class _MapComponentState extends State<MapComponent> {
     if (sections != null) {
       Set<Polyline> setPol = {};
       for (var section in sections) {
-        Polyline pol = section.line.copyWith(
+        Polyline pol = section.line!.copyWith(
           colorParam: _onColorParamBehaviorSection(section),
           onTapParam: () {
             _onTapParamBehaviorSection(section, sections);
@@ -216,7 +220,7 @@ class _MapComponentState extends State<MapComponent> {
         );
         setPol.add(pol);
         setPol.addAll(
-            polylineArrows(section.line.points, section.line.polylineId));
+            polylineArrows(section.line!.points, section.line!.polylineId));
       }
       return setPol;
     } else {
@@ -266,192 +270,211 @@ class _MapComponentState extends State<MapComponent> {
     }
   }
 
+  Future fetchAndUpdateData(String token) async {
+    Future<List<Section>?> asyncNewSections = fetchSectionsPolylines(token);
+    Future<List<Register>?> asyncNewRegisters = fetchRegistersCircles(token);
+    Future<List<Catchment>?> asyncNewCatchments = fetchCatchmentsCircles(token);
+
+    await asyncNewSections.then((fetchedSections) {
+      setState(() {
+        polylines = getPolylines(fetchedSections);
+      });
+    });
+    await asyncNewCatchments.then((fetchedCatchments) {
+      asyncNewRegisters.then((fetchedRegisters) {
+        setState(() {
+          circles = getCircles(fetchedCatchments, fetchedRegisters);
+        });
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final token = context.read<UserProvider>().getToken;
+
     return Scaffold(
       body: Row(
         children: [
           Expanded(
-              child: Stack(
-            children: [
-              AnimatedContainer(
-                duration: Duration(milliseconds: 500),
-                width: viewDetailElementInfo ? mapWidth - 300 : mapWidth,
-                child: GoogleMap(
-                  mapType: _currentMapType,
-                  initialCameraPosition: const CameraPosition(
-                    target: initLocation,
-                    zoom: zoom,
+            child: Stack(
+              children: [
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 0),
+                  width: viewDetailElementInfo && !widget.isModal
+                      ? mapWidth - modalWidth
+                      : mapWidth,
+                  child: GoogleMap(
+                    mapType: _currentMapType,
+                    initialCameraPosition: CameraPosition(
+                      target: initLocation,
+                      zoom: zoom,
+                    ),
+                    polylines: polylines,
+                    circles: circles,
+                    markers: markers,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    onMapCreated: (GoogleMapController controller) {
+                      _mapController.complete(controller);
+                    },
+                    onTap: (LatLng latLng) {
+                      if (locationManual) {
+                        setState(() {
+                          final Marker newMarker = Marker(
+                            markerId: MarkerId('tapped_location_manual'),
+                            position: latLng,
+                          );
+                          markersGPS.clear();
+                          markersGPS.add(newMarker);
+                          _getMarkers();
+                          location = LatLng(latLng.latitude, latLng.longitude);
+                        });
+                      }
+                    },
                   ),
                 ),
-                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                ElevatedButton(
-                  onPressed: () async {
-                    Future<List<Section>?> asyncNewSections =
-                        fetchSectionsPolylines(token!);
-                    Future<List<Register>?> asyncNewRegisters =
-                        fetchRegistersCircles(token);
-                    Future<List<Catchment>?> asyncNewCatchments =
-                        fetchCatchmentsCircles(token);
-
-                    await asyncNewSections.then((fetchedSections) {
-                      setState(() {
-                        final Marker newMarker = Marker(
-                          markerId: const MarkerId('tapped_location_manual'),
-                          position: latLng,
-                        );
-                        markersGPS.clear();
-                        markersGPS.add(newMarker);
-                        _getMarkers();
-                        location = LatLng(latLng.latitude, latLng.longitude);
-                      });
-                    });
-                    await asyncNewCatchments.then((fetchedCatchments) {
-                      asyncNewRegisters.then((fetchedRegisters) {
-                        setState(() {
-                          _currentMapType = _currentMapType == MapType.normal
-                              ? MapType.satellite
-                              : MapType.normal;
-                        });
-                      },
-                      child: Tooltip(
-                        message: AppLocalizations.of(context)!
-                            .map_component_map_view_tooltip,
-                        preferBelow: false,
-                        verticalOffset: 14,
-                        waitDuration: const Duration(milliseconds: 1000),
-                        child: Icon(
-                          _currentMapType == MapType.normal
-                              ? Icons.map
-                              : Icons.satellite,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    if (kIsWeb)
-                      Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                    ElevatedButton(
-                      onPressed: () async {
-                        Future<List<Section>?> asyncNewSections =
-                            fetchPolylines(token!);
-                        Future<List<Register>?> asyncNewRegisters =
-                            fetchRegistersCircles(token);
-                        Future<List<Catchment>?> asyncNewCatchments =
-                            fetchCatchmentsCircles(token);
-
-                        asyncNewSections.then((fetchedSections) {
+                Positioned(
+                  bottom: 80,
+                  left: 16,
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
                           setState(() {
-                            polylines = getPolylines(fetchedSections);
+                            _currentMapType = _currentMapType == MapType.normal
+                                ? MapType.satellite
+                                : MapType.normal;
                           });
-                        });
-                        asyncNewCatchments.then((fetchedCatchments) {
-                          asyncNewRegisters.then((fetchedRegisters) {
-                            setState(() {
-                              circles = getCircles(
-                                  fetchedCatchments, fetchedRegisters);
-                            });
+                        },
+                        child: Tooltip(
+                          message: AppLocalizations.of(context)!
+                              .map_component_map_view_tooltip,
+                          preferBelow: false,
+                          verticalOffset: 14,
+                          waitDuration: Duration(milliseconds: 1000),
+                          child: Icon(
+                            _currentMapType == MapType.normal
+                                ? Icons.map
+                                : Icons.satellite,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      if (kIsWeb) SizedBox(height: 6),
+                      ElevatedButton(
+                        onPressed: () async {
+                          await fetchAndUpdateData(token!);
+                        },
+                        child: Tooltip(
+                          message: AppLocalizations.of(context)!
+                              .map_component_fetch_elements,
+                          preferBelow: false,
+                          verticalOffset: 14,
+                          waitDuration: Duration(milliseconds: 1000),
+                          child: Icon(
+                            Icons.area_chart_outlined,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      if (kIsWeb) SizedBox(height: 6),
+                      ElevatedButton(
+                        onPressed: () {
+                          getCurrentLocation();
+                          _getMarkers();
+                        },
+                        child: Tooltip(
+                          message: AppLocalizations.of(context)!
+                              .map_component_get_location,
+                          preferBelow: false,
+                          verticalOffset: 14,
+                          waitDuration: Duration(milliseconds: 1000),
+                          child: Icon(
+                            Icons.my_location,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      if (kIsWeb) SizedBox(height: 6),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: locationManual
+                              ? selectedButtonColor
+                              : defaultButtonColor,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            polylines = {};
+                            circles = {};
+                            locationManual = !locationManual;
                           });
-                        });
-                      },
-                      child: Tooltip(
-                        message: AppLocalizations.of(context)!
-                            .map_component_fetch_elements,
-                        preferBelow: false,
-                        verticalOffset: 14,
-                        waitDuration: const Duration(milliseconds: 1000),
-                        child: const Icon(
-                          Icons.area_chart_outlined,
-                          color: Colors.white,
+                        },
+                        child: Tooltip(
+                          message: AppLocalizations.of(context)!
+                              .map_component_select_location,
+                          preferBelow: false,
+                          verticalOffset: 14,
+                          waitDuration: Duration(milliseconds: 1000),
+                          child: Icon(
+                            Icons.location_pin,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
-                    if (kIsWeb)
-                      Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                    ElevatedButton(
-                      onPressed: () {
-                        getCurrentLocation();
-                        _getMarkers();
-                      },
-                      child: Tooltip(
-                        message: AppLocalizations.of(context)!
-                            .map_component_get_location,
-                        preferBelow: false,
-                        verticalOffset: 14,
-                        waitDuration: const Duration(milliseconds: 1000),
-                        child: const Icon(
-                          Icons.my_location,
-                          color: Colors.white,
+                      if (kIsWeb) SizedBox(height: 6),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            distanceSelected =
+                                (distanceSelected + 1) % distances.length;
+                          });
+                        },
+                        child: Tooltip(
+                          message: AppLocalizations.of(context)!
+                              .map_component_diameter_tooltip,
+                          preferBelow: false,
+                          verticalOffset: 14,
+                          waitDuration: Duration(milliseconds: 1000),
+                          child: Text(distances[distanceSelected]),
                         ),
                       ),
-                    ),
-                    if (kIsWeb)
-                      Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: (locationManual)
-                            ? selectedButtonColor
-                            : defaultButtonColor,
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Visibility(
+            visible: kIsWeb && !widget.isModal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 0),
+                onEnd: () {},
+                curve: Curves.easeIn,
+                width: viewDetailElementInfo ? modalWidth : 0,
+                child: Container(
+                  width: viewDetailElementInfo ? modalWidth : 0,
+                  color: Colors.cyan,
+                  child: Column(
+                    children: [
+                      Text('Aquí va el modal'),
+                      SectionDetail(),
+                      ElevatedButton(
+                        child: Text('Haz clic para cerrar'),
+                        onPressed: () {
+                          setState(() {
+                            viewDetailElementInfo = false;
+                          });
+                        },
                       ),
-                      onPressed: () {
-                        setState(() {
-                          polylines = {};
-                          circles = {};
-                          locationManual = !locationManual;
-                        });
-                      },
-                      child: Tooltip(
-                        message: AppLocalizations.of(context)!
-                            .map_component_select_location,
-                        preferBelow: false,
-                        verticalOffset: 14,
-                        waitDuration: const Duration(milliseconds: 1000),
-                        child: const Icon(
-                          Icons.location_pin,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    if (kIsWeb)
-                      Padding(padding: EdgeInsets.symmetric(vertical: 6)),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          distanceSelected =
-                              (distanceSelected + 1) % distances.length;
-                        });
-                      },
-                      child: Tooltip(
-                        message: AppLocalizations.of(context)!
-                            .map_component_diameter_tooltip,
-                        preferBelow: false,
-                        verticalOffset: 14,
-                        waitDuration: const Duration(milliseconds: 1000),
-                        child: Text(distances[distanceSelected].toString()),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ],
-          )),
-          if (kIsWeb && viewDetailElementInfo)
-            AnimatedContainer(
-              duration: Duration(milliseconds: 500),
-              width: 300,
-              child: Column(
-                children: [
-                  Text('Aca el modal'),
-                  ElevatedButton(
-                      child: Text('Click me to close'),
-                      onPressed: () {
-                        setState(() {
-                          viewDetailElementInfo = false;
-                        });
-                      }),
-                ],
-              ),
             ),
+          ),
         ],
       ),
     );
