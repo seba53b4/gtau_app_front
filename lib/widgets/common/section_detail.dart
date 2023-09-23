@@ -2,33 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-class SectionDetail extends StatefulWidget {
+class SectionDetail extends StatelessWidget {
   const SectionDetail({Key? key}) : super(key: key);
-
-  @override
-  State<SectionDetail> createState() => _SectionDetailState();
-}
-
-class _SectionDetailState extends State<SectionDetail> {
-  @override
-  void initState() {
-    super.initState();
-    //_fetchSectionDetail();
-  }
-
-  //
-  // Future<void> _fetchSectionDetail() async {
-  //   if (widget.sectionId != null) {
-  //     final token = context.read<UserProvider>().getToken;
-  //     await fetchSectionById(token!, widget.sectionId!);
-  //   }
-  // }
-  //
-  // Future<Section?> fetchSectionById(String token, int sectionId) async {
-  //   final sectionViewModel =
-  //       Provider.of<SectionViewModel>(context, listen: false);
-  //   return await sectionViewModel.fetchSectionById(token, sectionId);
-  // }
 
   @override
   Widget build(BuildContext context) {

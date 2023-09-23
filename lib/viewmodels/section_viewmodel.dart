@@ -48,7 +48,6 @@ class SectionViewModel extends ChangeNotifier {
           await _sectionService.fetchSectionById(token, sectionId);
       if (responseSection != null) {
         _sectionForDetail = responseSection;
-        print("seccion elegida: ${_sectionForDetail?.ogcFid.toString()}");
         _isLoading = false;
       }
       notifyListeners();
