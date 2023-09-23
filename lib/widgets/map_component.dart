@@ -106,7 +106,7 @@ class _MapComponentState extends State<MapComponent> {
     }
   }
 
-  Future<List<Section>?> fetchPolylines(String token) async {
+  Future<List<Section>?> fetchSectionsPolylines(String token) async {
     final sectionViewModel =
         Provider.of<SectionViewModel>(context, listen: false);
     LatLng? finalLocation = getFinalLocation();
@@ -170,7 +170,7 @@ class _MapComponentState extends State<MapComponent> {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isSectionSelected(section.line.polylineId)
         ? selectedPolylineColor
-        : defaultPolylineColor;
+        : section.line.color;
   }
 
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
@@ -284,16 +284,18 @@ class _MapComponentState extends State<MapComponent> {
                     target: initLocation,
                     zoom: zoom,
                   ),
-                  polylines: polylines,
-                  circles: circles,
-                  markers: markers,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                  onMapCreated: (GoogleMapController controller) {
-                    _mapController.complete(controller);
-                  },
-                  onTap: (LatLng latLng) {
-                    if (locationManual) {
+                ),
+                if (kIsWeb) Padding(padding: EdgeInsets.symmetric(vertical: 6)),
+                ElevatedButton(
+                  onPressed: () async {
+                    Future<List<Section>?> asyncNewSections =
+                        fetchSectionsPolylines(token!);
+                    Future<List<Register>?> asyncNewRegisters =
+                        fetchRegistersCircles(token);
+                    Future<List<Catchment>?> asyncNewCatchments =
+                        fetchCatchmentsCircles(token);
+
+                    await asyncNewSections.then((fetchedSections) {
                       setState(() {
                         final Marker newMarker = Marker(
                           markerId: const MarkerId('tapped_location_manual'),
@@ -304,17 +306,9 @@ class _MapComponentState extends State<MapComponent> {
                         _getMarkers();
                         location = LatLng(latLng.latitude, latLng.longitude);
                       });
-                    }
-                  },
-                ),
-              ),
-              Positioned(
-                bottom: 80,
-                left: 16,
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
+                    });
+                    await asyncNewCatchments.then((fetchedCatchments) {
+                      asyncNewRegisters.then((fetchedRegisters) {
                         setState(() {
                           _currentMapType = _currentMapType == MapType.normal
                               ? MapType.satellite
