@@ -44,10 +44,10 @@ class RegisterService {
           Circle circle = Circle(
               circleId: CircleId(register['ogcFid'].toString()),
               center: latLngCenter,
-              radius: 2,
-              strokeWidth: 2,
-              strokeColor: Colors.green,
-              fillColor: Colors.blueGrey);
+              radius: 1.3,
+              strokeWidth: 7,
+              strokeColor: Colors.black87,
+              fillColor: Colors.grey);
 
           return Register(
               ogcFid: register['ogcFid'],
