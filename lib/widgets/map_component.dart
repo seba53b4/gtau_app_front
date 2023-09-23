@@ -93,7 +93,7 @@ class _MapComponentState extends State<MapComponent> {
     }
   }
 
-  Future<List<Section>?> fetchPolylines(String token) async {
+  Future<List<Section>?> fetchSectionsPolylines(String token) async {
     final sectionViewModel =
         Provider.of<SectionViewModel>(context, listen: false);
     LatLng? finalLocation = getFinalLocation();
@@ -151,7 +151,7 @@ class _MapComponentState extends State<MapComponent> {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isSectionSelected(section.line.polylineId)
         ? selectedPolylineColor
-        : defaultPolylineColor;
+        : section.line.color;
   }
 
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
@@ -313,18 +313,18 @@ class _MapComponentState extends State<MapComponent> {
                 ElevatedButton(
                   onPressed: () async {
                     Future<List<Section>?> asyncNewSections =
-                        fetchPolylines(token!);
+                        fetchSectionsPolylines(token!);
                     Future<List<Register>?> asyncNewRegisters =
                         fetchRegistersCircles(token);
                     Future<List<Catchment>?> asyncNewCatchments =
                         fetchCatchmentsCircles(token);
 
-                    asyncNewSections.then((fetchedSections) {
+                    await asyncNewSections.then((fetchedSections) {
                       setState(() {
                         polylines = getPolylines(fetchedSections);
                       });
                     });
-                    asyncNewCatchments.then((fetchedCatchments) {
+                    await asyncNewCatchments.then((fetchedCatchments) {
                       asyncNewRegisters.then((fetchedRegisters) {
                         setState(() {
                           circles =

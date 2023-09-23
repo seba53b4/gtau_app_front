@@ -29,7 +29,7 @@ List<LatLng> getLargePolylineOnSection(List<LatLng> points) {
 
 Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
   Set<Polyline> ret = {};
-  const Color arrowColor = Colors.lightBlue;
+  const Color arrowColor = Colors.cyanAccent;
   const int arrowWidth = 3;
 
   try {
