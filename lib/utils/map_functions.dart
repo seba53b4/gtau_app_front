@@ -1,8 +1,8 @@
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 
 double calculateDistance(LatLng point1, LatLng point2) {
   final double dx = point1.latitude - point2.latitude;
@@ -11,40 +11,37 @@ double calculateDistance(LatLng point1, LatLng point2) {
   return distance;
 }
 
-List<LatLng> getLargePolylineOnSection(List<LatLng> points){
-
+List<LatLng> getLargePolylineOnSection(List<LatLng> points) {
   List<LatLng> ret = [];
   double maxLength = 0;
-  for (int i = 0; i < points.length-1; i++) {
-    final dist = calculateDistance(points[i], points[i+1]);
-    if(dist > maxLength){
+  for (int i = 0; i < points.length - 1; i++) {
+    final dist = calculateDistance(points[i], points[i + 1]);
+    if (dist > maxLength) {
       maxLength = dist;
       ret.clear();
       ret.add(points[i]);
-      ret.add(points[i+1]);
+      ret.add(points[i + 1]);
     }
   }
 
   return ret;
-
 }
 
 Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
-
   Set<Polyline> ret = {};
   const Color arrowColor = Colors.lightBlue;
   const int arrowWidth = 3;
 
-  try{
+  try {
     LatLng init, end;
 
-    if (points.length == 2){
-      init = points.first;
-      end = points.last;
+    if (points.length == 2) {
+      end = points.first;
+      init = points.last;
     } else {
       List<LatLng> pointsOfArrow = getLargePolylineOnSection(points);
-      init = pointsOfArrow.first;
-      end = pointsOfArrow.last;
+      init = pointsOfArrow.last;
+      end = pointsOfArrow.first;
     }
 
     // Calcula el punto medio de la línea principal
@@ -54,8 +51,8 @@ Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
     );
 
     // Calcula el ángulo entre los puntos init y end
-    double angleOfPolylineRadians = atan2(end.latitude - init.latitude, end.longitude - init.longitude);
-
+    double angleOfPolylineRadians =
+        atan2(end.latitude - init.latitude, end.longitude - init.longitude);
 
     double angle = 20 * (pi / 180); // Ángulo de los vertices según la polylinea
     double arrowLength = 0.00001225; // Largo de los vértices de la flecha
@@ -82,7 +79,7 @@ Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
       width: 3,
       points: [midPoint, sidePoint2],
     ));
-  } catch(error) {
+  } catch (error) {
     if (kDebugMode) {
       print(error);
     }
