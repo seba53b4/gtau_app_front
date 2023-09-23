@@ -36,12 +36,12 @@ Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
     LatLng init, end;
 
     if (points.length == 2) {
-      init = points.first;
-      end = points.last;
+      end = points.first;
+      init = points.last;
     } else {
       List<LatLng> pointsOfArrow = getLargePolylineOnSection(points);
-      init = pointsOfArrow.first;
-      end = pointsOfArrow.last;
+      init = pointsOfArrow.last;
+      end = pointsOfArrow.first;
     }
 
     // Calcula el punto medio de la línea principal
