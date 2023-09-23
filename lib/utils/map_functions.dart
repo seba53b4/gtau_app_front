@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -28,7 +29,7 @@ List<LatLng> getLargePolylineOnSection(List<LatLng> points) {
 
 Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
   Set<Polyline> ret = {};
-  const Color arrowColor = Colors.black87;
+  const Color arrowColor = Colors.cyanAccent;
   const int arrowWidth = 3;
 
   try {
