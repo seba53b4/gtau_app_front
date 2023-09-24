@@ -26,8 +26,8 @@ class RegisterViewModel extends ChangeNotifier {
           token, longitude, latitude, radiusMtr);
       if (responseListSection != null) {
         _registers = responseListSection;
-        _isLoading = false;
       }
+      _isLoading = false;
       notifyListeners();
       return responseListSection;
     } catch (error) {
@@ -36,17 +36,17 @@ class RegisterViewModel extends ChangeNotifier {
     }
   }
 
-  Future<Register?> fetchRegisterById(String token, int sectionId) async {
+  Future<Register?> fetchRegisterById(String token, int registerId) async {
     try {
       _isLoading = true;
       _registerForDetail = null;
       notifyListeners();
       final responseRegister =
-          await _registerService.fetchRegisterById(token, sectionId);
+          await _registerService.fetchRegisterById(token, registerId);
       if (responseRegister != null) {
         _registerForDetail = responseRegister;
-        _isLoading = false;
       }
+      _isLoading = false;
       notifyListeners();
       return responseRegister;
     } catch (error) {

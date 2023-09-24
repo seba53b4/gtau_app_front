@@ -11,12 +11,12 @@ import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/catchment_detail.dart';
 import 'package:provider/provider.dart';
 
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
-import 'common/register_detail.dart';
 
 class MapComponent extends StatefulWidget {
   final bool isModal;
@@ -162,6 +162,14 @@ class _MapComponentState extends State<MapComponent> {
       Catchment catchment, List<Catchment>? catchments) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.toggleCatchmentSelected(catchment.point!.circleId);
+    if (kIsWeb) {
+      final catchmentViewModel = context.read<CatchmentViewModel>();
+      final token = context.read<UserProvider>().getToken;
+      catchmentViewModel.fetchCatchmentById(token!, catchment.ogcFid);
+      setState(() {
+        viewDetailElementInfo = true;
+      });
+    }
   }
 
   void _onTapParamBehaviorRegister(
@@ -469,7 +477,8 @@ class _MapComponentState extends State<MapComponent> {
                     children: [
                       Text('Aquí va el modal'),
                       //SectionDetail(),
-                      RegisterDetail(),
+                      //RegisterDetail(),
+                      CatchmentDetail(),
                       ElevatedButton(
                         child: Text('Haz clic para cerrar'),
                         onPressed: () {

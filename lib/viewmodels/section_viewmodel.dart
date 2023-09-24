@@ -27,8 +27,8 @@ class SectionViewModel extends ChangeNotifier {
           token, longitude, latitude, radiusMtr);
       if (responseListSection != null) {
         _sections = responseListSection;
-        _isLoading = false;
       }
+      _isLoading = false;
       notifyListeners();
 
       return responseListSection;
@@ -48,9 +48,10 @@ class SectionViewModel extends ChangeNotifier {
           await _sectionService.fetchSectionById(token, sectionId);
       if (responseSection != null) {
         _sectionForDetail = responseSection;
-        _isLoading = false;
       }
+      _isLoading = false;
       notifyListeners();
+
       return responseSection;
     } catch (error) {
       _isLoading = false;
