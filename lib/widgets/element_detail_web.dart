@@ -34,11 +34,11 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
     }
     switch (widget.elementType) {
       case ElementType.catchment:
-        return CatchmentDetail();
+        return const CatchmentDetail();
       case ElementType.register:
-        return RegisterDetail();
+        return const RegisterDetail();
       case ElementType.section:
-        return SectionDetail();
+        return const SectionDetail();
       default:
         throw Exception('Invalid status string: ${widget.elementType}');
     }

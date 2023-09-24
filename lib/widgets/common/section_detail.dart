@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:provider/provider.dart';
 
+import '../loading_component.dart';
+
 class SectionDetail extends StatelessWidget {
   const SectionDetail({Key? key}) : super(key: key);
 
@@ -10,7 +12,11 @@ class SectionDetail extends StatelessWidget {
     return Consumer<SectionViewModel>(
         builder: (context, sectionViewModel, child) {
       final sectionDetail = sectionViewModel.sectionForDetail;
+      final sectionLoading = sectionViewModel.isLoading;
 
+      if (sectionLoading) {
+        return const LoadingWidget();
+      }
       return sectionDetail != null
           ? SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),

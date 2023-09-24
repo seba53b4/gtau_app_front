@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../utils/date_utils.dart';
 import '../../viewmodels/catchment_viewmodel.dart';
+import '../loading_component.dart';
 
 class CatchmentDetail extends StatelessWidget {
   const CatchmentDetail({Key? key}) : super(key: key);
@@ -12,6 +13,11 @@ class CatchmentDetail extends StatelessWidget {
     return Consumer<CatchmentViewModel>(
         builder: (context, catchmentViewModel, child) {
       final catchmentDetail = catchmentViewModel.catchmentForDetail;
+      final catchmentLoading = catchmentViewModel.isLoading;
+
+      if (catchmentLoading) {
+        return const LoadingWidget();
+      }
       return catchmentDetail != null
           ? SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),

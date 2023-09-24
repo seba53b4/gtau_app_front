@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/register_viewmodel.dart';
+import '../loading_component.dart';
 
 class RegisterDetail extends StatelessWidget {
   const RegisterDetail({Key? key}) : super(key: key);
@@ -11,7 +12,11 @@ class RegisterDetail extends StatelessWidget {
     return Consumer<RegisterViewModel>(
         builder: (context, registerViewModel, child) {
       final registerDetail = registerViewModel.registerForDetail;
+      final registerLoading = registerViewModel.isLoading;
 
+      if (registerLoading) {
+        return const LoadingWidget();
+      }
       return registerDetail != null
           ? SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
