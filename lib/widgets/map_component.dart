@@ -11,12 +11,13 @@ import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
-import 'package:gtau_app_front/widgets/common/catchment_detail.dart';
 import 'package:provider/provider.dart';
 
+import '../models/enums/element_type.dart';
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
+import 'element_detail_web.dart';
 
 class MapComponent extends StatefulWidget {
   final bool isModal;
@@ -50,6 +51,9 @@ class _MapComponentState extends State<MapComponent> {
   double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
+
+  late int? elementSelectedId = null;
+  late ElementType? elementSelectedType = null;
 
   @override
   void initState() {
@@ -144,45 +148,69 @@ class _MapComponentState extends State<MapComponent> {
 
   LatLng? getFinalLocation() => (location != null) ? location : initLocation;
 
-  void _onTapParamBehaviorSection(Section section, List<Section>? sections) {
+  Future<void> _onTapParamBehaviorSection(
+      Section section, List<Section>? sections) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
 
     selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
     if (kIsWeb) {
-      final sectionViewModel = context.read<SectionViewModel>();
-      final token = context.read<UserProvider>().getToken;
-      sectionViewModel.fetchSectionById(token!, section.ogcFid);
       setState(() {
+        elementSelectedId = section.ogcFid;
+        elementSelectedType = ElementType.section;
         viewDetailElementInfo = true;
       });
+      await _fetchElementInfo();
     }
   }
 
-  void _onTapParamBehaviorCatchment(
-      Catchment catchment, List<Catchment>? catchments) {
+  Future<void> _onTapParamBehaviorCatchment(
+      Catchment catchment, List<Catchment>? catchments) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.toggleCatchmentSelected(catchment.point!.circleId);
     if (kIsWeb) {
-      final catchmentViewModel = context.read<CatchmentViewModel>();
-      final token = context.read<UserProvider>().getToken;
-      catchmentViewModel.fetchCatchmentById(token!, catchment.ogcFid);
       setState(() {
+        elementSelectedId = catchment.ogcFid;
+        elementSelectedType = ElementType.catchment;
         viewDetailElementInfo = true;
       });
+      await _fetchElementInfo();
     }
   }
 
-  void _onTapParamBehaviorRegister(
-      Register register, List<Register>? registers) {
+  Future<void> _onTapParamBehaviorRegister(
+      Register register, List<Register>? registers) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.toggleRegistroSelected(register.point!.circleId);
     if (kIsWeb) {
-      final registerViewModel = context.read<RegisterViewModel>();
-      final token = context.read<UserProvider>().getToken;
-      registerViewModel.fetchRegisterById(token!, register.ogcFid);
       setState(() {
+        elementSelectedId = register.ogcFid;
+        elementSelectedType = ElementType.register;
         viewDetailElementInfo = true;
       });
+      await _fetchElementInfo();
+    }
+  }
+
+  Future _fetchElementInfo() async {
+    if (elementSelectedType != null && elementSelectedId != null) {
+      final token = context.read<UserProvider>().getToken;
+      final catchmentViewModel = context.read<CatchmentViewModel>();
+      final registerViewModel = context.read<RegisterViewModel>();
+      final sectionViewModel = context.read<SectionViewModel>();
+      switch (elementSelectedType) {
+        case ElementType.catchment:
+          await catchmentViewModel.fetchCatchmentById(
+              token!, elementSelectedId!);
+          break;
+        case ElementType.register:
+          await registerViewModel.fetchRegisterById(token!, elementSelectedId!);
+          break;
+        case ElementType.section:
+          await sectionViewModel.fetchSectionById(token!, elementSelectedId!);
+          break;
+        default:
+          throw Exception('Invalid status string: $elementSelectedId');
+      }
     }
   }
 
@@ -227,8 +255,8 @@ class _MapComponentState extends State<MapComponent> {
       for (var section in sections) {
         Polyline pol = section.line!.copyWith(
           colorParam: _onColorParamBehaviorSection(section),
-          onTapParam: () {
-            _onTapParamBehaviorSection(section, sections);
+          onTapParam: () async {
+            await _onTapParamBehaviorSection(section, sections);
             setState(() {
               polylines = getPolylines(sections);
             });
@@ -254,8 +282,8 @@ class _MapComponentState extends State<MapComponent> {
           radiusParam: catchment.point!.radius,
           strokeWidthParam: catchment.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
-          onTapParam: () {
-            _onTapParamBehaviorCatchment(catchment, catchments);
+          onTapParam: () async {
+            await _onTapParamBehaviorCatchment(catchment, catchments);
             setState(() {
               circles = getCircles(catchments, registers);
             });
@@ -271,8 +299,8 @@ class _MapComponentState extends State<MapComponent> {
           radiusParam: register.point!.radius,
           strokeWidthParam: register.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorRegister(register),
-          onTapParam: () {
-            _onTapParamBehaviorRegister(register, registers);
+          onTapParam: () async {
+            await _onTapParamBehaviorRegister(register, registers);
             setState(() {
               circles = getCircles(catchments, registers);
             });
@@ -461,38 +489,40 @@ class _MapComponentState extends State<MapComponent> {
               ],
             ),
           ),
-          Visibility(
-            visible: kIsWeb && !widget.isModal,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 0),
-                onEnd: () {},
-                curve: Curves.easeIn,
-                width: viewDetailElementInfo ? modalWidth : 0,
-                child: Container(
+          if (elementSelectedType != null && elementSelectedId != null)
+            Visibility(
+              visible: kIsWeb && !widget.isModal,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 0),
+                  onEnd: () {},
+                  curve: Curves.easeIn,
                   width: viewDetailElementInfo ? modalWidth : 0,
-                  color: Colors.cyan,
-                  child: Column(
-                    children: [
-                      Text('Aquí va el modal'),
-                      //SectionDetail(),
-                      //RegisterDetail(),
-                      CatchmentDetail(),
-                      ElevatedButton(
-                        child: Text('Haz clic para cerrar'),
-                        onPressed: () {
-                          setState(() {
-                            viewDetailElementInfo = false;
-                          });
-                        },
-                      ),
-                    ],
+                  child: Container(
+                    width: viewDetailElementInfo ? modalWidth : 0,
+                    color: Colors.cyan,
+                    child: Column(
+                      children: [
+                        Text('Aquí va el modal'),
+                        ElementDetailWeb(
+                          elementType: elementSelectedType,
+                          elementId: elementSelectedId,
+                        ),
+                        ElevatedButton(
+                          child: Text('Haz clic para cerrar'),
+                          onPressed: () {
+                            setState(() {
+                              viewDetailElementInfo = false;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

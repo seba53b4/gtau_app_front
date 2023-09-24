@@ -1,7 +1,7 @@
 import 'dart:core';
 
+import 'package:gtau_app_front/models/enums/point_type_enum.dart';
 import 'package:gtau_app_front/models/point_data.dart';
-import 'package:gtau_app_front/models/point_type_enum.dart';
 
 class Register extends PointData {
   late final String? tipo;
