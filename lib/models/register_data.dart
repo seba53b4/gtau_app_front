@@ -12,6 +12,7 @@ class Register extends PointData {
   late final double? latC;
   late final double? lonC;
   late final String? datoObra;
+  late final String? descripcion;
 
   Register(
       {required super.ogcFid,
@@ -23,6 +24,7 @@ class Register extends PointData {
       this.inspeccion,
       this.latC,
       this.lonC,
+      this.descripcion,
       this.datoObra})
       : super(type: PointType.register);
 }

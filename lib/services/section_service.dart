@@ -10,6 +10,7 @@ import '../models/section_data.dart';
 
 class SectionService {
   final String baseUrl;
+  static const String sourcePath = 'tramos';
 
   SectionService({String? baseUrl})
       : baseUrl =
@@ -26,7 +27,7 @@ class SectionService {
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
       final url = Uri.parse(
-          '$baseUrl/tramos/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
+          '$baseUrl/$sourcePath/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
       final response = await http.get(
         url,
         headers: _getHeaders(token),
@@ -71,7 +72,7 @@ class SectionService {
 
   Future<Section?> fetchSectionById(String token, int sectionId) async {
     try {
-      final url = Uri.parse('$baseUrl/tramos/$sectionId');
+      final url = Uri.parse('$baseUrl/$sourcePath/$sectionId');
       final response = await http.get(
         url,
         headers: _getHeaders(token),

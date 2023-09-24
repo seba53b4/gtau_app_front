@@ -11,12 +11,12 @@ import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
-import 'package:gtau_app_front/widgets/common/section_detail.dart';
 import 'package:provider/provider.dart';
 
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
+import 'common/register_detail.dart';
 
 class MapComponent extends StatefulWidget {
   final bool isModal;
@@ -161,13 +161,21 @@ class _MapComponentState extends State<MapComponent> {
   void _onTapParamBehaviorCatchment(
       Catchment catchment, List<Catchment>? catchments) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.toggleCatchmentSelected(catchment.point.circleId);
+    selectedItemsProvider.toggleCatchmentSelected(catchment.point!.circleId);
   }
 
   void _onTapParamBehaviorRegister(
       Register register, List<Register>? registers) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.toggleRegistroSelected(register.point.circleId);
+    selectedItemsProvider.toggleRegistroSelected(register.point!.circleId);
+    if (kIsWeb) {
+      final registerViewModel = context.read<RegisterViewModel>();
+      final token = context.read<UserProvider>().getToken;
+      registerViewModel.fetchRegisterById(token!, register.ogcFid);
+      setState(() {
+        viewDetailElementInfo = true;
+      });
+    }
   }
 
   Color _onColorParamBehaviorSection(Section section) {
@@ -179,16 +187,16 @@ class _MapComponentState extends State<MapComponent> {
 
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isCatchmentSelected(catchment.point.circleId)
+    return selectedItemsProvider.isCatchmentSelected(catchment.point!.circleId)
         ? selectedPolylineColor
-        : catchment.point.strokeColor;
+        : catchment.point!.strokeColor;
   }
 
   Color _onColorParamBehaviorRegister(Register register) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isRegistroSelected(register.point.circleId)
+    return selectedItemsProvider.isRegistroSelected(register.point!.circleId)
         ? selectedPolylineColor
-        : register.point.strokeColor;
+        : register.point!.strokeColor;
   }
 
   void _getMarkers() {
@@ -233,10 +241,10 @@ class _MapComponentState extends State<MapComponent> {
     Set<Circle> setCir = {};
     if (catchments != null) {
       for (var catchment in catchments) {
-        Circle circle = catchment.point.copyWith(
-          centerParam: catchment.point.center,
-          radiusParam: catchment.point.radius,
-          strokeWidthParam: catchment.point.strokeWidth,
+        Circle circle = catchment.point!.copyWith(
+          centerParam: catchment.point!.center,
+          radiusParam: catchment.point!.radius,
+          strokeWidthParam: catchment.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
           onTapParam: () {
             _onTapParamBehaviorCatchment(catchment, catchments);
@@ -250,10 +258,10 @@ class _MapComponentState extends State<MapComponent> {
     }
     if (registers != null) {
       for (var register in registers) {
-        Circle circle = register.point.copyWith(
-          centerParam: register.point.center,
-          radiusParam: register.point.radius,
-          strokeWidthParam: register.point.strokeWidth,
+        Circle circle = register.point!.copyWith(
+          centerParam: register.point!.center,
+          radiusParam: register.point!.radius,
+          strokeWidthParam: register.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorRegister(register),
           onTapParam: () {
             _onTapParamBehaviorRegister(register, registers);
@@ -460,7 +468,8 @@ class _MapComponentState extends State<MapComponent> {
                   child: Column(
                     children: [
                       Text('Aquí va el modal'),
-                      SectionDetail(),
+                      //SectionDetail(),
+                      RegisterDetail(),
                       ElevatedButton(
                         child: Text('Haz clic para cerrar'),
                         onPressed: () {

@@ -10,6 +10,7 @@ import '../models/register_data.dart';
 
 class RegisterService {
   final String baseUrl;
+  static const String sourcePath = 'registros';
 
   RegisterService({String? baseUrl})
       : baseUrl =
@@ -26,7 +27,7 @@ class RegisterService {
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
       final url = Uri.parse(
-          '$baseUrl/registros/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
+          '$baseUrl/$sourcePath/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
       final response = await http.get(
         url,
         headers: _getHeaders(token),
@@ -54,6 +55,39 @@ class RegisterService {
               tipo: register['tipo'],
               point: circle);
         }).toList();
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener registros: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<Register?> fetchRegisterById(String token, int sectionId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$sourcePath/$sectionId');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return Register(
+          ogcFid: jsonResponse['ogcFid'],
+          datoObra: jsonResponse['datoObra'],
+          gid: jsonResponse['gid'],
+          elemRed: jsonResponse['elemRed'],
+          lonC: jsonResponse['lonc'],
+          latC: jsonResponse['latc'],
+          cota: jsonResponse['cota'],
+          inspeccion: jsonResponse['inspeccion'],
+          tipo: jsonResponse['tipo'],
+          descripcion: jsonResponse['descripcio'],
+          point: Circle(circleId: CircleId(['ogcFid'].toString())),
+        );
       } else {
         return null;
       }
