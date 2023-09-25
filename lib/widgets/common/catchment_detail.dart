@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../utils/date_utils.dart';
 import '../../viewmodels/catchment_viewmodel.dart';
 import '../loading_component.dart';
+import 'box_container.dart';
+import 'common_element_detail.dart';
 
 class CatchmentDetail extends StatelessWidget {
   const CatchmentDetail({Key? key}) : super(key: key);
@@ -20,75 +22,30 @@ class CatchmentDetail extends StatelessWidget {
       }
       return SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: SizedBox(
-          height: 560,
+        child: BoxContainer(
           child: Wrap(
             crossAxisAlignment: WrapCrossAlignment.start,
             children: [
-              _buildInfoRow("ogcFid", catchmentDetail?.ogcFid.toString()),
-              _buildInfoRow("gid", catchmentDetail?.gid?.toString()),
-              _buildInfoRow(
+              buildInfoRow("ogcFid", catchmentDetail?.ogcFid.toString()),
+              buildInfoRow("gid", catchmentDetail?.gid?.toString()),
+              buildInfoRow(
                   "elemred", catchmentDetail?.elemRed?.toStringAsFixed(1)),
-              _buildInfoRow("Tipo", catchmentDetail?.tipo.toString()),
-              _buildInfoRow("Tipo Boca", catchmentDetail?.tipoboca.toString()),
-              _buildInfoRow("latc", catchmentDetail?.latC?.toString()),
-              _buildInfoRow("lonc", catchmentDetail?.lonC?.toString()),
-              _buildInfoRow("datoObra", catchmentDetail?.datoObra),
-              _buildInfoRow("ucrea", catchmentDetail?.ucrea?.toString()),
-              _buildInfoRow(
+              buildInfoRow("Tipo", catchmentDetail?.tipo.toString()),
+              buildInfoRow("Tipo Boca", catchmentDetail?.tipoboca.toString()),
+              buildInfoRow("latc", catchmentDetail?.latC?.toString()),
+              buildInfoRow("lonc", catchmentDetail?.lonC?.toString()),
+              buildInfoRow("datoObra", catchmentDetail?.datoObra),
+              buildInfoRow("ucrea", catchmentDetail?.ucrea?.toString()),
+              buildInfoRow(
                   "fcrea", parseDateTimeOnFormatHour(catchmentDetail?.fcrea)),
-              _buildInfoRow("uact", catchmentDetail?.uact?.toString()),
-              _buildInfoRow(
+              buildInfoRow("uact", catchmentDetail?.uact?.toString()),
+              buildInfoRow(
                   "fact", parseDateTimeOnFormatHour(catchmentDetail?.fact)),
-              _buildInfoMultiRow("idauditori", catchmentDetail?.idauditori),
+              buildInfoMultiRow("idauditori", catchmentDetail?.idauditori),
             ],
           ),
         ),
       );
     });
-  }
-
-  Widget _buildInfoRow(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "$label: ",
-              style: const TextStyle(
-                  color: Color.fromRGBO(14, 45, 9, 1),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-            ),
-            Text(value ?? "Sin Datos", style: const TextStyle(fontSize: 18)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoMultiRow(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "$label: ",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            Text(
-              value ?? "Sin Datos",
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

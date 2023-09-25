@@ -60,12 +60,10 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
             ],
           ),
         ),
-        Container(
-          child: Column(
-            children: [
-              DetailWidget(elementType: widget.elementType),
-            ],
-          ),
+        Column(
+          children: [
+            DetailWidget(elementType: widget.elementType),
+          ],
         )
       ],
     );
