@@ -16,50 +16,56 @@ class CatchmentDetail extends StatelessWidget {
       final catchmentLoading = catchmentViewModel.isLoading;
 
       if (catchmentLoading) {
-        return const LoadingWidget();
+        return const LoadingWidget(heightRatio: 0.8);
       }
-      return catchmentDetail != null
-          ? SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.start,
-                children: [
-                  _buildInfoRow("ogcFid", catchmentDetail.ogcFid.toString()),
-                  _buildInfoRow("gid", catchmentDetail.gid?.toString()),
-                  _buildInfoRow(
-                      "elemred", catchmentDetail.elemRed?.toStringAsFixed(1)),
-                  _buildInfoRow("Tipo", catchmentDetail.tipo.toString()),
-                  _buildInfoRow(
-                      "Tipo Boca", catchmentDetail.tipoboca.toString()),
-                  _buildInfoRow("latc", catchmentDetail.latC?.toString()),
-                  _buildInfoRow("lonc", catchmentDetail.lonC?.toString()),
-                  _buildInfoRow("datoObra", catchmentDetail.datoObra),
-                  _buildInfoRow("ucrea", catchmentDetail.ucrea?.toString()),
-                  _buildInfoRow("fcrea",
-                      parseDateTimeOnFormatHour(catchmentDetail.fcrea)),
-                  _buildInfoRow("uact", catchmentDetail.uact?.toString()),
-                  _buildInfoRow(
-                      "fact", parseDateTimeOnFormatHour(catchmentDetail.fact)),
-                  _buildInfoMultiRow("idauditori", catchmentDetail.idauditori),
-                ],
-              ),
-            )
-          : Text("no data por aca");
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: SizedBox(
+          height: 560,
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: [
+              _buildInfoRow("ogcFid", catchmentDetail?.ogcFid.toString()),
+              _buildInfoRow("gid", catchmentDetail?.gid?.toString()),
+              _buildInfoRow(
+                  "elemred", catchmentDetail?.elemRed?.toStringAsFixed(1)),
+              _buildInfoRow("Tipo", catchmentDetail?.tipo.toString()),
+              _buildInfoRow("Tipo Boca", catchmentDetail?.tipoboca.toString()),
+              _buildInfoRow("latc", catchmentDetail?.latC?.toString()),
+              _buildInfoRow("lonc", catchmentDetail?.lonC?.toString()),
+              _buildInfoRow("datoObra", catchmentDetail?.datoObra),
+              _buildInfoRow("ucrea", catchmentDetail?.ucrea?.toString()),
+              _buildInfoRow(
+                  "fcrea", parseDateTimeOnFormatHour(catchmentDetail?.fcrea)),
+              _buildInfoRow("uact", catchmentDetail?.uact?.toString()),
+              _buildInfoRow(
+                  "fact", parseDateTimeOnFormatHour(catchmentDetail?.fact)),
+              _buildInfoMultiRow("idauditori", catchmentDetail?.idauditori),
+            ],
+          ),
+        ),
+      );
     });
   }
 
   Widget _buildInfoRow(String label, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          Text(value ?? "Sin Datos", style: const TextStyle(fontSize: 18)),
-        ],
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "$label: ",
+              style: const TextStyle(
+                  color: Color.fromRGBO(14, 45, 9, 1),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
+            ),
+            Text(value ?? "Sin Datos", style: const TextStyle(fontSize: 18)),
+          ],
+        ),
       ),
     );
   }
@@ -67,18 +73,21 @@ class CatchmentDetail extends StatelessWidget {
   Widget _buildInfoMultiRow(String label, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "$label: ",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          Text(
-            value ?? "Sin Datos",
-            style: const TextStyle(fontSize: 18),
-          ),
-        ],
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "$label: ",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            Text(
+              value ?? "Sin Datos",
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
       ),
     );
   }

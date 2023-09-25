@@ -491,7 +491,7 @@ class _MapComponentState extends State<MapComponent> {
           ),
           if (elementSelectedType != null && elementSelectedId != null)
             Visibility(
-              visible: kIsWeb && !widget.isModal,
+              visible: kIsWeb && !widget.isModal && viewDetailElementInfo,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: AnimatedContainer(
@@ -501,16 +501,12 @@ class _MapComponentState extends State<MapComponent> {
                   width: viewDetailElementInfo ? modalWidth : 0,
                   child: Container(
                     width: viewDetailElementInfo ? modalWidth : 0,
-                    color: Colors.cyan,
+                    color: const Color.fromRGBO(253, 255, 252, 1),
                     child: Column(
                       children: [
-                        Text('Aquí va el modal'),
                         ElementDetailWeb(
                           elementType: elementSelectedType,
                           elementId: elementSelectedId,
-                        ),
-                        ElevatedButton(
-                          child: Text('Haz clic para cerrar'),
                           onPressed: () {
                             setState(() {
                               viewDetailElementInfo = false;
