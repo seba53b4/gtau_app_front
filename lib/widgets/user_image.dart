@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:js_interop';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
@@ -31,14 +30,14 @@ class _UserImageState extends State<UserImage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (imagesFiles.isUndefinedOrNull)
+        if (imagesFiles == null)
           Icon(
             Icons.image,
             size: 60,
             color: Colors.blue,
             semanticLabel: 'No image have been uploaded',
           ),
-        if (!imagesFiles.isUndefinedOrNull)
+        if (imagesFiles != null)
           CarouselSlider.builder(
               options: CarouselOptions(height: 200,
               onPageChanged: (index, reason) => setState(() => activeIndex = index),
@@ -90,7 +89,7 @@ class _UserImageState extends State<UserImage> {
           child: Padding(
             padding: EdgeInsets.all(8.0),
             child: Text(
-              !imagesFiles.isUndefinedOrNull ? 'Add Photo' : 'Select Photo',
+              imagesFiles != null ? 'Add Photo' : 'Select Photo',
               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
             ),
           ),
@@ -141,7 +140,7 @@ class _UserImageState extends State<UserImage> {
             : Image.file(File(pickedFile.path));
 
         setState(() {
-          if(!imagesFiles.isUndefinedOrNull){
+          if(imagesFiles != null){
             imagesFiles!.add(temporaryfile);
           }else{
             imagesFiles = <Image>[temporaryfile];
@@ -149,7 +148,7 @@ class _UserImageState extends State<UserImage> {
         });
       }else{
         final List<XFile> images = await _picker.pickMultiImage(imageQuality: 50);
-        if (images.isNull) {
+        if (images == null) {
           // Manejo de caso en el que no se seleccionó ningún archivo.
           return;
         }
@@ -157,7 +156,7 @@ class _UserImageState extends State<UserImage> {
         List<Image> tempImages = images.map((val) => kIsWeb ? Image.network(val.path) : Image.file(File(val.path))).toList();
 
         setState(() {
-          if(!imagesFiles.isUndefinedOrNull){
+          if(imagesFiles != null){
             imagesFiles!.addAll(tempImages);
           }else{
             imagesFiles = tempImages;
