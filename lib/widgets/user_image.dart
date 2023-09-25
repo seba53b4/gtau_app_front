@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:js_interop';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +11,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class UserImage extends StatefulWidget {
-  final Function(File file) onFileChanged;
+  final Function(List<Image> files) onFileChanged;
 
   UserImage({
     required this.onFileChanged,
@@ -23,40 +24,73 @@ class UserImage extends StatefulWidget {
 class _UserImageState extends State<UserImage> {
   final ImagePicker _picker = ImagePicker();
 
-  Image? imageFile;
+  List<Image>? imagesFiles;
+  int activeIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (imageFile.isUndefinedOrNull)
+        if (imagesFiles.isUndefinedOrNull)
           Icon(
             Icons.image,
             size: 60,
             color: Colors.blue,
             semanticLabel: 'No image have been uploaded',
           ),
-        if (!imageFile.isUndefinedOrNull)
-          InkWell(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () => _selectPhoto(),
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image:
-                    DecorationImage(image: imageFile!.image, fit: BoxFit.fill),
+        if (!imagesFiles.isUndefinedOrNull)
+          CarouselSlider.builder(
+              options: CarouselOptions(height: 200,
+              onPageChanged: (index, reason) => setState(() => activeIndex = index),
               ),
-            ),
+              itemCount: imagesFiles!.length,
+              itemBuilder: (context, index, realIndex){
+                final actualImage = imagesFiles![index];
+                return Stack(
+                    children: [
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () => _selectPhoto(),
+                        child: Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image:
+                                  DecorationImage(image: actualImage!.image, fit: BoxFit.fill),
+                            ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 10,
+                        top: -9,
+                        child: IconButton(
+                            icon: Icon(
+                              Icons.cancel,
+                              color: Colors.red.withOpacity(1),
+                              size: 40,
+                            ),
+                            onPressed: () => setState(() {
+                              if(imagesFiles!.length==1){
+                                imagesFiles=null;
+                              }else{
+                                imagesFiles!.removeAt(activeIndex);
+                              }
+                              /*images.removeAt(index);*/
+                            })
+                        )
+                      )
+                  ]
+                );
+              }
           ),
         InkWell(
           onTap: () => _selectPhoto(),
           child: Padding(
             padding: EdgeInsets.all(8.0),
             child: Text(
-              !imageFile.isUndefinedOrNull ? 'Change Photo' : 'Select Photo',
+              !imagesFiles.isUndefinedOrNull ? 'Add Photo' : 'Select Photo',
               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
             ),
           ),
@@ -64,6 +98,7 @@ class _UserImageState extends State<UserImage> {
       ],
     );
   }
+
 
   void _selectPhoto() async {
     await showModalBottomSheet(
@@ -94,19 +129,42 @@ class _UserImageState extends State<UserImage> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final pickedFile =
+      if(source==ImageSource.camera){
+        final pickedFile =
           await _picker.pickImage(source: source, imageQuality: 50);
-      if (pickedFile == null) {
-        // Manejo de caso en el que no se seleccionó ningún archivo.
-        return;
-      }
-      Image temporaryfile = kIsWeb
-          ? Image.network(pickedFile.path)
-          : Image.file(File(pickedFile.path));
+        if (pickedFile == null) {
+          // Manejo de caso en el que no se seleccionó ningún archivo.
+          return;
+        }
+        Image temporaryfile = kIsWeb
+            ? Image.network(pickedFile.path)
+            : Image.file(File(pickedFile.path));
 
-      setState(() {
-        imageFile = temporaryfile;
-      });
+        setState(() {
+          if(!imagesFiles.isUndefinedOrNull){
+            imagesFiles!.add(temporaryfile);
+          }else{
+            imagesFiles = <Image>[temporaryfile];
+          }
+        });
+      }else{
+        final List<XFile> images = await _picker.pickMultiImage(imageQuality: 50);
+        if (images.isNull) {
+          // Manejo de caso en el que no se seleccionó ningún archivo.
+          return;
+        }
+
+        List<Image> tempImages = images.map((val) => kIsWeb ? Image.network(val.path) : Image.file(File(val.path))).toList();
+
+        setState(() {
+          if(!imagesFiles.isUndefinedOrNull){
+            imagesFiles!.addAll(tempImages);
+          }else{
+            imagesFiles = tempImages;
+          }
+        });
+      }
+      
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
       print('Error al seleccionar la imagen: $e');

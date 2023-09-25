@@ -27,6 +27,7 @@ dependencies:
   flutter_image_compress: ^2.0.4
   hive:
   hive_flutter:
+  carousel_slider: ^4.2.1
 dev_dependencies:
   hive_generator:
   build_runner:

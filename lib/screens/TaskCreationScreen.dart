@@ -340,7 +340,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     Navigator.of(context).pop();
   }
 
-  File? imageFile = null;
+  List<Image>? imagesFiles = null;
 
   @override
   Widget build(BuildContext context) {
@@ -638,9 +638,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 controller: descriptionController,
               ),
               UserImage(
-                onFileChanged: (imageFile) {
+                onFileChanged: (imagesFiles) {
                   setState(() {
-                    this.imageFile = imageFile;
+                    this.imagesFiles = imagesFiles;
                   });
                 },
               ),
@@ -702,13 +702,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         border: const OutlineInputBorder(),
                       ),
                       controller: conclusionsController,
-                    ),
-                    UserImage(
-                      onFileChanged: (imageFile) {
-                        setState(() {
-                          this.imageFile = imageFile;
-                        });
-                      },
                     ),
                   ],
                 ),
