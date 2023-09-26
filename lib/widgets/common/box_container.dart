@@ -8,13 +8,13 @@ class BoxContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Color.fromRGBO(242, 242, 242, 1),
+        color: const Color.fromRGBO(242, 242, 242, 1),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Color.fromRGBO(200, 217, 184, 0.5),
             spreadRadius: 3,
             blurRadius: 7,
             offset: Offset(0, 3),

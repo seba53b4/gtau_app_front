@@ -40,7 +40,7 @@ class _MapComponentState extends State<MapComponent> {
   Set<Circle> circles = {};
   Set<Marker> markersGPS = {};
   bool isSectionDetailsVisible = false;
-  Color selectedPolylineColor = Colors.greenAccent;
+  Color selectedColor = Colors.greenAccent;
   Color defaultPolylineColor = Colors.redAccent;
   Color selectedButtonColor = Colors.green;
   Color defaultButtonColor = Colors.primaries.first;
@@ -151,43 +151,82 @@ class _MapComponentState extends State<MapComponent> {
   Future<void> _onTapParamBehaviorSection(
       Section section, List<Section>? sections) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-
-    selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
-    if (kIsWeb) {
-      setState(() {
-        elementSelectedId = section.ogcFid;
-        elementSelectedType = ElementType.section;
-        viewDetailElementInfo = true;
-      });
-      await _fetchElementInfo();
+    if (selectedItemsProvider.letMultipleItemsSelected) {
+      selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
+    } else {
+      if (!(selectedItemsProvider.isSomeCatchmentSelected() ||
+          selectedItemsProvider.isSomeRegisterSelected())) {
+        if (selectedItemsProvider.isSomeSectionSelected()) {
+          selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
+        } else {
+          selectedItemsProvider.clearAllSelections();
+          selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
+          if (kIsWeb) {
+            setState(() {
+              elementSelectedId = section.ogcFid;
+              elementSelectedType = ElementType.section;
+              viewDetailElementInfo = true;
+            });
+            await _fetchElementInfo();
+          }
+        }
+      }
     }
   }
 
   Future<void> _onTapParamBehaviorCatchment(
       Catchment catchment, List<Catchment>? catchments) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.toggleCatchmentSelected(catchment.point!.circleId);
-    if (kIsWeb) {
-      setState(() {
-        elementSelectedId = catchment.ogcFid;
-        elementSelectedType = ElementType.catchment;
-        viewDetailElementInfo = true;
-      });
-      await _fetchElementInfo();
+    if (selectedItemsProvider.letMultipleItemsSelected) {
+      selectedItemsProvider.toggleCatchmentSelected(catchment.point!.circleId);
+    } else {
+      if (!(selectedItemsProvider.isSomeSectionSelected() ||
+          selectedItemsProvider.isSomeRegisterSelected())) {
+        if (selectedItemsProvider.isSomeCatchmentSelected()) {
+          selectedItemsProvider
+              .toggleCatchmentSelected(catchment.point!.circleId);
+        } else {
+          selectedItemsProvider.clearAllSelections();
+          selectedItemsProvider
+              .toggleCatchmentSelected(catchment.point!.circleId);
+          if (kIsWeb) {
+            setState(() {
+              elementSelectedId = catchment.ogcFid;
+              elementSelectedType = ElementType.catchment;
+              viewDetailElementInfo = true;
+            });
+            await _fetchElementInfo();
+          }
+        }
+      }
     }
   }
 
   Future<void> _onTapParamBehaviorRegister(
       Register register, List<Register>? registers) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.toggleRegistroSelected(register.point!.circleId);
-    if (kIsWeb) {
-      setState(() {
-        elementSelectedId = register.ogcFid;
-        elementSelectedType = ElementType.register;
-        viewDetailElementInfo = true;
-      });
-      await _fetchElementInfo();
+    if (selectedItemsProvider.letMultipleItemsSelected) {
+      selectedItemsProvider.toggleRegistroSelected(register.point!.circleId);
+    } else {
+      if (!(selectedItemsProvider.isSomeCatchmentSelected() ||
+          selectedItemsProvider.isSomeSectionSelected())) {
+        if (selectedItemsProvider.isSomeRegisterSelected()) {
+          selectedItemsProvider
+              .toggleRegistroSelected(register.point!.circleId);
+        } else {
+          selectedItemsProvider.clearAllSelections();
+          selectedItemsProvider
+              .toggleRegistroSelected(register.point!.circleId);
+          if (kIsWeb) {
+            setState(() {
+              elementSelectedId = register.ogcFid;
+              elementSelectedType = ElementType.register;
+              viewDetailElementInfo = true;
+            });
+            await _fetchElementInfo();
+          }
+        }
+      }
     }
   }
 
@@ -217,21 +256,21 @@ class _MapComponentState extends State<MapComponent> {
   Color _onColorParamBehaviorSection(Section section) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isSectionSelected(section.line!.polylineId)
-        ? selectedPolylineColor
+        ? selectedColor
         : section.line!.color;
   }
 
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isCatchmentSelected(catchment.point!.circleId)
-        ? selectedPolylineColor
+        ? selectedColor
         : catchment.point!.strokeColor;
   }
 
   Color _onColorParamBehaviorRegister(Register register) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isRegistroSelected(register.point!.circleId)
-        ? selectedPolylineColor
+        ? selectedColor
         : register.point!.strokeColor;
   }
 
@@ -344,13 +383,13 @@ class _MapComponentState extends State<MapComponent> {
             child: Stack(
               children: [
                 AnimatedContainer(
-                  duration: Duration(milliseconds: 0),
+                  duration: const Duration(milliseconds: 0),
                   width: viewDetailElementInfo && !widget.isModal
                       ? mapWidth - modalWidth
                       : mapWidth,
                   child: GoogleMap(
                     mapType: _currentMapType,
-                    initialCameraPosition: CameraPosition(
+                    initialCameraPosition: const CameraPosition(
                       target: initLocation,
                       zoom: zoom,
                     ),
@@ -366,7 +405,7 @@ class _MapComponentState extends State<MapComponent> {
                       if (locationManual) {
                         setState(() {
                           final Marker newMarker = Marker(
-                            markerId: MarkerId('tapped_location_manual'),
+                            markerId: const MarkerId('tapped_location_manual'),
                             position: latLng,
                           );
                           markersGPS.clear();
@@ -396,7 +435,7 @@ class _MapComponentState extends State<MapComponent> {
                               .map_component_map_view_tooltip,
                           preferBelow: false,
                           verticalOffset: 14,
-                          waitDuration: Duration(milliseconds: 1000),
+                          waitDuration: const Duration(milliseconds: 1000),
                           child: Icon(
                             _currentMapType == MapType.normal
                                 ? Icons.map
@@ -405,7 +444,7 @@ class _MapComponentState extends State<MapComponent> {
                           ),
                         ),
                       ),
-                      if (kIsWeb) SizedBox(height: 6),
+                      if (kIsWeb) const SizedBox(height: 6),
                       ElevatedButton(
                         onPressed: () async {
                           await fetchAndUpdateData(token!);
@@ -416,7 +455,7 @@ class _MapComponentState extends State<MapComponent> {
                           preferBelow: false,
                           verticalOffset: 14,
                           waitDuration: Duration(milliseconds: 1000),
-                          child: Icon(
+                          child: const Icon(
                             Icons.area_chart_outlined,
                             color: Colors.white,
                           ),
@@ -434,7 +473,7 @@ class _MapComponentState extends State<MapComponent> {
                           preferBelow: false,
                           verticalOffset: 14,
                           waitDuration: Duration(milliseconds: 1000),
-                          child: Icon(
+                          child: const Icon(
                             Icons.my_location,
                             color: Colors.white,
                           ),
@@ -459,14 +498,14 @@ class _MapComponentState extends State<MapComponent> {
                               .map_component_select_location,
                           preferBelow: false,
                           verticalOffset: 14,
-                          waitDuration: Duration(milliseconds: 1000),
-                          child: Icon(
+                          waitDuration: const Duration(milliseconds: 1000),
+                          child: const Icon(
                             Icons.location_pin,
                             color: Colors.white,
                           ),
                         ),
                       ),
-                      if (kIsWeb) SizedBox(height: 6),
+                      if (kIsWeb) const SizedBox(height: 6),
                       ElevatedButton(
                         onPressed: () {
                           setState(() {
@@ -479,7 +518,7 @@ class _MapComponentState extends State<MapComponent> {
                               .map_component_diameter_tooltip,
                           preferBelow: false,
                           verticalOffset: 14,
-                          waitDuration: Duration(milliseconds: 1000),
+                          waitDuration: const Duration(milliseconds: 1000),
                           child: Text(distances[distanceSelected]),
                         ),
                       ),
@@ -495,7 +534,7 @@ class _MapComponentState extends State<MapComponent> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 0),
+                  duration: const Duration(milliseconds: 0),
                   onEnd: () {},
                   curve: Curves.easeIn,
                   width: viewDetailElementInfo ? modalWidth : 0,
