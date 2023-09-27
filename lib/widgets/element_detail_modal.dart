@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/widgets/common/section_detail.dart';
+
+import '../models/enums/element_type.dart';
+import 'common/detail_element_widget.dart';
 
 typedef void OnCloseCallback();
 
-void showElementModal(BuildContext context, OnCloseCallback onClose) {
-  final numWorkController = TextEditingController();
-
+void showElementModal(
+    BuildContext context, ElementType elementType, OnCloseCallback? onClose) {
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -16,17 +17,17 @@ void showElementModal(BuildContext context, OnCloseCallback onClose) {
           style: TextStyle(
             color: Colors.black87,
             fontFamily: 'Overpass',
-            fontSize: 20,
+            fontSize: 12,
           ),
         ),
         content: SingleChildScrollView(
-          child: SectionDetail(),
+          child: DetailElementWidget(elementType: elementType),
         ),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              onClose();
+              onClose!();
             },
             child: Text("Cerrar"),
           ),

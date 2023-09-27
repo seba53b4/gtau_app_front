@@ -7,7 +7,7 @@ class Section {
   late final int? gid;
   late final String? tipoSec;
   late final String? tipoTra;
-  late final int? elemRed;
+  late final double? elemRed;
   late final double? dim1;
   late final double? dim2;
   late final double? zArriba;

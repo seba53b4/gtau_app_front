@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/enums/element_type.dart';
 import 'package:gtau_app_front/widgets/common/button_circle.dart';
-import 'package:gtau_app_front/widgets/common/catchment_detail.dart';
-import 'package:gtau_app_front/widgets/common/register_detail.dart';
-import 'package:gtau_app_front/widgets/common/section_detail.dart';
+
+import 'common/detail_element_widget.dart';
 
 class ElementDetailWeb extends StatefulWidget {
   final ElementType? elementType;
-  final int? elementId;
   final VoidCallback onPressed;
 
   const ElementDetailWeb(
-      {Key? key,
-      required this.elementType,
-      required this.elementId,
-      required this.onPressed})
+      {Key? key, required this.elementType, required this.onPressed})
       : super(key: key);
 
   @override
@@ -61,36 +56,12 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
           ),
         ),
         Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            DetailWidget(elementType: widget.elementType),
+            DetailElementWidget(elementType: widget.elementType),
           ],
         )
       ],
     );
-  }
-}
-
-class DetailWidget extends StatefulWidget {
-  final ElementType? elementType;
-
-  const DetailWidget({Key? key, this.elementType}) : super(key: key);
-
-  @override
-  State<DetailWidget> createState() => _DetailWidgetState();
-}
-
-class _DetailWidgetState extends State<DetailWidget> {
-  @override
-  Widget build(BuildContext context) {
-    switch (widget.elementType) {
-      case ElementType.catchment:
-        return const CatchmentDetail();
-      case ElementType.register:
-        return const RegisterDetail();
-      case ElementType.section:
-        return const SectionDetail();
-      default:
-        throw Exception('Invalid status string: ${widget.elementType}');
-    }
   }
 }

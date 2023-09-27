@@ -6,7 +6,7 @@ import 'package:gtau_app_front/models/point_data.dart';
 class Register extends PointData {
   late final String? tipo;
   late final double? gid;
-  late final int? elemRed;
+  late final double? elemRed;
   late final double? cota;
   late final double? inspeccion;
   late final double? latC;

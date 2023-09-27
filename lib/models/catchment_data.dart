@@ -5,9 +5,9 @@ import 'package:gtau_app_front/models/point_data.dart';
 
 class Catchment extends PointData {
   late final double? gid;
-  late final int? elemRed;
+  late final double? elemRed;
   late final String? tipo;
-  late final int? tipoboca;
+  late final double? tipoboca;
   late final double? latC;
   late final double? lonC;
   late final String? datoObra;

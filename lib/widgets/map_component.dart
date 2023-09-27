@@ -17,6 +17,7 @@ import '../models/enums/element_type.dart';
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
+import 'element_detail_modal.dart';
 import 'element_detail_web.dart';
 
 class MapComponent extends StatefulWidget {
@@ -140,10 +141,7 @@ class _MapComponentState extends State<MapComponent> {
 
     LatLng? finalLocation = getFinalLocation();
     return await registerViewModel.fetchRegistersByRadius(
-        token,
-        finalLocation!.latitude,
-        finalLocation!.longitude,
-        int.parse(distances[distanceSelected]));
+        token, finalLocation!.latitude, finalLocation!.longitude, 200);
   }
 
   LatLng? getFinalLocation() => (location != null) ? location : initLocation;
@@ -161,12 +159,14 @@ class _MapComponentState extends State<MapComponent> {
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
-          if (kIsWeb) {
-            setState(() {
-              elementSelectedId = section.ogcFid;
-              elementSelectedType = ElementType.section;
+          setState(() {
+            elementSelectedId = section.ogcFid;
+            elementSelectedType = ElementType.section;
+            if (kIsWeb) {
               viewDetailElementInfo = true;
-            });
+            }
+          });
+          if (kIsWeb) {
             await _fetchElementInfo();
           }
         }
@@ -189,17 +189,24 @@ class _MapComponentState extends State<MapComponent> {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
               .toggleCatchmentSelected(catchment.point!.circleId);
-          if (kIsWeb) {
-            setState(() {
-              elementSelectedId = catchment.ogcFid;
-              elementSelectedType = ElementType.catchment;
+          setState(() {
+            elementSelectedId = catchment.ogcFid;
+            elementSelectedType = ElementType.catchment;
+            if (kIsWeb) {
               viewDetailElementInfo = true;
-            });
+            }
+          });
+          if (kIsWeb) {
             await _fetchElementInfo();
           }
         }
       }
     }
+  }
+
+  bool isSomeElementSelected() {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    return selectedItemsProvider.isSomeElementSelected();
   }
 
   Future<void> _onTapParamBehaviorRegister(
@@ -217,12 +224,14 @@ class _MapComponentState extends State<MapComponent> {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
               .toggleRegistroSelected(register.point!.circleId);
-          if (kIsWeb) {
-            setState(() {
-              elementSelectedId = register.ogcFid;
-              elementSelectedType = ElementType.register;
+          setState(() {
+            elementSelectedId = register.ogcFid;
+            elementSelectedType = ElementType.register;
+            if (kIsWeb) {
               viewDetailElementInfo = true;
-            });
+            }
+          });
+          if (kIsWeb) {
             await _fetchElementInfo();
           }
         }
@@ -354,21 +363,13 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Future fetchAndUpdateData(String token) async {
-    Future<List<Section>?> asyncNewSections = fetchSectionsPolylines(token);
-    Future<List<Register>?> asyncNewRegisters = fetchRegistersCircles(token);
-    Future<List<Catchment>?> asyncNewCatchments = fetchCatchmentsCircles(token);
+    List<Section>? fetchedSections = await fetchSectionsPolylines(token);
+    List<Register>? fetchedRegisters = await fetchRegistersCircles(token);
+    List<Catchment>? fetchedCatchments = await fetchCatchmentsCircles(token);
 
-    await asyncNewSections.then((fetchedSections) {
-      setState(() {
-        polylines = getPolylines(fetchedSections);
-      });
-    });
-    await asyncNewCatchments.then((fetchedCatchments) {
-      asyncNewRegisters.then((fetchedRegisters) {
-        setState(() {
-          circles = getCircles(fetchedCatchments, fetchedRegisters);
-        });
-      });
+    setState(() {
+      polylines = getPolylines(fetchedSections);
+      circles = getCircles(fetchedCatchments, fetchedRegisters);
     });
   }
 
@@ -397,7 +398,7 @@ class _MapComponentState extends State<MapComponent> {
                     circles: circles,
                     markers: markers,
                     myLocationEnabled: true,
-                    myLocationButtonEnabled: true,
+                    mapToolbarEnabled: true,
                     onMapCreated: (GoogleMapController controller) {
                       _mapController.complete(controller);
                     },
@@ -522,6 +523,20 @@ class _MapComponentState extends State<MapComponent> {
                           child: Text(distances[distanceSelected]),
                         ),
                       ),
+                      if (!kIsWeb)
+                        ElevatedButton(
+                          child: Text('Detail'),
+                          onPressed: () async {
+                            if (isSomeElementSelected()) {
+                              showElementModal(
+                                context,
+                                ElementType.section,
+                                () {},
+                              );
+                              await _fetchElementInfo();
+                            }
+                          },
+                        ),
                     ],
                   ),
                 ),
@@ -545,7 +560,6 @@ class _MapComponentState extends State<MapComponent> {
                       children: [
                         ElementDetailWeb(
                           elementType: elementSelectedType,
-                          elementId: elementSelectedId,
                           onPressed: () {
                             setState(() {
                               viewDetailElementInfo = false;
