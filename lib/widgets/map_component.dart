@@ -527,10 +527,11 @@ class _MapComponentState extends State<MapComponent> {
                         ElevatedButton(
                           child: Text('Detail'),
                           onPressed: () async {
-                            if (isSomeElementSelected()) {
+                            if (isSomeElementSelected() &&
+                                elementSelectedType != null) {
                               showElementModal(
                                 context,
-                                ElementType.section,
+                                elementSelectedType!,
                                 () {},
                               );
                               await _fetchElementInfo();
