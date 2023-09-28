@@ -5,12 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:gtau_app_front/dto/image_data.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class UserImage extends StatefulWidget {
-  final Function(List<Image> files) onFileChanged;
+  final Function(List<ImageDataDTO> files) onFileChanged;
 
   UserImage({
     required this.onFileChanged,
@@ -23,7 +24,7 @@ class UserImage extends StatefulWidget {
 class _UserImageState extends State<UserImage> {
   final ImagePicker _picker = ImagePicker();
 
-  List<Image>? imagesFiles;
+  List<ImageDataDTO>? imagesFiles;
   int activeIndex = 0;
 
   @override
@@ -39,51 +40,48 @@ class _UserImageState extends State<UserImage> {
           ),
         if (imagesFiles != null)
           CarouselSlider.builder(
-              options: CarouselOptions(height: 200,
-              onPageChanged: (index, reason) => setState(() => activeIndex = index),
+              options: CarouselOptions(
+                height: 200,
+                onPageChanged: (index, reason) =>
+                    setState(() => activeIndex = index),
               ),
               itemCount: imagesFiles!.length,
-              itemBuilder: (context, index, realIndex){
-                final actualImage = imagesFiles![index];
-                return Stack(
-                    children: [
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () => _selectPhoto(),
-                        child: Container(
-                            width: 150,
-                            height: 150,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image:
-                                  DecorationImage(image: actualImage!.image, fit: BoxFit.fill),
-                            ),
-                        ),
+              itemBuilder: (context, index, realIndex) {
+                final actualImage = imagesFiles![index].getImage;
+                return Stack(children: [
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () => _selectPhoto(),
+                    child: Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: actualImage!.image, fit: BoxFit.fill),
                       ),
-                      Positioned(
-                        right: 10,
-                        top: -9,
-                        child: IconButton(
-                            icon: Icon(
-                              Icons.cancel,
-                              color: Colors.red.withOpacity(1),
-                              size: 40,
-                            ),
-                            onPressed: () => setState(() {
-                              if(imagesFiles!.length==1){
-                                imagesFiles=null;
-                              }else{
-                                imagesFiles!.removeAt(activeIndex);
-                              }
-                              /*images.removeAt(index);*/
-                            })
-                        )
-                      )
-                  ]
-                );
-              }
-          ),
+                    ),
+                  ),
+                  Positioned(
+                      right: 10,
+                      top: -9,
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.cancel,
+                            color: Colors.red.withOpacity(1),
+                            size: 40,
+                          ),
+                          onPressed: () => setState(() {
+                                if (imagesFiles!.length == 1) {
+                                  imagesFiles = null;
+                                } else {
+                                  imagesFiles!.removeAt(activeIndex);
+                                }
+                                /*images.removeAt(index);*/
+                              })))
+                ]);
+              }),
         InkWell(
           onTap: () => _selectPhoto(),
           child: Padding(
@@ -97,7 +95,6 @@ class _UserImageState extends State<UserImage> {
       ],
     );
   }
-
 
   void _selectPhoto() async {
     await showModalBottomSheet(
@@ -128,9 +125,9 @@ class _UserImageState extends State<UserImage> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      if(source==ImageSource.camera){
+      if (source == ImageSource.camera) {
         final pickedFile =
-          await _picker.pickImage(source: source, imageQuality: 50);
+            await _picker.pickImage(source: source, imageQuality: 50);
         if (pickedFile == null) {
           // Manejo de caso en el que no se seleccionó ningún archivo.
           return;
@@ -138,32 +135,38 @@ class _UserImageState extends State<UserImage> {
         Image temporaryfile = kIsWeb
             ? Image.network(pickedFile.path)
             : Image.file(File(pickedFile.path));
-
+        var imageDataDTO =
+            ImageDataDTO(image: temporaryfile, path: pickedFile.path);
         setState(() {
-          if(imagesFiles != null){
-            imagesFiles!.add(temporaryfile);
-          }else{
-            imagesFiles = <Image>[temporaryfile];
+          if (imagesFiles != null) {
+            imagesFiles!.add(imageDataDTO);
+          } else {
+            imagesFiles = <ImageDataDTO>[imageDataDTO];
           }
         });
-      }else{
-        final List<XFile> images = await _picker.pickMultiImage(imageQuality: 50);
+      } else {
+        final List<XFile> images =
+            await _picker.pickMultiImage(imageQuality: 50);
         if (images == null) {
           // Manejo de caso en el que no se seleccionó ningún archivo.
           return;
         }
 
-        List<Image> tempImages = images.map((val) => kIsWeb ? Image.network(val.path) : Image.file(File(val.path))).toList();
+        List<ImageDataDTO> tempImages = images
+            .map((val) => kIsWeb
+                ? ImageDataDTO(image: Image.network(val.path), path: val.path)
+                : ImageDataDTO(
+                    image: Image.file(File(val.path)), path: val.path))
+            .toList();
 
         setState(() {
-          if(imagesFiles != null){
+          if (imagesFiles != null) {
             imagesFiles!.addAll(tempImages);
-          }else{
+          } else {
             imagesFiles = tempImages;
           }
         });
       }
-      
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
       print('Error al seleccionar la imagen: $e');

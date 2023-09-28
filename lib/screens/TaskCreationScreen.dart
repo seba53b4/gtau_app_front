@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
@@ -9,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../utils/boxes.dart';
@@ -307,7 +306,25 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     Map<String, dynamic> requestBody = createBodyToCreate();
     bool isUpdated = await _createTask(requestBody);
     if (isUpdated) {
+      this.processImages();
       reset();
+    }
+  }
+
+  void processImages() {
+    if (this.imagesFiles != null) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final taskListViewModel =
+          Provider.of<TaskListViewModel>(context, listen: false);
+      this.imagesFiles!.forEach((image) async {
+        try {
+          final response = await taskListViewModel.uploadImage(
+              token!, widget.idTask!, image.getPath);
+        } catch (error) {
+          print(error);
+          throw Exception('Error al subir imagen');
+        }
+      });
     }
   }
 
@@ -340,7 +357,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     Navigator.of(context).pop();
   }
 
-  List<Image>? imagesFiles = null;
+  List<ImageDataDTO>? imagesFiles = null;
 
   @override
   Widget build(BuildContext context) {
