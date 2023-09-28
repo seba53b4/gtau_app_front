@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
 import 'package:provider/provider.dart';
@@ -5,11 +6,22 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../providers/selected_items_provider.dart';
 
+const double ratioWeb = 0.8;
+const double ratioTablet = 0.75;
+const double ratioMobile = 0.735;
 
-void _showMapModal(BuildContext context) {
+double _getHeightModalOnDevice(BuildContext context) {
   double screenHeight = MediaQuery.of(context).size.height;
-  double modalHeight = screenHeight * 0.8;
 
+  if (MediaQuery.of(context).size.shortestSide < 600) {
+    return screenHeight * ratioMobile;
+  } else if (kIsWeb) {
+    return screenHeight * ratioWeb;
+  } else {
+    return screenHeight * ratioTablet;
+  }
+}
+void _showMapModal(BuildContext context) {
   showGeneralDialog(
     context: context,
     barrierDismissible: false,
@@ -43,7 +55,7 @@ void _showMapModal(BuildContext context) {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                height: modalHeight,
+                height: _getHeightModalOnDevice(context),
                 child: const MapComponent(isModal: true),
               ),
               const SizedBox(height: 16),

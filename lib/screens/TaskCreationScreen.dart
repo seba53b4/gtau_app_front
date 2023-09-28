@@ -3,19 +3,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
-import '../utils/boxes.dart';
-import '../utils/imagesbundle.dart';
+import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/map_modal.dart';
-import '../widgets/user_image.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -36,6 +32,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   int selectedIndex = 0;
   String userAssigned = "not-assigned";
   late String taskStatus = 'PENDING';
+  late String initStatus = 'PENDING';
   final descriptionController = TextEditingController();
   final numWorkController = TextEditingController();
   final locationController = TextEditingController();
@@ -89,6 +86,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       }
 
       selectedItemsProvider.setSections(task.sections);
+      selectedItemsProvider.setCatchments(task.catchments);
+      selectedItemsProvider.setRegisters(task.registers);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -100,6 +99,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       observationsController.text = task.observations ?? '';
       startDate = task.addDate!;
       taskStatus = task.status!;
+      initStatus = task.status!;
       if (task.releasedDate != null) {
         releasedDate = task.releasedDate!;
         releasedDateController.text =
@@ -137,10 +137,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<bool> _updateTask(Map<String, dynamic> body) async {
-    Hive.registerAdapter(ImageBundleAdapter());
-
-    boxImages = await Hive.openBox<ImageBundle>('imagesBox');
-
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
 
     final taskListViewModel =
@@ -208,7 +204,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
       initializeTask();
-      Hive.initFlutter().then((value) => null);
     } else {
       startDate = DateTime.now();
     }
@@ -252,6 +247,21 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToCreate() {
+    final selectedSections =
+        context.read<SelectedItemsProvider>().selectedPolylines;
+    final List<String> listSelectedSections =
+        selectedSections.map((polylineId) => polylineId.value).toList();
+
+    final selectedCatchments =
+        context.read<SelectedItemsProvider>().selectedCatchments;
+    final List<String> listSelectedCatchments =
+        selectedCatchments.map((circleId) => circleId.value).toList();
+
+    final selectedRegisters =
+        context.read<SelectedItemsProvider>().selectedRegisters;
+    final List<String> listSelectedRegisters =
+        selectedRegisters.map((circleId) => circleId.value).toList();
+
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -262,16 +272,30 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "location": locationController.text,
       "description": descriptionController.text,
       "user": userAssigned,
+      "tramos": listSelectedSections,
+      "captaciones": listSelectedCatchments,
+      "registros": listSelectedRegisters
     };
     return requestBody;
   }
 
   Map<String, dynamic> createBodyToUpdate() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String? releasedDateSelected = releasedDateController.text.isNotEmpty
+        ? formattedDateToUpdate(releasedDateController.text)
+        : null;
     final selectedSections =
         context.read<SelectedItemsProvider>().selectedPolylines;
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
+    final selectedCatchments =
+        context.read<SelectedItemsProvider>().selectedCatchments;
+    final List<String> listSelectedCatchments =
+        selectedCatchments.map((circleId) => circleId.value).toList();
+    final selectedRegisters =
+        context.read<SelectedItemsProvider>().selectedRegisters;
+    final List<String> listSelectedRegisters =
+        selectedRegisters.map((circleId) => circleId.value).toList();
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -281,15 +305,15 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "applicant": applicantController.text,
       "location": locationController.text,
       "description": descriptionController.text,
-      "releasedDate": releasedDate == null
-          ? formattedDateToUpdate(releasedDateController.text)
-          : null,
+      "releasedDate": releasedDateSelected,
       "user": userAssignedController.text,
       "length": lengthController.text,
       "material": materialController.text,
       "observations": observationsController.text,
       "conclusions": conclusionsController.text,
-      "tramos": listSelectedSections
+      "tramos": listSelectedSections,
+      "captaciones": listSelectedCatchments,
+      "registros": listSelectedRegisters
     };
     return requestBody;
   }
@@ -300,32 +324,24 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    updateTaskList();
   }
 
   void handleAcceptOnShowDialogCreateTask() async {
     Map<String, dynamic> requestBody = createBodyToCreate();
     bool isUpdated = await _createTask(requestBody);
     if (isUpdated) {
-      this.processImages();
       reset();
     }
+    updateTaskList();
   }
 
-  void processImages() {
-    if (this.imagesFiles != null) {
-      final token = Provider.of<UserProvider>(context, listen: false).getToken;
-      final taskListViewModel =
-          Provider.of<TaskListViewModel>(context, listen: false);
-      this.imagesFiles!.forEach((image) async {
-        try {
-          final response = await taskListViewModel.uploadImage(
-              token!, widget.idTask!, image.getPath);
-        } catch (error) {
-          print(error);
-          throw Exception('Error al subir imagen');
-        }
-      });
-    }
+  void updateTaskList() async {
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    await taskListViewModel.initializeTasks(context, initStatus, userName);
   }
 
   void handleEditTask() {
@@ -356,8 +372,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     resetSelectionOnMap();
     Navigator.of(context).pop();
   }
-
-  List<ImageDataDTO>? imagesFiles = null;
 
   @override
   Widget build(BuildContext context) {
@@ -492,7 +506,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ),
                             controller: releasedDateController,
                             enabled: false,
-                            readOnly: true,
                           ),
                         ),
                       ),
@@ -500,10 +513,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     MapModal(),
                     Consumer<SelectedItemsProvider>(
                       builder: (context, selectedItemsProvider, child) {
-                        final selectedPolylines =
+                        final selectedSections =
                             selectedItemsProvider.selectedPolylines.toList();
+                        final selectedCatchments =
+                            selectedItemsProvider.selectedCatchments.toList();
+                        final selectedRegisters =
+                            selectedItemsProvider.selectedRegisters.toList();
 
-                        return selectedPolylines.isNotEmpty
+                        return selectedSections.isNotEmpty
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -518,19 +535,22 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
                                       children: [
-                                        for (var polylineId
-                                            in selectedPolylines)
-                                          Container(
-                                            margin: const EdgeInsets.all(8),
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.grey),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Text(polylineId.value),
-                                          ),
+                                        Text("tramos: "),
+                                        for (var sectionId in selectedSections)
+                                          EntityIdContainer(
+                                              id: sectionId.value),
+                                        const SizedBox(height: 10),
+                                        Text("captaciones: "),
+                                        for (var catchmentId
+                                            in selectedCatchments)
+                                          EntityIdContainer(
+                                              id: catchmentId.value),
+                                        const SizedBox(height: 10),
+                                        Text("registros: "),
+                                        for (var registerId
+                                            in selectedRegisters)
+                                          EntityIdContainer(
+                                              id: registerId.value),
                                       ],
                                     ),
                                   ),
@@ -654,13 +674,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 ),
                 controller: descriptionController,
               ),
-              UserImage(
-                onFileChanged: (imagesFiles) {
-                  setState(() {
-                    this.imagesFiles = imagesFiles;
-                  });
-                },
-              ),
               if (widget.detail)
                 Column(
                   children: [
@@ -753,6 +766,28 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class EntityIdContainer extends StatelessWidget {
+  const EntityIdContainer({
+    super.key,
+    required this.id,
+  });
+
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(id),
     );
   }
 }

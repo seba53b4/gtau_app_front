@@ -1,3 +1,4 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task.dart';
@@ -15,24 +16,36 @@ class TaskListViewModel extends ChangeNotifier {
   };
   Map<String, List<Task>> get tasks => _tasks;
 
+
   int page = 0;
   int size = 10;
 
-  Future<List<Task>?> initializeTasks(
-      BuildContext context, String status) async {
-    // if (_tasks[status]!.isNotEmpty){
-    //   return _tasks[status];
-    // }
-    return await fetchTasksFromUser(context, status);
+  void clearLists() {
+    for (var key in _tasks.keys) {
+      _tasks[key]?.clear();
+    }
+  }
+  void clearListByStatus(String status){
+    _tasks[status]?.clear();
   }
 
-  Future<List<Task>?> fetchTasksFromUser(
-      BuildContext context, String status) async {
+  Future<List<Task>?> initializeTasks(BuildContext context, String status, String? user) async {
+   return await fetchTasksFromUser(context, status, user);
+  }
+
+  Future<List<Task>?> fetchTasksFromUser(BuildContext context, String status, String? user) async {
     final token = context.read<UserProvider>().getToken;
-    final user = context.read<UserProvider>().userName;
+    String? userName;
+    if (user == null) {
+      userName = context
+          .read<UserProvider>()
+          .userName;
+    } else {
+      userName = user;
+    }
     try {
-      final responseListTask =
-          await _taskService.getTasks(token!, user!, page, size, status);
+
+      final responseListTask = await _taskService.getTasks(token!,userName!,page,size,status);
       _tasks[status] = responseListTask!;
       notifyListeners();
       return responseListTask;
@@ -63,6 +76,7 @@ class TaskListViewModel extends ChangeNotifier {
 
   Future<Task?> fetchTask(token, int idTask) async {
     try {
+
       final responseTask = await _taskService.fetchTask(token, idTask);
       if (responseTask != null) {
         notifyListeners();
@@ -81,8 +95,8 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateTask(
-      String token, int idTask, Map<String, dynamic> body) async {
+  Future<bool> updateTask(String token, int idTask, Map<String, dynamic> body)  async {
+
     try {
       final response = await _taskService.updateTask(token, idTask, body);
       if (response) {
@@ -100,6 +114,7 @@ class TaskListViewModel extends ChangeNotifier {
   }
 
   Future<bool> createTask(String token, Map<String, dynamic> body) async {
+
     try {
       final response = await _taskService.createTask(token, body);
       if (response) {
@@ -116,7 +131,4 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  uploadImage(String token, int id, String path) {
-    this._taskService.putMultipartImages(token, id, path);
-  }
 }

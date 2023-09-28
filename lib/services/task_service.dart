@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 
 class TaskService {
   final String baseUrl;
@@ -51,7 +50,9 @@ class TaskService {
               material: taskData['material'],
               observations: taskData['observations'],
               conclusions: taskData['conclusions'],
-              sections: _parseSectionsFromResponse(taskData['tramos']));
+              sections: _parseIntListToPolylineIdList(taskData['tramos']),
+              catchments: _parseIntListToCircleIdList(taskData['captaciones']),
+              registers: _parseIntListToCircleIdList(taskData['registros']));
         }).toList();
       } else {
         print('Error getTasks re null');
@@ -65,7 +66,7 @@ class TaskService {
     }
   }
 
-  Set<PolylineId> _parseSectionsFromResponse(dynamic sections) {
+  Set<PolylineId> _parseIntListToPolylineIdList(dynamic sections) {
     List<int> sectionsList = List<int>.from(sections);
     Set<PolylineId> returnSections = {};
 
@@ -75,6 +76,18 @@ class TaskService {
       returnSections.add(polylineId);
     }
     return returnSections;
+  }
+
+  Set<CircleId> _parseIntListToCircleIdList(dynamic catchments) {
+    List<int> catchmentList = List<int>.from(catchments);
+    Set<CircleId> returnCatchments = {};
+
+    for (int section in catchmentList) {
+      String sectionString = section.toString();
+      CircleId circleId = CircleId(sectionString);
+      returnCatchments.add(circleId);
+    }
+    return returnCatchments;
   }
 
   Future<bool> deleteTask(String token, int id) async {
@@ -114,7 +127,9 @@ class TaskService {
             material: taskData['material'],
             observations: taskData['observations'],
             conclusions: taskData['conclusions'],
-            sections: _parseSectionsFromResponse(taskData['tramos']));
+            sections: _parseIntListToPolylineIdList(taskData['tramos']),
+            catchments: _parseIntListToCircleIdList(taskData['captaciones']),
+            registers: _parseIntListToCircleIdList(taskData['registros']));
       } else {
         if (kDebugMode) {
           print('No se pudieron traer datos');
@@ -168,53 +183,6 @@ class TaskService {
     } catch (error) {
       if (kDebugMode) {
         print('Error in createTask: $error');
-      }
-      rethrow;
-    }
-  }
-
-  // Future<List<String>?> putImages(
-  //     String token, String id, Map<String, dynamic> body) async {
-  //   try {
-  //     final String jsonBody = jsonEncode(body);
-  //     final url = Uri.parse('$baseUrl/inspection-tasks/$id/image/v2');
-  //     final response =
-  //         await http.post(url, headers: _getHeaders(token), body: jsonBody);
-  //
-  //     if (response.statusCode == 200) {
-  //       final jsonResponse = json.decode(response.body);
-  //       var image = jsonResponse['image'];
-  //       var id = jsonResponse['inspectionTaskId'];
-  //
-  //       return jsonResponse.map<String>((register) {
-  //         return "";
-  //       }).toList();
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     if (kDebugMode) {
-  //       print('Error al guardar imagenes: $error');
-  //     }
-  //     rethrow;
-  //   }
-  // }
-
-  Future<bool> putMultipartImages(String token, int id, String path) async {
-    try {
-      final url = Uri.parse('$baseUrl/inspection-tasks/$id/image/v2');
-      var request = http.MultipartRequest("POST", url);
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        path,
-        contentType: MediaType('image', 'jpg'),
-      ));
-      var response = await request.send();
-
-      return response.statusCode == 200;
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error al guardar imagenes: $error');
       }
       rethrow;
     }
