@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/enums/element_type.dart';
 import 'common/detail_element_widget.dart';
@@ -12,27 +13,41 @@ void showElementModal(
     barrierDismissible: false,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text(
-          "Detalle del tramo",
-          style: TextStyle(
-            color: Colors.black87,
-            fontFamily: 'Overpass',
-            fontSize: 12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0), // Ajusta el radio aquí
           ),
-        ),
-        content: SingleChildScrollView(
-          child: DetailElementWidget(elementType: elementType),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onClose!();
-            },
-            child: Text("Cerrar"),
+          title: Container(
+            color: const Color.fromRGBO(96, 166, 27, 1),
+            height: 50,
+            child: Container(
+              height: 24,
+              alignment: Alignment.center, // Esto centrará el contenido
+              child: Text(AppLocalizations.of(context)!.component_detail_title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      color: Color.fromRGBO(14, 45, 9, 1),
+                      letterSpacing: 1,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18)),
+            ),
           ),
-        ],
-      );
+          content: SingleChildScrollView(
+            child: DetailElementWidget(elementType: elementType),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onClose!();
+              },
+              child: Text(
+                AppLocalizations.of(context)!.dialogCloseButton,
+                style: const TextStyle(
+                    fontSize: 18, color: Color.fromRGBO(96, 166, 27, 1)),
+              ),
+            ),
+          ],
+          backgroundColor: const Color.fromRGBO(242, 242, 242, 1));
     },
   );
 }

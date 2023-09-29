@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../viewmodels/register_viewmodel.dart';
 import '../loading_component.dart';
-import 'box_container.dart';
 import 'common_element_detail.dart';
 
 class RegisterDetail extends StatelessWidget {
@@ -21,24 +20,21 @@ class RegisterDetail extends StatelessWidget {
       }
       return SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: BoxContainer(
-          child: Wrap(
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: [
-              buildInfoRow("ogcFid", registerDetail?.ogcFid.toString()),
-              buildInfoRow("tipo", registerDetail?.tipo.toString()),
-              buildInfoRow("gid", registerDetail?.gid?.toString()),
-              buildInfoRow(
-                  "elemred", registerDetail?.elemRed?.toStringAsFixed(1)),
-              buildInfoRow("cota", registerDetail?.cota?.toString()),
-              buildInfoRow(
-                  "inspección", registerDetail?.inspeccion?.toString()),
-              buildInfoRow("latc", registerDetail?.latC?.toString()),
-              buildInfoRow("lonc", registerDetail?.lonC?.toString()),
-              buildInfoRow("datoObra", registerDetail?.datoObra),
-              buildInfoMultiRow("descripción", registerDetail?.descripcion),
-            ],
-          ),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.start,
+          children: [
+            buildInfoRow("ogcFid", registerDetail?.ogcFid.toString()),
+            buildInfoRow("tipo", registerDetail?.tipo.toString()),
+            buildInfoRow("gid", registerDetail?.gid?.toString()),
+            buildInfoRow(
+                "elemred", registerDetail?.elemRed?.toStringAsFixed(1)),
+            buildInfoRow("cota", registerDetail?.cota?.toString()),
+            buildInfoRow("inspección", registerDetail?.inspeccion?.toString()),
+            buildInfoRow("latc", registerDetail?.latC?.toString()),
+            buildInfoRow("lonc", registerDetail?.lonC?.toString()),
+            buildInfoRow("datoObra", registerDetail?.datoObra),
+            buildInfoMultiRow("descripción", registerDetail?.descripcion),
+          ],
         ),
       );
     });

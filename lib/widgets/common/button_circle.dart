@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 class ButtonCircle extends StatefulWidget {
   final IconData icon;
+  final double size;
   final VoidCallback onPressed;
 
-  const ButtonCircle({Key? key, required this.icon, required this.onPressed})
+  const ButtonCircle(
+      {Key? key, required this.icon, required this.onPressed, required this.size})
       : super(key: key);
 
   @override
@@ -27,8 +29,8 @@ class _ButtonCircleState extends State<ButtonCircle> {
         : const Color.fromRGBO(96, 166, 27, 1);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      height: 50,
-      width: 50,
+      height: widget.size,
+      width: widget.size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: circleColor,

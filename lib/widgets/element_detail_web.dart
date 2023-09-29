@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/element_type.dart';
 import 'package:gtau_app_front/widgets/common/button_circle.dart';
 
@@ -29,6 +30,7 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Column(
       children: [
         Container(
@@ -38,15 +40,17 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
             children: [
               ButtonCircle(
                   icon: Icons.close,
+                  size: 50,
                   onPressed: () {
                     widget.onPressed();
                   }),
               Container(
                 width: 250,
                 alignment: Alignment.center, // Esto centrará el contenido
-                child: const Text("Detalle del Elemento",
+                child: Text(
+                    AppLocalizations.of(context)!.component_detail_title,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Color.fromRGBO(14, 45, 9, 1),
                         letterSpacing: 1,
                         fontWeight: FontWeight.bold,
@@ -55,12 +59,19 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
             ],
           ),
         ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DetailElementWidget(elementType: widget.elementType),
-          ],
-        )
+        Container(
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 6),
+          width: double.infinity,
+          height: screenHeight * 0.94,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DetailElementWidget(elementType: widget.elementType),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
