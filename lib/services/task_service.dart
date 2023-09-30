@@ -218,7 +218,7 @@ class TaskService {
 
   Future<bool> putMultipartImages(String token, int id, String path) async {
     try {
-      final url = Uri.parse('$baseUrl/inspection-tasks/$id/image/v2');
+      final url = Uri.parse('$baseUrl/inspection-tasks/$id/image');
       var request = http.MultipartRequest("POST", url);
       request.files.add(await http.MultipartFile.fromPath(
         'image',

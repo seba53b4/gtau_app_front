@@ -330,14 +330,15 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   void handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
+    this.processImages();
     if (isUpdated) {
-      this.processImages();
       reset();
     }
     updateTaskList();
   }
 
   void processImages() {
+    print(this.imagesFiles!.length);
     if (this.imagesFiles != null) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
       final taskListViewModel =
@@ -705,9 +706,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               ),
               UserImage(
                 onFileChanged: (imagesFiles) {
-                  setState(() {
-                    this.imagesFiles = imagesFiles;
-                  });
+                  this.imagesFiles = imagesFiles;
                 },
               ),
               if (widget.detail)

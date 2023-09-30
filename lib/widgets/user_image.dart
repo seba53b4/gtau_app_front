@@ -18,14 +18,17 @@ class UserImage extends StatefulWidget {
   });
 
   @override
-  _UserImageState createState() => _UserImageState();
+  _UserImageState createState() => _UserImageState(this.onFileChanged);
 }
 
 class _UserImageState extends State<UserImage> {
+  final Function(List<ImageDataDTO> files) onFileChanged;
   final ImagePicker _picker = ImagePicker();
 
   List<ImageDataDTO>? imagesFiles;
   int activeIndex = 0;
+
+  _UserImageState(this.onFileChanged);
 
   @override
   Widget build(BuildContext context) {
@@ -135,19 +138,19 @@ class _UserImageState extends State<UserImage> {
         Image temporaryfile = kIsWeb
             ? Image.network(pickedFile.path)
             : Image.file(File(pickedFile.path));
-        var imageDataDTO =
+        ImageDataDTO imageDataDTO =
             ImageDataDTO(image: temporaryfile, path: pickedFile.path);
         setState(() {
           if (imagesFiles != null) {
             imagesFiles!.add(imageDataDTO);
           } else {
-            imagesFiles = <ImageDataDTO>[imageDataDTO];
+            imagesFiles = [imageDataDTO];
           }
         });
       } else {
         final List<XFile> images =
             await _picker.pickMultiImage(imageQuality: 50);
-        if (images == null) {
+        if (images.isEmpty) {
           // Manejo de caso en el que no se seleccionó ningún archivo.
           return;
         }
@@ -166,6 +169,7 @@ class _UserImageState extends State<UserImage> {
             imagesFiles = tempImages;
           }
         });
+        this.onFileChanged?.call(imagesFiles!);
       }
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
