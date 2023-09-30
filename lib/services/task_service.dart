@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart' as p;
 
 class TaskService {
   final String baseUrl;
@@ -189,32 +191,42 @@ class TaskService {
     }
   }
 
-  // Future<List<String>?> putImages(
-  //     String token, String id, Map<String, dynamic> body) async {
-  //   try {
-  //     final String jsonBody = jsonEncode(body);
-  //     final url = Uri.parse('$baseUrl/inspection-tasks/$id/image/v2');
-  //     final response =
-  //         await http.post(url, headers: _getHeaders(token), body: jsonBody);
-  //
-  //     if (response.statusCode == 200) {
-  //       final jsonResponse = json.decode(response.body);
-  //       var image = jsonResponse['image'];
-  //       var id = jsonResponse['inspectionTaskId'];
-  //
-  //       return jsonResponse.map<String>((register) {
-  //         return "";
-  //       }).toList();
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     if (kDebugMode) {
-  //       print('Error al guardar imagenes: $error');
-  //     }
-  //     rethrow;
-  //   }
-  // }
+  Future<List<String>?> putBase64Images(
+      String token, int id, String path) async {
+    try {
+      File imageFile = File(path);
+      Uint8List bytes = await imageFile.readAsBytes();
+      String base64String = base64.encode(bytes);
+      String basename = p.basename(imageFile.path);
+
+      final Map<String, dynamic> body = {
+        "image": base64String,
+        "name": basename
+      };
+
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse('$baseUrl/inspection-tasks/$id/image/v2');
+      final response =
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        var image = jsonResponse['image'];
+        var id = jsonResponse['inspectionTaskId'];
+
+        return jsonResponse.map<String>((register) {
+          return "";
+        }).toList();
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al guardar imagenes: $error');
+      }
+      rethrow;
+    }
+  }
 
   Future<bool> putMultipartImages(String token, int id, String path) async {
     try {
