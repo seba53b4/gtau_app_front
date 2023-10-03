@@ -47,6 +47,7 @@ class CatchmentService {
               center: latLngCenter,
               radius: 2,
               strokeWidth: 2,
+              consumeTapEvents: true,
               strokeColor: Colors.pink,
               fillColor: Colors.black);
 

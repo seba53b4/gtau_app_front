@@ -146,8 +146,7 @@ class _MapComponentState extends State<MapComponent> {
 
   LatLng? getFinalLocation() => (location != null) ? location : initLocation;
 
-  Future<void> _onTapParamBehaviorSection(
-      Section section, List<Section>? sections) async {
+  Future<void> _onTapParamBehaviorSection(Section section) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
@@ -174,8 +173,7 @@ class _MapComponentState extends State<MapComponent> {
     }
   }
 
-  Future<void> _onTapParamBehaviorCatchment(
-      Catchment catchment, List<Catchment>? catchments) async {
+  Future<void> _onTapParamBehaviorCatchment(Catchment catchment) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.toggleCatchmentSelected(catchment.point!.circleId);
@@ -209,8 +207,8 @@ class _MapComponentState extends State<MapComponent> {
     return selectedItemsProvider.isSomeElementSelected();
   }
 
-  Future<void> _onTapParamBehaviorRegister(
-      Register register, List<Register>? registers) async {
+  Future<void> _onTapParamBehaviorRegister(Register register) async {
+    print("holis se clickeo el registro: ${register.ogcFid}");
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.toggleRegistroSelected(register.point!.circleId);
@@ -304,7 +302,7 @@ class _MapComponentState extends State<MapComponent> {
         Polyline pol = section.line!.copyWith(
           colorParam: _onColorParamBehaviorSection(section),
           onTapParam: () async {
-            await _onTapParamBehaviorSection(section, sections);
+            await _onTapParamBehaviorSection(section);
             setState(() {
               polylines = getPolylines(sections);
             });
@@ -331,7 +329,7 @@ class _MapComponentState extends State<MapComponent> {
           strokeWidthParam: catchment.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
           onTapParam: () async {
-            await _onTapParamBehaviorCatchment(catchment, catchments);
+            await _onTapParamBehaviorCatchment(catchment);
             setState(() {
               circles = getCircles(catchments, registers);
             });
@@ -348,7 +346,7 @@ class _MapComponentState extends State<MapComponent> {
           strokeWidthParam: register.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorRegister(register),
           onTapParam: () async {
-            await _onTapParamBehaviorRegister(register, registers);
+            await _onTapParamBehaviorRegister(register);
             setState(() {
               circles = getCircles(catchments, registers);
             });
@@ -356,10 +354,8 @@ class _MapComponentState extends State<MapComponent> {
         );
         setCir.add(circle);
       }
-      return setCir;
-    } else {
-      return {};
     }
+    return setCir;
   }
 
   Future fetchAndUpdateData(String token) async {
@@ -388,34 +384,42 @@ class _MapComponentState extends State<MapComponent> {
                   width: viewDetailElementInfo && !widget.isModal
                       ? mapWidth - modalWidth
                       : mapWidth,
-                  child: GoogleMap(
-                    mapType: _currentMapType,
-                    initialCameraPosition: const CameraPosition(
-                      target: initLocation,
-                      zoom: zoom,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Gestos generales si es necesario
+                    },
+                    child: GoogleMap(
+                      mapType: _currentMapType,
+                      initialCameraPosition: const CameraPosition(
+                        target: initLocation,
+                        zoom: zoom,
+                      ),
+                      polylines: polylines,
+                      circles: circles,
+                      markers: markers,
+                      onMapCreated: (GoogleMapController controller) {
+                        _mapController.complete(controller);
+                      },
+                      onTap: (LatLng latLng) {
+                        if (locationManual) {
+                          setState(() {
+                            final Marker newMarker = Marker(
+                              onTap: () {
+                                print("seleccionado el marker");
+                              },
+                              markerId:
+                                  const MarkerId('tapped_location_manual'),
+                              position: latLng,
+                            );
+                            markersGPS.clear();
+                            markersGPS.add(newMarker);
+                            _getMarkers();
+                            location =
+                                LatLng(latLng.latitude, latLng.longitude);
+                          });
+                        }
+                      },
                     ),
-                    polylines: polylines,
-                    circles: circles,
-                    markers: markers,
-                    myLocationEnabled: true,
-                    mapToolbarEnabled: true,
-                    onMapCreated: (GoogleMapController controller) {
-                      _mapController.complete(controller);
-                    },
-                    onTap: (LatLng latLng) {
-                      if (locationManual) {
-                        setState(() {
-                          final Marker newMarker = Marker(
-                            markerId: const MarkerId('tapped_location_manual'),
-                            position: latLng,
-                          );
-                          markersGPS.clear();
-                          markersGPS.add(newMarker);
-                          _getMarkers();
-                          location = LatLng(latLng.latitude, latLng.longitude);
-                        });
-                      }
-                    },
                   ),
                 ),
                 Positioned(
@@ -525,7 +529,6 @@ class _MapComponentState extends State<MapComponent> {
                       ),
                       if (!kIsWeb)
                         ElevatedButton(
-                          child: Text('Detail'),
                           onPressed: () async {
                             if (isSomeElementSelected() &&
                                 elementSelectedType != null) {
@@ -537,6 +540,10 @@ class _MapComponentState extends State<MapComponent> {
                               await _fetchElementInfo();
                             }
                           },
+                          child: const Icon(
+                            Icons.list_alt,
+                            color: Colors.white,
+                          ),
                         ),
                     ],
                   ),

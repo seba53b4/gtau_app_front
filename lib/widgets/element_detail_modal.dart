@@ -14,14 +14,14 @@ void showElementModal(
     builder: (BuildContext context) {
       return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0), // Ajusta el radio aquí
+            borderRadius: BorderRadius.circular(20.0),
           ),
           title: Container(
             color: const Color.fromRGBO(96, 166, 27, 1),
             height: 50,
             child: Container(
               height: 24,
-              alignment: Alignment.center, // Esto centrará el contenido
+              alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.component_detail_title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
@@ -31,8 +31,11 @@ void showElementModal(
                       fontSize: 18)),
             ),
           ),
-          content: SingleChildScrollView(
-            child: DetailElementWidget(elementType: elementType),
+          content: SizedBox(
+            height: 500,
+            child: SingleChildScrollView(
+              child: DetailElementWidget(elementType: elementType),
+            ),
           ),
           actions: <Widget>[
             TextButton(
