@@ -30,7 +30,7 @@ class _NavigationWeb extends State<NavigationWeb> {
     if (userStateProvider.isAdmin!) {
       optionsNav = [
         NavigationRailDestination(
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home),
           label: Text(AppLocalizations.of(context)!.navigation_label_home),
         ),
         NavigationRailDestination(
@@ -57,7 +57,7 @@ class _NavigationWeb extends State<NavigationWeb> {
     } else {
       optionsNav = [
         NavigationRailDestination(
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home),
           label: Text(AppLocalizations.of(context)!.navigation_label_home),
         ),
         NavigationRailDestination(
