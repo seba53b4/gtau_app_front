@@ -58,6 +58,9 @@
     "map_modal_add_elements_button": "Añadir elementos",
     "map_modal_add_elements_title": "Añadir elementos",
     "component_detail_title" : "Detalle del elemento",
-    "component_detail_no_data": "Sin Datos"
-
+    "component_detail_no_data": "Sin Datos",
+    "navigation_label_map": "Mapa",
+    "navigation_label_profile": "Perfil",
+    "navigation_label_home": "Inicio",
+    "navigation_label_task_add": "Agregar tareas"
 }

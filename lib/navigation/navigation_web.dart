@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/MapScreen.dart';
@@ -24,26 +25,25 @@ class _NavigationWeb extends State<NavigationWeb> {
 
   @override
   Widget build(BuildContext context) {
-
     final userStateProvider = Provider.of<UserProvider>(context, listen: false);
     late List<NavigationRailDestination> optionsNav;
     if (userStateProvider.isAdmin!) {
       optionsNav = [
-        const NavigationRailDestination(
+        NavigationRailDestination(
           icon: Icon(Icons.home),
-          label: Text('Inicio'),
+          label: Text(AppLocalizations.of(context)!.navigation_label_home),
         ),
-        const NavigationRailDestination(
-          icon: Icon(Icons.add),
-          label: Text('Agregar tareas'),
+        NavigationRailDestination(
+          icon: const Icon(Icons.add),
+          label: Text(AppLocalizations.of(context)!.navigation_label_task_add),
         ),
-        const NavigationRailDestination(
-          icon: Icon(Icons.map),
-          label: Text('Mapa'),
+        NavigationRailDestination(
+          icon: const Icon(Icons.map),
+          label: Text(AppLocalizations.of(context)!.navigation_label_map),
         ),
-        const NavigationRailDestination(
-          icon: Icon(Icons.person),
-          label: Text('Perfil'),
+        NavigationRailDestination(
+          icon: const Icon(Icons.person),
+          label: Text(AppLocalizations.of(context)!.navigation_label_profile),
         ),
       ];
       screens = [
@@ -56,21 +56,19 @@ class _NavigationWeb extends State<NavigationWeb> {
       ];
     } else {
       optionsNav = [
-        const NavigationRailDestination(
+        NavigationRailDestination(
           icon: Icon(Icons.home),
-          label: Text('Inicio'),
+          label: Text(AppLocalizations.of(context)!.navigation_label_home),
         ),
-        const NavigationRailDestination(
-          icon: Icon(Icons.map),
-          label: Text('Mapa'),
+        NavigationRailDestination(
+          icon: const Icon(Icons.map),
+          label: Text(AppLocalizations.of(context)!.navigation_label_map),
         ),
-        const NavigationRailDestination(
-          icon: Icon(Icons.person),
-          label: Text('Perfil'),
+        NavigationRailDestination(
+          icon: const Icon(Icons.person),
+          label: Text(AppLocalizations.of(context)!.navigation_label_profile),
         ),
       ];
-
-
     }
 
     return Scaffold(
