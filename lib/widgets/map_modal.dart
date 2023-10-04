@@ -56,7 +56,7 @@ void _showMapModal(BuildContext context) {
             children: [
               SizedBox(
                 height: _getHeightModalOnDevice(context),
-                child: const MapComponent(isModal: true),
+                child: MapComponent(isModal: true),
               ),
               const SizedBox(height: 16),
               SizedBox(

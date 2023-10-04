@@ -524,7 +524,7 @@ class _MapComponentState extends State<MapComponent> {
                           child: Text(distances[distanceSelected]),
                         ),
                       ),
-                      if (!kIsWeb)
+                      if (!kIsWeb && !widget.isModal)
                         ElevatedButton(
                           onPressed: () async {
                             if (isSomeElementSelected() &&
