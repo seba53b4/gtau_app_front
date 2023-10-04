@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 class ImageDataDTO {
   late final Image image;
   late final String path;
+  late final bool fromBlob;
 
   Image get getImage => image;
 
@@ -14,5 +15,10 @@ class ImageDataDTO {
 
   set setPath(String value) => path = value;
 
-  ImageDataDTO({required this.image, required this.path});
+  bool get getFromBlob => fromBlob;
+
+  set setFromBlob(bool value) => fromBlob = value;
+
+  ImageDataDTO(
+      {required this.image, required this.path, required this.fromBlob});
 }

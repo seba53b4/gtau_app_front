@@ -23,6 +23,7 @@ dependencies:
   universal_html: ^2.2.3
   image_cropper: ^4.0.1
   image_picker: ^1.0.2
+  gallery_image_viewer: ^1.2.0
   path_provider: ^2.1.0
   flutter_image_compress: ^2.0.4
   hive:

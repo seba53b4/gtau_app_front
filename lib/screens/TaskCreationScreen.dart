@@ -15,6 +15,7 @@ import '../utils/boxes.dart';
 import '../utils/imagesbundle.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
+import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
 import '../widgets/user_image.dart';
 
@@ -330,6 +331,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   void handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
+    print("Aca llego!");
     this.processImages();
     if (isUpdated) {
       reset();
@@ -705,10 +707,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 controller: descriptionController,
               ),
               UserImage(
-                onFileChanged: (imagesFiles) {
-                  this.imagesFiles = imagesFiles;
-                },
-              ),
+                  onFileChanged: (imagesFiles) {
+                    this.imagesFiles = imagesFiles;
+                  },
+                  idTask: widget.idTask),
+              ImageGalleryModal(idTask: widget.idTask!),
               if (widget.detail)
                 Column(
                   children: [

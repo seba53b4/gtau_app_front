@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:html' as html;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -147,6 +147,27 @@ class TaskService {
     }
   }
 
+  Future<List<String>> fetchTaskImages(token, int idTask) async {
+    try {
+      final url = Uri.parse('$baseUrl/$idTask/images');
+      final response = await http.get(url, headers: _getHeaders(token));
+      if (response.statusCode == 200) {
+        List<dynamic> decode = json.decode(response.body) as List<dynamic>;
+        return decode.map((e) => e["image"].toString()).toList();
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return [];
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in fetchTaskImages: $error');
+      }
+      rethrow;
+    }
+  }
+
   Future<bool> updateTask(
       String token, int idTask, Map<String, dynamic> body) async {
     try {
@@ -194,10 +215,11 @@ class TaskService {
   Future<List<String>?> putBase64Images(
       String token, int id, String path) async {
     try {
-      File imageFile = File(path);
-      Uint8List bytes = await imageFile.readAsBytes();
-      String base64String = base64.encode(bytes);
-      String basename = p.basename(imageFile.path);
+      Uri uri = Uri.parse(path);
+      String basename = p.basename(uri.path);
+      final ext = p.extension(uri.path); // No funciona!
+
+      String base64String = await imageToBase64(path, "png");
 
       final Map<String, dynamic> body = {
         "image": base64String,
@@ -205,7 +227,7 @@ class TaskService {
       };
 
       final String jsonBody = jsonEncode(body);
-      final url = Uri.parse('$baseUrl/inspection-tasks/$id/image/v2');
+      final url = Uri.parse('$baseUrl/$id/image/v2');
       final response =
           await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
@@ -226,6 +248,28 @@ class TaskService {
       }
       rethrow;
     }
+  }
+
+  Future<String> imageToBase64(String imageUrl, String ext) async {
+    final html.ImageElement image = html.ImageElement(src: imageUrl);
+    var localName = image.localName;
+    // Espera a que la imagen se cargue completamente.
+    await image.onLoad.first;
+
+    // Crea un elemento de lienzo (canvas) para dibujar la imagen.
+    final html.CanvasElement canvas =
+        html.CanvasElement(width: image.width, height: image.height);
+    final html.CanvasRenderingContext2D? context =
+        canvas.getContext('2d') as html.CanvasRenderingContext2D?;
+
+    // Dibuja la imagen en el lienzo.
+    context!.drawImage(image, 0, 0);
+
+    // Convierte el lienzo a una cadena Base64.
+    final String base64Image = canvas.toDataUrl();
+    String remove = "data:image/$ext;base64,";
+
+    return "$base64Image.$ext";
   }
 
   Future<bool> putMultipartImages(String token, int id, String path) async {

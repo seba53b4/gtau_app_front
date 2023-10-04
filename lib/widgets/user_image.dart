@@ -9,33 +9,41 @@ import 'package:gtau_app_front/dto/image_data.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
+import '../viewmodels/task_list_viewmodel.dart';
 
 class UserImage extends StatefulWidget {
   final Function(List<ImageDataDTO> files) onFileChanged;
+  int? idTask = 0;
 
-  UserImage({
-    required this.onFileChanged,
-  });
+  UserImage({required this.onFileChanged, required this.idTask});
 
   @override
-  _UserImageState createState() => _UserImageState(this.onFileChanged);
+  _UserImageState createState() =>
+      _UserImageState(this.onFileChanged, this.idTask);
 }
 
 class _UserImageState extends State<UserImage> {
   final Function(List<ImageDataDTO> files) onFileChanged;
+  int? idTask = 0;
+
   final ImagePicker _picker = ImagePicker();
 
   List<ImageDataDTO>? imagesFiles;
   int activeIndex = 0;
 
-  _UserImageState(this.onFileChanged);
+  _UserImageState(this.onFileChanged, this.idTask);
 
   @override
   Widget build(BuildContext context) {
+    Future<List<String>> fetchTaskImages = _fetchTaskImages();
+    fetchTaskImages.then((imgs) => imagesFiles = buildImageFiles(imgs));
     return Column(
       children: [
         if (imagesFiles == null)
-          Icon(
+          const Icon(
             Icons.image,
             size: 60,
             color: Colors.blue,
@@ -129,7 +137,7 @@ class _UserImageState extends State<UserImage> {
   Future<void> _pickImage(ImageSource source) async {
     try {
       if (source == ImageSource.camera) {
-        final pickedFile =
+        XFile? pickedFile =
             await _picker.pickImage(source: source, imageQuality: 50);
         if (pickedFile == null) {
           // Manejo de caso en el que no se seleccionó ningún archivo.
@@ -138,8 +146,8 @@ class _UserImageState extends State<UserImage> {
         Image temporaryfile = kIsWeb
             ? Image.network(pickedFile.path)
             : Image.file(File(pickedFile.path));
-        ImageDataDTO imageDataDTO =
-            ImageDataDTO(image: temporaryfile, path: pickedFile.path);
+        ImageDataDTO imageDataDTO = ImageDataDTO(
+            image: temporaryfile, path: pickedFile.path, fromBlob: false);
         setState(() {
           if (imagesFiles != null) {
             imagesFiles!.add(imageDataDTO);
@@ -157,9 +165,14 @@ class _UserImageState extends State<UserImage> {
 
         List<ImageDataDTO> tempImages = images
             .map((val) => kIsWeb
-                ? ImageDataDTO(image: Image.network(val.path), path: val.path)
+                ? ImageDataDTO(
+                    image: Image.network(val.path),
+                    path: val.path,
+                    fromBlob: false)
                 : ImageDataDTO(
-                    image: Image.file(File(val.path)), path: val.path))
+                    image: Image.file(File(val.path)),
+                    path: val.path,
+                    fromBlob: false))
             .toList();
 
         setState(() {
@@ -189,5 +202,24 @@ class _UserImageState extends State<UserImage> {
       quality: quality,
     );
     return File(result!.path);
+  }
+
+  Future<List<String>> _fetchTaskImages() async {
+    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    try {
+      return await taskListViewModel.fetchTaskImages(token!, idTask!);
+    } catch (error) {
+      print(error);
+      throw Exception('Error al obtener los datos');
+    }
+  }
+
+  List<ImageDataDTO>? buildImageFiles(List<String> fetchTaskImages) {
+    return fetchTaskImages
+        .map((url) =>
+            ImageDataDTO(image: Image.network(url), path: url, fromBlob: true))
+        .toList();
   }
 }

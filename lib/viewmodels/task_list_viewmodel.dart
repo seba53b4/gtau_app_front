@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/services/task_service.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/user_provider.dart';
 
 class TaskListViewModel extends ChangeNotifier {
@@ -13,6 +14,7 @@ class TaskListViewModel extends ChangeNotifier {
     "PENDING": [],
     "BLOCKED": []
   };
+
   Map<String, List<Task>> get tasks => _tasks;
 
   int page = 0;
@@ -84,6 +86,27 @@ class TaskListViewModel extends ChangeNotifier {
           print('No se pudieron traer datos');
         }
         return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
+    }
+  }
+
+  Future<List<String>> fetchTaskImages(token, int idTask) async {
+    try {
+      final List<String> responseTask =
+          await _taskService.fetchTaskImages(token, idTask);
+      if (responseTask != []) {
+        notifyListeners();
+        return responseTask;
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return [];
       }
     } catch (error) {
       if (kDebugMode) {

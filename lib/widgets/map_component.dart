@@ -318,7 +318,6 @@ class _MapComponentState extends State<MapComponent> {
                         fetchRegistersCircles(token);
                     Future<List<Catchment>?> asyncNewCatchments =
                         fetchCatchmentsCircles(token);
-
                     await asyncNewSections.then((fetchedSections) {
                       setState(() {
                         polylines = getPolylines(fetchedSections);
