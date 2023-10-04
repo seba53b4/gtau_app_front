@@ -48,7 +48,7 @@ class RegisterService {
               radius: 1.3,
               strokeWidth: 7,
               consumeTapEvents: true,
-              strokeColor: Colors.black87,
+              strokeColor: Colors.deepPurpleAccent,
               fillColor: Colors.grey);
 
           return Register(

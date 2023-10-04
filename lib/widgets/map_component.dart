@@ -208,7 +208,6 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Future<void> _onTapParamBehaviorRegister(Register register) async {
-    print("holis se clickeo el registro: ${register.ogcFid}");
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.toggleRegistroSelected(register.point!.circleId);
@@ -404,9 +403,7 @@ class _MapComponentState extends State<MapComponent> {
                         if (locationManual) {
                           setState(() {
                             final Marker newMarker = Marker(
-                              onTap: () {
-                                print("seleccionado el marker");
-                              },
+                              onTap: () {},
                               markerId:
                                   const MarkerId('tapped_location_manual'),
                               position: latLng,

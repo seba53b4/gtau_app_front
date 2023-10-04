@@ -46,7 +46,8 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
                   }),
               Container(
                 width: 250,
-                alignment: Alignment.center, // Esto centrará el contenido
+                padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
+                alignment: Alignment.centerLeft,
                 child: Text(
                     AppLocalizations.of(context)!.component_detail_title,
                     textAlign: TextAlign.center,
