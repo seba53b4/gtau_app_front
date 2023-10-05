@@ -64,12 +64,13 @@ class _MapComponentState extends State<MapComponent> {
         return;
       }
 
-      Position currentPosition = await Geolocator.getCurrentPosition();
+      Position currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
       setState(() {
         final locationGPS =
             LatLng(currentPosition.latitude, currentPosition.longitude);
         final Marker newMarker = Marker(
-          markerId: const MarkerId('tapped_location'),
+          markerId: const MarkerId('current_gps_location'),
           position: locationGPS,
         );
         location = locationGPS;
