@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:html' as html;
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -251,36 +251,42 @@ class TaskService {
   }
 
   Future<String> imageToBase64(String imageUrl, String ext) async {
-    final html.ImageElement image = html.ImageElement(src: imageUrl);
-    var localName = image.localName;
-    // Espera a que la imagen se cargue completamente.
-    await image.onLoad.first;
+    // El siguiente codigo funciona web, pero la dependencia hace que no compile mobile.
+    // final html.ImageElement image = html.ImageElement(src: imageUrl);
+    // var localName = image.localName;
+    // // Espera a que la imagen se cargue completamente.
+    // await image.onLoad.first;
+    // // Crea un elemento de lienzo (canvas) para dibujar la imagen.
+    // final html.CanvasElement canvas =
+    // html.CanvasElement(width: image.width, height: image.height);
+    // final html.CanvasRenderingContext2D? context =
+    // canvas.getContext('2d') as html.CanvasRenderingContext2D?;
+    //
+    // // Dibuja la imagen en el lienzo.
+    // context!.drawImage(image, 0, 0);
 
-    // Crea un elemento de lienzo (canvas) para dibujar la imagen.
-    final html.CanvasElement canvas =
-        html.CanvasElement(width: image.width, height: image.height);
-    final html.CanvasRenderingContext2D? context =
-        canvas.getContext('2d') as html.CanvasRenderingContext2D?;
+    print("Entro a convertir!");
+    File imagefile = File(imageUrl); //convert Path to File
+    print("1");
+    Uint8List imagebytes = await imagefile.readAsBytes(); //ACa se rompe
+    print("2");
+    String base64string =
+        base64.encode(imagebytes); //convert bytes to base64 string
+    print("3");
+    print(base64string);
 
-    // Dibuja la imagen en el lienzo.
-    context!.drawImage(image, 0, 0);
-
-    // Convierte el lienzo a una cadena Base64.
-    final String base64Image = canvas.toDataUrl();
     String remove = "data:image/$ext;base64,";
 
-    return "$base64Image.$ext";
+    return "$base64string.$ext";
   }
 
   Future<bool> putMultipartImages(String token, int id, String path) async {
     try {
-      final url = Uri.parse('$baseUrl/inspection-tasks/$id/image');
+      final url = Uri.parse('$baseUrl/$id/image');
       var request = http.MultipartRequest("POST", url);
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        path,
-        contentType: MediaType('image', 'jpg'),
-      ));
+      request.headers.addAll(_getHeaders(token));
+      request.files.add(await http.MultipartFile.fromPath('image', path,
+          contentType: MediaType('image', 'jpg')));
       var response = await request.send();
 
       return response.statusCode == 200;

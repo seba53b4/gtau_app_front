@@ -143,7 +143,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<bool> _updateTask(Map<String, dynamic> body) async {
-    Hive.registerAdapter(ImageBundleAdapter());
+    if (Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(ImageBundleAdapter());
+    }
 
     boxImages = await Hive.openBox<ImageBundle>('imagesBox');
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
@@ -331,7 +333,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   void handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
-    print("Aca llego!");
     this.processImages();
     if (isUpdated) {
       reset();
@@ -340,7 +341,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   void processImages() {
-    print(this.imagesFiles!.length);
     if (this.imagesFiles != null) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
       final taskListViewModel =

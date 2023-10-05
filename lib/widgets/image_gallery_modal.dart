@@ -1,5 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gallery_image_viewer/gallery_image_viewer.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
@@ -24,16 +27,13 @@ class _ImageGalleryModalState extends State<ImageGalleryModal> {
     return ElevatedButton(
       onPressed: () async {
         List<String> _urls = await _fetchTaskImages(context, widget.idTask!);
-        List<ImageProvider> _imageProviders =
-            _urls.map((url) => Image.network(url).image).toList();
-        _showGalleryModal(context, _imageProviders);
+        _showGalleryModal(context, _urls);
       },
       child: const Text("Imágenes"),
     );
   }
 
-  void _showGalleryModal(
-      BuildContext context, List<ImageProvider> _imageProviders) {
+  void _showGalleryModal(BuildContext context, List<String> photos) {
     showGeneralDialog(
         context: context,
         barrierDismissible: false,
@@ -41,27 +41,85 @@ class _ImageGalleryModalState extends State<ImageGalleryModal> {
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (_, __, ___) {
           return Scaffold(
-            appBar: AppBar(
-              title: Text("Imágenes"),
-            ),
-            body: SingleChildScrollView(
-              child: Center(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GalleryImageView(
-                    listImage: _imageProviders,
-                    width: 200,
-                    height: 200,
-                    imageDecoration:
-                        BoxDecoration(border: Border.all(color: Colors.white)),
-                    galleryType: 1,
-                  )
-                ],
-              )),
+            appBar: AppBar(title: const Text("Gallery")),
+            body: GridView.builder(
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              padding: const EdgeInsets.all(1),
+              itemCount: photos.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+              ),
+              itemBuilder: ((context, index) {
+                return Container(
+                  padding: const EdgeInsets.all(0.5),
+                  child: InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            PhotoViewPage(photos: photos, index: index),
+                      ),
+                    ),
+                    child: Hero(
+                      tag: photos[index],
+                      child: CachedNetworkImage(
+                        imageUrl: photos[index],
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            Container(color: Colors.grey),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.red.shade400,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
             ),
           );
         });
+  }
+}
+
+class PhotoViewPage extends StatelessWidget {
+  final List<String> photos;
+  final int index;
+
+  const PhotoViewPage({
+    Key? key,
+    required this.photos,
+    required this.index,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: PhotoViewGallery.builder(
+        itemCount: photos.length,
+        builder: (context, index) => PhotoViewGalleryPageOptions.customChild(
+          child: CachedNetworkImage(
+            imageUrl: photos[index],
+            placeholder: (context, url) => Container(
+              color: Colors.grey,
+            ),
+            errorWidget: (context, url, error) => Container(
+              color: Colors.red.shade400,
+            ),
+          ),
+          minScale: PhotoViewComputedScale.covered,
+          heroAttributes: PhotoViewHeroAttributes(tag: photos[index]),
+        ),
+        pageController: PageController(initialPage: index),
+        enableRotation: true,
+      ),
+    );
   }
 }
 

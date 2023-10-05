@@ -9,10 +9,6 @@ import 'package:gtau_app_front/dto/image_data.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
-
-import '../providers/user_provider.dart';
-import '../viewmodels/task_list_viewmodel.dart';
 
 class UserImage extends StatefulWidget {
   final Function(List<ImageDataDTO> files) onFileChanged;
@@ -38,8 +34,6 @@ class _UserImageState extends State<UserImage> {
 
   @override
   Widget build(BuildContext context) {
-    Future<List<String>> fetchTaskImages = _fetchTaskImages();
-    fetchTaskImages.then((imgs) => imagesFiles = buildImageFiles(imgs));
     return Column(
       children: [
         if (imagesFiles == null)
@@ -155,6 +149,7 @@ class _UserImageState extends State<UserImage> {
             imagesFiles = [imageDataDTO];
           }
         });
+        this.onFileChanged?.call(imagesFiles!);
       } else {
         final List<XFile> images =
             await _picker.pickMultiImage(imageQuality: 50);
@@ -202,24 +197,5 @@ class _UserImageState extends State<UserImage> {
       quality: quality,
     );
     return File(result!.path);
-  }
-
-  Future<List<String>> _fetchTaskImages() async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    try {
-      return await taskListViewModel.fetchTaskImages(token!, idTask!);
-    } catch (error) {
-      print(error);
-      throw Exception('Error al obtener los datos');
-    }
-  }
-
-  List<ImageDataDTO>? buildImageFiles(List<String> fetchTaskImages) {
-    return fetchTaskImages
-        .map((url) =>
-            ImageDataDTO(image: Image.network(url), path: url, fromBlob: true))
-        .toList();
   }
 }
