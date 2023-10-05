@@ -73,7 +73,10 @@ class _MapComponentState extends State<MapComponent> {
           position: locationGPS,
         );
         location = locationGPS;
-        markersGPS.add(newMarker);
+        if (kIsWeb) {
+          markersGPS.add(newMarker);
+          _getMarkers();
+        }
       });
 
       // Actualiza la cámara del mapa para centrarse en la ubicación actual
