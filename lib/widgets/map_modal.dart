@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../providers/selected_items_provider.dart';
 
@@ -21,6 +21,7 @@ double _getHeightModalOnDevice(BuildContext context) {
     return screenHeight * ratioTablet;
   }
 }
+
 void _showMapModal(BuildContext context) {
   showGeneralDialog(
     context: context,
@@ -38,16 +39,15 @@ void _showMapModal(BuildContext context) {
                   color: Colors.black,
                   size: 12,
                 ),
-                onPressed: (){
+                onPressed: () {
                   Navigator.pop(context);
-                }
-            ),
+                }),
             title: Text(
               AppLocalizations.of(context)!.map_modal_add_elements_title,
-              style: const TextStyle(color: Colors.black87, fontFamily: 'Overpass', fontSize: 20),
+              style: const TextStyle(
+                  color: Colors.black87, fontFamily: 'Overpass', fontSize: 20),
             ),
-            elevation: 0.0
-        ),
+            elevation: 0.0),
         body: Container(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -56,36 +56,33 @@ void _showMapModal(BuildContext context) {
             children: [
               SizedBox(
                 height: _getHeightModalOnDevice(context),
-                child: const MapComponent(isModal: true),
+                child: MapComponent(isModal: true),
               ),
               const SizedBox(height: 16),
               SizedBox(
                 height: 50,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                        ),
-                        onPressed: () {
-                          final selectedItemsProvider = context.read<SelectedItemsProvider>();
-                          selectedItemsProvider.clearAllSelections();
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(AppLocalizations.of(context)!.buttonCancelLabel),
-                      ),
-                      const SizedBox(width: 10.0),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(AppLocalizations.of(context)!.buttonAcceptLabel),
-                      ),
-                    ]
-                ),
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child:
+                        Text(AppLocalizations.of(context)!.buttonCancelLabel),
+                  ),
+                  const SizedBox(width: 10.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child:
+                        Text(AppLocalizations.of(context)!.buttonAcceptLabel),
+                  ),
+                ]),
               )
-
             ],
           ),
         ),
@@ -93,7 +90,6 @@ void _showMapModal(BuildContext context) {
     },
   );
 }
-
 
 class MapModal extends StatelessWidget {
   const MapModal({super.key});
@@ -103,10 +99,10 @@ class MapModal extends StatelessWidget {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.activateMultipleSelection();
     return ElevatedButton(
-        onPressed: () {
-          _showMapModal(context);
-        },
-        child: Text(AppLocalizations.of(context)!.map_modal_add_elements_button),
-      );
+      onPressed: () {
+        _showMapModal(context);
+      },
+      child: Text(AppLocalizations.of(context)!.map_modal_add_elements_button),
+    );
   }
 }

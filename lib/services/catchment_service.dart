@@ -10,6 +10,7 @@ import '../models/catchment_data.dart';
 
 class CatchmentService {
   final String baseUrl;
+  static const sourcePath = 'captaciones';
 
   CatchmentService({String? baseUrl})
       : baseUrl =
@@ -26,7 +27,7 @@ class CatchmentService {
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
       final url = Uri.parse(
-          '$baseUrl/captaciones/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
+          '$baseUrl/$sourcePath/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
       final response = await http.get(
         url,
         headers: _getHeaders(token),
@@ -46,6 +47,7 @@ class CatchmentService {
               center: latLngCenter,
               radius: 2,
               strokeWidth: 2,
+              consumeTapEvents: true,
               strokeColor: Colors.pink,
               fillColor: Colors.black);
 
@@ -61,6 +63,46 @@ class CatchmentService {
     } catch (error) {
       if (kDebugMode) {
         print('Error al obtener captaciones: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<Catchment?> fetchCatchmentById(String token, int catchmentId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$sourcePath/$catchmentId');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return Catchment(
+          ogcFid: jsonResponse['ogcFid'],
+          gid: jsonResponse['gid'],
+          elemRed: jsonResponse['elemred'],
+          tipo: jsonResponse['tipo'],
+          tipoboca: jsonResponse['tipoboca'],
+          datoObra: jsonResponse['datoObra'],
+          lonC: jsonResponse['lonc'],
+          latC: jsonResponse['latc'],
+          fact: jsonResponse['fact'] != null
+              ? DateTime.parse(jsonResponse['fact'])
+              : null,
+          fcrea: jsonResponse['fcrea'] != null
+              ? DateTime.parse(jsonResponse['fcrea'])
+              : null,
+          idauditori: jsonResponse['idauditori'],
+          uact: jsonResponse['uact'],
+          ucrea: jsonResponse['ucrea'],
+          point: Circle(circleId: CircleId(['ogcFid'].toString())),
+        );
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener registros: $error');
       }
       rethrow;
     }
