@@ -5,8 +5,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="gtau_app_front">
         <meta-data
-            android:name="com.google.android.geo.AIzaSyDw98zkmYzBQPJ4oAqBgkwdaWA_EK2YB-s"
+            android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDw98zkmYzBQPJ4oAqBgkwdaWA_EK2YB-s" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
