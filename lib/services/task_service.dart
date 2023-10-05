@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -217,13 +216,14 @@ class TaskService {
     try {
       Uri uri = Uri.parse(path);
       String basename = p.basename(uri.path);
-      final ext = p.extension(uri.path); // No funciona!
 
-      String base64String = await imageToBase64(path, "png");
-
+      Map<String, String> imageEncode = await imageToBase64(path);
+      var extension = imageEncode['ext'];
+      var content = imageEncode['content'];
+      var base64 = imageEncode['base64'];
       final Map<String, dynamic> body = {
-        "image": base64String,
-        "name": basename
+        "image": "$content,$base64",
+        "name": "$basename.$extension"
       };
 
       final String jsonBody = jsonEncode(body);
@@ -233,6 +233,7 @@ class TaskService {
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
+        //Cuando ingresa a la galeria la imagen se renderiza de todas formas, no es necesario hacer nada aca.
         var image = jsonResponse['image'];
         var id = jsonResponse['inspectionTaskId'];
 
@@ -250,34 +251,21 @@ class TaskService {
     }
   }
 
-  Future<String> imageToBase64(String imageUrl, String ext) async {
-    // El siguiente codigo funciona web, pero la dependencia hace que no compile mobile.
-    // final html.ImageElement image = html.ImageElement(src: imageUrl);
-    // var localName = image.localName;
-    // // Espera a que la imagen se cargue completamente.
-    // await image.onLoad.first;
-    // // Crea un elemento de lienzo (canvas) para dibujar la imagen.
-    // final html.CanvasElement canvas =
-    // html.CanvasElement(width: image.width, height: image.height);
-    // final html.CanvasRenderingContext2D? context =
-    // canvas.getContext('2d') as html.CanvasRenderingContext2D?;
-    //
-    // // Dibuja la imagen en el lienzo.
-    // context!.drawImage(image, 0, 0);
-
-    print("Entro a convertir!");
-    File imagefile = File(imageUrl); //convert Path to File
-    print("1");
-    Uint8List imagebytes = await imagefile.readAsBytes(); //ACa se rompe
-    print("2");
-    String base64string =
-        base64.encode(imagebytes); //convert bytes to base64 string
-    print("3");
-    print(base64string);
-
-    String remove = "data:image/$ext;base64,";
-
-    return "$base64string.$ext";
+  Future<Map<String, String>> imageToBase64(String imageUrl) async {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      String content = response.headers['content-type'].toString();
+      String ext = content.split('/').last;
+      final List<int> imageBytes = response.bodyBytes;
+      final String base64String = base64Encode(imageBytes);
+      return {
+        "ext": ext,
+        "base64": base64String,
+        "content": content,
+      };
+    } else {
+      throw Exception('No se pudo cargar la imagen desde la URL: $imageUrl');
+    }
   }
 
   Future<bool> putMultipartImages(String token, int id, String path) async {
