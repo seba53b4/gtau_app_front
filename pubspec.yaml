@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.2
-  http: ^1.1.0
+  http: 0.13.6
   geolocator: 10.1.0
   google_maps_flutter: 2.5.0
   geojson: ^1.0.0
