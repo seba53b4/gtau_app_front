@@ -153,9 +153,9 @@ class TaskListViewModel extends ChangeNotifier {
 
   uploadImage(String token, int id, String path) {
     if (kIsWeb) {
-      this._taskService.putBase64Images(token, id, path);
+      _taskService.putBase64Images(token, id, path);
     } else {
-      this._taskService.putMultipartImages(token, id, path);
+      _taskService.putMultipartImages(token, id, path);
     }
   }
 }

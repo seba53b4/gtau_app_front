@@ -237,8 +237,8 @@ class TaskService {
         var image = jsonResponse['image'];
         var id = jsonResponse['inspectionTaskId'];
 
-        return jsonResponse.map<String>((register) {
-          return "";
+        return jsonResponse.entries.map<String>((entry) {
+          return "${entry.key}: ${entry.value}"; //Agrego esto por aca solo para que no salte error
         }).toList();
       } else {
         return null;
