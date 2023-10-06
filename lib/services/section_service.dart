@@ -10,6 +10,7 @@ import '../models/section_data.dart';
 
 class SectionService {
   final String baseUrl;
+  static const String sourcePath = 'tramos';
 
   SectionService({String? baseUrl})
       : baseUrl =
@@ -26,7 +27,7 @@ class SectionService {
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
       final url = Uri.parse(
-          '$baseUrl/tramos/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
+          '$baseUrl/$sourcePath/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
       final response = await http.get(
         url,
         headers: _getHeaders(token),
@@ -58,6 +59,44 @@ class SectionService {
 
           return Section(ogcFid: ogcFid, line: polyline, tipoTra: tipoTra);
         }).toList();
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener tramos: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<Section?> fetchSectionById(String token, int sectionId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$sourcePath/$sectionId');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return Section(
+            ogcFid: jsonResponse['ogcFid'],
+            zAbajo: jsonResponse['zabajo'],
+            longitud: jsonResponse['longitud'],
+            latC: jsonResponse['latc'],
+            lonC: jsonResponse['lonc'],
+            year: DateTime(jsonResponse['anio'].toInt(), 1, 1),
+            gid: jsonResponse['gid'].toInt(),
+            elemRed: jsonResponse['elemred'],
+            dim1: jsonResponse['dim1'],
+            dim2: jsonResponse['dim2'],
+            zArriba: jsonResponse['zarriba'],
+            tipoSec: jsonResponse['tiposec'],
+            tipoTra: jsonResponse['tipotra'],
+            datoObra: jsonResponse['datoObra'],
+            descSeccion: jsonResponse['descSecci'],
+            descTramo: jsonResponse['descTramo'],
+            line: null);
       } else {
         return null;
       }

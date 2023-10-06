@@ -33,7 +33,6 @@ class TaskService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final content = data['content'];
-        //print('Error getTasks no null,  statusCode:${response.statusCode} ${response.body}');
         return content.map<Task>((taskData) {
           return Task(
               id: taskData['id'],

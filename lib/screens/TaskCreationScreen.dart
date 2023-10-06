@@ -13,6 +13,7 @@ import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../utils/boxes.dart';
 import '../utils/imagesbundle.dart';
+import '../utils/date_utils.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/image_gallery_modal.dart';
@@ -108,11 +109,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       initStatus = task.status!;
       if (task.releasedDate != null) {
         releasedDate = task.releasedDate!;
-        releasedDateController.text =
-            DateFormat(formatDate).format(task.releasedDate!).toString();
+        releasedDateController.text = parseDateTimeOnFormat(task.releasedDate!);
       }
-      addDateController.text =
-          DateFormat(formatDate).format(task.addDate!).toString();
+      addDateController.text = parseDateTimeOnFormat(task.addDate!);
 
       return true;
     } catch (error) {
@@ -177,15 +176,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         context: context, messageType: type, onAcceptPressed: () {});
   }
 
-  String formattedDateToUpdate(String dateString) {
-    DateFormat inputFormat = DateFormat(formatDate);
-    DateTime date = inputFormat.parse(dateString);
-
-    String formattedDate = date.toUtc().toIso8601String();
-
-    return formattedDate;
-  }
-
   Future<void> initializeTask() async {
     await _fetchTask();
   }
@@ -225,14 +215,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     setState(() {
       startDate = date;
     });
-    addDateController.text = DateFormat(formatDate).format(date);
+    addDateController.text = parseDateTimeOnFormat(date);
   }
 
   void handleReleasedDateChange(DateTime dateReleased) {
     setState(() {
       releasedDate = dateReleased;
     });
-    releasedDateController.text = DateFormat(formatDate).format(dateReleased);
+    releasedDateController.text = parseDateTimeOnFormat(dateReleased);
   }
 
   void handleSubmit() {
@@ -503,7 +493,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             hintText: AppLocalizations.of(context)!
                                 .default_datepicker_hint,
                           ),
-                          //initialValue:  DateFormat('dd-MM-yyyy').format(startDate),
                           controller: addDateController,
                           enabled: false,
                           readOnly: true,

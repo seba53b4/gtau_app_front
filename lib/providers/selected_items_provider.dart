@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class SelectedItemsProvider with ChangeNotifier {
-  bool _multipleItemsSelected = false;
+  bool _letMultipleItemsSelected = false;
 
-  bool get multipleItemsSelected => _multipleItemsSelected;
+  bool get letMultipleItemsSelected => _letMultipleItemsSelected;
 
   Set<PolylineId> _selectedSections = {};
 
@@ -19,14 +19,14 @@ class SelectedItemsProvider with ChangeNotifier {
   Set<CircleId> get selectedCatchments => _selectedCatchments;
 
   void activateMultipleSelection() {
-    _multipleItemsSelected = true;
+    _letMultipleItemsSelected = true;
   }
 
   void toggleSectionSelected(PolylineId polylineId) {
     if (_selectedSections.contains(polylineId)) {
       _selectedSections.remove(polylineId);
     } else {
-      if (_selectedSections.isEmpty || _multipleItemsSelected) {
+      if (_selectedSections.isEmpty || _letMultipleItemsSelected) {
         _selectedSections.add(polylineId);
       }
     }
@@ -62,7 +62,7 @@ class SelectedItemsProvider with ChangeNotifier {
     if (_selectedRegisters.contains(circleId)) {
       _selectedRegisters.remove(circleId);
     } else {
-      if (_selectedRegisters.isEmpty || _multipleItemsSelected) {
+      if (_selectedRegisters.isEmpty || _letMultipleItemsSelected) {
         _selectedRegisters.add(circleId);
       }
     }
@@ -73,11 +73,23 @@ class SelectedItemsProvider with ChangeNotifier {
     return _selectedRegisters.contains(circleId);
   }
 
+  bool isSomeRegisterSelected() {
+    return _selectedRegisters.isNotEmpty;
+  }
+
+  bool isSomeCatchmentSelected() {
+    return _selectedCatchments.isNotEmpty;
+  }
+
+  bool isSomeSectionSelected() {
+    return _selectedSections.isNotEmpty;
+  }
+
   void toggleCatchmentSelected(CircleId circleId) {
     if (_selectedCatchments.contains(circleId)) {
       _selectedCatchments.remove(circleId);
     } else {
-      if (_selectedCatchments.isEmpty || _multipleItemsSelected) {
+      if (_selectedCatchments.isEmpty || _letMultipleItemsSelected) {
         _selectedCatchments.add(circleId);
       }
     }
@@ -86,6 +98,12 @@ class SelectedItemsProvider with ChangeNotifier {
 
   bool isCatchmentSelected(CircleId circleId) {
     return _selectedCatchments.contains(circleId);
+  }
+
+  bool isSomeElementSelected() {
+    return _selectedSections.isNotEmpty ||
+        _selectedCatchments.isNotEmpty ||
+        _selectedRegisters.isNotEmpty;
   }
 
   void clearAllSelections() {
@@ -97,6 +115,6 @@ class SelectedItemsProvider with ChangeNotifier {
 
   void reset() {
     clearAllSelections();
-    _multipleItemsSelected = false;
+    _letMultipleItemsSelected = false;
   }
 }
