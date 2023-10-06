@@ -1,9 +1,9 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/services/task_service.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/user_provider.dart';
 
 class TaskListViewModel extends ChangeNotifier {
@@ -14,8 +14,8 @@ class TaskListViewModel extends ChangeNotifier {
     "PENDING": [],
     "BLOCKED": []
   };
-  Map<String, List<Task>> get tasks => _tasks;
 
+  Map<String, List<Task>> get tasks => _tasks;
 
   int page = 0;
   int size = 10;
@@ -25,27 +25,28 @@ class TaskListViewModel extends ChangeNotifier {
       _tasks[key]?.clear();
     }
   }
-  void clearListByStatus(String status){
+
+  void clearListByStatus(String status) {
     _tasks[status]?.clear();
   }
 
-  Future<List<Task>?> initializeTasks(BuildContext context, String status, String? user) async {
-   return await fetchTasksFromUser(context, status, user);
+  Future<List<Task>?> initializeTasks(
+      BuildContext context, String status, String? user) async {
+    return await fetchTasksFromUser(context, status, user);
   }
 
-  Future<List<Task>?> fetchTasksFromUser(BuildContext context, String status, String? user) async {
+  Future<List<Task>?> fetchTasksFromUser(
+      BuildContext context, String status, String? user) async {
     final token = context.read<UserProvider>().getToken;
     String? userName;
     if (user == null) {
-      userName = context
-          .read<UserProvider>()
-          .userName;
+      userName = context.read<UserProvider>().userName;
     } else {
       userName = user;
     }
     try {
-
-      final responseListTask = await _taskService.getTasks(token!,userName!,page,size,status);
+      final responseListTask =
+          await _taskService.getTasks(token!, userName!, page, size, status);
       _tasks[status] = responseListTask!;
       notifyListeners();
       return responseListTask;
@@ -76,7 +77,6 @@ class TaskListViewModel extends ChangeNotifier {
 
   Future<Task?> fetchTask(token, int idTask) async {
     try {
-
       final responseTask = await _taskService.fetchTask(token, idTask);
       if (responseTask != null) {
         notifyListeners();
@@ -95,8 +95,29 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateTask(String token, int idTask, Map<String, dynamic> body)  async {
+  Future<List<String>> fetchTaskImages(token, int idTask) async {
+    try {
+      final List<String> responseTask =
+          await _taskService.fetchTaskImages(token, idTask);
+      if (responseTask != []) {
+        notifyListeners();
+        return responseTask;
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return [];
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
+    }
+  }
 
+  Future<bool> updateTask(
+      String token, int idTask, Map<String, dynamic> body) async {
     try {
       final response = await _taskService.updateTask(token, idTask, body);
       if (response) {
@@ -114,7 +135,6 @@ class TaskListViewModel extends ChangeNotifier {
   }
 
   Future<bool> createTask(String token, Map<String, dynamic> body) async {
-
     try {
       final response = await _taskService.createTask(token, body);
       if (response) {
@@ -131,4 +151,11 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
+  uploadImage(String token, int id, String path) {
+    if (kIsWeb) {
+      _taskService.putBase64Images(token, id, path);
+    } else {
+      _taskService.putMultipartImages(token, id, path);
+    }
+  }
 }

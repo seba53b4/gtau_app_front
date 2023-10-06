@@ -3,15 +3,22 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
+import '../utils/boxes.dart';
+import '../utils/imagesbundle.dart';
 import '../utils/date_utils.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
+import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
+import '../widgets/user_image.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -135,6 +142,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<bool> _updateTask(Map<String, dynamic> body) async {
+    if (Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(ImageBundleAdapter());
+    }
+
+    boxImages = await Hive.openBox<ImageBundle>('imagesBox');
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
 
     final taskListViewModel =
@@ -193,6 +205,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
       initializeTask();
+      Hive.initFlutter().then((value) => null);
     } else {
       startDate = DateTime.now();
     }
@@ -310,10 +323,28 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   void handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
+    this.processImages();
     if (isUpdated) {
       reset();
     }
     updateTaskList();
+  }
+
+  void processImages() {
+    if (this.imagesFiles != null) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final taskListViewModel =
+          Provider.of<TaskListViewModel>(context, listen: false);
+      this.imagesFiles!.forEach((image) async {
+        try {
+          final response = await taskListViewModel.uploadImage(
+              token!, widget.idTask!, image.getPath);
+        } catch (error) {
+          print(error);
+          throw Exception('Error al subir imagen');
+        }
+      });
+    }
   }
 
   void handleAcceptOnShowDialogCreateTask() async {
@@ -361,6 +392,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     resetSelectionOnMap();
     Navigator.of(context).pop();
   }
+
+  List<ImageDataDTO>? imagesFiles = null;
 
   @override
   Widget build(BuildContext context) {
@@ -662,6 +695,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 ),
                 controller: descriptionController,
               ),
+              UserImage(
+                  onFileChanged: (imagesFiles) {
+                    this.imagesFiles = imagesFiles;
+                  },
+                  idTask: widget.idTask),
+              ImageGalleryModal(idTask: widget.idTask!),
               if (widget.detail)
                 Column(
                   children: [
