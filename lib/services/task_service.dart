@@ -284,4 +284,29 @@ class TaskService {
       rethrow;
     }
   }
+
+  Future<bool> deleteTaskImage(String token, int id, String path) async {
+    try {
+      var fileName = path.split("/").last;
+      final Map<String, dynamic> body = {"name": fileName};
+
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse('$baseUrl/$id/image');
+      final response =
+          await http.delete(url, headers: _getHeaders(token), body: jsonBody);
+
+      if (response.statusCode == 200) {
+        final bool jsonResponse = json.decode(response.body);
+
+        return jsonResponse;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al guardar imagenes: $error');
+      }
+      rethrow;
+    }
+  }
 }

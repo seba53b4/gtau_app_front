@@ -158,4 +158,8 @@ class TaskListViewModel extends ChangeNotifier {
       _taskService.putMultipartImages(token, id, path);
     }
   }
+
+  deleteImage(String token, int id, String path) {
+    _taskService.deleteTaskImage(token, id, path);
+  }
 }
