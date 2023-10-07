@@ -215,4 +215,8 @@ class TaskListViewModel extends ChangeNotifier {
       _taskService.putMultipartImages(token, id, path);
     }
   }
+
+  Future<bool> deleteImage(String token, int id, String path) {
+    return _taskService.deleteTaskImage(token, id, path);
+  }
 }

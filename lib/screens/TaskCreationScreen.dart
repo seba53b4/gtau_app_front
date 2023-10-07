@@ -4,7 +4,6 @@ import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../dto/image_data.dart';
@@ -12,8 +11,8 @@ import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../utils/boxes.dart';
-import '../utils/imagesbundle.dart';
 import '../utils/date_utils.dart';
+import '../utils/imagesbundle.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/image_gallery_modal.dart';
@@ -158,11 +157,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
       if (response) {
         print('Tarea ha sido actualizada correctamente');
-        showMessageDialog(DialogMessageType.success);
+        await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         print('No se pudieron traer datos');
-        showMessageDialog(DialogMessageType.error);
+        await showMessageDialog(DialogMessageType.error);
         return false;
       }
     } catch (error) {
@@ -171,8 +170,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
   }
 
-  void showMessageDialog(DialogMessageType type) {
-    showCustomMessageDialog(
+  Future<void> showMessageDialog(DialogMessageType type) async {
+    await showCustomMessageDialog(
         context: context, messageType: type, onAcceptPressed: () {});
   }
 
@@ -234,8 +233,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         onDisablePressed: () {
           Navigator.of(context).pop();
         },
-        onEnablePressed: () {
-          handleAcceptOnShowDialogCreateTask();
+        onEnablePressed: () async {
+          await handleAcceptOnShowDialogCreateTask();
           resetSelectionOnMap();
           Navigator.of(context).pop();
         },
@@ -320,14 +319,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     return requestBody;
   }
 
-  void handleAcceptOnShowDialogEditTask() async {
+  Future handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
     this.processImages();
     if (isUpdated) {
       reset();
     }
-    updateTaskList();
+    await updateTaskList();
   }
 
   void processImages() {
@@ -347,16 +346,16 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
   }
 
-  void handleAcceptOnShowDialogCreateTask() async {
+  Future handleAcceptOnShowDialogCreateTask() async {
     Map<String, dynamic> requestBody = createBodyToCreate();
     bool isUpdated = await _createTask(requestBody);
     if (isUpdated) {
       reset();
     }
-    updateTaskList();
+    await updateTaskList();
   }
 
-  void updateTaskList() async {
+  Future updateTaskList() async {
     final userName =
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final taskListViewModel =
@@ -372,8 +371,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       onDisablePressed: () {
         Navigator.of(context).pop();
       },
-      onEnablePressed: () {
-        handleAcceptOnShowDialogEditTask();
+      onEnablePressed: () async {
+        await handleAcceptOnShowDialogEditTask();
         resetSelectionOnMap();
         Navigator.of(context).pop();
         Navigator.of(context).pop();
@@ -695,12 +694,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 ),
                 controller: descriptionController,
               ),
-              UserImage(
-                  onFileChanged: (imagesFiles) {
-                    this.imagesFiles = imagesFiles;
-                  },
-                  idTask: widget.idTask),
-              ImageGalleryModal(idTask: widget.idTask!),
               if (widget.detail)
                 Column(
                   children: [
@@ -762,6 +755,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                   ],
                 ),
+              UserImage(
+                  onFileChanged: (imagesFiles) {
+                    this.imagesFiles = imagesFiles;
+                  },
+                  idTask: widget.idTask),
+              ImageGalleryModal(idTask: widget.idTask!),
               Container(
                 height: 50.0,
                 margin: const EdgeInsets.symmetric(vertical: 20.0),
