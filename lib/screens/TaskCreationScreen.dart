@@ -157,11 +157,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
       if (response) {
         print('Tarea ha sido actualizada correctamente');
-        showMessageDialog(DialogMessageType.success);
+        await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         print('No se pudieron traer datos');
-        showMessageDialog(DialogMessageType.error);
+        await showMessageDialog(DialogMessageType.error);
         return false;
       }
     } catch (error) {
@@ -170,8 +170,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
   }
 
-  void showMessageDialog(DialogMessageType type) {
-    showCustomMessageDialog(
+  Future<void> showMessageDialog(DialogMessageType type) async {
+    await showCustomMessageDialog(
         context: context, messageType: type, onAcceptPressed: () {});
   }
 
