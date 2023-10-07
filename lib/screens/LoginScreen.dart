@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gtau_app_front/models/auth_data.dart';
 import 'package:gtau_app_front/models/user_state.dart';
 import 'package:gtau_app_front/navigation/navigation.dart';
@@ -12,6 +11,7 @@ import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
 import '../widgets/common/custom_taost.dart';
+import '../widgets/common/custom_textfield.dart';
 import '../widgets/loading_overlay.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -47,12 +47,11 @@ class LoginScreen extends StatelessWidget {
   }
 
   _showWrongCredentialsToast(BuildContext context) {
-    Fluttertoast.showToast(
-      msg: AppLocalizations.of(context)!.toast_warning_wrong_credentials,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.grey,
-      textColor: Colors.white,
+    CustomToast.show(
+      context,
+      title: 'Advertencia',
+      message: AppLocalizations.of(context)!.toast_warning_wrong_credentials,
+      type: MessageType.warning,
     );
   }
 
@@ -83,8 +82,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<void> onLogInPressed(BuildContext context) async {
-    final String username = "gtau-oper"; //usernameController.text;
-    final String password = "123"; //passwordController.text;
+    final String username = usernameController.text;
+    final String password = passwordController.text;
 
     AuthData? authData = await _fetchAuth(context, username, password);
     if (context.mounted && authData != null) {
@@ -94,8 +93,13 @@ class LoginScreen extends StatelessWidget {
     }
   }
 
-  void onForgotPressed() {
-    print('Wrong');
+  void onForgotPressed(BuildContext context) {
+    // CustomToast.show(
+    //   context,
+    //   title: 'Advertencia',
+    //   message: 'Olvidaste tu contraseña :D',
+    //   type: MessageType.warning,
+    // );
   }
 
   @override
@@ -125,20 +129,21 @@ class LoginScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text('PipeTracker'),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!
-                        .default_input_username_hint,
-                  ),
+                CustomTextField(
                   controller: usernameController,
+                  hintText:
+                      AppLocalizations.of(context)!.default_input_username_hint,
+                  keyboardType: TextInputType.text,
+                  obscureText: false,
+                  hasError: hasError,
                 ),
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!
-                        .default_input_password_hint,
-                  ),
+                CustomTextField(
                   controller: passwordController,
+                  hintText:
+                      AppLocalizations.of(context)!.default_input_password_hint,
+                  keyboardType: TextInputType.text,
                   obscureText: true,
+                  hasError: hasError,
                 ),
                 ElevatedButton(
                   onPressed: () => onLogInPressed(context),
@@ -146,7 +151,7 @@ class LoginScreen extends StatelessWidget {
                       Text(AppLocalizations.of(context)!.default_login_button),
                 ),
                 ElevatedButton(
-                  onPressed: onForgotPressed,
+                  onPressed: () => onForgotPressed(context),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.grey),
                   ),
