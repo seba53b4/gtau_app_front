@@ -15,6 +15,14 @@ class TaskListViewModel extends ChangeNotifier {
     "BLOCKED": []
   };
 
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  bool _error = false;
+
+  bool get error => _error;
+
   Map<String, List<Task>> get tasks => _tasks;
 
   int page = 0;
@@ -45,20 +53,33 @@ class TaskListViewModel extends ChangeNotifier {
       userName = user;
     }
     try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
+
       _tasks[status] = responseListTask!;
       notifyListeners();
+
       return responseListTask;
     } catch (error) {
+      _error = true;
       print(error);
       throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<bool> deleteTask(BuildContext context, int id) async {
     final token = context.read<UserProvider>().getToken;
     try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
       final response = await _taskService.deleteTask(token!, id);
 
       if (response) {
@@ -70,13 +91,20 @@ class TaskListViewModel extends ChangeNotifier {
         return false;
       }
     } catch (error) {
+      _error = true;
       print(error);
       throw Exception('Error al eliminar la tarea');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<Task?> fetchTask(token, int idTask) async {
     try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
       final responseTask = await _taskService.fetchTask(token, idTask);
       if (responseTask != null) {
         notifyListeners();
@@ -85,69 +113,98 @@ class TaskListViewModel extends ChangeNotifier {
         if (kDebugMode) {
           print('No se pudieron traer datos');
         }
+        _error = true;
         return null;
       }
     } catch (error) {
+      _error = true;
       if (kDebugMode) {
         print(error);
       }
       throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<List<String>> fetchTaskImages(token, int idTask) async {
     try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
       final List<String> responseTask =
           await _taskService.fetchTaskImages(token, idTask);
       if (responseTask != []) {
         notifyListeners();
         return responseTask;
       } else {
+        _error = true;
         if (kDebugMode) {
           print('No se pudieron traer datos');
         }
         return [];
       }
     } catch (error) {
+      _error = true;
       if (kDebugMode) {
         print(error);
       }
       throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<bool> updateTask(
       String token, int idTask, Map<String, dynamic> body) async {
     try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
       final response = await _taskService.updateTask(token, idTask, body);
       if (response) {
         print('Tarea ha sido actualizada correctamente');
         notifyListeners();
         return true;
       } else {
+        _error = true;
         print('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
+      _error = true;
       print(error);
       throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<bool> createTask(String token, Map<String, dynamic> body) async {
     try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
       final response = await _taskService.createTask(token, body);
       if (response) {
         print('Tarea ha sido creada correctamente');
         notifyListeners();
         return true;
       } else {
+        _error = true;
         print('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
+      _error = true;
       print(error);
       throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

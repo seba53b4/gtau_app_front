@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/widgets/TaskList.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
@@ -9,6 +10,7 @@ import '../viewmodels/task_list_viewmodel.dart';
 
 class TaskStatusDashboard extends StatefulWidget {
   final String? userName;
+
   const TaskStatusDashboard({Key? key, this.userName});
 
   @override
@@ -19,9 +21,18 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   int _currentIndex = 0;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
+      updateTaskListState(TaskStatus.Doing.value);
+    });
+  }
 
-    final taskFilterProvider = Provider.of<TaskFilterProvider>(context, listen: false);
+  @override
+  Widget build(BuildContext context) {
+    final taskFilterProvider =
+        Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setUserNameFilter(widget.userName);
 
     return DefaultTabController(
@@ -41,15 +52,37 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
               setState(() {
                 _currentIndex = index;
               });
+              String status = getTaskStatusSelected();
+              updateTaskListState(status);
             },
           ),
         ),
-        body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 10),
-          child: _buildTabContent(),
-        ),
-      ),);
+        body: Consumer<TaskListViewModel>(
+            builder: (context, taskListViewModel, child) {
+          return LoadingOverlay(
+              isLoading: taskListViewModel.isLoading,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 10),
+                child: _buildTabContent(),
+              ));
+        }),
+      ),
+    );
+  }
 
+  String getTaskStatusSelected() {
+    switch (_currentIndex) {
+      case 0:
+        return TaskStatus.Pending.value;
+      case 1:
+        return TaskStatus.Doing.value;
+      case 2:
+        return TaskStatus.Blocked.value;
+      case 3:
+        return TaskStatus.Done.value;
+      default:
+        return "";
+    }
   }
 
   Widget _buildTabContent() {
@@ -68,15 +101,15 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   }
 
   void updateTaskListState(status) async {
-    final userName = Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
-    final taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status);
     await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   Widget _buildTaskList(String status) {
-    updateTaskListState(status);
-
     return FadeTransition(
       key: ValueKey<int>(_currentIndex),
       opacity: const AlwaysStoppedAnimation(1.0),
@@ -84,4 +117,3 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     );
   }
 }
-
