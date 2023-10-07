@@ -1,20 +1,18 @@
 import 'dart:core';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gtau_app_front/models/enums/point_type_enum.dart';
 import 'package:gtau_app_front/models/point_data.dart';
-import 'package:gtau_app_front/models/point_type_enum.dart';
-import 'package:gtau_app_front/models/point_type_enum.dart';
-import 'package:gtau_app_front/models/point_type_enum.dart';
 
 class Register extends PointData {
   late final String? tipo;
   late final double? gid;
-  late final int? elemRed;
+  late final double? elemRed;
   late final double? cota;
   late final double? inspeccion;
   late final double? latC;
   late final double? lonC;
   late final String? datoObra;
+  late final String? descripcion;
 
   Register(
       {required super.ogcFid,
@@ -26,6 +24,7 @@ class Register extends PointData {
       this.inspeccion,
       this.latC,
       this.lonC,
+      this.descripcion,
       this.datoObra})
       : super(type: PointType.register);
 }

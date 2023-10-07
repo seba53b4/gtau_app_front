@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
-import 'package:provider/provider.dart';
 
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({super.key});
@@ -15,42 +14,24 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   int myCurrentIndex = 0;
 
-
   List screens = [HomeScreen(), MapMobile(), ProfileScreen()];
 
   @override
   Widget build(BuildContext context) {
-    final userStateProvider = Provider.of<UserProvider>(context, listen: false);
-    late List<BottomNavigationBarItem> optionsNav;
-    if (userStateProvider.isAdmin!) {
-      optionsNav = [
-        const BottomNavigationBarItem(
-        icon: Icon(Icons.home),
-        label: 'Inicio',
+    late List<BottomNavigationBarItem> optionsNav = [
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.home),
+        label: AppLocalizations.of(context)!.navigation_label_home,
       ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.add),
-          label: 'Registrar',
-        ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Perfil',
-        )
-      ];
-    } else {
-      optionsNav = [
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Inicio',
-        ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Perfil',
-        )
-      ];
-      screens = [HomeScreen(), ProfileScreen()];
-
-    }
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.add),
+        label: AppLocalizations.of(context)!.navigation_label_map,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.person),
+        label: AppLocalizations.of(context)!.navigation_label_profile,
+      )
+    ];
 
     return Scaffold(
         bottomNavigationBar: BottomNavigationBar(
@@ -70,7 +51,7 @@ class MapMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: MapComponent(),
       ),
