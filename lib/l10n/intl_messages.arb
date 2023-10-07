@@ -25,7 +25,7 @@
     "default_selectPlaceholder": "Seleccione una opción",
     "default_input_username_hint": "Nombre del usuario",
     "default_input_password_hint": "Ingresa la constraseña",
-    "default_login_button": "Loguearse",
+    "default_login_button": "Ingresar",
     "default_logout_button": "Cerrar sesión",
     "default_forgot_password": "Olvidaste tu password?",
     "default_dropdown_label": "Elija una opción",

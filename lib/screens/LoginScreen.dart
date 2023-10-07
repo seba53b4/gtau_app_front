@@ -11,6 +11,7 @@ import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
+import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_taost.dart';
 import '../widgets/common/custom_textfield.dart';
 import '../widgets/loading_overlay.dart';
@@ -128,13 +129,14 @@ class LoginScreen extends StatelessWidget {
             child: Center(
               child: BoxContainer(
                 width: kIsWeb ? 400 : 340,
-                height: kIsWeb ? 400 : 340,
+                height: kIsWeb ? 400 : 368,
                 padding: const EdgeInsets.all(16.0),
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text('PipeTracker'),
+                    const SizedBox(height: 24.0),
                     CustomTextField(
                       controller: usernameController,
                       hintText: AppLocalizations.of(context)!
@@ -151,19 +153,17 @@ class LoginScreen extends StatelessWidget {
                       obscureText: true,
                       hasError: hasError,
                     ),
-                    ElevatedButton(
-                      onPressed: () => onLogInPressed(context),
-                      child: Text(
-                          AppLocalizations.of(context)!.default_login_button),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => onForgotPressed(context),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.grey),
-                      ),
-                      child: Text(AppLocalizations.of(context)!
-                          .default_forgot_password),
-                    ),
+                    const SizedBox(height: 16.0),
+                    CustomElevatedButton(
+                        onPressed: () => onLogInPressed(context),
+                        text:
+                            AppLocalizations.of(context)!.default_login_button),
+                    const SizedBox(height: 8.0),
+                    CustomElevatedButton(
+                        onPressed: () => onForgotPressed(context),
+                        backgroundColor: Colors.grey,
+                        text: AppLocalizations.of(context)!
+                            .default_forgot_password),
                   ],
                 ),
               ),
