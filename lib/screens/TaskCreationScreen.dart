@@ -233,8 +233,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         onDisablePressed: () {
           Navigator.of(context).pop();
         },
-        onEnablePressed: () {
-          handleAcceptOnShowDialogCreateTask();
+        onEnablePressed: () async {
+          await handleAcceptOnShowDialogCreateTask();
           resetSelectionOnMap();
           Navigator.of(context).pop();
         },
@@ -319,14 +319,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     return requestBody;
   }
 
-  void handleAcceptOnShowDialogEditTask() async {
+  Future handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
     this.processImages();
     if (isUpdated) {
       reset();
     }
-    updateTaskList();
+    await updateTaskList();
   }
 
   void processImages() {
@@ -346,16 +346,16 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
   }
 
-  void handleAcceptOnShowDialogCreateTask() async {
+  Future handleAcceptOnShowDialogCreateTask() async {
     Map<String, dynamic> requestBody = createBodyToCreate();
     bool isUpdated = await _createTask(requestBody);
     if (isUpdated) {
       reset();
     }
-    updateTaskList();
+    await updateTaskList();
   }
 
-  void updateTaskList() async {
+  Future updateTaskList() async {
     final userName =
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final taskListViewModel =
@@ -371,8 +371,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       onDisablePressed: () {
         Navigator.of(context).pop();
       },
-      onEnablePressed: () {
-        handleAcceptOnShowDialogEditTask();
+      onEnablePressed: () async {
+        await handleAcceptOnShowDialogEditTask();
         resetSelectionOnMap();
         Navigator.of(context).pop();
         Navigator.of(context).pop();
