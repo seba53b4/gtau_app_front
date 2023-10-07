@@ -159,7 +159,7 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  deleteImage(String token, int id, String path) {
-    _taskService.deleteTaskImage(token, id, path);
+  Future<bool> deleteImage(String token, int id, String path) {
+    return _taskService.deleteTaskImage(token, id, path);
   }
 }

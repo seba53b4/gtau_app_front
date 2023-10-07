@@ -14,77 +14,168 @@ class ImageGalleryModal extends StatefulWidget {
   const ImageGalleryModal({super.key, this.idTask});
 
   @override
-  State<ImageGalleryModal> createState() => _ImageGalleryModalState(idTask);
+  State<ImageGalleryModal> createState() => _ImageGalleryModalState(idTask, []);
 }
 
 class _ImageGalleryModalState extends State<ImageGalleryModal> {
   int? idTask;
+  List<Photo> photos;
 
-  _ImageGalleryModalState(this.idTask);
+  _ImageGalleryModalState(this.idTask, this.photos);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
         List<String> _urls = await _fetchTaskImages(context, widget.idTask!);
-        _showGalleryModal(context, _urls);
+        this.photos = _urls.map((url) => Photo(url: url)).toList();
+        //_showGalleryModal(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => _GelleryShow(idTask, photos)),
+        );
       },
       child: const Text("Imágenes"),
     );
   }
+}
 
-  void _showGalleryModal(BuildContext context, List<String> photos) {
-    showGeneralDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierLabel: "Map Modal",
-        transitionDuration: const Duration(milliseconds: 200),
-        pageBuilder: (_, __, ___) {
-          return Scaffold(
-            appBar: AppBar(title: const Text("Gallery")),
-            body: GridView.builder(
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
+class _GelleryShow extends StatefulWidget {
+  int? idTask;
+  List<Photo> photos;
+
+  _GelleryShow(this.idTask, this.photos);
+
+  @override
+  State<StatefulWidget> createState() => _GelleryShowState(idTask, this.photos);
+}
+
+class _GelleryShowState extends State<_GelleryShow> {
+  int? idTask;
+  List<Photo> photos;
+
+  _GelleryShowState(this.idTask, this.photos);
+
+  @override
+  Widget build(BuildContext context) {
+    print(this.photos.length);
+    return Scaffold(
+      appBar: AppBar(title: const Text("Imágenes")),
+      body: GridView.builder(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        padding: const EdgeInsets.all(1),
+        itemCount: photos.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+        ),
+        itemBuilder: ((context, index) {
+          return Container(
+            padding: const EdgeInsets.all(0.5),
+            decoration: BoxDecoration(
+              border: photos[index].isSelected
+                  ? Border.all(color: Colors.blue, width: 3)
+                  : null,
+            ),
+            child: InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PhotoViewPage(photos: photos, index: index),
+                ),
               ),
-              padding: const EdgeInsets.all(1),
-              itemCount: photos.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-              ),
-              itemBuilder: ((context, index) {
-                return Container(
-                  padding: const EdgeInsets.all(0.5),
-                  child: InkWell(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            PhotoViewPage(photos: photos, index: index),
-                      ),
-                    ),
-                    child: Hero(
-                      tag: photos[index],
-                      child: CachedNetworkImage(
-                        imageUrl: photos[index],
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Container(color: Colors.grey),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.red.shade400,
-                        ),
-                      ),
-                    ),
+              onLongPress: () {
+                setState(() {
+                  photos[index].isSelected = !photos[index].isSelected;
+                });
+              },
+              onDoubleTap: () {
+                setState(() {
+                  photos[index].isSelected = !photos[index].isSelected;
+                });
+              },
+              child: Hero(
+                tag: photos[index],
+                child: CachedNetworkImage(
+                  color: Colors.black
+                      .withOpacity(photos[index].isSelected ? 1 : 0),
+                  colorBlendMode: BlendMode.color,
+                  imageUrl: photos[index].url,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(color: Colors.grey),
+                  errorWidget: (context, url, error) => Container(
+                    color: !photos[index].isSelected
+                        ? Colors.red.shade400
+                        : Colors.black87,
                   ),
-                );
-              }),
+                ),
+              ),
             ),
           );
-        });
+        }),
+      ),
+      bottomNavigationBar: photos.any((photo) => photo.isSelected)
+          ? BottomNavigationBar(
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.cleaning_services),
+                  label: 'Quitar seleccion',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.delete),
+                  label: 'Eliminar',
+                ),
+              ],
+              onTap: (index) {
+                if (index == 0) {
+                  setState(() {
+                    photos.forEach((element) => element.isSelected = false);
+                    this.photos = photos;
+                  });
+                } else if (index == 1) {
+                  _deleteSelectedImages(photos);
+                }
+              },
+              // Habilita o deshabilita el botón "Eliminar" según si hay imágenes seleccionadas o no
+              currentIndex: 1,
+            )
+          : null,
+    );
+  }
+
+  void _deleteSelectedImages(List<Photo> photos) {
+    final selectedImages = photos.where((photo) => photo.isSelected).toList();
+    if (selectedImages.isNotEmpty) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final taskListViewModel =
+          Provider.of<TaskListViewModel>(context, listen: false);
+
+      photos.forEach((photo) async {
+        if (photo.isSelected) {
+          bool deleteImage = await taskListViewModel.deleteImage(
+              token!, this.idTask!, photo.url);
+          if (!deleteImage) {
+            photo.isSelected = false;
+          }
+        }
+      });
+      setState(() {
+        photos.removeWhere((photo) => photo.isSelected);
+      });
+    }
   }
 }
 
+class Photo {
+  String url;
+  bool isSelected;
+
+  Photo({required this.url, this.isSelected = false});
+}
+
 class PhotoViewPage extends StatelessWidget {
-  final List<String> photos;
+  final List<Photo> photos;
   final int index;
 
   const PhotoViewPage({
@@ -105,7 +196,7 @@ class PhotoViewPage extends StatelessWidget {
         itemCount: photos.length,
         builder: (context, index) => PhotoViewGalleryPageOptions.customChild(
           child: CachedNetworkImage(
-            imageUrl: photos[index],
+            imageUrl: photos[index].url,
             placeholder: (context, url) => Container(
               color: Colors.grey,
             ),

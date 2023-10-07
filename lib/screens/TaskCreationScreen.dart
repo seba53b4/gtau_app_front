@@ -4,7 +4,6 @@ import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../dto/image_data.dart';
@@ -12,8 +11,8 @@ import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../utils/boxes.dart';
-import '../utils/imagesbundle.dart';
 import '../utils/date_utils.dart';
+import '../utils/imagesbundle.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/image_gallery_modal.dart';
@@ -695,12 +694,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                 ),
                 controller: descriptionController,
               ),
-              UserImage(
-                  onFileChanged: (imagesFiles) {
-                    this.imagesFiles = imagesFiles;
-                  },
-                  idTask: widget.idTask),
-              ImageGalleryModal(idTask: widget.idTask!),
               if (widget.detail)
                 Column(
                   children: [
@@ -762,6 +755,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                   ],
                 ),
+              UserImage(
+                  onFileChanged: (imagesFiles) {
+                    this.imagesFiles = imagesFiles;
+                  },
+                  idTask: widget.idTask),
+              ImageGalleryModal(idTask: widget.idTask!),
               Container(
                 height: 50.0,
                 margin: const EdgeInsets.symmetric(vertical: 20.0),
