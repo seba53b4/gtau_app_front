@@ -31,6 +31,7 @@
     "default_dropdown_label": "Elija una opción",
     "default_datepicker_hint": "Elija una fecha",
     "toast_warning_wrong_credentials": "Usuario y/o contraseña incorrectos",
+    "login_warning_empty_input": "Por favor, ingrese usuario y contraseña",
     "usernamePlaceholder": "Username",
     "passwordPlaceholder": "Password",
     "loginButton": "Log In",

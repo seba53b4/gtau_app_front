@@ -7,6 +7,7 @@ import 'package:gtau_app_front/navigation/navigation.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
@@ -50,7 +51,7 @@ class LoginScreen extends StatelessWidget {
     CustomToast.show(
       context,
       title: 'Advertencia',
-      message: AppLocalizations.of(context)!.toast_warning_wrong_credentials,
+      message: AppLocalizations.of(context)!.login_warning_empty_input,
       type: MessageType.warning,
     );
   }
@@ -123,42 +124,49 @@ class LoginScreen extends StatelessWidget {
         isLoading: isLoading,
         child: Scaffold(
           body: Container(
-            padding: const EdgeInsets.all(16.0),
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('PipeTracker'),
-                CustomTextField(
-                  controller: usernameController,
-                  hintText:
-                      AppLocalizations.of(context)!.default_input_username_hint,
-                  keyboardType: TextInputType.text,
-                  obscureText: false,
-                  hasError: hasError,
+            color: const Color.fromRGBO(253, 255, 252, 1),
+            child: Center(
+              child: BoxContainer(
+                width: kIsWeb ? 400 : 340,
+                height: kIsWeb ? 400 : 340,
+                padding: const EdgeInsets.all(16.0),
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('PipeTracker'),
+                    CustomTextField(
+                      controller: usernameController,
+                      hintText: AppLocalizations.of(context)!
+                          .default_input_username_hint,
+                      keyboardType: TextInputType.text,
+                      obscureText: false,
+                      hasError: hasError,
+                    ),
+                    CustomTextField(
+                      controller: passwordController,
+                      hintText: AppLocalizations.of(context)!
+                          .default_input_password_hint,
+                      keyboardType: TextInputType.text,
+                      obscureText: true,
+                      hasError: hasError,
+                    ),
+                    ElevatedButton(
+                      onPressed: () => onLogInPressed(context),
+                      child: Text(
+                          AppLocalizations.of(context)!.default_login_button),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => onForgotPressed(context),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.grey),
+                      ),
+                      child: Text(AppLocalizations.of(context)!
+                          .default_forgot_password),
+                    ),
+                  ],
                 ),
-                CustomTextField(
-                  controller: passwordController,
-                  hintText:
-                      AppLocalizations.of(context)!.default_input_password_hint,
-                  keyboardType: TextInputType.text,
-                  obscureText: true,
-                  hasError: hasError,
-                ),
-                ElevatedButton(
-                  onPressed: () => onLogInPressed(context),
-                  child:
-                      Text(AppLocalizations.of(context)!.default_login_button),
-                ),
-                ElevatedButton(
-                  onPressed: () => onForgotPressed(context),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.grey),
-                  ),
-                  child: Text(
-                      AppLocalizations.of(context)!.default_forgot_password),
-                ),
-              ],
+              ),
             ),
           ),
         ),
