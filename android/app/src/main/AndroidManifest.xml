@@ -7,7 +7,7 @@
         android:label="gtau_app_front">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDw98zkmYzBQPJ4oAqBgkwdaWA_EK2YB-s" />
+            android:value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
 
         <activity
             android:name=".MainActivity"
@@ -31,9 +31,9 @@
             </intent-filter>
         </activity>
         <activity
-        android:name="com.yalantis.ucrop.UCropActivity"
-        android:screenOrientation="portrait"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
