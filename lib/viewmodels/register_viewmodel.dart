@@ -17,6 +17,10 @@ class RegisterViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  bool _error = false;
+
+  bool get error => _error;
+
   Future<List<Register>?> fetchRegistersByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
@@ -27,12 +31,14 @@ class RegisterViewModel extends ChangeNotifier {
       if (responseListSection != null) {
         _registers = responseListSection;
       }
-      _isLoading = false;
-      notifyListeners();
       return responseListSection;
     } catch (error) {
+      _error = true;
       print(error);
       throw Exception('Error al obtener los datos: $error');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -46,15 +52,16 @@ class RegisterViewModel extends ChangeNotifier {
       if (responseRegister != null) {
         _registerForDetail = responseRegister;
       }
-      _isLoading = false;
-      notifyListeners();
       return responseRegister;
     } catch (error) {
-      _isLoading = false;
+      _error = true;
       if (kDebugMode) {
         print('Error al obtener registros: $error');
       }
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }
