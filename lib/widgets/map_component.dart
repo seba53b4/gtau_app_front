@@ -413,7 +413,7 @@ class _MapComponentState extends State<MapComponent> {
               registerViewModel.isLoading ||
               sectionViewModel.isLoading;
           return LoadingOverlay(
-              isLoading: isMapLoading,
+              isLoading: isMapLoading && !viewDetailElementInfo,
               child: Scaffold(
                 body: Row(
                   children: [
