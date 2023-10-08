@@ -47,7 +47,7 @@ class _MapComponentState extends State<MapComponent> {
   Color selectedButtonColor = Colors.green;
   Color defaultButtonColor = Colors.primaries.first;
   bool locationManual = false;
-  static const double zoom = 15;
+  double zoomMap = 16;
   late Completer<GoogleMapController> _mapController;
   bool viewDetailElementInfo = false;
   double modalWidth = 300.0;
@@ -116,7 +116,7 @@ class _MapComponentState extends State<MapComponent> {
         CameraUpdate.newCameraPosition(
           CameraPosition(
             target: LatLng(currentPosition.latitude, currentPosition.longitude),
-            zoom: zoom,
+            zoom: zoomMap,
           ),
         ),
       );
@@ -431,20 +431,27 @@ class _MapComponentState extends State<MapComponent> {
                               },
                               child: GoogleMap(
                                 mapType: _currentMapType,
-                                initialCameraPosition: const CameraPosition(
-                                  target: initLocation,
-                                  zoom: zoom,
+                                initialCameraPosition: CameraPosition(
+                                  target: (location != null)
+                                      ? location!
+                                      : initLocation,
+                                  zoom: zoomMap,
                                 ),
                                 polylines: polylines,
                                 circles: circles,
                                 markers: markers,
+                                onCameraMove: (CameraPosition cameraPosition) {
+                                  setState(() {
+                                    zoomMap = cameraPosition.zoom;
+                                  });
+                                },
                                 onMapCreated: (GoogleMapController controller) {
                                   if (location != null &&
                                       _mapController.isCompleted &&
                                       !isMapLoading) {
                                     controller.moveCamera(
                                         CameraUpdate.newLatLngZoom(
-                                            location!, zoom));
+                                            location!, zoomMap));
                                   }
                                   if (!_mapController.isCompleted) {
                                     _mapController.complete(controller);
