@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/theme_constants.dart';
+
 class BoxContainer extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
@@ -30,9 +32,9 @@ class BoxContainer extends StatelessWidget {
       decoration: decoration ??
           BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: const Color.fromRGBO(200, 217, 184, 0.25),
+            color: Theme.of(context).primaryColor,
             border: Border.all(
-              color: const Color.fromRGBO(200, 217, 184, 1),
+              color: baseBorderColor,
               width: 2.0, // Cambia el ancho del borde aquí
             ),
             // boxShadow: const [

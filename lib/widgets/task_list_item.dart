@@ -25,7 +25,10 @@ class TaskListItem extends StatelessWidget {
       contentPadding: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       tileColor: Colors.white,
-      subtitle: Text('${task!.inspectionType}'),
+      subtitle: Text(
+        '${task!.inspectionType}',
+        style: const TextStyle(fontSize: 15),
+      ),
       title: Text('${task!.getWorkNumber}'),
       leading: const Icon(Icons.check),
       trailing: Row(

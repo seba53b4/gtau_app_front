@@ -40,7 +40,7 @@ class _UserImageState extends State<UserImage> {
           const Icon(
             Icons.image,
             size: 60,
-            color: Colors.blue,
+            color: Colors.white10,
             semanticLabel: 'No image have been uploaded',
           ),
         if (imagesFiles != null)
@@ -93,7 +93,7 @@ class _UserImageState extends State<UserImage> {
             padding: EdgeInsets.all(8.0),
             child: Text(
               imagesFiles != null ? 'Add Photo' : 'Select Photo',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         )

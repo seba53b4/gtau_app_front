@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
@@ -45,6 +46,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
         appBar: AppBar(
           toolbarHeight: 0,
           bottom: TabBar(
+            labelColor: Colors.white,
+            labelStyle: const TextStyle(fontSize: kIsWeb ? 20 : 14),
+            unselectedLabelColor: Colors.white60,
             tabs: [
               Tab(text: AppLocalizations.of(context)!.task_status_pendingTitle),
               Tab(text: AppLocalizations.of(context)!.task_status_doingTitle),

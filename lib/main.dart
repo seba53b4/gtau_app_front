@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
@@ -13,6 +14,8 @@ import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:provider/provider.dart';
 import "package:universal_html/html.dart" as html;
+
+import 'constants/theme_constants.dart';
 
 Future<void> main() async {
   await dotenv.load(
@@ -60,9 +63,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: LoginScreen(),
-    );
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: LoginScreen(),
+        theme: defaultTheme);
   }
 }
