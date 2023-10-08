@@ -21,7 +21,8 @@ class LoadingOverlay extends StatelessWidget {
             children: [
               child,
               Container(
-                  color: const Color.fromRGBO(88, 87, 89, 0.25),
+                  color: const Color.fromRGBO(
+                      161, 180, 156, 0.3568627450980392),
                   child: const LoadingWidget()),
             ],
           ),
