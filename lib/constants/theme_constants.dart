@@ -12,11 +12,11 @@ ThemeData defaultTheme = ThemeData(
       fontSize: 68,
       fontWeight: FontWeight.bold,
     ),
-    titleLarge: GoogleFonts.oswald(
+    titleLarge: GoogleFonts.sora(
       fontSize: 30,
       fontStyle: FontStyle.italic,
     ),
-    titleSmall: GoogleFonts.oswald(
+    titleSmall: GoogleFonts.sora(
       fontSize: 5,
     ),
 
@@ -25,9 +25,9 @@ ThemeData defaultTheme = ThemeData(
       fontSize: 20,
     ),
     //Ej: Tamaño del placeholder 'Nombre de usuario'
-    titleMedium: GoogleFonts.oswald(
+    titleMedium: GoogleFonts.sora(
       fontSize: 15,
     ),
-    displaySmall: GoogleFonts.aleo(),
+    displaySmall: GoogleFonts.sora(),
   ),
 );

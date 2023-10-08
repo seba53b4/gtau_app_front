@@ -124,34 +124,6 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<String>> fetchTaskImages(token, int idTask) async {
-    try {
-      _isLoading = true;
-      _error = false;
-      notifyListeners();
-      final List<String> responseTask =
-          await _taskService.fetchTaskImages(token, idTask);
-      if (responseTask != []) {
-        return responseTask;
-      } else {
-        _error = true;
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
-        return [];
-      }
-    } catch (error) {
-      _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
-      throw Exception('Error al obtener los datos');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
   Future<bool> updateTask(
       String token, int idTask, Map<String, dynamic> body) async {
     try {
@@ -201,17 +173,5 @@ class TaskListViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  uploadImage(String token, int id, String path) {
-    if (kIsWeb) {
-      _taskService.putBase64Images(token, id, path);
-    } else {
-      _taskService.putMultipartImages(token, id, path);
-    }
-  }
-
-  Future<bool> deleteImage(String token, int id, String path) {
-    return _taskService.deleteTaskImage(token, id, path);
   }
 }

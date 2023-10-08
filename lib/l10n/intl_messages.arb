@@ -27,7 +27,7 @@
     "default_input_password_hint": "Ingresa la constraseña",
     "default_login_button": "Ingresar",
     "default_logout_button": "Cerrar sesión",
-    "default_forgot_password": "Olvidaste tu password?",
+    "default_forgot_password": "Olvidaste tu contraseña?",
     "default_dropdown_label": "Elija una opción",
     "default_datepicker_hint": "Elija una fecha",
     "toast_warning_wrong_credentials": "Usuario y/o contraseña incorrectos",

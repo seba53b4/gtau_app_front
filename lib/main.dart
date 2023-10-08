@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/images_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
@@ -40,6 +40,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<TaskListViewModel>(
           create: (context) => TaskListViewModel(),
+        ),
+        ChangeNotifierProvider<ImagesViewModel>(
+          create: (context) => ImagesViewModel(),
         ),
         ChangeNotifierProvider<AuthViewModel>(
           create: (context) => AuthViewModel(),
