@@ -5,7 +5,8 @@ class LoadingOverlay extends StatelessWidget {
   final Widget child;
   final bool isLoading;
 
-  LoadingOverlay({super.key,
+  LoadingOverlay({
+    super.key,
     required this.child,
     required this.isLoading,
   });
@@ -20,7 +21,7 @@ class LoadingOverlay extends StatelessWidget {
             children: [
               child,
               Container(
-                  color: const Color.fromRGBO(88, 87, 89, 0.65),
+                  color: const Color.fromRGBO(88, 87, 89, 0.25),
                   child: const LoadingWidget()),
             ],
           ),

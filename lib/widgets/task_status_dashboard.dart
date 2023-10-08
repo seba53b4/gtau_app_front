@@ -24,8 +24,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-      updateTaskListState(TaskStatus.Doing.value);
+      updateTaskListState(TaskStatus.Pending.value);
     });
   }
 
@@ -34,11 +33,15 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     final taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setUserNameFilter(widget.userName);
+    //taskFilterProvider.setLastStatus(TaskStatus.Pending.value);
+    final GlobalKey<ScaffoldState> _scaffoldKeyDashboard =
+        GlobalKey<ScaffoldState>();
 
     return DefaultTabController(
       length: 4,
       initialIndex: 0,
       child: Scaffold(
+        key: _scaffoldKeyDashboard,
         appBar: AppBar(
           toolbarHeight: 0,
           bottom: TabBar(
@@ -63,7 +66,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
               isLoading: taskListViewModel.isLoading,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 10),
-                child: _buildTabContent(),
+                child: _buildTabContent(_scaffoldKeyDashboard),
               ));
         }),
       ),
@@ -85,16 +88,16 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     }
   }
 
-  Widget _buildTabContent() {
+  Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
     switch (_currentIndex) {
       case 0:
-        return _buildTaskList(TaskStatus.Pending.value);
+        return _buildTaskList(TaskStatus.Pending.value, _scaffoldKeyDashboard);
       case 1:
-        return _buildTaskList(TaskStatus.Doing.value);
+        return _buildTaskList(TaskStatus.Doing.value, _scaffoldKeyDashboard);
       case 2:
-        return _buildTaskList(TaskStatus.Blocked.value);
+        return _buildTaskList(TaskStatus.Blocked.value, _scaffoldKeyDashboard);
       case 3:
-        return _buildTaskList(TaskStatus.Done.value);
+        return _buildTaskList(TaskStatus.Done.value, _scaffoldKeyDashboard);
       default:
         return Container();
     }
@@ -109,11 +112,16 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     await taskListViewModel.initializeTasks(context, status, userName);
   }
 
-  Widget _buildTaskList(String status) {
+  Widget _buildTaskList(
+      String status, GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
     return FadeTransition(
       key: ValueKey<int>(_currentIndex),
       opacity: const AlwaysStoppedAnimation(1.0),
-      child: SafeArea(child: TaskList(status: status)),
+      child: SafeArea(
+          child: TaskList(
+        status: status,
+        scaffoldKey: _scaffoldKeyDashboard,
+      )),
     );
   }
 }

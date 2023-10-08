@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -76,14 +77,16 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<bool> _fetchTask() async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final token = Provider
+        .of<UserProvider>(context, listen: false)
+        .getToken;
     final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
+    Provider.of<TaskListViewModel>(context, listen: false);
 
     try {
       final selectedItemsProvider = context.read<SelectedItemsProvider>();
       final responseTask =
-          await taskListViewModel.fetchTask(token, widget.idTask!);
+      await taskListViewModel.fetchTask(token, widget.idTask!);
 
       if (responseTask != null) {
         setState(() {
@@ -120,9 +123,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<bool> _createTask(Map<String, dynamic> body) async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final token = Provider
+        .of<UserProvider>(context, listen: false)
+        .getToken;
     final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
+    Provider.of<TaskListViewModel>(context, listen: false);
     try {
       final response = await taskListViewModel.createTask(token!, body);
       if (response) {
@@ -146,14 +151,16 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
 
     boxImages = await Hive.openBox<ImageBundle>('imagesBox');
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final token = Provider
+        .of<UserProvider>(context, listen: false)
+        .getToken;
 
     final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
+    Provider.of<TaskListViewModel>(context, listen: false);
 
     try {
       final response =
-          await taskListViewModel.updateTask(token!, widget.idTask!, body);
+      await taskListViewModel.updateTask(token!, widget.idTask!, body);
 
       if (response) {
         print('Tarea ha sido actualizada correctamente');
@@ -203,7 +210,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
-      initializeTask();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
+        initializeTask();
+      });
       Hive.initFlutter().then((value) => null);
     } else {
       startDate = DateTime.now();
@@ -234,34 +244,41 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           Navigator.of(context).pop();
         },
         onEnablePressed: () async {
+          Navigator.of(context).pop();
           await handleAcceptOnShowDialogCreateTask();
           resetSelectionOnMap();
-          Navigator.of(context).pop();
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
       );
     } else {
       print(
-          'Programada: ${scheduledNumberController.text} Descripcion: ${descriptionController.text}');
+          'Programada: ${scheduledNumberController
+              .text} Descripcion: ${descriptionController.text}');
     }
   }
 
   Map<String, dynamic> createBodyToCreate() {
     final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+        context
+            .read<SelectedItemsProvider>()
+            .selectedPolylines;
     final List<String> listSelectedSections =
-        selectedSections.map((polylineId) => polylineId.value).toList();
+    selectedSections.map((polylineId) => polylineId.value).toList();
 
     final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+        context
+            .read<SelectedItemsProvider>()
+            .selectedCatchments;
     final List<String> listSelectedCatchments =
-        selectedCatchments.map((circleId) => circleId.value).toList();
+    selectedCatchments.map((circleId) => circleId.value).toList();
 
     final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+        context
+            .read<SelectedItemsProvider>()
+            .selectedRegisters;
     final List<String> listSelectedRegisters =
-        selectedRegisters.map((circleId) => circleId.value).toList();
+    selectedRegisters.map((circleId) => circleId.value).toList();
 
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
@@ -286,17 +303,23 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         ? formattedDateToUpdate(releasedDateController.text)
         : null;
     final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+        context
+            .read<SelectedItemsProvider>()
+            .selectedPolylines;
     final List<String> listSelectedSections =
-        selectedSections.map((polylineId) => polylineId.value).toList();
+    selectedSections.map((polylineId) => polylineId.value).toList();
     final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+        context
+            .read<SelectedItemsProvider>()
+            .selectedCatchments;
     final List<String> listSelectedCatchments =
-        selectedCatchments.map((circleId) => circleId.value).toList();
+    selectedCatchments.map((circleId) => circleId.value).toList();
     final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+        context
+            .read<SelectedItemsProvider>()
+            .selectedRegisters;
     final List<String> listSelectedRegisters =
-        selectedRegisters.map((circleId) => circleId.value).toList();
+    selectedRegisters.map((circleId) => circleId.value).toList();
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -331,9 +354,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   void processImages() {
     if (this.imagesFiles != null) {
-      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final token = Provider
+          .of<UserProvider>(context, listen: false)
+          .getToken;
       final taskListViewModel =
-          Provider.of<TaskListViewModel>(context, listen: false);
+      Provider.of<TaskListViewModel>(context, listen: false);
       this.imagesFiles!.forEach((image) async {
         try {
           final response = await taskListViewModel.uploadImage(
@@ -357,9 +382,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future updateTaskList() async {
     final userName =
-        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+        Provider
+            .of<TaskFilterProvider>(context, listen: false)
+            .userNameFilter;
     final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
+    Provider.of<TaskListViewModel>(context, listen: false);
     await taskListViewModel.initializeTasks(context, initStatus, userName);
   }
 
@@ -372,9 +399,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         Navigator.of(context).pop();
       },
       onEnablePressed: () async {
+        Navigator.of(context).pop();
         await handleAcceptOnShowDialogEditTask();
         resetSelectionOnMap();
-        Navigator.of(context).pop();
         Navigator.of(context).pop();
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
@@ -396,403 +423,426 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 36.0),
-              Text(
-                widget.detail
-                    ? AppLocalizations.of(context)!.createTaskPage_titleOnEdit
-                    : AppLocalizations.of(context)!.createTaskPage_title,
-                style: const TextStyle(fontSize: 32.0),
-              ),
-              const SizedBox(height: 20.0),
-              if (!widget.detail)
-                Column(
-                  children: [
-                    ToggleButtons(
-                      isSelected: [selectedIndex == 0, selectedIndex == 1],
-                      onPressed: (int index) {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                      },
-                      children: [
-                        Text(AppLocalizations.of(context)!
-                            .createTaskPage_scheduled),
-                        Text(AppLocalizations.of(context)!
-                            .createTaskPage_inspection),
-                      ],
-                    ),
-                    const SizedBox(height: 10.0),
-                  ],
-                ),
-              const SizedBox(height: 20.0),
-              if (selectedIndex == 1)
-                Column(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_numberWorkTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_placeHolderInputText,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: numWorkController,
-                    ),
-                    const SizedBox(height: 10.0),
-                    if (widget.detail)
+    return Consumer<TaskListViewModel>(
+        builder: (context, taskListViewModel, child) {
+          return LoadingOverlay(
+            isLoading: taskListViewModel.isLoading,
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: Container(
+                  margin:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 36.0),
                       Text(
-                        AppLocalizations.of(context)!.editTaskPage_statusTitle,
-                        style: const TextStyle(fontSize: 24.0),
+                        widget.detail
+                            ? AppLocalizations.of(context)!
+                            .createTaskPage_titleOnEdit
+                            : AppLocalizations.of(context)!
+                            .createTaskPage_title,
+                        style: const TextStyle(fontSize: 32.0),
                       ),
-                    DropdownButton<String>(
-                      value: taskStatus,
-                      onChanged: (String? value) {
-                        setState(() {
-                          taskStatus = value!;
-                        });
-                      },
-                      items: TaskStatus.values.map((TaskStatus status) {
-                        return DropdownMenuItem<String>(
-                          value: status.value,
-                          child: Text(status.value),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_startDateTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: startDate!,
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null) {
-                          handleStartDateChange(pickedDate);
-                        }
-                      },
-                      child: IgnorePointer(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .default_datepicker_hint,
-                          ),
-                          controller: addDateController,
-                          enabled: false,
-                          readOnly: true,
-                        ),
-                      ),
-                    ),
-                    if (widget.detail) const SizedBox(height: 10.0),
-                    if (widget.detail)
-                      Text(
-                        AppLocalizations.of(context)!
-                            .createTaskPage_realizationDateTitle,
-                        style: const TextStyle(fontSize: 24.0),
-                      ),
-                    if (widget.detail)
-                      InkWell(
-                        onTap: () async {
-                          final DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            initialDate: releasedDate!,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          );
-                          if (pickedDate != null) {
-                            handleReleasedDateChange(pickedDate);
-                          }
-                        },
-                        child: IgnorePointer(
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              hintText: AppLocalizations.of(context)!
-                                  .default_datepicker_hint,
+                      const SizedBox(height: 20.0),
+                      if (!widget.detail)
+                        Column(
+                          children: [
+                            ToggleButtons(
+                              isSelected: [
+                                selectedIndex == 0,
+                                selectedIndex == 1
+                              ],
+                              onPressed: (int index) {
+                                setState(() {
+                                  selectedIndex = index;
+                                });
+                              },
+                              children: [
+                                Text(AppLocalizations.of(context)!
+                                    .createTaskPage_scheduled),
+                                Text(AppLocalizations.of(context)!
+                                    .createTaskPage_inspection),
+                              ],
                             ),
-                            controller: releasedDateController,
-                            enabled: false,
-                          ),
+                            const SizedBox(height: 10.0),
+                          ],
                         ),
-                      ),
-                    if (widget.detail) const SizedBox(height: 10.0),
-                    MapModal(),
-                    Consumer<SelectedItemsProvider>(
-                      builder: (context, selectedItemsProvider, child) {
-                        final selectedSections =
-                            selectedItemsProvider.selectedPolylines.toList();
-                        final selectedCatchments =
-                            selectedItemsProvider.selectedCatchments.toList();
-                        final selectedRegisters =
-                            selectedItemsProvider.selectedRegisters.toList();
-
-                        return selectedSections.isNotEmpty
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context)!.elementsTitle,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
+                      const SizedBox(height: 20.0),
+                      if (selectedIndex == 1)
+                        Column(
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_numberWorkTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_placeHolderInputText,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: numWorkController,
+                            ),
+                            const SizedBox(height: 10.0),
+                            if (widget.detail)
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .editTaskPage_statusTitle,
+                                style: const TextStyle(fontSize: 24.0),
+                              ),
+                            DropdownButton<String>(
+                              value: taskStatus,
+                              onChanged: (String? value) {
+                                setState(() {
+                                  taskStatus = value!;
+                                });
+                              },
+                              items: TaskStatus.values.map((TaskStatus status) {
+                                return DropdownMenuItem<String>(
+                                  value: status.value,
+                                  child: Text(status.value),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_startDateTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                final DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: startDate!,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (pickedDate != null) {
+                                  handleStartDateChange(pickedDate);
+                                }
+                              },
+                              child: IgnorePointer(
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    hintText: AppLocalizations.of(context)!
+                                        .default_datepicker_hint,
                                   ),
-                                  const SizedBox(height: 10),
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: [
-                                        Text("tramos: "),
-                                        for (var sectionId in selectedSections)
-                                          EntityIdContainer(
-                                              id: sectionId.value),
-                                        const SizedBox(height: 10),
-                                        Text("captaciones: "),
-                                        for (var catchmentId
-                                            in selectedCatchments)
-                                          EntityIdContainer(
-                                              id: catchmentId.value),
-                                        const SizedBox(height: 10),
-                                        Text("registros: "),
-                                        for (var registerId
-                                            in selectedRegisters)
-                                          EntityIdContainer(
-                                              id: registerId.value),
-                                      ],
+                                  controller: addDateController,
+                                  enabled: false,
+                                  readOnly: true,
+                                ),
+                              ),
+                            ),
+                            if (widget.detail) const SizedBox(height: 10.0),
+                            if (widget.detail)
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .createTaskPage_realizationDateTitle,
+                                style: const TextStyle(fontSize: 24.0),
+                              ),
+                            if (widget.detail)
+                              InkWell(
+                                onTap: () async {
+                                  final DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: releasedDate!,
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2100),
+                                  );
+                                  if (pickedDate != null) {
+                                    handleReleasedDateChange(pickedDate);
+                                  }
+                                },
+                                child: IgnorePointer(
+                                  child: TextFormField(
+                                    decoration: InputDecoration(
+                                      hintText: AppLocalizations.of(context)!
+                                          .default_datepicker_hint,
                                     ),
+                                    controller: releasedDateController,
+                                    enabled: false,
+                                  ),
+                                ),
+                              ),
+                            if (widget.detail) const SizedBox(height: 10.0),
+                            MapModal(),
+                            Consumer<SelectedItemsProvider>(
+                              builder: (context, selectedItemsProvider, child) {
+                                final selectedSections = selectedItemsProvider
+                                    .selectedPolylines
+                                    .toList();
+                                final selectedCatchments = selectedItemsProvider
+                                    .selectedCatchments
+                                    .toList();
+                                final selectedRegisters = selectedItemsProvider
+                                    .selectedRegisters
+                                    .toList();
+
+                                return selectedSections.isNotEmpty
+                                    ? Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!
+                                          .elementsTitle,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: [
+                                          Text("tramos: "),
+                                          for (var sectionId
+                                          in selectedSections)
+                                            EntityIdContainer(
+                                                id: sectionId.value),
+                                          const SizedBox(height: 10),
+                                          Text("captaciones: "),
+                                          for (var catchmentId
+                                          in selectedCatchments)
+                                            EntityIdContainer(
+                                                id: catchmentId.value),
+                                          const SizedBox(height: 10),
+                                          Text("registros: "),
+                                          for (var registerId
+                                          in selectedRegisters)
+                                            EntityIdContainer(
+                                                id: registerId.value),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                                    : Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!
+                                          .elementsTitle,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_selectUbicationTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_placeHolderInputText,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: locationController,
+                            ),
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_assignedUserTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            if (!widget.detail)
+                              DropdownButton<String>(
+                                value: userAssigned,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    userAssigned = value!;
+                                  });
+                                },
+                                items: [
+                                  DropdownMenuItem<String>(
+                                    value: 'not-assigned',
+                                    child: Text(AppLocalizations.of(context)!
+                                        .default_dropdown_label),
+                                  ),
+                                  const DropdownMenuItem<String>(
+                                    value: 'gtau-oper',
+                                    child: Text('gtau-oper'),
+                                  ),
+                                  const DropdownMenuItem<String>(
+                                    value: 'gtau-admin',
+                                    child: Text('gtau-oper'),
+                                  ),
+                                  const DropdownMenuItem<String>(
+                                    value: 'operario3',
+                                    child: Text('Operario C'),
                                   ),
                                 ],
-                              )
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context)!.elementsTitle,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              );
-                      },
-                    ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_selectUbicationTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_placeHolderInputText,
-                        border: const OutlineInputBorder(),
+                              ),
+                            const SizedBox(height: 10.0),
+                            if (widget.detail)
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: AppLocalizations.of(context)!
+                                      .default_placeHolderInputText,
+                                  border: const OutlineInputBorder(),
+                                ),
+                                controller: userAssignedController,
+                              ),
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_solicitantTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_placeHolderInputText,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: applicantController,
+                            ),
+                            const SizedBox(height: 10.0)
+                          ],
+                        ),
+                      if (selectedIndex == 0)
+                        Column(
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_scheduled,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_placeHolderInputText,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: scheduledNumberController,
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 10.0),
+                      Text(
+                        AppLocalizations.of(context)!.default_descriptionTitle,
+                        style: const TextStyle(fontSize: 24.0),
                       ),
-                      controller: locationController,
-                    ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_assignedUserTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    if (!widget.detail)
-                      DropdownButton<String>(
-                        value: userAssigned,
-                        onChanged: (String? value) {
-                          setState(() {
-                            userAssigned = value!;
-                          });
-                        },
-                        items: [
-                          DropdownMenuItem<String>(
-                            value: 'not-assigned',
-                            child: Text(AppLocalizations.of(context)!
-                                .default_dropdown_label),
-                          ),
-                          const DropdownMenuItem<String>(
-                            value: 'gtau-oper',
-                            child: Text('gtau-oper'),
-                          ),
-                          const DropdownMenuItem<String>(
-                            value: 'gtau-admin',
-                            child: Text('gtau-oper'),
-                          ),
-                          const DropdownMenuItem<String>(
-                            value: 'operario3',
-                            child: Text('Operario C'),
-                          ),
-                        ],
-                      ),
-                    const SizedBox(height: 10.0),
-                    if (widget.detail)
                       TextFormField(
                         decoration: InputDecoration(
                           hintText: AppLocalizations.of(context)!
-                              .default_placeHolderInputText,
+                              .default_descriptionPlaceholder,
                           border: const OutlineInputBorder(),
                         ),
-                        controller: userAssignedController,
+                        controller: descriptionController,
                       ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_solicitantTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_placeHolderInputText,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: applicantController,
-                    ),
-                    const SizedBox(height: 10.0)
-                  ],
-                ),
-              if (selectedIndex == 0)
-                Column(
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.createTaskPage_scheduled,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_placeHolderInputText,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: scheduledNumberController,
-                    ),
-                  ],
-                ),
-              const SizedBox(height: 10.0),
-              Text(
-                AppLocalizations.of(context)!.default_descriptionTitle,
-                style: const TextStyle(fontSize: 24.0),
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!
-                      .default_descriptionPlaceholder,
-                  border: const OutlineInputBorder(),
-                ),
-                controller: descriptionController,
-              ),
-              if (widget.detail)
-                Column(
-                  children: [
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_longitudeTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_descriptionPlaceholder,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: lengthController,
-                    ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_materialTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_descriptionPlaceholder,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: materialController,
-                    ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_observationsTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_descriptionPlaceholder,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: observationsController,
-                    ),
-                    const SizedBox(height: 10.0),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_conclusionsTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_descriptionPlaceholder,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: conclusionsController,
-                    ),
-                  ],
-                ),
-              UserImage(
-                  onFileChanged: (imagesFiles) {
-                    this.imagesFiles = imagesFiles;
-                  },
-                  idTask: widget.idTask),
-              ImageGalleryModal(idTask: widget.idTask!),
-              Container(
-                height: 50.0,
-                margin: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (widget.detail)
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                      if (widget.detail)
+                        Column(
+                          children: [
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_longitudeTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_descriptionPlaceholder,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: lengthController,
+                            ),
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_materialTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_descriptionPlaceholder,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: materialController,
+                            ),
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_observationsTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_descriptionPlaceholder,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: observationsController,
+                            ),
+                            const SizedBox(height: 10.0),
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .createTaskPage_conclusionsTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(context)!
+                                    .default_descriptionPlaceholder,
+                                border: const OutlineInputBorder(),
+                              ),
+                              controller: conclusionsController,
+                            ),
+                          ],
                         ),
-                        onPressed: handleCancel,
-                        child: Text(
-                            AppLocalizations.of(context)!.buttonCancelLabel),
+                      UserImage(
+                          onFileChanged: (imagesFiles) {
+                            this.imagesFiles = imagesFiles;
+                          },
+                          idTask: widget.idTask),
+                      ImageGalleryModal(idTask: widget.idTask!),
+                      Container(
+                        height: 50.0,
+                        margin: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (widget.detail)
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                ),
+                                onPressed: handleCancel,
+                                child: Text(AppLocalizations.of(context)!
+                                    .buttonCancelLabel),
+                              ),
+                            const SizedBox(width: 10.0),
+                            ElevatedButton(
+                              onPressed:
+                              widget.detail ? handleEditTask : handleSubmit,
+                              child: widget.detail
+                                  ? Text(AppLocalizations.of(context)!
+                                  .buttonAcceptLabel)
+                                  : Text(AppLocalizations.of(context)!
+                                  .createTaskPage_submitButton),
+                            ),
+                          ],
+                        ),
                       ),
-                    const SizedBox(width: 10.0),
-                    ElevatedButton(
-                      onPressed: widget.detail ? handleEditTask : handleSubmit,
-                      child: widget.detail
-                          ? Text(
-                              AppLocalizations.of(context)!.buttonAcceptLabel)
-                          : Text(AppLocalizations.of(context)!
-                              .createTaskPage_submitButton),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 }
 

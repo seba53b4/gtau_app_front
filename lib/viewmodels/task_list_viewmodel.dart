@@ -61,7 +61,6 @@ class TaskListViewModel extends ChangeNotifier {
           await _taskService.getTasks(token!, userName!, page, size, status);
 
       _tasks[status] = responseListTask!;
-      notifyListeners();
 
       return responseListTask;
     } catch (error) {
@@ -74,17 +73,15 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> deleteTask(BuildContext context, int id) async {
-    final token = context.read<UserProvider>().getToken;
+  Future<bool> deleteTask(String token, int id) async {
     try {
       _isLoading = true;
       _error = false;
       notifyListeners();
-      final response = await _taskService.deleteTask(token!, id);
+      final response = await _taskService.deleteTask(token, id);
 
       if (response) {
         print('Tarea ha sido eliminada correctamente');
-        notifyListeners();
         return true;
       } else {
         print('No se pudo eliminar la tarea');
@@ -107,7 +104,6 @@ class TaskListViewModel extends ChangeNotifier {
       notifyListeners();
       final responseTask = await _taskService.fetchTask(token, idTask);
       if (responseTask != null) {
-        notifyListeners();
         return responseTask;
       } else {
         if (kDebugMode) {
@@ -136,7 +132,6 @@ class TaskListViewModel extends ChangeNotifier {
       final List<String> responseTask =
           await _taskService.fetchTaskImages(token, idTask);
       if (responseTask != []) {
-        notifyListeners();
         return responseTask;
       } else {
         _error = true;
