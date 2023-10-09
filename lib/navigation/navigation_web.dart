@@ -75,6 +75,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         body: Row(
       children: [
         NavigationRail(
+          backgroundColor: Color.fromRGBO(200, 217, 184, 1),
           destinations: optionsNav,
           selectedIndex: myCurrentIndex, // Índice seleccionado inicialmente
           onDestinationSelected: (int index) {
