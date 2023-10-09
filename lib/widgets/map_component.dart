@@ -53,6 +53,7 @@ class _MapComponentState extends State<MapComponent> {
   double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
+  SelectedItemsProvider? selectedItemsProvider;
 
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
@@ -71,6 +72,16 @@ class _MapComponentState extends State<MapComponent> {
     setState(() {
       mapWidth = mapInit;
     });
+    selectedItemsProvider = context.read<SelectedItemsProvider>();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (selectedItemsProvider != null) {
+      selectedItemsProvider!.reset();
+    }
   }
 
   Future<void> _initializeLocation() async {
