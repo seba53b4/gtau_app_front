@@ -7,6 +7,8 @@ import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:provider/provider.dart';
 
+import '../constants/theme_constants.dart';
+
 class NavigationWeb extends StatefulWidget {
   const NavigationWeb({super.key});
 
@@ -75,6 +77,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         body: Row(
       children: [
         NavigationRail(
+          backgroundColor: navColor,
           destinations: optionsNav,
           selectedIndex: myCurrentIndex, // Índice seleccionado inicialmente
           onDestinationSelected: (int index) {

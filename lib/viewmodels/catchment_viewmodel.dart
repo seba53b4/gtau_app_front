@@ -18,6 +18,10 @@ class CatchmentViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  bool _error = false;
+
+  bool get error => _error;
+
   Future<List<Catchment>?> fetchCatchmentsByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
@@ -29,11 +33,14 @@ class CatchmentViewModel extends ChangeNotifier {
         _catchments = responseListSection;
       }
       _isLoading = false;
-      notifyListeners();
       return responseListSection;
     } catch (error) {
+      _error = true;
       print(error);
       throw Exception('Error al obtener los datos: $error');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -48,14 +55,17 @@ class CatchmentViewModel extends ChangeNotifier {
         _catchmentForDetail = responseCatchment;
       }
       _isLoading = false;
-      notifyListeners();
+
       return responseCatchment;
     } catch (error) {
-      _isLoading = false;
+      _error = true;
       if (kDebugMode) {
         print('Error al obtener captaciones: $error');
       }
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 }
