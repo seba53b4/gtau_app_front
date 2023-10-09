@@ -18,6 +18,10 @@ class SectionViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  bool _error = false;
+
+  bool get error => _error;
+
   Future<List<Section>?> fetchSectionsByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
@@ -28,14 +32,14 @@ class SectionViewModel extends ChangeNotifier {
       if (responseListSection != null) {
         _sections = responseListSection;
       }
-      _isLoading = false;
-      notifyListeners();
-
       return responseListSection;
     } catch (error) {
       print(error);
-      _isLoading = false;
+      _error = true;
       throw Exception('Error al obtener los datos: $error');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -49,16 +53,16 @@ class SectionViewModel extends ChangeNotifier {
       if (responseSection != null) {
         _sectionForDetail = responseSection;
       }
-      _isLoading = false;
-      notifyListeners();
-
       return responseSection;
     } catch (error) {
-      _isLoading = false;
+      _error = true;
       if (kDebugMode) {
         print('Error al obtener tramos: $error');
       }
       rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

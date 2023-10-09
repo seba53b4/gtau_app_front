@@ -8,11 +8,14 @@ import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/images_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:provider/provider.dart';
 import "package:universal_html/html.dart" as html;
+
+import 'constants/theme_constants.dart';
 
 Future<void> main() async {
   await dotenv.load(
@@ -38,6 +41,9 @@ Future<void> main() async {
         ChangeNotifierProvider<TaskListViewModel>(
           create: (context) => TaskListViewModel(),
         ),
+        ChangeNotifierProvider<ImagesViewModel>(
+          create: (context) => ImagesViewModel(),
+        ),
         ChangeNotifierProvider<AuthViewModel>(
           create: (context) => AuthViewModel(),
         ),
@@ -60,9 +66,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: LoginScreen(),
-    );
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: LoginScreen(),
+        theme: defaultTheme);
   }
 }
