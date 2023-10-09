@@ -4,6 +4,8 @@ import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
 
+import '../constants/theme_constants.dart';
+
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({super.key});
 
@@ -35,6 +37,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
     return Scaffold(
         bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: navColor,
             currentIndex: myCurrentIndex,
             onTap: (value) {
               setState(() {

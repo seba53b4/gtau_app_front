@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 Color baseColor = const Color.fromRGBO(200, 217, 184, 0.25);
 Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
+Color navColor = const Color.fromRGBO(200, 217, 184, 1);
 
 ThemeData defaultTheme = ThemeData(
   primaryColor: baseColor,
