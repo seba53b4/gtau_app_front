@@ -110,7 +110,6 @@ class SelectedItemsProvider with ChangeNotifier {
     _selectedCatchments.clear();
     _selectedSections.clear();
     _selectedRegisters.clear();
-    notifyListeners();
   }
 
   void reset() {

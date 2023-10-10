@@ -79,7 +79,7 @@ class _MapComponentState extends State<MapComponent> {
   void dispose() {
     super.dispose();
 
-    if (selectedItemsProvider != null) {
+    if (selectedItemsProvider != null && !widget.isModal) {
       selectedItemsProvider!.reset();
     }
   }
