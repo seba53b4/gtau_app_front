@@ -5,6 +5,7 @@ Color baseColor = const Color.fromRGBO(200, 217, 184, 0.25);
 Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
 Color navColor = const Color.fromRGBO(200, 217, 184, 1);
 Color lightBackground = const Color.fromRGBO(253, 255, 252, 1);
+Color redColor = const Color.fromRGBO(219, 49, 13, 1);
 
 MaterialColor primarySwatch = const MaterialColor(
   0xFF60A61B,
@@ -26,10 +27,6 @@ ThemeData defaultTheme = ThemeData(
   primaryColor: baseColor,
   primarySwatch: primarySwatch,
   textTheme: TextTheme(
-    displayLarge: const TextStyle(
-      fontSize: 68,
-      fontWeight: FontWeight.bold,
-    ),
     titleLarge: GoogleFonts.sora(
       fontSize: 30,
       fontStyle: FontStyle.italic,
@@ -37,15 +34,14 @@ ThemeData defaultTheme = ThemeData(
     titleSmall: GoogleFonts.sora(
       fontSize: 5,
     ),
-
-    bodyMedium: GoogleFonts.merriweather(
-      //Ej: Tamaño del titulo PipeTracker en login
+    bodyMedium: GoogleFonts.sora(
       fontSize: 20,
     ),
-    //Ej: Tamaño del placeholder 'Nombre de usuario'
     titleMedium: GoogleFonts.sora(
       fontSize: 15,
     ),
-    displaySmall: GoogleFonts.sora(),
+    displaySmall: GoogleFonts.sora(
+      fontSize: 14,
+    ),
   ),
 );

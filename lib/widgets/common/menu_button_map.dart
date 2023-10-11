@@ -9,6 +9,8 @@ class MenuElevatedButton extends StatefulWidget {
   final bool colorChangeOnPress;
   final String? text;
   final String tooltipMessage;
+  final Color? colorSelected;
+  final Color? colorNotSelected;
 
   const MenuElevatedButton({
     Key? key,
@@ -17,6 +19,8 @@ class MenuElevatedButton extends StatefulWidget {
     this.colorChangeOnPress = false,
     this.text,
     required this.tooltipMessage,
+    this.colorSelected,
+    this.colorNotSelected,
   }) : super(key: key);
 
   @override
@@ -33,6 +37,12 @@ class _State extends State<MenuElevatedButton> {
     double circleSize = 48;
     if (kIsWeb) {
       circleSize = 56;
+    }
+    if (widget.colorNotSelected != null) {
+      colorNotSelected = widget.colorNotSelected!;
+    }
+    if (widget.colorSelected != null) {
+      colorSelected = widget.colorSelected!;
     }
     return ElevatedButton(
       onPressed: () {
@@ -56,11 +66,13 @@ class _State extends State<MenuElevatedButton> {
         verticalOffset: 14,
         waitDuration: const Duration(seconds: 1),
         child: widget.text != null
-            ? Text(widget.text!)
+            ? Text(
+          widget.text!,
+        )
             : Icon(
-                widget.icon,
-                color: isSelected ? colorSelected : colorNotSelected,
-              ),
+          widget.icon,
+          color: isSelected ? colorSelected : colorNotSelected,
+        ),
       ),
     );
   }
