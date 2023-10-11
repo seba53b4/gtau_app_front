@@ -8,7 +8,7 @@ class MenuElevatedButton extends StatefulWidget {
   final IconData? icon;
   final bool colorChangeOnPress;
   final String? text;
-  final String tooltipMessage;
+  final String? tooltipMessage;
   final Color? colorSelected;
   final Color? colorNotSelected;
 
@@ -18,7 +18,7 @@ class MenuElevatedButton extends StatefulWidget {
     this.icon,
     this.colorChangeOnPress = false,
     this.text,
-    required this.tooltipMessage,
+    this.tooltipMessage,
     this.colorSelected,
     this.colorNotSelected,
   }) : super(key: key);
@@ -60,7 +60,8 @@ class _State extends State<MenuElevatedButton> {
         foregroundColor: isSelected ? colorSelected : colorNotSelected,
         backgroundColor: isSelected ? colorNotSelected : colorSelected,
       ),
-      child: Tooltip(
+      child: widget.tooltipMessage != null ?
+      Tooltip(
         message: widget.tooltipMessage,
         preferBelow: false,
         verticalOffset: 14,
@@ -73,7 +74,15 @@ class _State extends State<MenuElevatedButton> {
           widget.icon,
           color: isSelected ? colorSelected : colorNotSelected,
         ),
+      ) : widget.text != null
+          ? Text(
+        widget.text!,
+      )
+          : Icon(
+        widget.icon,
+        color: isSelected ? colorSelected : colorNotSelected,
       ),
+
     );
   }
 }

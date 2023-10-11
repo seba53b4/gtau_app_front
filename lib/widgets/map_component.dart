@@ -498,7 +498,7 @@ class _MapComponentState extends State<MapComponent> {
                                     ? Icons.map
                                     : Icons.satellite,
                               ),
-                              if (kIsWeb) const SizedBox(height: 6),
+                              const SizedBox(height: 6),
                               MenuElevatedButton(
                                 onPressed: () async {
                                   await fetchAndUpdateData(token!);
@@ -507,7 +507,7 @@ class _MapComponentState extends State<MapComponent> {
                                     .map_component_fetch_elements,
                                 icon: Icons.area_chart_outlined,
                               ),
-                              if (kIsWeb) SizedBox(height: 6),
+                              SizedBox(height: 6),
                               MenuElevatedButton(
                                   onPressed: () {
                                     getCurrentLocation();
@@ -516,7 +516,7 @@ class _MapComponentState extends State<MapComponent> {
                                   icon: Icons.my_location,
                                   tooltipMessage: AppLocalizations.of(context)!
                                       .map_component_get_location),
-                              if (kIsWeb) SizedBox(height: 6),
+                              SizedBox(height: 6),
                               MenuElevatedButton(
                                 colorChangeOnPress: true,
                                 onPressed: () {
@@ -532,7 +532,7 @@ class _MapComponentState extends State<MapComponent> {
                                     .map_component_select_location,
                                 icon: Icons.location_pin,
                               ),
-                              if (kIsWeb) const SizedBox(height: 6),
+                              const SizedBox(height: 6),
                               MenuElevatedButton(
                                 onPressed: () {
                                   setState(() {
@@ -545,23 +545,21 @@ class _MapComponentState extends State<MapComponent> {
                                 text: distances[distanceSelected],
                               ),
                               if (!kIsWeb && !widget.isModal)
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    if (isSomeElementSelected() &&
-                                        elementSelectedType != null) {
-                                      showElementModal(
-                                        context,
-                                        elementSelectedType!,
-                                        () {},
-                                      );
-                                      await _fetchElementInfo();
-                                    }
-                                  },
-                                  child: const Icon(
-                                    Icons.list_alt,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                const SizedBox(height: 6),
+                              MenuElevatedButton(
+                                onPressed: () async {
+                                  if (isSomeElementSelected() &&
+                                      elementSelectedType != null) {
+                                    showElementModal(
+                                      context,
+                                      elementSelectedType!,
+                                      () {},
+                                    );
+                                    await _fetchElementInfo();
+                                  }
+                                },
+                                icon: Icons.list_alt,
+                              ),
                             ],
                           ),
                         ),
