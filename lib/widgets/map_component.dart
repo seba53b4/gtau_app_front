@@ -182,9 +182,11 @@ class _MapComponentState extends State<MapComponent> {
           selectedItemsProvider.isSomeRegisterSelected())) {
         if (selectedItemsProvider.isSomeSectionSelected()) {
           selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
-          isDetailsButtonVisible=false;
-          if (kIsWeb) {
-            viewDetailElementInfo = false;
+          if(section.ogcFid == elementSelectedId){
+            isDetailsButtonVisible=false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
           }
         } else {
           selectedItemsProvider.clearAllSelections();
@@ -571,6 +573,9 @@ class _MapComponentState extends State<MapComponent> {
                                     final selectedItemsProvider = context.read<SelectedItemsProvider>();
                                     selectedItemsProvider.clearAllSelections();
                                     isDetailsButtonVisible=false;
+                                    if (kIsWeb) {
+                                      viewDetailElementInfo = false;
+                                    }
                                     polylines = {};
                                     circles = {};
                                     locationManual = !locationManual;
