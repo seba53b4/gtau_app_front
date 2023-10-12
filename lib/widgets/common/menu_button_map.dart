@@ -34,9 +34,11 @@ class _State extends State<MenuElevatedButton> {
 
   @override
   Widget build(BuildContext context) {
-    double circleSize = 48;
+    double circleSize = 42;
+    double sizeIcon = 22;
     if (kIsWeb) {
       circleSize = 56;
+      sizeIcon = 24;
     }
     if (widget.colorNotSelected != null) {
       colorNotSelected = widget.colorNotSelected!;
@@ -60,29 +62,31 @@ class _State extends State<MenuElevatedButton> {
         foregroundColor: isSelected ? colorSelected : colorNotSelected,
         backgroundColor: isSelected ? colorNotSelected : colorSelected,
       ),
-      child: widget.tooltipMessage != null ?
-      Tooltip(
-        message: widget.tooltipMessage,
-        preferBelow: false,
-        verticalOffset: 14,
-        waitDuration: const Duration(seconds: 1),
-        child: widget.text != null
-            ? Text(
-          widget.text!,
-        )
-            : Icon(
-          widget.icon,
-          color: isSelected ? colorSelected : colorNotSelected,
-        ),
-      ) : widget.text != null
-          ? Text(
-        widget.text!,
-      )
-          : Icon(
-        widget.icon,
-        color: isSelected ? colorSelected : colorNotSelected,
-      ),
-
+      child: widget.tooltipMessage != null
+          ? Tooltip(
+              message: widget.tooltipMessage,
+              preferBelow: false,
+              verticalOffset: 14,
+              waitDuration: const Duration(seconds: 1),
+              child: widget.text != null
+                  ? Text(
+                      widget.text!,
+                    )
+                  : Icon(
+                      widget.icon,
+                      size: sizeIcon,
+                      color: isSelected ? colorSelected : colorNotSelected,
+                    ),
+            )
+          : widget.text != null
+              ? Text(
+                  widget.text!,
+                )
+              : Icon(
+                  widget.icon,
+                  size: sizeIcon,
+                  color: isSelected ? colorSelected : colorNotSelected,
+                ),
     );
   }
 }
