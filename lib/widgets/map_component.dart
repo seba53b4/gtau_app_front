@@ -20,6 +20,7 @@ import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
 import 'common/menu_button_map.dart';
+import 'common/menu_button_map_options.dart';
 import 'element_detail_modal.dart';
 import 'element_detail_web.dart';
 
@@ -54,6 +55,9 @@ class _MapComponentState extends State<MapComponent> {
   double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
+
+  // Indices { S, R, C, P};
+  Set<int> selectedIndices = {0, 1, 2};
 
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
@@ -373,31 +377,61 @@ class _MapComponentState extends State<MapComponent> {
     return setCir;
   }
 
+  List<Future> getElementFutureSelected(String token) {
+    List<Future> futures = [];
+    // Agregar tramos a búsqueda
+    if (selectedIndices.contains(0)) {
+      futures.add(fetchSectionsPolylines(token));
+    }
+    // Agregar tramos a búsqueda
+    if (selectedIndices.contains(1)) {
+      futures.add(fetchRegistersCircles(token));
+    }
+    // Agregar tramos a búsqueda
+    if (selectedIndices.contains(2)) {
+      futures.add(fetchCatchmentsCircles(token));
+    }
+    if (selectedIndices.contains(3)) {
+      //result.add(fetchSectionsPolylines(token));
+    }
+    return futures;
+  }
+
   Future<void> fetchAndUpdateData(String token) async {
     List<Section>? fetchedSections;
     List<Register>? fetchedRegisters;
     List<Catchment>? fetchedCatchments;
 
-    await Future.wait([
-      fetchSectionsPolylines(token),
-      fetchRegistersCircles(token),
-      fetchCatchmentsCircles(token),
-    ]).then((responses) {
-      fetchedSections = responses[0]?.cast<Section>();
-      fetchedRegisters = responses[1]?.cast<Register>();
-      fetchedCatchments = responses[2]?.cast<Catchment>();
+    List<Future> futuresElementSelected = getElementFutureSelected(token);
+    await Future.wait(futuresElementSelected).then((responses) {
+      int iter = 0;
+      if (selectedIndices.contains(0)) {
+        fetchedSections = responses[iter]?.cast<Section>();
+        iter++;
+      }
+      if (selectedIndices.contains(1)) {
+        fetchedRegisters = responses[iter]?.cast<Register>();
+        iter++;
+      }
+      if (selectedIndices.contains(2)) {
+        fetchedCatchments = responses[iter]?.cast<Catchment>();
+        iter++;
+      }
     }).catchError((error) {
       // Manejo de error
     });
 
-    if (fetchedSections != null &&
-        fetchedRegisters != null &&
-        fetchedCatchments != null) {
-      setState(() {
-        polylines = getPolylines(fetchedSections!);
-        circles = getCircles(fetchedCatchments!, fetchedRegisters!);
-      });
-    }
+    setState(() {
+      polylines = getPolylines(fetchedSections);
+      circles = getCircles(fetchedCatchments, fetchedRegisters);
+    });
+  }
+
+  void handleIconsSelected(Set<int> indices) {
+    setState(() {
+      selectedIndices = indices;
+    });
+    print(selectedIndices.toString());
   }
 
   @override
@@ -543,6 +577,14 @@ class _MapComponentState extends State<MapComponent> {
                                 tooltipMessage: AppLocalizations.of(context)!
                                     .map_component_diameter_tooltip,
                                 text: distances[distanceSelected],
+                              ),
+                              MultiSelectPopupMenuButton(
+                                icons: [
+                                  Icons.ac_unit,
+                                  Icons.assessment,
+                                  Icons.airline_seat_flat_angled_outlined
+                                ],
+                                onIconsSelected: handleIconsSelected,
                               ),
                               if (kIsWeb) const SizedBox(height: 6),
                               if (!kIsWeb && !widget.isModal)

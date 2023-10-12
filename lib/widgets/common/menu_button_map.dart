@@ -34,12 +34,9 @@ class _State extends State<MenuElevatedButton> {
 
   @override
   Widget build(BuildContext context) {
-    double circleSize = 42;
-    double sizeIcon = 22;
-    if (kIsWeb) {
-      circleSize = 56;
-      sizeIcon = 24;
-    }
+    double circleSize = kIsWeb ? 56 : 42;
+    double sizeIcon = kIsWeb ? 24 : 22;
+
     if (widget.colorNotSelected != null) {
       colorNotSelected = widget.colorNotSelected!;
     }
