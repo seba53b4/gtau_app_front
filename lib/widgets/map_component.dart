@@ -180,8 +180,8 @@ class _MapComponentState extends State<MapComponent> {
           selectedItemsProvider.isSomeRegisterSelected())) {
         if (selectedItemsProvider.isSomeSectionSelected()) {
           selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
-          if(section.ogcFid == elementSelectedId){
-            isDetailsButtonVisible=false;
+          if (section.ogcFid == elementSelectedId) {
+            isDetailsButtonVisible = false;
             if (kIsWeb) {
               viewDetailElementInfo = false;
             }
@@ -192,7 +192,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = section.ogcFid;
             elementSelectedType = ElementType.section;
-            isDetailsButtonVisible=true;
+            isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -215,8 +215,8 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeCatchmentSelected()) {
           selectedItemsProvider
               .toggleCatchmentSelected(catchment.point!.circleId);
-          if(catchment.ogcFid == elementSelectedId){
-            isDetailsButtonVisible=false;
+          if (catchment.ogcFid == elementSelectedId) {
+            isDetailsButtonVisible = false;
             if (kIsWeb) {
               viewDetailElementInfo = false;
             }
@@ -228,7 +228,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = catchment.ogcFid;
             elementSelectedType = ElementType.catchment;
-            isDetailsButtonVisible=true;
+            isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -256,8 +256,8 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeRegisterSelected()) {
           selectedItemsProvider
               .toggleRegistroSelected(register.point!.circleId);
-          if(register.ogcFid == elementSelectedId){
-            isDetailsButtonVisible=false;
+          if (register.ogcFid == elementSelectedId) {
+            isDetailsButtonVisible = false;
             if (kIsWeb) {
               viewDetailElementInfo = false;
             }
@@ -269,7 +269,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = register.ogcFid;
             elementSelectedType = ElementType.register;
-            isDetailsButtonVisible=true;
+            isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -333,9 +333,8 @@ class _MapComponentState extends State<MapComponent> {
     });
   }
 
-  void _clearMarkers() {
+  void _clearMarkersGPS() {
     setState(() {
-      markers.clear();
       markersGPS.clear();
     });
   }
@@ -508,10 +507,10 @@ class _MapComponentState extends State<MapComponent> {
                       LoadingOverlay(
                         isLoading: isMapLoading && !viewDetailElementInfo,
                         child: Positioned(
-                          top: kIsWeb? null : 80,
-                          right: kIsWeb? null : 16,
-                          bottom: kIsWeb? 80 : null,
-                          left: kIsWeb? 16 : null,
+                          top: kIsWeb ? null : 80,
+                          right: kIsWeb ? null : 16,
+                          bottom: kIsWeb ? 80 : null,
+                          left: kIsWeb ? 16 : null,
                           child: Column(
                             children: [
                               ElevatedButton(
@@ -558,8 +557,13 @@ class _MapComponentState extends State<MapComponent> {
                               if (kIsWeb) SizedBox(height: 6),
                               ElevatedButton(
                                 onPressed: () {
+                                  markersGPS.clear();
                                   getCurrentLocation();
                                   _getMarkers();
+                                  setState(() {
+                                    polylines = {};
+                                    circles = {};
+                                  });
                                 },
                                 child: Tooltip(
                                   message: AppLocalizations.of(context)!
@@ -582,9 +586,11 @@ class _MapComponentState extends State<MapComponent> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+                                    markersGPS.clear();
+                                    final selectedItemsProvider =
+                                        context.read<SelectedItemsProvider>();
                                     selectedItemsProvider.clearAllSelections();
-                                    isDetailsButtonVisible=false;
+                                    isDetailsButtonVisible = false;
                                     if (kIsWeb) {
                                       viewDetailElementInfo = false;
                                     }
@@ -626,8 +632,8 @@ class _MapComponentState extends State<MapComponent> {
                               ),
                               if (!kIsWeb && !widget.isModal)
                                 Visibility(
-                                  visible:isDetailsButtonVisible,
-                                  child:ElevatedButton(
+                                  visible: isDetailsButtonVisible,
+                                  child: ElevatedButton(
                                     onPressed: () async {
                                       if (isSomeElementSelected() &&
                                           elementSelectedType != null) {
@@ -644,7 +650,7 @@ class _MapComponentState extends State<MapComponent> {
                                       color: Colors.white,
                                     ),
                                   ),
-                              )
+                                )
                             ],
                           ),
                         ),
