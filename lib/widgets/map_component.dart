@@ -560,6 +560,10 @@ class _MapComponentState extends State<MapComponent> {
                                   markersGPS.clear();
                                   getCurrentLocation();
                                   _getMarkers();
+                                  setState(() {
+                                    polylines = {};
+                                    circles = {};
+                                  });
                                 },
                                 child: Tooltip(
                                   message: AppLocalizations.of(context)!
