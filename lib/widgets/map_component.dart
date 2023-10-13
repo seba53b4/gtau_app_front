@@ -217,6 +217,12 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeCatchmentSelected()) {
           selectedItemsProvider
               .toggleCatchmentSelected(catchment.point!.circleId);
+          if(catchment.ogcFid == elementSelectedId){
+            isDetailsButtonVisible=false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
@@ -224,6 +230,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = catchment.ogcFid;
             elementSelectedType = ElementType.catchment;
+            isDetailsButtonVisible=true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -251,6 +258,12 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeRegisterSelected()) {
           selectedItemsProvider
               .toggleRegistroSelected(register.point!.circleId);
+          if(register.ogcFid == elementSelectedId){
+            isDetailsButtonVisible=false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
@@ -258,6 +271,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = register.ogcFid;
             elementSelectedType = ElementType.register;
+            isDetailsButtonVisible=true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
