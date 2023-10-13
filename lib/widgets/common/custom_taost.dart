@@ -35,7 +35,7 @@ class CustomToast {
 
     scaffold.showSnackBar(
       SnackBar(
-        width: kIsWeb ? screenWidth * 0.24 : screenWidth * 0.8,
+        width: kIsWeb ? 400 : screenWidth * 0.8,
         showCloseIcon: true,
         closeIconColor: Colors.white,
         backgroundColor: backgroundColor ?? Colors.grey[800],

@@ -55,6 +55,8 @@ class _MapComponentState extends State<MapComponent> {
   double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
+  SelectedItemsProvider? selectedItemsProvider;
+  bool isDetailsButtonVisible = false;
 
   // Indices { S, R, C, P};
   Set<int> selectedIndices = {0, 1, 2};
@@ -76,6 +78,16 @@ class _MapComponentState extends State<MapComponent> {
     setState(() {
       mapWidth = mapInit;
     });
+    selectedItemsProvider = context.read<SelectedItemsProvider>();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (selectedItemsProvider != null && !widget.isModal) {
+      selectedItemsProvider!.reset();
+    }
   }
 
   Future<void> _initializeLocation() async {
@@ -109,10 +121,8 @@ class _MapComponentState extends State<MapComponent> {
           position: locationGPS,
         );
         location = locationGPS;
-        if (kIsWeb) {
-          markersGPS.add(newMarker);
-          _getMarkers();
-        }
+        markersGPS.add(newMarker);
+        _getMarkers();
       });
 
       // Actualiza la cámara del mapa para centrarse en la ubicación actual sin animación
@@ -175,12 +185,19 @@ class _MapComponentState extends State<MapComponent> {
           selectedItemsProvider.isSomeRegisterSelected())) {
         if (selectedItemsProvider.isSomeSectionSelected()) {
           selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
+          if (section.ogcFid == elementSelectedId) {
+            isDetailsButtonVisible = false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
           setState(() {
             elementSelectedId = section.ogcFid;
             elementSelectedType = ElementType.section;
+            isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -203,6 +220,12 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeCatchmentSelected()) {
           selectedItemsProvider
               .toggleCatchmentSelected(catchment.point!.circleId);
+          if (catchment.ogcFid == elementSelectedId) {
+            isDetailsButtonVisible = false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
@@ -210,6 +233,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = catchment.ogcFid;
             elementSelectedType = ElementType.catchment;
+            isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -237,6 +261,12 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeRegisterSelected()) {
           selectedItemsProvider
               .toggleRegistroSelected(register.point!.circleId);
+          if (register.ogcFid == elementSelectedId) {
+            isDetailsButtonVisible = false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
@@ -244,6 +274,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = register.ogcFid;
             elementSelectedType = ElementType.register;
+            isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -512,8 +543,10 @@ class _MapComponentState extends State<MapComponent> {
                       LoadingOverlay(
                         isLoading: isMapLoading && !viewDetailElementInfo,
                         child: Positioned(
-                          bottom: 80,
-                          left: 16,
+                          top: kIsWeb ? null : 80,
+                          right: kIsWeb ? null : 16,
+                          bottom: kIsWeb ? 80 : null,
+                          left: kIsWeb ? 16 : null,
                           child: Column(
                             children: [
                               MenuElevatedButton(
@@ -555,6 +588,13 @@ class _MapComponentState extends State<MapComponent> {
                                 colorChangeOnPress: true,
                                 onPressed: () {
                                   setState(() {
+                                    final selectedItemsProvider =
+                                        context.read<SelectedItemsProvider>();
+                                    selectedItemsProvider.clearAllSelections();
+                                    isDetailsButtonVisible = false;
+                                    if (kIsWeb) {
+                                      viewDetailElementInfo = false;
+                                    }
                                     polylines = {};
                                     circles = {};
                                     locationManual = !locationManual;
@@ -587,8 +627,9 @@ class _MapComponentState extends State<MapComponent> {
                                 onIconsSelected: handleIconsSelected,
                               ),
                               if (kIsWeb) const SizedBox(height: 6),
-                              if (!kIsWeb && !widget.isModal)
-                                MenuElevatedButton(
+                              Visibility(
+                                visible: isDetailsButtonVisible,
+                                child: MenuElevatedButton(
                                   onPressed: () async {
                                     if (isSomeElementSelected() &&
                                         elementSelectedType != null) {
@@ -602,6 +643,7 @@ class _MapComponentState extends State<MapComponent> {
                                   },
                                   icon: Icons.list_alt,
                                 ),
+                              )
                             ],
                           ),
                         ),

@@ -776,12 +776,18 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         ),
                       ],
                     ),
-                  UserImage(
-                      onFileChanged: (imagesFiles) {
-                        this.imagesFiles = imagesFiles;
-                      },
-                      idTask: widget.idTask),
-                  ImageGalleryModal(idTask: widget.idTask!),
+                  Visibility(
+                    visible: widget.detail,
+                    child: UserImage(
+                        onFileChanged: (imagesFiles) {
+                          this.imagesFiles = imagesFiles;
+                        },
+                        idTask: widget.idTask),
+                  ),
+                  Visibility(
+                    visible: widget.detail,
+                    child: ImageGalleryModal(idTask: widget.idTask!),
+                  ),
                   Container(
                     height: 50.0,
                     margin: const EdgeInsets.symmetric(vertical: 20.0),
