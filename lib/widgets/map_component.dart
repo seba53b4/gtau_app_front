@@ -338,9 +338,8 @@ class _MapComponentState extends State<MapComponent> {
     });
   }
 
-  void _clearMarkers() {
+  void _clearMarkersGPS() {
     setState(() {
-      markers.clear();
       markersGPS.clear();
     });
   }
@@ -624,6 +623,7 @@ class _MapComponentState extends State<MapComponent> {
                                   Icons.assessment,
                                   Icons.airline_seat_flat_angled_outlined
                                 ],
+                                selectedIndices: selectedIndices,
                                 onIconsSelected: handleIconsSelected,
                               ),
                               if (kIsWeb) const SizedBox(height: 6),
@@ -643,7 +643,28 @@ class _MapComponentState extends State<MapComponent> {
                                   },
                                   icon: Icons.list_alt,
                                 ),
-                              )
+                              ),
+                              if (!kIsWeb && !widget.isModal)
+                                Visibility(
+                                  visible: isDetailsButtonVisible,
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      if (isSomeElementSelected() &&
+                                          elementSelectedType != null) {
+                                        showElementModal(
+                                          context,
+                                          elementSelectedType!,
+                                          () {},
+                                        );
+                                        await _fetchElementInfo();
+                                      }
+                                    },
+                                    child: const Icon(
+                                      Icons.info_outline_rounded,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
                             ],
                           ),
                         ),
