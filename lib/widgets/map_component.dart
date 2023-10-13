@@ -53,6 +53,8 @@ class _MapComponentState extends State<MapComponent> {
   double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
+  SelectedItemsProvider? selectedItemsProvider;
+  bool isDetailsButtonVisible = false;
 
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
@@ -71,6 +73,16 @@ class _MapComponentState extends State<MapComponent> {
     setState(() {
       mapWidth = mapInit;
     });
+    selectedItemsProvider = context.read<SelectedItemsProvider>();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    if (selectedItemsProvider != null && !widget.isModal) {
+      selectedItemsProvider!.reset();
+    }
   }
 
   Future<void> _initializeLocation() async {
@@ -170,12 +182,19 @@ class _MapComponentState extends State<MapComponent> {
           selectedItemsProvider.isSomeRegisterSelected())) {
         if (selectedItemsProvider.isSomeSectionSelected()) {
           selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
+          if(section.ogcFid == elementSelectedId){
+            isDetailsButtonVisible=false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
           setState(() {
             elementSelectedId = section.ogcFid;
             elementSelectedType = ElementType.section;
+            isDetailsButtonVisible=true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -198,6 +217,12 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeCatchmentSelected()) {
           selectedItemsProvider
               .toggleCatchmentSelected(catchment.point!.circleId);
+          if(catchment.ogcFid == elementSelectedId){
+            isDetailsButtonVisible=false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
@@ -205,6 +230,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = catchment.ogcFid;
             elementSelectedType = ElementType.catchment;
+            isDetailsButtonVisible=true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -232,6 +258,12 @@ class _MapComponentState extends State<MapComponent> {
         if (selectedItemsProvider.isSomeRegisterSelected()) {
           selectedItemsProvider
               .toggleRegistroSelected(register.point!.circleId);
+          if(register.ogcFid == elementSelectedId){
+            isDetailsButtonVisible=false;
+            if (kIsWeb) {
+              viewDetailElementInfo = false;
+            }
+          }
         } else {
           selectedItemsProvider.clearAllSelections();
           selectedItemsProvider
@@ -239,6 +271,7 @@ class _MapComponentState extends State<MapComponent> {
           setState(() {
             elementSelectedId = register.ogcFid;
             elementSelectedType = ElementType.register;
+            isDetailsButtonVisible=true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
             }
@@ -477,8 +510,10 @@ class _MapComponentState extends State<MapComponent> {
                       LoadingOverlay(
                         isLoading: isMapLoading && !viewDetailElementInfo,
                         child: Positioned(
-                          bottom: 80,
-                          left: 16,
+                          top: kIsWeb? null : 80,
+                          right: kIsWeb? null : 16,
+                          bottom: kIsWeb? 80 : null,
+                          left: kIsWeb? 16 : null,
                           child: Column(
                             children: [
                               ElevatedButton(
@@ -549,6 +584,12 @@ class _MapComponentState extends State<MapComponent> {
                                 ),
                                 onPressed: () {
                                   setState(() {
+                                    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+                                    selectedItemsProvider.clearAllSelections();
+                                    isDetailsButtonVisible=false;
+                                    if (kIsWeb) {
+                                      viewDetailElementInfo = false;
+                                    }
                                     polylines = {};
                                     circles = {};
                                     locationManual = !locationManual;
@@ -586,23 +627,26 @@ class _MapComponentState extends State<MapComponent> {
                                 ),
                               ),
                               if (!kIsWeb && !widget.isModal)
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    if (isSomeElementSelected() &&
-                                        elementSelectedType != null) {
-                                      showElementModal(
-                                        context,
-                                        elementSelectedType!,
-                                        () {},
-                                      );
-                                      await _fetchElementInfo();
-                                    }
-                                  },
-                                  child: const Icon(
-                                    Icons.list_alt,
-                                    color: Colors.white,
+                                Visibility(
+                                  visible:isDetailsButtonVisible,
+                                  child:ElevatedButton(
+                                    onPressed: () async {
+                                      if (isSomeElementSelected() &&
+                                          elementSelectedType != null) {
+                                        showElementModal(
+                                          context,
+                                          elementSelectedType!,
+                                          () {},
+                                        );
+                                        await _fetchElementInfo();
+                                      }
+                                    },
+                                    child: const Icon(
+                                      Icons.info_outline_rounded,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
+                              )
                             ],
                           ),
                         ),
