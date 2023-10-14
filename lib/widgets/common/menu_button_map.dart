@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../constants/theme_constants.dart';
 
 class MenuElevatedButton extends StatefulWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final IconData? icon;
   final bool colorChangeOnPress;
   final String? text;
@@ -34,7 +34,7 @@ class _State extends State<MenuElevatedButton> {
 
   @override
   Widget build(BuildContext context) {
-    double circleSize = kIsWeb ? 56 : 42;
+    double circleSize = kIsWeb ? 56 : 46;
     double sizeIcon = kIsWeb ? 24 : 22;
 
     if (widget.colorNotSelected != null) {
@@ -50,7 +50,9 @@ class _State extends State<MenuElevatedButton> {
             isSelected = !isSelected;
           });
         }
-        widget.onPressed();
+        if (widget.onPressed != null) {
+          widget.onPressed!();
+        }
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.all(0),

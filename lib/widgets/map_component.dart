@@ -422,7 +422,7 @@ class _MapComponentState extends State<MapComponent> {
       futures.add(fetchCatchmentsCircles(token));
     }
     if (selectedIndices.contains(3)) {
-      //result.add(fetchSectionsPolylines(token));
+      //lo mismo pero para parcela
     }
     return futures;
   }
@@ -432,8 +432,8 @@ class _MapComponentState extends State<MapComponent> {
     List<Register>? fetchedRegisters;
     List<Catchment>? fetchedCatchments;
 
-    List<Future> futuresElementSelected = getElementFutureSelected(token);
-    await Future.wait(futuresElementSelected).then((responses) {
+    List<Future> futuresElementsSelected = getElementFutureSelected(token);
+    await Future.wait(futuresElementsSelected).then((responses) {
       int iter = 0;
       if (selectedIndices.contains(0)) {
         fetchedSections = responses[iter]?.cast<Section>();
@@ -446,6 +446,10 @@ class _MapComponentState extends State<MapComponent> {
       if (selectedIndices.contains(2)) {
         fetchedCatchments = responses[iter]?.cast<Catchment>();
         iter++;
+      }
+      if (selectedIndices.contains(3)) {
+        // fetchedParcelas = responses[iter]?.cast<Parcels>();
+        // iter++;
       }
     }).catchError((error) {
       // Manejo de error
@@ -576,8 +580,13 @@ class _MapComponentState extends State<MapComponent> {
                               if (kIsWeb) SizedBox(height: 6),
                               MenuElevatedButton(
                                   onPressed: () {
+                                    markersGPS.clear();
                                     getCurrentLocation();
                                     _getMarkers();
+                                    setState(() {
+                                      polylines = {};
+                                      circles = {};
+                                    });
                                   },
                                   icon: Icons.my_location,
                                   tooltipMessage: AppLocalizations.of(context)!
@@ -591,6 +600,7 @@ class _MapComponentState extends State<MapComponent> {
                                         context.read<SelectedItemsProvider>();
                                     selectedItemsProvider.clearAllSelections();
                                     isDetailsButtonVisible = false;
+                                    markersGPS.clear();
                                     if (kIsWeb) {
                                       viewDetailElementInfo = false;
                                     }
@@ -617,18 +627,21 @@ class _MapComponentState extends State<MapComponent> {
                                     .map_component_diameter_tooltip,
                                 text: distances[distanceSelected],
                               ),
+                              if (kIsWeb) const SizedBox(height: 6),
                               MultiSelectPopupMenuButton(
-                                icons: [
-                                  Icons.ac_unit,
-                                  Icons.assessment,
-                                  Icons.airline_seat_flat_angled_outlined
+                                texts: const [
+                                  'Tramos',
+                                  'Registros',
+                                  'Captaciones'
                                 ],
                                 selectedIndices: selectedIndices,
                                 onIconsSelected: handleIconsSelected,
                               ),
                               if (kIsWeb) const SizedBox(height: 6),
                               Visibility(
-                                visible: isDetailsButtonVisible,
+                                visible: isDetailsButtonVisible &&
+                                    !kIsWeb &&
+                                    !widget.isModal,
                                 child: MenuElevatedButton(
                                   onPressed: () async {
                                     if (isSomeElementSelected() &&
@@ -644,27 +657,6 @@ class _MapComponentState extends State<MapComponent> {
                                   icon: Icons.list_alt,
                                 ),
                               ),
-                              if (!kIsWeb && !widget.isModal)
-                                Visibility(
-                                  visible: isDetailsButtonVisible,
-                                  child: ElevatedButton(
-                                    onPressed: () async {
-                                      if (isSomeElementSelected() &&
-                                          elementSelectedType != null) {
-                                        showElementModal(
-                                          context,
-                                          elementSelectedType!,
-                                          () {},
-                                        );
-                                        await _fetchElementInfo();
-                                      }
-                                    },
-                                    child: const Icon(
-                                      Icons.info_outline_rounded,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                )
                             ],
                           ),
                         ),

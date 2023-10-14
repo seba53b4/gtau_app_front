@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/providers/map_preferences_provider.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
@@ -31,6 +32,9 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider<SelectedItemsProvider>(
           create: (context) => SelectedItemsProvider(),
+        ),
+        ChangeNotifierProvider<MapPreferencesProvider>(
+          create: (context) => MapPreferencesProvider(),
         ),
         ChangeNotifierProvider<UserProvider>(
           create: (context) => UserProvider(),

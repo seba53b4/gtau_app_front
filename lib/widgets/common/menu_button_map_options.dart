@@ -1,12 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../constants/theme_constants.dart';
+
 class MultiSelectPopupMenuButton extends StatefulWidget {
-  final List<IconData> icons;
+  final List<String> texts;
   final Function(Set<int>) onIconsSelected;
+  final Set<int> selectedIndices;
 
   MultiSelectPopupMenuButton({
-    required this.icons,
+    required this.texts,
     required this.onIconsSelected,
+    required this.selectedIndices,
   });
 
   @override
@@ -18,8 +23,16 @@ class _MultiSelectPopupMenuButtonState
     extends State<MultiSelectPopupMenuButton> {
   Set<int> selectedIndices = {};
 
+  void _noop() {
+    // Esta función no hace nada
+  }
+
   @override
   Widget build(BuildContext context) {
+    selectedIndices = widget.selectedIndices;
+    double circleSize = kIsWeb ? 56 : 42;
+    double sizeIcon = kIsWeb ? 24 : 22;
+
     return PopupMenuButton<Set<int>>(
       onSelected: (Set<int> indices) {
         setState(() {
@@ -27,13 +40,28 @@ class _MultiSelectPopupMenuButtonState
           widget.onIconsSelected(selectedIndices);
         });
       },
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: lightBackground,
+        ),
+        child: ElevatedButton(
+          onPressed: null, // Puedes ajustar esta propiedad si es necesario
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.all(0),
+            minimumSize: Size(circleSize, circleSize),
+            shape: OvalBorder(),
+          ),
+          child: Icon(Icons.menu, size: sizeIcon, color: primarySwatch[500]!),
+        ), // Icono del botón
+      ),
       itemBuilder: (BuildContext context) {
         return <PopupMenuEntry<Set<int>>>[
           PopupMenuItem<Set<int>>(
             value: Set<int>.from(selectedIndices),
             child: Column(
               children: [
-                for (int index = 0; index < widget.icons.length; index++)
+                for (int index = 0; index < widget.texts.length; index++)
                   Row(
                     children: [
                       StatefulBuilder(
@@ -52,7 +80,7 @@ class _MultiSelectPopupMenuButtonState
                           );
                         },
                       ),
-                      Icon(widget.icons[index]),
+                      Text(widget.texts[index]),
                     ],
                   ),
                 ElevatedButton(
@@ -66,16 +94,6 @@ class _MultiSelectPopupMenuButtonState
           ),
         ];
       },
-      child: ElevatedButton(
-        onPressed: null,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.all(0),
-          minimumSize: Size(48, 48),
-          shape: const CircleBorder(),
-          primary: Colors.white,
-        ),
-        child: Icon(Icons.menu, color: Colors.black),
-      ),
     );
   }
 }
