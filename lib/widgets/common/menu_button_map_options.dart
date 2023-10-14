@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/theme_constants.dart';
+import 'custom_elevated_button.dart';
 
 class MultiSelectPopupMenuButton extends StatefulWidget {
   final List<String> texts;
@@ -22,10 +23,6 @@ class MultiSelectPopupMenuButton extends StatefulWidget {
 class _MultiSelectPopupMenuButtonState
     extends State<MultiSelectPopupMenuButton> {
   Set<int> selectedIndices = {};
-
-  void _noop() {
-    // Esta función no hace nada
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +45,9 @@ class _MultiSelectPopupMenuButtonState
         child: ElevatedButton(
           onPressed: null, // Puedes ajustar esta propiedad si es necesario
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(0),
+            padding: const EdgeInsets.all(0),
             minimumSize: Size(circleSize, circleSize),
-            shape: OvalBorder(),
+            shape: const OvalBorder(),
           ),
           child: Icon(Icons.menu, size: sizeIcon, color: primarySwatch[500]!),
         ), // Icono del botón
@@ -83,11 +80,11 @@ class _MultiSelectPopupMenuButtonState
                       Text(widget.texts[index]),
                     ],
                   ),
-                ElevatedButton(
+                CustomElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop(Set<int>.from(selectedIndices));
                   },
-                  child: Text("Cerrar"),
+                  text: "Cerrar",
                 ),
               ],
             ),
