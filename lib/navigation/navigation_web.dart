@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
@@ -18,6 +19,8 @@ class NavigationWeb extends StatefulWidget {
 
 class _NavigationWeb extends State<NavigationWeb> {
   int myCurrentIndex = 0;
+  late List<NavigationRailDestination> optionsNav;
+  double iconSize = kIsWeb ? 28 : 24;
 
   List screens = [
     const HomeScreen(),
@@ -26,27 +29,35 @@ class _NavigationWeb extends State<NavigationWeb> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateOptionsNav();
+  }
+
+  void _updateOptionsNav() {
     final userStateProvider = Provider.of<UserProvider>(context, listen: false);
-    late List<NavigationRailDestination> optionsNav;
+    NavigationRailDestination navHome = _buildCircularDestination(
+        icon: Icon(Icons.home, size: iconSize),
+        label: Text(AppLocalizations.of(context)!.navigation_label_home));
+
+    NavigationRailDestination navAddTask = _buildCircularDestination(
+        icon: Icon(Icons.add, size: iconSize),
+        label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
+
+    NavigationRailDestination navMap = _buildCircularDestination(
+        icon: Icon(Icons.map, size: iconSize),
+        label: Text(AppLocalizations.of(context)!.navigation_label_map));
+
+    NavigationRailDestination navProfile = _buildCircularDestination(
+        icon: Icon(Icons.person, size: iconSize),
+        label: Text(AppLocalizations.of(context)!.navigation_label_profile));
+
     if (userStateProvider.isAdmin!) {
       optionsNav = [
-        NavigationRailDestination(
-          icon: const Icon(Icons.home),
-          label: Text(AppLocalizations.of(context)!.navigation_label_home),
-        ),
-        NavigationRailDestination(
-          icon: const Icon(Icons.add),
-          label: Text(AppLocalizations.of(context)!.navigation_label_task_add),
-        ),
-        NavigationRailDestination(
-          icon: const Icon(Icons.map),
-          label: Text(AppLocalizations.of(context)!.navigation_label_map),
-        ),
-        NavigationRailDestination(
-          icon: const Icon(Icons.person),
-          label: Text(AppLocalizations.of(context)!.navigation_label_profile),
-        ),
+        navHome,
+        navAddTask,
+        navMap,
+        navProfile,
       ];
       screens = [
         const HomeScreen(),
@@ -58,36 +69,50 @@ class _NavigationWeb extends State<NavigationWeb> {
       ];
     } else {
       optionsNav = [
-        NavigationRailDestination(
-          icon: const Icon(Icons.home),
-          label: Text(AppLocalizations.of(context)!.navigation_label_home),
-        ),
-        NavigationRailDestination(
-          icon: const Icon(Icons.map),
-          label: Text(AppLocalizations.of(context)!.navigation_label_map),
-        ),
-        NavigationRailDestination(
-          icon: const Icon(Icons.person),
-          label: Text(AppLocalizations.of(context)!.navigation_label_profile),
-        ),
+        navHome,
+        navMap,
+        navProfile,
       ];
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-        body: Row(
-      children: [
-        NavigationRail(
-          backgroundColor: navColor,
-          destinations: optionsNav,
-          selectedIndex: myCurrentIndex, // Índice seleccionado inicialmente
-          onDestinationSelected: (int index) {
-            setState(() {
-              myCurrentIndex = index;
-            });
-          },
-        ),
-        Expanded(child: screens[myCurrentIndex]),
-      ],
-    ));
+      body: Row(
+        children: [
+          NavigationRail(
+            backgroundColor: navColor,
+            destinations: optionsNav,
+            selectedIndex: myCurrentIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                myCurrentIndex = index;
+                for (int i = 0; i < optionsNav.length; i++) {
+                  optionsNav[i] = _buildCircularDestination(
+                    icon: optionsNav[i].icon,
+                    label: optionsNav[i].label,
+                    isSelected: i == index,
+                  );
+                }
+              });
+            },
+          ),
+          Expanded(child: screens[myCurrentIndex]),
+        ],
+      ),
+    );
+  }
+
+  NavigationRailDestination _buildCircularDestination(
+      {required Widget icon, required Widget label, bool? isSelected}) {
+    return NavigationRailDestination(
+      label: label,
+      icon: Container(
+        width: 40,
+        height: 40,
+        child: icon,
+      ),
+    );
   }
 }
