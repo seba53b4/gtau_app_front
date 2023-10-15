@@ -90,12 +90,13 @@ class _NavigationWeb extends State<NavigationWeb> {
             extended: isNavRailExtended,
             backgroundColor: navColor,
             destinations: [
-              NavigationRailDestination(
-                icon: Icon(
-                  isNavRailExtended ? Icons.menu_open : Icons.menu,
+              if (kIsWeb)
+                NavigationRailDestination(
+                  icon: Icon(
+                    isNavRailExtended ? Icons.menu_open : Icons.menu,
+                  ),
+                  label: const Text('Cerrar'),
                 ),
-                label: Text('Cerrar'),
-              ),
               ...optionsNav,
             ],
             selectedIndex: myCurrentIndex,
@@ -118,7 +119,7 @@ class _NavigationWeb extends State<NavigationWeb> {
   }
 
   NavigationRailDestination _buildCircularDestination(
-      {required Widget icon, required Widget label, bool? isSelected}) {
+      {required Widget icon, required Widget label}) {
     return NavigationRailDestination(
       label: label,
       icon: SizedBox(
