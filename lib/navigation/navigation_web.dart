@@ -101,15 +101,10 @@ class _NavigationWeb extends State<NavigationWeb> {
               extended: isNavRailExtended,
               backgroundColor: Colors.transparent,
               useIndicator: true,
-              indicatorShape: CircleBorder(
-                side: BorderSide(
-                  color: lightBackground,
-                  width: 1.0,
-                ),
-              ),
               indicatorColor: lightBackground,
               selectedLabelTextStyle: GoogleFonts.sora(
                 textStyle: TextStyle(
+                    decoration: TextDecoration.underline,
                     color: lightBackground,
                     fontSize: 20,
                     fontWeight: FontWeight.w500),
@@ -121,7 +116,7 @@ class _NavigationWeb extends State<NavigationWeb> {
                       isNavRailExtended ? Icons.menu_open : Icons.menu,
                     ),
                     label: const Text(''),
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.only(bottom: 8),
                   ),
                 ...optionsNav,
               ],
