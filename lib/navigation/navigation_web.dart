@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/MapScreen.dart';
@@ -85,30 +86,56 @@ class _NavigationWeb extends State<NavigationWeb> {
     return Scaffold(
       body: Row(
         children: [
-          NavigationRail(
-            elevation: 150,
-            extended: isNavRailExtended,
-            backgroundColor: navColor,
-            destinations: [
-              if (kIsWeb)
-                NavigationRailDestination(
-                  icon: Icon(
-                    isNavRailExtended ? Icons.menu_open : Icons.menu,
-                  ),
-                  label: const Text('Cerrar'),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.center,
+                end: Alignment.centerRight,
+                colors: [
+                  primarySwatch[100]!,
+                  primarySwatch[50]!,
+                ], // Colores del gradiente
+              ),
+            ),
+            child: NavigationRail(
+              extended: isNavRailExtended,
+              backgroundColor: Colors.transparent,
+              useIndicator: true,
+              indicatorShape: CircleBorder(
+                side: BorderSide(
+                  color: lightBackground,
+                  width: 1.0,
                 ),
-              ...optionsNav,
-            ],
-            selectedIndex: myCurrentIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                if (index != 0) {
-                  myCurrentIndex = index;
-                } else {
-                  isNavRailExtended = !isNavRailExtended;
-                }
-              });
-            },
+              ),
+              indicatorColor: lightBackground,
+              selectedLabelTextStyle: GoogleFonts.sora(
+                textStyle: TextStyle(
+                    color: lightBackground,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500),
+              ),
+              destinations: [
+                if (kIsWeb)
+                  NavigationRailDestination(
+                    icon: Icon(
+                      isNavRailExtended ? Icons.menu_open : Icons.menu,
+                    ),
+                    label: const Text(''),
+                    padding: const EdgeInsets.only(bottom: 16),
+                  ),
+                ...optionsNav,
+              ],
+              selectedIndex: myCurrentIndex,
+              onDestinationSelected: (int index) {
+                setState(() {
+                  if (index != 0) {
+                    myCurrentIndex = index;
+                  } else {
+                    isNavRailExtended = !isNavRailExtended;
+                  }
+                });
+              },
+            ),
           ),
           Expanded(
             child: screens[myCurrentIndex],
