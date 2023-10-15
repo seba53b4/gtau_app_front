@@ -29,7 +29,6 @@ ThemeData defaultTheme = ThemeData(
   textTheme: TextTheme(
     titleLarge: GoogleFonts.sora(
       fontSize: 30,
-      fontStyle: FontStyle.italic,
     ),
     titleSmall: GoogleFonts.sora(
       fontSize: 5,
@@ -41,6 +40,24 @@ ThemeData defaultTheme = ThemeData(
       fontSize: 15,
     ),
     displaySmall: GoogleFonts.sora(
+      fontSize: 14,
+    ),
+    displayMedium: GoogleFonts.sora(
+      fontSize: 20,
+    ),
+    displayLarge: GoogleFonts.sora(
+      fontSize: 30,
+    ),
+    headlineMedium: GoogleFonts.sora(
+      fontSize: 16,
+    ),
+    headlineSmall: GoogleFonts.sora(
+      fontSize: 14,
+    ),
+    bodyLarge: GoogleFonts.sora(
+      fontSize: 16,
+    ),
+    bodySmall: GoogleFonts.sora(
       fontSize: 14,
     ),
   ),
