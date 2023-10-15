@@ -18,9 +18,10 @@ class NavigationWeb extends StatefulWidget {
 }
 
 class _NavigationWeb extends State<NavigationWeb> {
-  int myCurrentIndex = 0;
+  int myCurrentIndex = 1;
   late List<NavigationRailDestination> optionsNav;
   double iconSize = kIsWeb ? 28 : 24;
+  bool isNavRailExtended = false;
 
   List screens = [
     const HomeScreen(),
@@ -59,14 +60,17 @@ class _NavigationWeb extends State<NavigationWeb> {
         navMap,
         navProfile,
       ];
-      screens = [
-        const HomeScreen(),
-        TaskCreationScreen(
-          type: '',
-        ),
-        const MapScreen(),
-        const ProfileScreen(),
-      ];
+      setState(() {
+        screens = [
+          const HomeScreen(),
+          const HomeScreen(),
+          TaskCreationScreen(
+            type: '',
+          ),
+          const MapScreen(),
+          const ProfileScreen(),
+        ];
+      });
     } else {
       optionsNav = [
         navHome,
@@ -82,23 +86,32 @@ class _NavigationWeb extends State<NavigationWeb> {
       body: Row(
         children: [
           NavigationRail(
+            elevation: 150,
+            extended: isNavRailExtended,
             backgroundColor: navColor,
-            destinations: optionsNav,
+            destinations: [
+              NavigationRailDestination(
+                icon: Icon(
+                  isNavRailExtended ? Icons.menu_open : Icons.menu,
+                ),
+                label: Text('Cerrar'),
+              ),
+              ...optionsNav,
+            ],
             selectedIndex: myCurrentIndex,
             onDestinationSelected: (int index) {
               setState(() {
-                myCurrentIndex = index;
-                for (int i = 0; i < optionsNav.length; i++) {
-                  optionsNav[i] = _buildCircularDestination(
-                    icon: optionsNav[i].icon,
-                    label: optionsNav[i].label,
-                    isSelected: i == index,
-                  );
+                if (index != 0) {
+                  myCurrentIndex = index;
+                } else {
+                  isNavRailExtended = !isNavRailExtended;
                 }
               });
             },
           ),
-          Expanded(child: screens[myCurrentIndex]),
+          Expanded(
+            child: screens[myCurrentIndex],
+          ),
         ],
       ),
     );
@@ -108,7 +121,7 @@ class _NavigationWeb extends State<NavigationWeb> {
       {required Widget icon, required Widget label, bool? isSelected}) {
     return NavigationRailDestination(
       label: label,
-      icon: Container(
+      icon: SizedBox(
         width: 40,
         height: 40,
         child: icon,
