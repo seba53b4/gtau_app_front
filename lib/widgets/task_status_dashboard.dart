@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/widgets/TaskList.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
@@ -35,25 +36,39 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
         Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setUserNameFilter(widget.userName);
     //taskFilterProvider.setLastStatus(TaskStatus.Pending.value);
-    final GlobalKey<ScaffoldState> _scaffoldKeyDashboard =
+    final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
 
     return DefaultTabController(
       length: 4,
       initialIndex: 0,
       child: Scaffold(
-        key: _scaffoldKeyDashboard,
+        key: scaffoldKeyDashboard,
         appBar: AppBar(
+          backgroundColor: primarySwatch[200],
           toolbarHeight: 0,
           bottom: TabBar(
+            indicatorColor: lightBackground,
             labelColor: Colors.white,
-            labelStyle: const TextStyle(fontSize: kIsWeb ? 20 : 14),
+            labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
             unselectedLabelColor: Colors.white60,
             tabs: [
-              Tab(text: AppLocalizations.of(context)!.task_status_pendingTitle),
-              Tab(text: AppLocalizations.of(context)!.task_status_doingTitle),
-              Tab(text: AppLocalizations.of(context)!.task_status_blockedTitle),
-              Tab(text: AppLocalizations.of(context)!.task_status_doneTitle),
+              _buildCustomTab(
+                text: AppLocalizations.of(context)!.task_status_pendingTitle,
+                isSelected: _currentIndex == 0,
+              ),
+              _buildCustomTab(
+                text: AppLocalizations.of(context)!.task_status_doingTitle,
+                isSelected: _currentIndex == 1,
+              ),
+              _buildCustomTab(
+                text: AppLocalizations.of(context)!.task_status_blockedTitle,
+                isSelected: _currentIndex == 2,
+              ),
+              _buildCustomTab(
+                text: AppLocalizations.of(context)!.task_status_doneTitle,
+                isSelected: _currentIndex == 3,
+              ),
             ],
             onTap: (index) {
               setState(() {
@@ -67,11 +82,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
         body: Consumer<TaskListViewModel>(
             builder: (context, taskListViewModel, child) {
           return LoadingOverlay(
-              isLoading: taskListViewModel.isLoading,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 10),
-                child: _buildTabContent(_scaffoldKeyDashboard),
-              ));
+            isLoading: taskListViewModel.isLoading,
+            child: _buildTabContent(scaffoldKeyDashboard),
+          );
         }),
       ),
     );
@@ -103,7 +116,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
       case 3:
         return _buildTaskList(TaskStatus.Done.value, _scaffoldKeyDashboard);
       default:
-        return Container();
+        return Text("Ver más");
     }
   }
 
@@ -121,11 +134,27 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     return FadeTransition(
       key: ValueKey<int>(_currentIndex),
       opacity: const AlwaysStoppedAnimation(1.0),
-      child: SafeArea(
-          child: TaskList(
+      child: TaskList(
         status: status,
         scaffoldKey: _scaffoldKeyDashboard,
-      )),
+      ),
+    );
+  }
+
+  Widget _buildCustomTab({required String text, required bool isSelected}) {
+    return SizedBox(
+      height: 40,
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: kIsWeb ? 20 : 13,
+            color: isSelected ? Colors.white : Colors.white60,
+            height:
+                1.0, // Ajusta el espaciado entre líneas para centrar verticalmente
+          ),
+        ),
+      ),
     );
   }
 }

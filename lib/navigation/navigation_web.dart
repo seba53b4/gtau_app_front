@@ -104,7 +104,6 @@ class _NavigationWeb extends State<NavigationWeb> {
               indicatorColor: lightBackground,
               selectedLabelTextStyle: GoogleFonts.sora(
                 textStyle: TextStyle(
-                    decoration: TextDecoration.underline,
                     color: lightBackground,
                     fontSize: 20,
                     fontWeight: FontWeight.w500),

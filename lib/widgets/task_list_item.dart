@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:provider/provider.dart';
@@ -21,45 +22,69 @@ class TaskListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
 
-    return ListTile(
-      contentPadding: const EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      tileColor: Colors.white,
-      subtitle: Text(
-        '${task!.inspectionType}',
-        style: const TextStyle(fontSize: 15),
-      ),
-      title: Text('${task!.getWorkNumber}'),
-      leading: const Icon(Icons.check),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TaskCreationScreen(
-                    detail: true,
-                    idTask: task!.getId,
-                    type: 'inspection',
-                  ),
-                ),
-              );
-            },
-            child: Text(AppLocalizations.of(context)!.taskListEditButtonLabel),
+    return Container(
+      width: 80,
+      margin: const EdgeInsets.all(8), // Margen exterior
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10), // Bordes redondeados
+        color: lightBackground,
+        // border: Border.all(
+        //   // Aquí defines el borde
+        //   color: primarySwatch[50]!, // Color del borde
+        //   width: 2.0, // Ancho del borde
+        // ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(200, 217, 184, 0.5),
+            spreadRadius: 3,
+            blurRadius: 7,
+            offset: Offset(0, 3),
           ),
-          const SizedBox(width: 10),
-          if (isAdmin != null && isAdmin)
-            ElevatedButton(
-              onPressed: () async {
-                await _showDeleteConfirmationDialog(context);
+        ], // Color de fondo
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(8),
+        // Relleno interior
+        tileColor: Colors.transparent,
+        // Color de fondo del ListTile
+        horizontalTitleGap: 20,
+        subtitle: Text(
+          '${task!.inspectionType}',
+          style: const TextStyle(fontSize: 15),
+        ),
+        title: Text('${task!.getWorkNumber}'),
+        leading: const Text('holis'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TaskCreationScreen(
+                      detail: true,
+                      idTask: task!.getId,
+                      type: 'inspection',
+                    ),
+                  ),
+                );
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child:
-                  Text(AppLocalizations.of(context)!.taskListDeleteButtonLabel),
+              icon: const Icon(Icons
+                  .edit), // Utiliza Icon() para proporcionar un ícono de Flutter
             ),
-        ],
+            const SizedBox(width: 10),
+            Visibility(
+              visible: isAdmin != null && isAdmin,
+              child: IconButton(
+                onPressed: () async {
+                  await _showDeleteConfirmationDialog(context);
+                },
+                icon: const Icon(Icons.delete, color: Colors.red),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
