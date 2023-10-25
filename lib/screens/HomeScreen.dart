@@ -48,9 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final isAdmin = context.read<UserProvider>().isAdmin;
 
     return isAdmin!
-        ? Scaffold(
-            backgroundColor: lightBackground,
-            body: Column(
+        ? Container(
+            color: lightBackground,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
@@ -69,18 +69,30 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           )
-        : _constraintBoxTaskDashboard(context, _enteredUsername);
+        : Container(
+            width: MediaQuery.of(context).size.width,
+            height: kIsWeb ? 840 : MediaQuery.of(context).size.height - 72,
+            color: lightBackground,
+            child: _constraintBoxTaskDashboard(context, _enteredUsername));
   }
 }
 
 Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
-  return ConstrainedBox(
-    constraints: BoxConstraints(
-      maxWidth: MediaQuery.of(context).size.width,
-      maxHeight: kIsWeb
-          ? MediaQuery.of(context).size.height * 0.9
-          : MediaQuery.of(context).size.height - 164,
+  double widthDashboard = 980;
+  double paddingDashboard =
+      (MediaQuery.of(context).size.width - widthDashboard) > 0 && kIsWeb
+          ? (MediaQuery.of(context).size.width - widthDashboard) / 2
+          : 0;
+  return Container(
+    margin: kIsWeb
+        ? EdgeInsets.symmetric(horizontal: paddingDashboard)
+        : const EdgeInsets.symmetric(horizontal: 0),
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width,
+        maxHeight: kIsWeb ? 840 : MediaQuery.of(context).size.height - 164,
+      ),
+      child: TaskStatusDashboard(userName: userName),
     ),
-    child: TaskStatusDashboard(userName: userName),
   );
 }

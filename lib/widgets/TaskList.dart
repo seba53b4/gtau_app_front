@@ -31,20 +31,26 @@ class _TaskListComponentState extends State<TaskList> {
         builder: (context, taskListViewModel, child) {
       final tasks = taskListViewModel.tasks[widget.status];
 
-      return CustomScrollView(
-        scrollDirection: Axis.vertical,
-        slivers: <Widget>[
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                final task = tasks?[index];
-                return TaskListItem(
-                    task: task!, scaffoldKey: widget.scaffoldKey);
-              },
-              childCount: tasks?.length ?? 0,
-            ),
+      return SizedBox(
+        width: 600,
+        child: Center(
+          widthFactor: 0.5,
+          child: CustomScrollView(
+            scrollDirection: Axis.vertical,
+            slivers: <Widget>[
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final task = tasks?[index];
+                    return TaskListItem(
+                        task: task!, scaffoldKey: widget.scaffoldKey);
+                  },
+                  childCount: tasks?.length ?? 0,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       );
     });
   }

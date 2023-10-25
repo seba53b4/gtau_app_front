@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
@@ -7,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
+import '../utils/date_utils.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
@@ -53,10 +55,49 @@ class TaskListItem extends StatelessWidget {
           style: const TextStyle(fontSize: 15),
         ),
         title: Text('${task!.getWorkNumber}'),
-        leading: const Text('holis'),
+        leading: Padding(
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 4),
+          child: CircleAvatar(
+            backgroundColor: primarySwatch[900],
+            // Cambia el color de fondo del círculo según tus preferencias
+            radius: 20,
+            // Tamaño del círculo
+            child: const Icon(Icons.abc_sharp,
+                color: Colors
+                    .white), // Puedes usar un Icon o una imagen en lugar del Icon
+          ),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (kIsWeb)
+              const VerticalDivider(
+                color: Colors.black,
+                width: 20, // Ancho de la línea vertical
+              ),
+            if (kIsWeb)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // Alinea el texto a la izquierda
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft, // Centra verticalmente
+                    child: Text(
+                      parseDateTimeOnFormatHour(task!.getAddDate!),
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft, // Centra verticalmente
+                    child: Text(
+                      task!.getUser!,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            const SizedBox(width: 24),
             IconButton(
               onPressed: () {
                 Navigator.push(
@@ -70,10 +111,9 @@ class TaskListItem extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons
-                  .edit), // Utiliza Icon() para proporcionar un ícono de Flutter
+              icon: const Icon(Icons.edit),
             ),
-            const SizedBox(width: 10),
+            //const SizedBox(width: 4),
             Visibility(
               visible: isAdmin != null && isAdmin,
               child: IconButton(

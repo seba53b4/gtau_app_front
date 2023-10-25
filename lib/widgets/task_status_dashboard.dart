@@ -39,53 +39,56 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
 
-    return DefaultTabController(
-      length: 4,
-      initialIndex: 0,
-      child: Scaffold(
-        key: scaffoldKeyDashboard,
-        appBar: AppBar(
-          backgroundColor: primarySwatch[200],
-          toolbarHeight: 0,
-          bottom: TabBar(
-            indicatorColor: lightBackground,
-            labelColor: Colors.white,
-            labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
-            unselectedLabelColor: Colors.white60,
-            tabs: [
-              _buildCustomTab(
-                text: AppLocalizations.of(context)!.task_status_pendingTitle,
-                isSelected: _currentIndex == 0,
-              ),
-              _buildCustomTab(
-                text: AppLocalizations.of(context)!.task_status_doingTitle,
-                isSelected: _currentIndex == 1,
-              ),
-              _buildCustomTab(
-                text: AppLocalizations.of(context)!.task_status_blockedTitle,
-                isSelected: _currentIndex == 2,
-              ),
-              _buildCustomTab(
-                text: AppLocalizations.of(context)!.task_status_doneTitle,
-                isSelected: _currentIndex == 3,
-              ),
-            ],
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-              String status = getTaskStatusSelected();
-              updateTaskListState(status);
-            },
+    return SizedBox(
+      width: 120,
+      child: DefaultTabController(
+        length: 4,
+        initialIndex: 0,
+        child: Scaffold(
+          key: scaffoldKeyDashboard,
+          appBar: AppBar(
+            backgroundColor: primarySwatch[200],
+            toolbarHeight: 0,
+            bottom: TabBar(
+              indicatorColor: lightBackground,
+              labelColor: Colors.white,
+              labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
+              unselectedLabelColor: Colors.white60,
+              tabs: [
+                _buildCustomTab(
+                  text: AppLocalizations.of(context)!.task_status_pendingTitle,
+                  isSelected: _currentIndex == 0,
+                ),
+                _buildCustomTab(
+                  text: AppLocalizations.of(context)!.task_status_doingTitle,
+                  isSelected: _currentIndex == 1,
+                ),
+                _buildCustomTab(
+                  text: AppLocalizations.of(context)!.task_status_blockedTitle,
+                  isSelected: _currentIndex == 2,
+                ),
+                _buildCustomTab(
+                  text: AppLocalizations.of(context)!.task_status_doneTitle,
+                  isSelected: _currentIndex == 3,
+                ),
+              ],
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+                String status = getTaskStatusSelected();
+                updateTaskListState(status);
+              },
+            ),
           ),
+          body: Consumer<TaskListViewModel>(
+              builder: (context, taskListViewModel, child) {
+            return LoadingOverlay(
+              isLoading: taskListViewModel.isLoading,
+              child: _buildTabContent(scaffoldKeyDashboard),
+            );
+          }),
         ),
-        body: Consumer<TaskListViewModel>(
-            builder: (context, taskListViewModel, child) {
-          return LoadingOverlay(
-            isLoading: taskListViewModel.isLoading,
-            child: _buildTabContent(scaffoldKeyDashboard),
-          );
-        }),
       ),
     );
   }
@@ -134,16 +137,18 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     return FadeTransition(
       key: ValueKey<int>(_currentIndex),
       opacity: const AlwaysStoppedAnimation(1.0),
-      child: TaskList(
-        status: status,
-        scaffoldKey: _scaffoldKeyDashboard,
+      child: Center(
+        child: TaskList(
+          status: status,
+          scaffoldKey: _scaffoldKeyDashboard,
+        ),
       ),
     );
   }
 
   Widget _buildCustomTab({required String text, required bool isSelected}) {
     return SizedBox(
-      height: 40,
+      height: 44,
       child: Center(
         child: Text(
           text,
