@@ -71,7 +71,9 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         : Container(
             width: MediaQuery.of(context).size.width,
-            height: kIsWeb ? 840 : MediaQuery.of(context).size.height - 72,
+            height: kIsWeb
+                ? MediaQuery.of(context).size.height * 0.78
+                : MediaQuery.of(context).size.height - 72,
             color: lightBackground,
             child: _constraintBoxTaskDashboard(context, _enteredUsername));
   }
@@ -90,7 +92,9 @@ Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
     child: ConstrainedBox(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width,
-        maxHeight: kIsWeb ? 840 : MediaQuery.of(context).size.height - 164,
+        maxHeight: kIsWeb
+            ? MediaQuery.of(context).size.height * 0.78
+            : MediaQuery.of(context).size.height - 164,
       ),
       child: TaskStatusDashboard(userName: userName),
     ),

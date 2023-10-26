@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 
 class CustomElevatedButton extends StatelessWidget {
@@ -23,7 +24,7 @@ class CustomElevatedButton extends StatelessWidget {
     if (backgroundColor == null) {
       switch (messageType) {
         case MessageType.success:
-          buttonBackgroundColor = Colors.green;
+          buttonBackgroundColor = primarySwatch[500];
           break;
         case MessageType.error:
           buttonBackgroundColor = Colors.red;
@@ -32,7 +33,7 @@ class CustomElevatedButton extends StatelessWidget {
           buttonBackgroundColor = Colors.orange;
           break;
         case null:
-          buttonBackgroundColor = Colors.green;
+          buttonBackgroundColor = primarySwatch[500];
       }
     }
 
