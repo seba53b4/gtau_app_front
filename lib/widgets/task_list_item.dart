@@ -1,11 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
+import '../utils/date_utils.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
@@ -20,46 +24,107 @@ class TaskListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
+    double fontSize = kIsWeb ? 15 : 12;
+    double fontSizeInfo = kIsWeb ? 12 : 8;
 
-    return ListTile(
-      contentPadding: const EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      tileColor: Colors.white,
-      subtitle: Text(
-        '${task!.inspectionType}',
-        style: const TextStyle(fontSize: 15),
-      ),
-      title: Text('${task!.getWorkNumber}'),
-      leading: const Icon(Icons.check),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TaskCreationScreen(
-                    detail: true,
-                    idTask: task!.getId,
-                    type: 'inspection',
-                  ),
-                ),
-              );
-            },
-            child: Text(AppLocalizations.of(context)!.taskListEditButtonLabel),
+    return Container(
+      width: 80,
+      margin: const EdgeInsets.all(8), // Margen exterior
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10), // Bordes redondeados
+        color: lightBackground,
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(200, 217, 184, 0.5),
+            spreadRadius: 3,
+            blurRadius: 7,
+            offset: Offset(0, 3),
           ),
-          const SizedBox(width: 10),
-          if (isAdmin != null && isAdmin)
-            ElevatedButton(
-              onPressed: () async {
-                await _showDeleteConfirmationDialog(context);
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child:
-                  Text(AppLocalizations.of(context)!.taskListDeleteButtonLabel),
-            ),
         ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(8),
+        tileColor: Colors.transparent,
+        horizontalTitleGap: 20,
+        title: Text('${task!.getWorkNumber}',
+            style: TextStyle(fontSize: fontSize)),
+        subtitle: Text(
+          '${task!.inspectionType}',
+          style: TextStyle(fontSize: fontSize - 2),
+        ),
+        leading: Padding(
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 4),
+          child: CircleAvatar(
+            backgroundColor: primarySwatch[900],
+            radius: 20,
+            child: Text(
+              'I',
+              style: GoogleFonts.merriweather(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const VerticalDivider(
+              color: Colors.black,
+              width: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      parseDateTimeOnFormatHour(task!.getAddDate!),
+                      style: TextStyle(fontSize: fontSizeInfo),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      task!.getUser!,
+                      style: TextStyle(fontSize: fontSizeInfo),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (kIsWeb) const SizedBox(width: 24),
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TaskCreationScreen(
+                      detail: true,
+                      idTask: task!.getId,
+                      type: 'inspection',
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.edit),
+            ),
+            //const SizedBox(width: 4),
+            Visibility(
+              visible: isAdmin != null && isAdmin,
+              child: IconButton(
+                onPressed: () async {
+                  await _showDeleteConfirmationDialog(context);
+                },
+                icon: const Icon(Icons.delete, color: Colors.red),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
