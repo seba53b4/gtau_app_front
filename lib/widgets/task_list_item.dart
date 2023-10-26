@@ -23,6 +23,8 @@ class TaskListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
+    double fontSize = kIsWeb ? 15 : 12;
+    double fontSizeInfo = kIsWeb ? 12 : 8;
 
     return Container(
       width: 80,
@@ -30,11 +32,6 @@ class TaskListItem extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10), // Bordes redondeados
         color: lightBackground,
-        // border: Border.all(
-        //   // Aquí defines el borde
-        //   color: primarySwatch[50]!, // Color del borde
-        //   width: 2.0, // Ancho del borde
-        // ),
         boxShadow: const [
           BoxShadow(
             color: Color.fromRGBO(200, 217, 184, 0.5),
@@ -42,62 +39,57 @@ class TaskListItem extends StatelessWidget {
             blurRadius: 7,
             offset: Offset(0, 3),
           ),
-        ], // Color de fondo
+        ],
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(8),
-        // Relleno interior
         tileColor: Colors.transparent,
-        // Color de fondo del ListTile
         horizontalTitleGap: 20,
+        title: Text('${task!.getWorkNumber}',
+            style: TextStyle(fontSize: fontSize)),
         subtitle: Text(
           '${task!.inspectionType}',
-          style: const TextStyle(fontSize: 15),
+          style: TextStyle(fontSize: fontSize - 2),
         ),
-        title: Text('${task!.getWorkNumber}'),
         leading: Padding(
           padding: const EdgeInsetsDirectional.symmetric(horizontal: 4),
           child: CircleAvatar(
             backgroundColor: primarySwatch[900],
-            // Cambia el color de fondo del círculo según tus preferencias
             radius: 20,
-            // Tamaño del círculo
-            child: const Icon(Icons.abc_sharp,
-                color: Colors
-                    .white), // Puedes usar un Icon o una imagen en lugar del Icon
+            child: const Icon(Icons.abc_sharp, color: Colors.white),
           ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (kIsWeb)
-              const VerticalDivider(
-                color: Colors.black,
-                width: 20, // Ancho de la línea vertical
-              ),
-            if (kIsWeb)
-              Column(
+            const VerticalDivider(
+              color: Colors.black,
+              width: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 18),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                // Alinea el texto a la izquierda
                 children: [
                   Align(
-                    alignment: Alignment.centerLeft, // Centra verticalmente
+                    alignment: Alignment.centerLeft,
                     child: Text(
                       parseDateTimeOnFormatHour(task!.getAddDate!),
-                      style: const TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: fontSizeInfo),
                     ),
                   ),
                   Align(
-                    alignment: Alignment.bottomLeft, // Centra verticalmente
+                    alignment: Alignment.bottomLeft,
                     child: Text(
                       task!.getUser!,
-                      style: const TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: fontSizeInfo),
                     ),
                   ),
                 ],
               ),
-            const SizedBox(width: 24),
+            ),
+            if (kIsWeb) const SizedBox(width: 24),
             IconButton(
               onPressed: () {
                 Navigator.push(
