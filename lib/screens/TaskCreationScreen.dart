@@ -17,6 +17,7 @@ import '../utils/imagesbundle.dart';
 import '../viewmodels/images_viewmodel.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
+import '../widgets/common/custom_toggle_buttons.dart';
 import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
 import '../widgets/user_image.dart';
@@ -423,23 +424,18 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   ),
                   const SizedBox(height: 20.0),
                   if (!widget.detail)
-                    Column(
-                      children: [
-                        ToggleButtons(
-                          isSelected: [selectedIndex == 0, selectedIndex == 1],
-                          onPressed: (int index) {
-                            setState(() {
-                              selectedIndex = index;
-                            });
-                          },
-                          children: [
-                            Text(AppLocalizations.of(context)!
-                                .createTaskPage_scheduled),
-                            Text(AppLocalizations.of(context)!
-                                .createTaskPage_inspection),
-                          ],
-                        ),
-                        const SizedBox(height: 10.0),
+                    CustomToggleButtons(
+                      onPressedList: [
+                        () {
+                          setState(() {
+                            selectedIndex = 0;
+                          });
+                        },
+                        () {
+                          setState(() {
+                            selectedIndex = 1;
+                          });
+                        }
                       ],
                     ),
                   const SizedBox(height: 20.0),
