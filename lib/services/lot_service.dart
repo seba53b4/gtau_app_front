@@ -54,7 +54,7 @@ class LotService {
               polylineId: PolylineId(ogcFid.toString()),
               points: latLngList,
               color: Colors.black26,
-              width: 2,
+              width: 4,
               consumeTapEvents: true);
 
           return Lot(ogcFid: ogcFid, polyline: polyline);
