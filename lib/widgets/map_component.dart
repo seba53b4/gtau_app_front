@@ -9,6 +9,7 @@ import 'package:gtau_app_front/models/catchment_data.dart';
 import 'package:gtau_app_front/models/register_data.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
@@ -16,6 +17,7 @@ import 'package:provider/provider.dart';
 
 import '../constants/theme_constants.dart';
 import '../models/enums/element_type.dart';
+import '../models/lot_data.dart';
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
@@ -59,7 +61,7 @@ class _MapComponentState extends State<MapComponent> {
   bool isDetailsButtonVisible = false;
 
   // Indices { S, R, C, P};
-  Set<int> selectedIndices = {0, 1, 2};
+  Set<int> selectedIndices = {0, 1, 2, 3};
 
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
@@ -74,10 +76,7 @@ class _MapComponentState extends State<MapComponent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    mapInit = MediaQuery
-        .of(context)
-        .size
-        .width;
+    mapInit = MediaQuery.of(context).size.width;
     setState(() {
       mapWidth = mapInit;
     });
@@ -118,7 +117,7 @@ class _MapComponentState extends State<MapComponent> {
           desiredAccuracy: LocationAccuracy.best);
       setState(() {
         final locationGPS =
-        LatLng(currentPosition.latitude, currentPosition.longitude);
+            LatLng(currentPosition.latitude, currentPosition.longitude);
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
           position: locationGPS,
@@ -147,7 +146,7 @@ class _MapComponentState extends State<MapComponent> {
 
   Future<List<Section>?> fetchSectionsPolylines(String token) async {
     final sectionViewModel =
-    Provider.of<SectionViewModel>(context, listen: false);
+        Provider.of<SectionViewModel>(context, listen: false);
     LatLng? finalLocation = getFinalLocation();
     return await sectionViewModel.fetchSectionsByRadius(
         token,
@@ -156,9 +155,16 @@ class _MapComponentState extends State<MapComponent> {
         int.parse(distances[distanceSelected]));
   }
 
+  Future<List<Lot>?> fetchLotsPolylines(String token) async {
+    final lotViewModel = Provider.of<LotViewModel>(context, listen: false);
+    LatLng? finalLocation = getFinalLocation();
+    return await lotViewModel.fetchLotsByRadius(token, finalLocation!.latitude,
+        finalLocation!.longitude, int.parse(distances[distanceSelected]));
+  }
+
   Future<List<Catchment>?> fetchCatchmentsCircles(String token) async {
     final catchmentViewModel =
-    Provider.of<CatchmentViewModel>(context, listen: false);
+        Provider.of<CatchmentViewModel>(context, listen: false);
 
     LatLng? finalLocation = getFinalLocation();
     return await catchmentViewModel.fetchCatchmentsByRadius(
@@ -170,7 +176,7 @@ class _MapComponentState extends State<MapComponent> {
 
   Future<List<Register>?> fetchRegistersCircles(String token) async {
     final registerViewModel =
-    Provider.of<RegisterViewModel>(context, listen: false);
+        Provider.of<RegisterViewModel>(context, listen: false);
 
     LatLng? finalLocation = getFinalLocation();
     return await registerViewModel.fetchRegistersByRadius(
@@ -179,27 +185,28 @@ class _MapComponentState extends State<MapComponent> {
 
   LatLng? getFinalLocation() => (location != null) ? location : initLocation;
 
-  Future<void> _onTapParamBehaviorSection(Section section) async {
+  Future<void> _onTapParamBehaviorPolyline(
+      int ogcFid, Polyline? line, ElementType type) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
-      selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
+      selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
     } else {
-      if (!(selectedItemsProvider.isSomeCatchmentSelected() ||
-          selectedItemsProvider.isSomeRegisterSelected())) {
-        if (selectedItemsProvider.isSomeSectionSelected()) {
-          selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
-          if (section.ogcFid == elementSelectedId) {
+      if (!(selectedItemsProvider.isSomeCircleSelected(type) ||
+          selectedItemsProvider.isSomeCircleSelected(type))) {
+        if (selectedItemsProvider.isSomePolylineSelected(type)) {
+          selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
+          if (ogcFid == elementSelectedId) {
             isDetailsButtonVisible = false;
             if (kIsWeb) {
               viewDetailElementInfo = false;
             }
           }
         } else {
-          selectedItemsProvider.clearAllSelections();
-          selectedItemsProvider.toggleSectionSelected(section.line!.polylineId);
+          selectedItemsProvider.clearAll();
+          selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
           setState(() {
-            elementSelectedId = section.ogcFid;
-            elementSelectedType = ElementType.section;
+            elementSelectedId = ogcFid;
+            elementSelectedType = type;
             isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
@@ -213,29 +220,28 @@ class _MapComponentState extends State<MapComponent> {
     }
   }
 
-  Future<void> _onTapParamBehaviorCatchment(Catchment catchment) async {
+  Future<void> _onTapParamBehaviorCircle(
+      int ogcFid, Circle? point, ElementType type) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
-      selectedItemsProvider.toggleCatchmentSelected(catchment.point!.circleId);
+      selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
     } else {
-      if (!(selectedItemsProvider.isSomeSectionSelected() ||
-          selectedItemsProvider.isSomeRegisterSelected())) {
-        if (selectedItemsProvider.isSomeCatchmentSelected()) {
-          selectedItemsProvider
-              .toggleCatchmentSelected(catchment.point!.circleId);
-          if (catchment.ogcFid == elementSelectedId) {
+      if (!(selectedItemsProvider.isSomePolylineSelected(type) ||
+          selectedItemsProvider.isSomeCircleSelected(type))) {
+        if (selectedItemsProvider.isSomeCircleSelected(type)) {
+          selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
+          if (ogcFid == elementSelectedId) {
             isDetailsButtonVisible = false;
             if (kIsWeb) {
               viewDetailElementInfo = false;
             }
           }
         } else {
-          selectedItemsProvider.clearAllSelections();
-          selectedItemsProvider
-              .toggleCatchmentSelected(catchment.point!.circleId);
+          selectedItemsProvider.clearAll();
+          selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
           setState(() {
-            elementSelectedId = catchment.ogcFid;
-            elementSelectedType = ElementType.catchment;
+            elementSelectedId = ogcFid;
+            elementSelectedType = type;
             isDetailsButtonVisible = true;
             if (kIsWeb) {
               viewDetailElementInfo = true;
@@ -254,50 +260,14 @@ class _MapComponentState extends State<MapComponent> {
     return selectedItemsProvider.isSomeElementSelected();
   }
 
-  Future<void> _onTapParamBehaviorRegister(Register register) async {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    if (selectedItemsProvider.letMultipleItemsSelected) {
-      selectedItemsProvider.toggleRegistroSelected(register.point!.circleId);
-    } else {
-      if (!(selectedItemsProvider.isSomeCatchmentSelected() ||
-          selectedItemsProvider.isSomeSectionSelected())) {
-        if (selectedItemsProvider.isSomeRegisterSelected()) {
-          selectedItemsProvider
-              .toggleRegistroSelected(register.point!.circleId);
-          if (register.ogcFid == elementSelectedId) {
-            isDetailsButtonVisible = false;
-            if (kIsWeb) {
-              viewDetailElementInfo = false;
-            }
-          }
-        } else {
-          selectedItemsProvider.clearAllSelections();
-          selectedItemsProvider
-              .toggleRegistroSelected(register.point!.circleId);
-          setState(() {
-            elementSelectedId = register.ogcFid;
-            elementSelectedType = ElementType.register;
-            isDetailsButtonVisible = true;
-            if (kIsWeb) {
-              viewDetailElementInfo = true;
-            }
-          });
-          if (kIsWeb) {
-            await _fetchElementInfo();
-          }
-        }
-      }
-    }
-  }
-
   Future _fetchElementInfo() async {
     if (elementSelectedType != null && elementSelectedId != null) {
-      final token = context
-          .read<UserProvider>()
-          .getToken;
+      final token = context.read<UserProvider>().getToken;
       final catchmentViewModel = context.read<CatchmentViewModel>();
       final registerViewModel = context.read<RegisterViewModel>();
       final sectionViewModel = context.read<SectionViewModel>();
+      final lotViewModel = context.read<LotViewModel>();
+
       switch (elementSelectedType) {
         case ElementType.catchment:
           await catchmentViewModel.fetchCatchmentById(
@@ -309,6 +279,9 @@ class _MapComponentState extends State<MapComponent> {
         case ElementType.section:
           await sectionViewModel.fetchSectionById(token!, elementSelectedId!);
           break;
+        case ElementType.lot:
+          await lotViewModel.fetchLotById(token!, elementSelectedId!);
+          break;
         default:
           throw Exception('Invalid status string: $elementSelectedId');
       }
@@ -317,21 +290,32 @@ class _MapComponentState extends State<MapComponent> {
 
   Color _onColorParamBehaviorSection(Section section) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isSectionSelected(section.line!.polylineId)
+    return selectedItemsProvider.isPolylineSelected(
+            section.line!.polylineId, ElementType.section)
         ? selectedColor
         : section.line!.color;
   }
 
+  Color _onColorParamBehaviorLot(Lot lot) {
+    final selectedItemsProvider = context.read<SelectedItemsProvider>();
+    return selectedItemsProvider.isPolylineSelected(
+            lot.polyline!.polylineId, ElementType.lot)
+        ? selectedColor
+        : lot.polyline!.color;
+  }
+
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isCatchmentSelected(catchment.point!.circleId)
+    return selectedItemsProvider.isCircleSelected(
+            catchment.point!.circleId, ElementType.catchment)
         ? selectedColor
         : catchment.point!.strokeColor;
   }
 
   Color _onColorParamBehaviorRegister(Register register) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    return selectedItemsProvider.isRegistroSelected(register.point!.circleId)
+    return selectedItemsProvider.isCircleSelected(
+            register.point!.circleId, ElementType.register)
         ? selectedColor
         : register.point!.strokeColor;
   }
@@ -349,16 +333,18 @@ class _MapComponentState extends State<MapComponent> {
     });
   }
 
-  Set<Polyline> getPolylines(List<Section>? sections) {
+  Set<Polyline> getPolylines(List<Section>? sections, List<Lot>? lots) {
+    Set<Polyline> setPol = {};
+
     if (sections != null) {
-      Set<Polyline> setPol = {};
       for (var section in sections) {
         Polyline pol = section.line!.copyWith(
           colorParam: _onColorParamBehaviorSection(section),
           onTapParam: () async {
-            await _onTapParamBehaviorSection(section);
+            await _onTapParamBehaviorPolyline(
+                section.ogcFid, section.line, ElementType.section);
             setState(() {
-              polylines = getPolylines(sections);
+              polylines = getPolylines(sections, lots);
             });
           },
         );
@@ -366,14 +352,28 @@ class _MapComponentState extends State<MapComponent> {
         setPol.addAll(
             polylineArrows(section.line!.points, section.line!.polylineId));
       }
-      return setPol;
-    } else {
-      return {};
     }
+    if (lots != null) {
+      for (var lot in lots) {
+        Polyline pol = lot.polyline!.copyWith(
+          colorParam: _onColorParamBehaviorLot(lot),
+          onTapParam: () async {
+            await _onTapParamBehaviorPolyline(
+                lot.ogcFid, lot.polyline, ElementType.lot);
+            setState(() {
+              polylines = getPolylines(sections, lots);
+            });
+          },
+        );
+        setPol.add(pol);
+      }
+    }
+
+    return setPol;
   }
 
-  Set<Circle> getCircles(List<Catchment>? catchments,
-      List<Register>? registers) {
+  Set<Circle> getCircles(
+      List<Catchment>? catchments, List<Register>? registers) {
     Set<Circle> setCir = {};
     if (catchments != null) {
       for (var catchment in catchments) {
@@ -383,7 +383,8 @@ class _MapComponentState extends State<MapComponent> {
           strokeWidthParam: catchment.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
           onTapParam: () async {
-            await _onTapParamBehaviorCatchment(catchment);
+            await _onTapParamBehaviorCircle(
+                catchment.ogcFid, catchment.point, ElementType.catchment);
             setState(() {
               circles = getCircles(catchments, registers);
             });
@@ -400,7 +401,8 @@ class _MapComponentState extends State<MapComponent> {
           strokeWidthParam: register.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorRegister(register),
           onTapParam: () async {
-            await _onTapParamBehaviorRegister(register);
+            await _onTapParamBehaviorCircle(
+                register.ogcFid, register.point, ElementType.register);
             setState(() {
               circles = getCircles(catchments, registers);
             });
@@ -428,6 +430,7 @@ class _MapComponentState extends State<MapComponent> {
     }
     if (selectedIndices.contains(3)) {
       //lo mismo pero para parcela
+      futures.add(fetchLotsPolylines(token));
     }
     return futures;
   }
@@ -436,6 +439,7 @@ class _MapComponentState extends State<MapComponent> {
     List<Section>? fetchedSections;
     List<Register>? fetchedRegisters;
     List<Catchment>? fetchedCatchments;
+    List<Lot>? fetchedLots;
 
     List<Future> futuresElementsSelected = getElementFutureSelected(token);
     await Future.wait(futuresElementsSelected).then((responses) {
@@ -453,15 +457,16 @@ class _MapComponentState extends State<MapComponent> {
         iter++;
       }
       if (selectedIndices.contains(3)) {
-        // fetchedParcelas = responses[iter]?.cast<Parcels>();
-        // iter++;
+        fetchedLots = responses[iter]?.cast<Lot>();
+        iter++;
       }
     }).catchError((error) {
+      print(error);
       // Manejo de error
     });
 
     setState(() {
-      polylines = getPolylines(fetchedSections);
+      polylines = getPolylines(fetchedSections, fetchedLots);
       circles = getCircles(fetchedCatchments, fetchedRegisters);
     });
   }
@@ -474,263 +479,235 @@ class _MapComponentState extends State<MapComponent> {
 
   @override
   Widget build(BuildContext context) {
-    final token = context
-        .read<UserProvider>()
-        .getToken;
-
+    final token = context.read<UserProvider>().getToken;
 
     return Consumer<SectionViewModel>(
         builder: (context, sectionViewModel, child) {
-          return Consumer<RegisterViewModel>(
-              builder: (context, registerViewModel, child) {
-                return Consumer<CatchmentViewModel>(
-                    builder: (context, catchmentViewModel, child) {
-                      final isMapLoading = catchmentViewModel.isLoading ||
-                          registerViewModel.isLoading ||
-                          sectionViewModel.isLoading;
-                      return Scaffold(
-                        body: Row(
-                          children: [
-                            Expanded(
-                              child: Stack(
-                                children: [
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 0),
-                                    width: viewDetailElementInfo &&
-                                        !widget.isModal
-                                        ? mapWidth - modalWidth
-                                        : mapWidth,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        // Gestos generales si es necesario
-                                      },
-                                      child: GoogleMap(
-                                        mapType: _currentMapType,
-                                        initialCameraPosition: CameraPosition(
-                                          target:
-                                          (location != null)
-                                              ? location!
-                                              : initLocation,
-                                          zoom: zoomMap,
-                                        ),
-                                        polylines: polylines,
-                                        circles: circles,
-                                        markers: markers,
-                                        onCameraMove: (
-                                            CameraPosition cameraPosition) {
-                                          setState(() {
-                                            zoomMap = cameraPosition.zoom;
-                                          });
-                                        },
-                                        onMapCreated: (
-                                            GoogleMapController controller) {
-                                          if (location != null &&
-                                              _mapController.isCompleted &&
-                                              !isMapLoading) {
-                                            controller.moveCamera(
-                                                CameraUpdate.newLatLngZoom(
-                                                    location!, zoomMap));
-                                          }
-                                          if (!_mapController.isCompleted) {
-                                            _mapController.complete(controller);
-                                          }
-                                        },
-                                        onTap: (LatLng latLng) {
-                                          if (locationManual) {
-                                            setState(() {
-                                              final Marker newMarker = Marker(
-                                                onTap: () {},
-                                                markerId: const MarkerId(
-                                                    'tapped_location_manual'),
-                                                position: latLng,
-                                              );
-                                              markersGPS.clear();
-                                              markersGPS.add(newMarker);
-                                              _getMarkers();
-                                              location =
-                                                  LatLng(latLng.latitude,
-                                                      latLng.longitude);
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  LoadingOverlay(
-                                    isLoading: isMapLoading &&
-                                        !viewDetailElementInfo,
-                                    child: Positioned(
-                                      top: kIsWeb ? null : 80,
-                                      right: kIsWeb ? null : 16,
-                                      bottom: kIsWeb ? 80 : null,
-                                      left: kIsWeb ? 16 : null,
-                                      child: Column(
-                                        children: [
-                                          MenuElevatedButton(
-                                            colorChangeOnPress: true,
-                                            onPressed: () {
-                                              setState(() {
-                                                _currentMapType =
-                                                _currentMapType ==
-                                                    MapType.normal
-                                                    ? MapType.satellite
-                                                    : MapType.normal;
-                                              });
-                                            },
-                                            tooltipMessage: AppLocalizations.of(
-                                                context)!
-                                                .map_component_map_view_tooltip,
-                                            icon: _currentMapType ==
-                                                MapType.normal
-                                                ? Icons.map
-                                                : Icons.satellite,
-                                          ),
-                                          if (kIsWeb) const SizedBox(height: 6),
-                                          MenuElevatedButton(
-                                            onPressed: () async {
-                                              await fetchAndUpdateData(token!);
-                                            },
-                                            tooltipMessage: AppLocalizations.of(
-                                                context)!
-                                                .map_component_fetch_elements,
-                                            icon: Icons.area_chart_outlined,
-                                          ),
-                                          if (kIsWeb) SizedBox(height: 6),
-                                          MenuElevatedButton(
-                                              onPressed: () {
-                                                markersGPS.clear();
-                                                getCurrentLocation();
-                                                _getMarkers();
-                                                setState(() {
-                                                  polylines = {};
-                                                  circles = {};
-                                                });
-                                              },
-                                              icon: Icons.my_location,
-                                              tooltipMessage: AppLocalizations
-                                                  .of(context)!
-                                                  .map_component_get_location),
-                                          if (kIsWeb) const SizedBox(height: 6),
-                                          MenuElevatedButton(
-                                            colorChangeOnPress: true,
-                                            onPressed: () {
-                                              setState(() {
-                                                final selectedItemsProvider =
-                                                context.read<
-                                                    SelectedItemsProvider>();
-                                                selectedItemsProvider
-                                                    .clearAllSelections();
-                                                isDetailsButtonVisible = false;
-                                                markersGPS.clear();
-                                                if (kIsWeb) {
-                                                  viewDetailElementInfo = false;
-                                                }
-                                                polylines = {};
-                                                circles = {};
-                                                locationManual =
-                                                !locationManual;
-                                              });
-                                            },
-                                            colorSelected: redColor,
-                                            colorNotSelected: lightBackground,
-                                            tooltipMessage: AppLocalizations.of(
-                                                context)!
-                                                .map_component_select_location,
-                                            icon: Icons.location_pin,
-                                          ),
-                                          if (kIsWeb) const SizedBox(height: 6),
-                                          MenuElevatedButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                distanceSelected =
-                                                    (distanceSelected + 1) %
-                                                        distances.length;
-                                              });
-                                            },
-                                            tooltipMessage: AppLocalizations.of(
-                                                context)!
-                                                .map_component_diameter_tooltip,
-                                            text: distances[distanceSelected],
-                                          ),
-                                          if (kIsWeb) const SizedBox(height: 6),
-                                          MultiSelectPopupMenuButton(
-                                            texts: const [
-                                              'Tramos',
-                                              'Registros',
-                                              'Captaciones'
-                                            ],
-                                            selectedIndices: selectedIndices,
-                                            onIconsSelected: handleIconsSelected,
-                                          ),
-                                          if (kIsWeb) const SizedBox(height: 6),
-                                          Visibility(
-                                            visible: isDetailsButtonVisible &&
-                                                !kIsWeb &&
-                                                !widget.isModal,
-                                            child: MenuElevatedButton(
-                                              onPressed: () async {
-                                                if (isSomeElementSelected() &&
-                                                    elementSelectedType !=
-                                                        null) {
-                                                  showElementModal(
-                                                    context,
-                                                    elementSelectedType!,
-                                                        () {},
-                                                  );
-                                                  await _fetchElementInfo();
-                                                }
-                                              },
-                                              icon: Icons.list_alt,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
+      return Consumer<RegisterViewModel>(
+          builder: (context, registerViewModel, child) {
+        return Consumer<CatchmentViewModel>(
+            builder: (context, catchmentViewModel, child) {
+          final isMapLoading = catchmentViewModel.isLoading ||
+              registerViewModel.isLoading ||
+              sectionViewModel.isLoading;
+          return Scaffold(
+            body: Row(
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 0),
+                        width: viewDetailElementInfo && !widget.isModal
+                            ? mapWidth - modalWidth
+                            : mapWidth,
+                        child: GestureDetector(
+                          onTap: () {
+                            // Gestos generales si es necesario
+                          },
+                          child: GoogleMap(
+                            mapType: _currentMapType,
+                            initialCameraPosition: CameraPosition(
+                              target:
+                                  (location != null) ? location! : initLocation,
+                              zoom: zoomMap,
                             ),
-                            if (elementSelectedType != null &&
-                                elementSelectedId != null)
+                            polylines: polylines,
+                            circles: circles,
+                            markers: markers,
+                            onCameraMove: (CameraPosition cameraPosition) {
+                              setState(() {
+                                zoomMap = cameraPosition.zoom;
+                              });
+                            },
+                            onMapCreated: (GoogleMapController controller) {
+                              if (location != null &&
+                                  _mapController.isCompleted &&
+                                  !isMapLoading) {
+                                controller.moveCamera(
+                                    CameraUpdate.newLatLngZoom(
+                                        location!, zoomMap));
+                              }
+                              if (!_mapController.isCompleted) {
+                                _mapController.complete(controller);
+                              }
+                            },
+                            onTap: (LatLng latLng) {
+                              if (locationManual) {
+                                setState(() {
+                                  final Marker newMarker = Marker(
+                                    onTap: () {},
+                                    markerId: const MarkerId(
+                                        'tapped_location_manual'),
+                                    position: latLng,
+                                  );
+                                  markersGPS.clear();
+                                  markersGPS.add(newMarker);
+                                  _getMarkers();
+                                  location =
+                                      LatLng(latLng.latitude, latLng.longitude);
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                      LoadingOverlay(
+                        isLoading: isMapLoading && !viewDetailElementInfo,
+                        child: Positioned(
+                          top: kIsWeb ? null : 80,
+                          right: kIsWeb ? null : 16,
+                          bottom: kIsWeb ? 80 : null,
+                          left: kIsWeb ? 16 : null,
+                          child: Column(
+                            children: [
+                              MenuElevatedButton(
+                                colorChangeOnPress: true,
+                                onPressed: () {
+                                  setState(() {
+                                    _currentMapType =
+                                        _currentMapType == MapType.normal
+                                            ? MapType.satellite
+                                            : MapType.normal;
+                                  });
+                                },
+                                tooltipMessage: AppLocalizations.of(context)!
+                                    .map_component_map_view_tooltip,
+                                icon: _currentMapType == MapType.normal
+                                    ? Icons.map
+                                    : Icons.satellite,
+                              ),
+                              if (kIsWeb) const SizedBox(height: 6),
+                              MenuElevatedButton(
+                                onPressed: () async {
+                                  await fetchAndUpdateData(token!);
+                                },
+                                tooltipMessage: AppLocalizations.of(context)!
+                                    .map_component_fetch_elements,
+                                icon: Icons.area_chart_outlined,
+                              ),
+                              if (kIsWeb) SizedBox(height: 6),
+                              MenuElevatedButton(
+                                  onPressed: () {
+                                    markersGPS.clear();
+                                    getCurrentLocation();
+                                    _getMarkers();
+                                    setState(() {
+                                      polylines = {};
+                                      circles = {};
+                                    });
+                                  },
+                                  icon: Icons.my_location,
+                                  tooltipMessage: AppLocalizations.of(context)!
+                                      .map_component_get_location),
+                              if (kIsWeb) const SizedBox(height: 6),
+                              MenuElevatedButton(
+                                colorChangeOnPress: true,
+                                onPressed: () {
+                                  setState(() {
+                                    final selectedItemsProvider =
+                                        context.read<SelectedItemsProvider>();
+                                    selectedItemsProvider.clearAll();
+                                    isDetailsButtonVisible = false;
+                                    markersGPS.clear();
+                                    if (kIsWeb) {
+                                      viewDetailElementInfo = false;
+                                    }
+                                    polylines = {};
+                                    circles = {};
+                                    locationManual = !locationManual;
+                                  });
+                                },
+                                colorSelected: redColor,
+                                colorNotSelected: lightBackground,
+                                tooltipMessage: AppLocalizations.of(context)!
+                                    .map_component_select_location,
+                                icon: Icons.location_pin,
+                              ),
+                              if (kIsWeb) const SizedBox(height: 6),
+                              MenuElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    distanceSelected = (distanceSelected + 1) %
+                                        distances.length;
+                                  });
+                                },
+                                tooltipMessage: AppLocalizations.of(context)!
+                                    .map_component_diameter_tooltip,
+                                text: distances[distanceSelected],
+                              ),
+                              if (kIsWeb) const SizedBox(height: 6),
+                              MultiSelectPopupMenuButton(
+                                texts: const [
+                                  'Tramos',
+                                  'Registros',
+                                  'Captaciones',
+                                  'Parcelas'
+                                ],
+                                selectedIndices: selectedIndices,
+                                onIconsSelected: handleIconsSelected,
+                              ),
+                              if (kIsWeb) const SizedBox(height: 6),
                               Visibility(
-                                visible: kIsWeb && !widget.isModal &&
-                                    viewDetailElementInfo,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 0),
-                                    onEnd: () {},
-                                    curve: Curves.easeIn,
-                                    width: viewDetailElementInfo
-                                        ? modalWidth
-                                        : 0,
-                                    child: Container(
-                                      width: viewDetailElementInfo
-                                          ? modalWidth
-                                          : 0,
-                                      color: const Color.fromRGBO(
-                                          253, 255, 252, 1),
-                                      child: Column(
-                                        children: [
-                                          ElementDetailWeb(
-                                            elementType: elementSelectedType,
-                                            onPressed: () {
-                                              setState(() {
-                                                viewDetailElementInfo = false;
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                visible: isDetailsButtonVisible &&
+                                    !kIsWeb &&
+                                    !widget.isModal,
+                                child: MenuElevatedButton(
+                                  onPressed: () async {
+                                    if (isSomeElementSelected() &&
+                                        elementSelectedType != null) {
+                                      showElementModal(
+                                        context,
+                                        elementSelectedType!,
+                                        () {},
+                                      );
+                                      await _fetchElementInfo();
+                                    }
+                                  },
+                                  icon: Icons.list_alt,
                                 ),
                               ),
-                          ],
+                            ],
+                          ),
                         ),
-                      );
-                    });
-              });
+                      )
+                    ],
+                  ),
+                ),
+                if (elementSelectedType != null && elementSelectedId != null)
+                  Visibility(
+                    visible: kIsWeb && !widget.isModal && viewDetailElementInfo,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 0),
+                        onEnd: () {},
+                        curve: Curves.easeIn,
+                        width: viewDetailElementInfo ? modalWidth : 0,
+                        child: Container(
+                          width: viewDetailElementInfo ? modalWidth : 0,
+                          color: const Color.fromRGBO(253, 255, 252, 1),
+                          child: Column(
+                            children: [
+                              ElementDetailWeb(
+                                elementType: elementSelectedType,
+                                onPressed: () {
+                                  setState(() {
+                                    viewDetailElementInfo = false;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
         });
+      });
+    });
   }
 }

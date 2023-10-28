@@ -9,6 +9,7 @@ import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/images_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
@@ -55,6 +56,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<RegisterViewModel>(
           create: (context) => RegisterViewModel(),
+        ),
+        ChangeNotifierProvider<LotViewModel>(
+          create: (context) => LotViewModel(),
         ),
       ],
       child: MyApp(),

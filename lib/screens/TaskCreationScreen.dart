@@ -140,6 +140,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       selectedItemsProvider.setSections(task.sections);
       selectedItemsProvider.setCatchments(task.catchments);
       selectedItemsProvider.setRegisters(task.registers);
+      selectedItemsProvider.setLots(task.lots);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -278,6 +279,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
 
+    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final List<String> listSelectedLots =
+        selectedLots.map((polylineId) => polylineId.value).toList();
+
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -290,7 +295,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "user": userAssigned,
       "tramos": listSelectedSections,
       "captaciones": listSelectedCatchments,
-      "registros": listSelectedRegisters
+      "registros": listSelectedRegisters,
+      "parcelas": listSelectedLots
     };
     return requestBody;
   }
@@ -312,6 +318,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         context.read<SelectedItemsProvider>().selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
+    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final List<String> listSelectedLots =
+        selectedLots.map((polylineId) => polylineId.value).toList();
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -329,7 +338,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "conclusions": conclusionsController.text,
       "tramos": listSelectedSections,
       "captaciones": listSelectedCatchments,
-      "registros": listSelectedRegisters
+      "registros": listSelectedRegisters,
+      "parcelas": listSelectedLots,
     };
     return requestBody;
   }
@@ -564,8 +574,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             final selectedRegisters = selectedItemsProvider
                                 .selectedRegisters
                                 .toList();
+                            final selectedLots =
+                                selectedItemsProvider.selectedLots.toList();
 
-                            return selectedSections.isNotEmpty
+                            return selectedItemsProvider.isSomeElementSelected()
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -599,6 +611,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                                 in selectedRegisters)
                                               EntityIdContainer(
                                                   id: registerId.value),
+                                            const SizedBox(height: 10),
+                                            Text("parcelas: "),
+                                            for (var lotId in selectedLots)
+                                              EntityIdContainer(
+                                                  id: lotId.value),
                                           ],
                                         ),
                                       ),

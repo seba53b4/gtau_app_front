@@ -4,6 +4,7 @@ import 'package:gtau_app_front/widgets/common/section_detail.dart';
 
 import '../../models/enums/element_type.dart';
 import 'catchment_detail.dart';
+import 'lot_detail.dart';
 
 class DetailElementWidget extends StatefulWidget {
   final ElementType? elementType;
@@ -17,15 +18,12 @@ class DetailElementWidget extends StatefulWidget {
 class _DetailWidgetState extends State<DetailElementWidget> {
   @override
   Widget build(BuildContext context) {
-    switch (widget.elementType) {
-      case ElementType.catchment:
-        return const CatchmentDetail();
-      case ElementType.register:
-        return const RegisterDetail();
-      case ElementType.section:
-        return const SectionDetail();
-      default:
-        throw Exception('Invalid status string: ${widget.elementType}');
-    }
+    return switch (widget.elementType) {
+      ElementType.catchment => const CatchmentDetail(),
+      ElementType.register => const RegisterDetail(),
+      ElementType.section => const SectionDetail(),
+      ElementType.lot => const LotDetail(),
+      _ => throw Exception('Invalid status string: ${widget.elementType}')
+    };
   }
 }
