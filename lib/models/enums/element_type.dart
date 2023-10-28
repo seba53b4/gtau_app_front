@@ -1,7 +1,8 @@
 enum ElementType {
   catchment(type: "C"),
   register(type: "R"),
-  section(type: "S");
+  section(type: "S"),
+  lot(type: "L");
 
   const ElementType({
     required this.type,
