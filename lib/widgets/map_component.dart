@@ -224,8 +224,7 @@ class _MapComponentState extends State<MapComponent> {
       int ogcFid, Circle? point, ElementType type) async {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
-      selectedItemsProvider.toggleCircleSelected(
-          point!.circleId, ElementType.catchment);
+      selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
     } else {
       if (!(selectedItemsProvider.isSomePolylineSelected(type) ||
           selectedItemsProvider.isSomeCircleSelected(type))) {
@@ -239,8 +238,7 @@ class _MapComponentState extends State<MapComponent> {
           }
         } else {
           selectedItemsProvider.clearAll();
-          selectedItemsProvider.toggleCircleSelected(
-              point!.circleId, ElementType.catchment);
+          selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
           setState(() {
             elementSelectedId = ogcFid;
             elementSelectedType = type;
