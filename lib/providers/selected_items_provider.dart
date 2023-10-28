@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../models/enums/element_type.dart';
+
 class SelectedItemsProvider with ChangeNotifier {
   bool _letMultipleItemsSelected = false;
 
@@ -18,16 +20,33 @@ class SelectedItemsProvider with ChangeNotifier {
 
   Set<CircleId> get selectedCatchments => _selectedCatchments;
 
+  Set<PolylineId> _selectedLots = {};
+
+  Set<PolylineId> get selectedLots => _selectedLots;
+
   void activateMultipleSelection() {
     _letMultipleItemsSelected = true;
   }
 
-  void toggleSectionSelected(PolylineId polylineId) {
-    if (_selectedSections.contains(polylineId)) {
-      _selectedSections.remove(polylineId);
+  void togglePolylineSelected(PolylineId polylineId, ElementType type) {
+    var list = getPolylineList(type);
+    if (list.contains(polylineId)) {
+      list.remove(polylineId);
     } else {
-      if (_selectedSections.isEmpty || _letMultipleItemsSelected) {
-        _selectedSections.add(polylineId);
+      if (list.isEmpty || _letMultipleItemsSelected) {
+        list.add(polylineId);
+      }
+    }
+    notifyListeners();
+  }
+
+  void toggleCircleSelected(CircleId circleId, ElementType type) {
+    var circleList = getCircleList(type);
+    if (circleList.contains(circleId)) {
+      circleList.remove(circleId);
+    } else {
+      if (circleList.isEmpty || _letMultipleItemsSelected) {
+        circleList.add(circleId);
       }
     }
     notifyListeners();
@@ -54,66 +73,65 @@ class SelectedItemsProvider with ChangeNotifier {
     }
   }
 
-  bool isSectionSelected(PolylineId polylineId) {
-    return _selectedSections.contains(polylineId);
-  }
-
-  void toggleRegistroSelected(CircleId circleId) {
-    if (_selectedRegisters.contains(circleId)) {
-      _selectedRegisters.remove(circleId);
-    } else {
-      if (_selectedRegisters.isEmpty || _letMultipleItemsSelected) {
-        _selectedRegisters.add(circleId);
-      }
+  void setLots(Set<PolylineId>? lots) {
+    if (lots != null) {
+      _selectedLots = lots;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
-  bool isRegistroSelected(CircleId circleId) {
-    return _selectedRegisters.contains(circleId);
+  bool isPolylineSelected(PolylineId polylineId, ElementType type) {
+    var polylineList = getPolylineList(type);
+    return polylineList.contains(polylineId);
   }
 
-  bool isSomeRegisterSelected() {
-    return _selectedRegisters.isNotEmpty;
+  bool isSomePolylineSelected(ElementType type) {
+    var polylineList = getPolylineList(type);
+    return polylineList.isNotEmpty;
   }
 
-  bool isSomeCatchmentSelected() {
-    return _selectedCatchments.isNotEmpty;
+  bool isCircleSelected(CircleId circleId, ElementType type) {
+    var circleList = getCircleList(type);
+    return circleList.contains(circleId);
   }
 
-  bool isSomeSectionSelected() {
-    return _selectedSections.isNotEmpty;
-  }
-
-  void toggleCatchmentSelected(CircleId circleId) {
-    if (_selectedCatchments.contains(circleId)) {
-      _selectedCatchments.remove(circleId);
-    } else {
-      if (_selectedCatchments.isEmpty || _letMultipleItemsSelected) {
-        _selectedCatchments.add(circleId);
-      }
-    }
-    notifyListeners();
-  }
-
-  bool isCatchmentSelected(CircleId circleId) {
-    return _selectedCatchments.contains(circleId);
+  bool isSomeCircleSelected(ElementType type) {
+    var circleList = getCircleList(type);
+    return circleList.isNotEmpty;
   }
 
   bool isSomeElementSelected() {
     return _selectedSections.isNotEmpty ||
         _selectedCatchments.isNotEmpty ||
-        _selectedRegisters.isNotEmpty;
+        _selectedRegisters.isNotEmpty ||
+        _selectedLots.isNotEmpty;
   }
 
-  void clearAllSelections() {
+  Set<CircleId> getCircleList(ElementType type) {
+    return switch (type) {
+      ElementType.register => _selectedRegisters,
+      ElementType.catchment => _selectedCatchments,
+      _ => Set()
+    };
+  }
+
+  Set<PolylineId> getPolylineList(ElementType type) {
+    return switch (type) {
+      ElementType.section => _selectedSections,
+      ElementType.lot => _selectedLots,
+      _ => Set()
+    };
+  }
+
+  void clearAll() {
     _selectedCatchments.clear();
     _selectedSections.clear();
     _selectedRegisters.clear();
+    _selectedLots.clear();
   }
 
   void reset() {
-    clearAllSelections();
+    clearAll();
     _letMultipleItemsSelected = false;
   }
 }

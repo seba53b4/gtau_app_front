@@ -55,7 +55,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   final conclusionsController = TextEditingController();
   final addDateController = TextEditingController();
   final releasedDateController = TextEditingController();
-  final String formatDate = 'dd-MM-yyyy';
+
+  SelectedItemsProvider? selectedItemsProvider;
 
   String numOrder = "";
 
@@ -78,6 +79,49 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    selectedItemsProvider = context.read<SelectedItemsProvider>();
+  }
+
+  @override
+  void dispose() {
+    descriptionController.dispose();
+    numWorkController.dispose();
+    locationController.dispose();
+    scheduledNumberController.dispose();
+    contactController.dispose();
+    applicantController.dispose();
+    userAssignedController.dispose();
+    lengthController.dispose();
+    materialController.dispose();
+    observationsController.dispose();
+    conclusionsController.dispose();
+    addDateController.dispose();
+    releasedDateController.dispose();
+    if (selectedItemsProvider != null) {
+      selectedItemsProvider!.reset();
+    }
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.detail) {
+      widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
+      releasedDate = DateTime.now();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
+        initializeTask();
+      });
+      Hive.initFlutter().then((value) => null);
+    } else {
+      startDate = DateTime.now();
+    }
+  }
+
   Future<bool> _fetchTask() async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
     final taskListViewModel =
@@ -97,6 +141,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       selectedItemsProvider.setSections(task.sections);
       selectedItemsProvider.setCatchments(task.catchments);
       selectedItemsProvider.setRegisters(task.registers);
+      selectedItemsProvider.setLots(task.lots);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -182,40 +227,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     await _fetchTask();
   }
 
-  @override
-  void dispose() {
-    descriptionController.dispose();
-    numWorkController.dispose();
-    locationController.dispose();
-    scheduledNumberController.dispose();
-    contactController.dispose();
-    applicantController.dispose();
-    userAssignedController.dispose();
-    lengthController.dispose();
-    materialController.dispose();
-    observationsController.dispose();
-    conclusionsController.dispose();
-    addDateController.dispose();
-    releasedDateController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.detail) {
-      widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
-      releasedDate = DateTime.now();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-        initializeTask();
-      });
-      Hive.initFlutter().then((value) => null);
-    } else {
-      startDate = DateTime.now();
-    }
-  }
-
   void handleStartDateChange(DateTime date) {
     setState(() {
       startDate = date;
@@ -269,6 +280,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
 
+    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final List<String> listSelectedLots =
+        selectedLots.map((polylineId) => polylineId.value).toList();
+
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -281,7 +296,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "user": userAssigned,
       "tramos": listSelectedSections,
       "captaciones": listSelectedCatchments,
-      "registros": listSelectedRegisters
+      "registros": listSelectedRegisters,
+      "parcelas": listSelectedLots
     };
     return requestBody;
   }
@@ -303,6 +319,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         context.read<SelectedItemsProvider>().selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
+    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final List<String> listSelectedLots =
+        selectedLots.map((polylineId) => polylineId.value).toList();
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -320,7 +339,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "conclusions": conclusionsController.text,
       "tramos": listSelectedSections,
       "captaciones": listSelectedCatchments,
-      "registros": listSelectedRegisters
+      "registros": listSelectedRegisters,
+      "parcelas": listSelectedLots,
     };
     return requestBody;
   }
@@ -550,8 +570,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             final selectedRegisters = selectedItemsProvider
                                 .selectedRegisters
                                 .toList();
+                            final selectedLots =
+                                selectedItemsProvider.selectedLots.toList();
 
-                            return selectedSections.isNotEmpty
+                            return selectedItemsProvider.isSomeElementSelected()
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -585,6 +607,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                                 in selectedRegisters)
                                               EntityIdContainer(
                                                   id: registerId.value),
+                                            const SizedBox(height: 10),
+                                            Text("parcelas: "),
+                                            for (var lotId in selectedLots)
+                                              EntityIdContainer(
+                                                  id: lotId.value),
                                           ],
                                         ),
                                       ),
