@@ -13,6 +13,7 @@
     "createTaskPage_assignedUserTitle": "Usuario asignado",
     "createTaskPage_orderServiceNumberTitle": "Orden de servicio",
     "createTaskPage_solicitantTitle": "Solicitante",
+    "createTaskPage_solicitantPlaceholder": "Ingrese solicitante",
     "createTaskPage_contactTitle": "Contacto",
     "createTaskPage_longitudeTitle": "Longitud",
     "createTaskPage_materialTitle": "Material",

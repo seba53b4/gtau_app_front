@@ -7,6 +7,10 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputType textInputType;
   final int maxLength;
   final double width;
+  final double height;
+  final bool isTextBox;
+  final int maxLines;
+  final Color backgroundColor;
 
   const CustomTextFormField({
     required this.controller,
@@ -14,7 +18,11 @@ class CustomTextFormField extends StatelessWidget {
     this.textInputType = TextInputType.text,
     this.maxLength = 12,
     Key? key,
-    this.width = 200,
+    this.width = 180,
+    this.isTextBox = false,
+    this.maxLines = 1,
+    this.height = 94,
+    this.backgroundColor = const Color.fromRGBO(253, 255, 252, 1),
   }) : super(key: key);
 
   @override
@@ -31,15 +39,27 @@ class CustomTextFormField extends StatelessWidget {
 
     return SizedBox(
       width: width,
+      height: height,
       child: TextFormField(
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
+        maxLines: maxLines,
         decoration: InputDecoration(
           hintText: hintText,
-          border: const OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(isTextBox ? 24 : 48),
+          ),
+          contentPadding: isTextBox
+              ? const EdgeInsets.symmetric(vertical: 16, horizontal: 16)
+              : const EdgeInsets.symmetric(vertical: 21, horizontal: 8),
+          filled: true,
+          fillColor: backgroundColor,
+        ),
+        style: const TextStyle(
+          fontSize: 16,
         ),
         controller: controller,
-        maxLength: maxLength,
+        //maxLength: maxLength,
         maxLengthEnforcement: MaxLengthEnforcement.none,
       ),
     );
