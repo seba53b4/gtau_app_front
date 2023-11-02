@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gtau_app_front/constants/app_constants.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -18,11 +19,11 @@ class CustomTextFormField extends StatelessWidget {
     this.textInputType = TextInputType.text,
     this.maxLength = 12,
     Key? key,
-    this.width = 180,
+    this.width = AppConstants.textFieldWidth,
     this.isTextBox = false,
     this.maxLines = 1,
     this.height = 94,
-    this.backgroundColor = const Color.fromRGBO(253, 255, 252, 1),
+    this.backgroundColor = AppConstants.backgroundColor,
   }) : super(key: key);
 
   @override

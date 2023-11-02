@@ -8,6 +8,7 @@ import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../constants/app_constants.dart';
 import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
@@ -427,6 +428,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double widthRow = 640;
+    double heightrow = 128;
+
     return Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
       return LoadingOverlay(
@@ -437,7 +441,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               margin:
                   const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   //const SizedBox(height: 36.0),
                   Text(
@@ -468,17 +471,20 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   const SizedBox(height: 20.0),
                   if (selectedIndex == 1)
                     BoxContainer(
-                      width: 1048,
+                      width: widthRow * 1.25,
                       padding: const EdgeInsets.all(24),
                       child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // Primera fila
                           SizedBox(
-                            height: 128,
+                            height: heightrow,
+                            width: widthRow,
                             child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Column(
                                     children: [
@@ -487,7 +493,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             .createTaskPage_numberWorkTitle,
                                         style: const TextStyle(fontSize: 16.0),
                                       ),
-                                      const SizedBox(height: 12.0),
+                                      const SizedBox(
+                                          height: AppConstants.taskColumnSpace),
                                       CustomTextFormField(
                                         hintText: AppLocalizations.of(context)!
                                             .createTaskPage_numberWorkTitle,
@@ -496,7 +503,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(width: 24.0),
+                                  const SizedBox(
+                                      width: AppConstants.taskRowSpace),
                                   Column(children: [
                                     Text(
                                       AppLocalizations.of(context)!
@@ -515,9 +523,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           .map((status) => status.value)
                                           .toList(),
                                     ),
-                                    const SizedBox(height: 16.0),
+                                    const SizedBox(
+                                        height: AppConstants.taskColumnSpace),
                                   ]),
-                                  const SizedBox(width: 24.0),
+                                  const SizedBox(
+                                      width: AppConstants.taskRowSpace),
                                   Column(
                                     children: [
                                       Text(
@@ -539,20 +549,20 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           });
                                         },
                                       ),
-                                      const SizedBox(height: 16.0),
+                                      const SizedBox(
+                                          height: AppConstants.taskColumnSpace),
                                     ],
                                   ),
                                 ]),
                           ),
-                          //const SizedBox(height: 20.0),
                           // Segunda fila
                           SizedBox(
-                            height: 128,
+                            height: heightrow,
+                            width: widthRow,
                             child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const SizedBox(height: 10.0),
                                 Column(
                                   children: [
                                     Text(
@@ -560,9 +570,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           .createTaskPage_startDateTitle,
                                       style: const TextStyle(fontSize: 16.0),
                                     ),
-                                    const SizedBox(height: 12.0),
+                                    const SizedBox(
+                                        height: AppConstants.taskColumnSpace),
                                     SizedBox(
-                                      width: 160,
+                                      width: AppConstants.textFieldWidth,
                                       child: InkWell(
                                         overlayColor:
                                             MaterialStateColor.resolveWith(
@@ -595,7 +606,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(width: 24.0),
+                                const SizedBox(
+                                    width: AppConstants.taskRowSpace),
                                 Column(
                                   children: [
                                     Text(
@@ -605,6 +617,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                     ),
                                     const SizedBox(height: 12.0),
                                     CustomTextFormField(
+                                      width: AppConstants.textFieldWidth * 2 +
+                                          AppConstants.taskRowSpace,
                                       hintText: AppLocalizations.of(context)!
                                           .createTaskPage_solicitantPlaceholder,
                                       controller: applicantController,
@@ -622,25 +636,27 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               Text(
                                 AppLocalizations.of(context)!
                                     .createTaskPage_selectUbicationTitle,
-                                style: const TextStyle(fontSize: 24.0),
+                                style: const TextStyle(fontSize: 16.0),
                               ),
+                              const SizedBox(height: 12.0),
                               CustomTextFormField(
-                                width: 828,
+                                width: widthRow,
                                 hintText: AppLocalizations.of(context)!
-                                    .default_placeHolderInputText,
+                                    .createTaskPage_selectUbicationplaceholder,
                                 controller: locationController,
                               ),
-                              const SizedBox(width: 24.0),
+                              const SizedBox(width: AppConstants.taskRowSpace),
                               Text(
                                 AppLocalizations.of(context)!
                                     .default_descriptionTitle,
-                                style: const TextStyle(fontSize: 24.0),
+                                style: const TextStyle(fontSize: 16.0),
                               ),
+                              const SizedBox(height: 12.0),
                               CustomTextFormField(
                                 isTextBox: true,
                                 maxLines: 10,
-                                width: 828,
-                                height: 120,
+                                width: widthRow,
+                                height: heightrow,
                                 hintText: AppLocalizations.of(context)!
                                     .default_descriptionPlaceholder,
                                 controller: descriptionController,
