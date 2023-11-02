@@ -12,6 +12,7 @@ class CustomTextFormField extends StatelessWidget {
   final bool isTextBox;
   final int maxLines;
   final Color backgroundColor;
+  final double fontSize;
 
   const CustomTextFormField({
     required this.controller,
@@ -24,6 +25,7 @@ class CustomTextFormField extends StatelessWidget {
     this.maxLines = 1,
     this.height = 94,
     this.backgroundColor = AppConstants.backgroundColor,
+    this.fontSize = 16,
   }) : super(key: key);
 
   @override
@@ -56,8 +58,8 @@ class CustomTextFormField extends StatelessWidget {
           filled: true,
           fillColor: backgroundColor,
         ),
-        style: const TextStyle(
-          fontSize: 16,
+        style: TextStyle(
+          fontSize: fontSize,
         ),
         controller: controller,
         //maxLength: maxLength,

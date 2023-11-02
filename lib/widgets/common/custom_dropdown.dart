@@ -8,6 +8,7 @@ class CustomDropdown extends StatelessWidget {
   final double height;
   final double circularBorderRadius;
   final Color backgroundColor;
+  final double fontSize;
 
   const CustomDropdown({
     required this.value,
@@ -17,6 +18,7 @@ class CustomDropdown extends StatelessWidget {
     this.circularBorderRadius = 48.0,
     this.height = 54,
     this.backgroundColor = const Color.fromRGBO(253, 255, 252, 1),
+    this.fontSize = 14.0,
     Key? key,
   }) : super(key: key);
 
@@ -47,6 +49,9 @@ class CustomDropdown extends StatelessWidget {
               child: Text(
                 item,
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: fontSize,
+                ),
               ),
             ),
           );
