@@ -443,15 +443,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
               child: Column(
                 children: [
-                  //const SizedBox(height: 36.0),
-                  Text(
-                    widget.detail
-                        ? AppLocalizations.of(context)!
-                            .createTaskPage_titleOnEdit
-                        : AppLocalizations.of(context)!.createTaskPage_title,
-                    style: const TextStyle(fontSize: 32.0),
-                  ),
-                  const SizedBox(height: 20.0),
+                  const SizedBox(height: 12.0),
                   Visibility(
                     visible: !widget.detail,
                     child: CustomToggleButtons(
@@ -470,7 +462,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                   ),
                   const SizedBox(height: 20.0),
-                  //if (selectedIndex == 1)
                   Visibility(
                     visible: selectedIndex == 1 && kIsWeb,
                     child: BoxContainer(
@@ -480,6 +471,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Text(
+                            AppLocalizations.of(context)!.taskInformationTitle,
+                            style: const TextStyle(fontSize: 32.0),
+                          ),
+                          const SizedBox(height: 24.0),
                           // Primera fila
                           SizedBox(
                             height: heightrow,
@@ -539,8 +535,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                      width: AppConstants.taskRowSpace),
                                   Column(children: [
                                     Text(
                                       AppLocalizations.of(context)!
@@ -671,149 +665,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20.0),
-                          if (widget.detail) const SizedBox(height: 10.0),
-                          if (widget.detail)
-                            Text(
-                              AppLocalizations.of(context)!
-                                  .createTaskPage_realizationDateTitle,
-                              style: const TextStyle(fontSize: 24.0),
-                            ),
-                          Visibility(
-                            visible: widget.detail,
-                            child: InkWell(
-                              onTap: () async {
-                                final DateTime? pickedDate =
-                                    await showDatePicker(
-                                  context: context,
-                                  initialDate: releasedDate!,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (pickedDate != null) {
-                                  handleReleasedDateChange(pickedDate);
-                                }
-                              },
-                              child: IgnorePointer(
-                                child: TextFormField(
-                                  decoration: InputDecoration(
-                                    hintText: AppLocalizations.of(context)!
-                                        .default_datepicker_hint,
-                                  ),
-                                  controller: releasedDateController,
-                                  enabled: false,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (widget.detail) const SizedBox(height: 10.0),
-                          Visibility(
-                            visible: widget.detail,
-                            child: MapModal(),
-                          ),
-                          Visibility(
-                            visible: widget.detail,
-                            child: Consumer<SelectedItemsProvider>(
-                              builder: (context, selectedItemsProvider, child) {
-                                final selectedSections = selectedItemsProvider
-                                    .selectedPolylines
-                                    .toList();
-                                final selectedCatchments = selectedItemsProvider
-                                    .selectedCatchments
-                                    .toList();
-                                final selectedRegisters = selectedItemsProvider
-                                    .selectedRegisters
-                                    .toList();
-                                final selectedLots =
-                                    selectedItemsProvider.selectedLots.toList();
-
-                                return selectedItemsProvider
-                                        .isSomeElementSelected()
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .elementsTitle,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: Row(
-                                              children: [
-                                                Text("tramos: "),
-                                                for (var sectionId
-                                                    in selectedSections)
-                                                  EntityIdContainer(
-                                                      id: sectionId.value),
-                                                const SizedBox(height: 10),
-                                                Text("captaciones: "),
-                                                for (var catchmentId
-                                                    in selectedCatchments)
-                                                  EntityIdContainer(
-                                                      id: catchmentId.value),
-                                                const SizedBox(height: 10),
-                                                Text("registros: "),
-                                                for (var registerId
-                                                    in selectedRegisters)
-                                                  EntityIdContainer(
-                                                      id: registerId.value),
-                                                const SizedBox(height: 10),
-                                                Text("parcelas: "),
-                                                for (var lotId in selectedLots)
-                                                  EntityIdContainer(
-                                                      id: lotId.value),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .elementsTitle,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 10.0),
-                          // Text(
-                          //   AppLocalizations.of(context)!
-                          //       .createTaskPage_selectUbicationTitle,
-                          //   style: const TextStyle(fontSize: 24.0),
-                          // ),
-                          // TextFormField(
-                          //   decoration: InputDecoration(
-                          //     hintText: AppLocalizations.of(context)!
-                          //         .default_placeHolderInputText,
-                          //     border: const OutlineInputBorder(),
-                          //   ),
-                          //   controller: locationController,
-                          // ),
-                          const SizedBox(height: 10.0),
-                          if (widget.detail)
-                            TextFormField(
-                              decoration: InputDecoration(
-                                hintText: AppLocalizations.of(context)!
-                                    .default_placeHolderInputText,
-                                border: const OutlineInputBorder(),
-                              ),
-                              controller: userAssignedController,
-                            ),
-
-                          const SizedBox(height: 10.0)
                         ],
                       ),
                     ),
@@ -827,6 +678,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Text(
+                            AppLocalizations.of(context)!.taskInformationTitle,
+                            style: const TextStyle(fontSize: 24.0),
+                          ),
+                          const SizedBox(height: 16.0),
                           // Primera fila
                           SizedBox(
                             height: 100,
@@ -1024,6 +880,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               CustomTextFormField(
                                 isTextBox: true,
                                 maxLines: 10,
+                                fontSize: 12,
                                 width: widthRow,
                                 height: heightrow,
                                 hintText: AppLocalizations.of(context)!
@@ -1033,154 +890,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ],
                           ),
                           const SizedBox(height: 20.0),
-                          if (widget.detail) const SizedBox(height: 10.0),
-                          if (widget.detail)
-                            Text(
-                              AppLocalizations.of(context)!
-                                  .createTaskPage_realizationDateTitle,
-                              style: const TextStyle(fontSize: 24.0),
-                            ),
-                          Visibility(
-                            visible: widget.detail,
-                            child: InkWell(
-                              onTap: () async {
-                                final DateTime? pickedDate =
-                                    await showDatePicker(
-                                  context: context,
-                                  initialDate: releasedDate!,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (pickedDate != null) {
-                                  handleReleasedDateChange(pickedDate);
-                                }
-                              },
-                              child: IgnorePointer(
-                                child: TextFormField(
-                                  decoration: InputDecoration(
-                                    hintText: AppLocalizations.of(context)!
-                                        .default_datepicker_hint,
-                                  ),
-                                  controller: releasedDateController,
-                                  enabled: false,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (widget.detail) const SizedBox(height: 10.0),
-                          Visibility(
-                            visible: widget.detail,
-                            child: MapModal(),
-                          ),
-                          Visibility(
-                            visible: widget.detail,
-                            child: Consumer<SelectedItemsProvider>(
-                              builder: (context, selectedItemsProvider, child) {
-                                final selectedSections = selectedItemsProvider
-                                    .selectedPolylines
-                                    .toList();
-                                final selectedCatchments = selectedItemsProvider
-                                    .selectedCatchments
-                                    .toList();
-                                final selectedRegisters = selectedItemsProvider
-                                    .selectedRegisters
-                                    .toList();
-                                final selectedLots =
-                                    selectedItemsProvider.selectedLots.toList();
-
-                                return selectedItemsProvider
-                                        .isSomeElementSelected()
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .elementsTitle,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: Row(
-                                              children: [
-                                                Text("tramos: "),
-                                                for (var sectionId
-                                                    in selectedSections)
-                                                  EntityIdContainer(
-                                                      id: sectionId.value),
-                                                const SizedBox(height: 10),
-                                                Text("captaciones: "),
-                                                for (var catchmentId
-                                                    in selectedCatchments)
-                                                  EntityIdContainer(
-                                                      id: catchmentId.value),
-                                                const SizedBox(height: 10),
-                                                Text("registros: "),
-                                                for (var registerId
-                                                    in selectedRegisters)
-                                                  EntityIdContainer(
-                                                      id: registerId.value),
-                                                const SizedBox(height: 10),
-                                                Text("parcelas: "),
-                                                for (var lotId in selectedLots)
-                                                  EntityIdContainer(
-                                                      id: lotId.value),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .elementsTitle,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 10.0),
-                          // Text(
-                          //   AppLocalizations.of(context)!
-                          //       .createTaskPage_selectUbicationTitle,
-                          //   style: const TextStyle(fontSize: 24.0),
-                          // ),
-                          // TextFormField(
-                          //   decoration: InputDecoration(
-                          //     hintText: AppLocalizations.of(context)!
-                          //         .default_placeHolderInputText,
-                          //     border: const OutlineInputBorder(),
-                          //   ),
-                          //   controller: locationController,
-                          // ),
-                          const SizedBox(height: 10.0),
-                          if (widget.detail)
-                            TextFormField(
-                              decoration: InputDecoration(
-                                hintText: AppLocalizations.of(context)!
-                                    .default_placeHolderInputText,
-                                border: const OutlineInputBorder(),
-                              ),
-                              controller: userAssignedController,
-                            ),
-
-                          const SizedBox(height: 10.0)
                         ],
                       ),
                     ),
                   ),
-                  if (selectedIndex == 0)
-                    Column(
+                  Visibility(
+                    visible: selectedIndex == 0,
+                    child: Column(
                       children: [
                         Text(
                           AppLocalizations.of(context)!
@@ -1197,6 +913,137 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         ),
                       ],
                     ),
+                  ),
+                  if (widget.detail) const SizedBox(height: 10.0),
+                  if (widget.detail)
+                    Text(
+                      AppLocalizations.of(context)!
+                          .createTaskPage_realizationDateTitle,
+                      style: const TextStyle(fontSize: 24.0),
+                    ),
+                  Visibility(
+                    visible: widget.detail,
+                    child: InkWell(
+                      onTap: () async {
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: releasedDate!,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (pickedDate != null) {
+                          handleReleasedDateChange(pickedDate);
+                        }
+                      },
+                      child: IgnorePointer(
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            hintText: AppLocalizations.of(context)!
+                                .default_datepicker_hint,
+                          ),
+                          controller: releasedDateController,
+                          enabled: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (widget.detail) const SizedBox(height: 10.0),
+                  Visibility(
+                    visible: widget.detail,
+                    child: MapModal(),
+                  ),
+                  Visibility(
+                    visible: widget.detail,
+                    child: Consumer<SelectedItemsProvider>(
+                      builder: (context, selectedItemsProvider, child) {
+                        final selectedSections =
+                            selectedItemsProvider.selectedPolylines.toList();
+                        final selectedCatchments =
+                            selectedItemsProvider.selectedCatchments.toList();
+                        final selectedRegisters =
+                            selectedItemsProvider.selectedRegisters.toList();
+                        final selectedLots =
+                            selectedItemsProvider.selectedLots.toList();
+
+                        return selectedItemsProvider.isSomeElementSelected()
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!.elementsTitle,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        Text("tramos: "),
+                                        for (var sectionId in selectedSections)
+                                          EntityIdContainer(
+                                              id: sectionId.value),
+                                        const SizedBox(height: 10),
+                                        Text("captaciones: "),
+                                        for (var catchmentId
+                                            in selectedCatchments)
+                                          EntityIdContainer(
+                                              id: catchmentId.value),
+                                        const SizedBox(height: 10),
+                                        Text("registros: "),
+                                        for (var registerId
+                                            in selectedRegisters)
+                                          EntityIdContainer(
+                                              id: registerId.value),
+                                        const SizedBox(height: 10),
+                                        Text("parcelas: "),
+                                        for (var lotId in selectedLots)
+                                          EntityIdContainer(id: lotId.value),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!.elementsTitle,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  // Text(
+                  //   AppLocalizations.of(context)!
+                  //       .createTaskPage_selectUbicationTitle,
+                  //   style: const TextStyle(fontSize: 24.0),
+                  // ),
+                  // TextFormField(
+                  //   decoration: InputDecoration(
+                  //     hintText: AppLocalizations.of(context)!
+                  //         .default_placeHolderInputText,
+                  //     border: const OutlineInputBorder(),
+                  //   ),
+                  //   controller: locationController,
+                  // ),
+                  const SizedBox(height: 10.0),
+                  if (widget.detail)
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: AppLocalizations.of(context)!
+                            .default_placeHolderInputText,
+                        border: const OutlineInputBorder(),
+                      ),
+                      controller: userAssignedController,
+                    ),
+
                   const SizedBox(height: 10.0),
                   // Text(
                   //   AppLocalizations.of(context)!.default_descriptionTitle,
@@ -1300,8 +1147,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           ),
                         const SizedBox(width: 10.0),
                         CustomElevatedButton(
-                          onPressed:
-                              widget.detail ? handleEditTask : handleSubmit,
+                          onPressed: () {
+                            widget.detail
+                                ? handleEditTask
+                                : () {
+                                    // Se quita acción de creación en Programada
+                                    if (selectedIndex == 1) handleSubmit;
+                                  };
+                          },
                           text: widget.detail
                               ? AppLocalizations.of(context)!.buttonAcceptLabel
                               : AppLocalizations.of(context)!

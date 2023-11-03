@@ -1,6 +1,7 @@
 {
     "@@locale": "es",
     "searchPlaceHolder": "Ingrese su búsqueda...",
+    "taskInformationTitle": "Información de tarea",
     "createTaskPage_title" : "Creación de tarea",
     "createTaskPage_titleOnEdit": "Editar tarea",
     "createTaskPage_scheduled" : "Programada",
