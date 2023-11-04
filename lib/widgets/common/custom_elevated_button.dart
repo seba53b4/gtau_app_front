@@ -8,6 +8,8 @@ class CustomElevatedButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final MessageType? messageType;
+  final double? width;
+  final double? height;
 
   const CustomElevatedButton({
     Key? key,
@@ -16,6 +18,8 @@ class CustomElevatedButton extends StatelessWidget {
     this.backgroundColor,
     this.textColor,
     this.messageType,
+    this.width,
+    this.height,
   }) : super(key: key);
 
   @override
@@ -37,22 +41,21 @@ class CustomElevatedButton extends StatelessWidget {
       }
     }
 
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        foregroundColor: textColor ?? Colors.white,
-        backgroundColor: backgroundColor ?? buttonBackgroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24.0),
+    return SizedBox(
+      width: width,
+      height: height,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          foregroundColor: textColor ?? Colors.white,
+          backgroundColor: backgroundColor ?? buttonBackgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+          ),
         ),
-      ),
-      child: Text(
-        text,
-        // style: TextStyle(
-        //   color: textColor ?? Colors.white,
-        //   fontSize: 16.0,
-        //   fontWeight: FontWeight.bold,
-        // ),
+        child: Text(
+          text,
+        ),
       ),
     );
   }

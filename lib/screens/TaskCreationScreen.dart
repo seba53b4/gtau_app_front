@@ -17,6 +17,7 @@ import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../utils/boxes.dart';
+import '../utils/colorUtils.dart';
 import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
 import '../viewmodels/images_viewmodel.dart';
@@ -1180,8 +1181,7 @@ class ElementsSelected extends StatelessWidget {
                       //color: Colors.grey,
                       decoration: BoxDecoration(
                         color: softGrey,
-                        borderRadius: BorderRadius.circular(
-                            24.0), // Ajusta el valor según tus preferencias
+                        borderRadius: BorderRadius.circular(24.0),
                       ),
                       child: Wrap(
                         spacing: 15.0,
@@ -1225,7 +1225,7 @@ class EntityIdContainer extends StatelessWidget {
     return Chip(
       backgroundColor: lightBackground,
       avatar: CircleAvatar(
-        backgroundColor: Colors.blue,
+        backgroundColor: getElementDefaultColor(elementType),
         child: Text(
           initials,
           style: TextStyle(color: Colors.white),
