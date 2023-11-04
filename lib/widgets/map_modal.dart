@@ -5,6 +5,7 @@ import 'package:gtau_app_front/widgets/map_component.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/selected_items_provider.dart';
+import 'common/custom_elevated_button.dart';
 
 const double ratioWeb = 0.8;
 const double ratioTablet = 0.75;
@@ -98,11 +99,11 @@ class MapModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.activateMultipleSelection();
-    return ElevatedButton(
+    return CustomElevatedButton(
       onPressed: () {
         _showMapModal(context);
       },
-      child: Text(AppLocalizations.of(context)!.map_modal_add_elements_button),
+      text: AppLocalizations.of(context)!.map_modal_add_elements_button,
     );
   }
 }

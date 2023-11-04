@@ -10,7 +10,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/app_constants.dart';
+import '../constants/theme_constants.dart';
 import '../dto/image_data.dart';
+import '../models/enums/element_type.dart';
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
@@ -914,221 +916,163 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ],
                     ),
                   ),
-                  if (widget.detail) const SizedBox(height: 10.0),
-                  if (widget.detail)
-                    Text(
-                      AppLocalizations.of(context)!
-                          .createTaskPage_realizationDateTitle,
-                      style: const TextStyle(fontSize: 24.0),
-                    ),
                   Visibility(
                     visible: widget.detail,
-                    child: InkWell(
-                      onTap: () async {
-                        final DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: releasedDate!,
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (pickedDate != null) {
-                          handleReleasedDateChange(pickedDate);
-                        }
-                      },
-                      child: IgnorePointer(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .default_datepicker_hint,
+                    child: Container(
+                      width: widthRow * 1.15,
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.taskInspectionTitle,
+                            style: const TextStyle(fontSize: 32.0),
                           ),
-                          controller: releasedDateController,
-                          enabled: false,
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (widget.detail) const SizedBox(height: 10.0),
-                  Visibility(
-                    visible: widget.detail,
-                    child: MapModal(),
-                  ),
-                  Visibility(
-                    visible: widget.detail,
-                    child: Consumer<SelectedItemsProvider>(
-                      builder: (context, selectedItemsProvider, child) {
-                        final selectedSections =
-                            selectedItemsProvider.selectedPolylines.toList();
-                        final selectedCatchments =
-                            selectedItemsProvider.selectedCatchments.toList();
-                        final selectedRegisters =
-                            selectedItemsProvider.selectedRegisters.toList();
-                        final selectedLots =
-                            selectedItemsProvider.selectedLots.toList();
-
-                        return selectedItemsProvider.isSomeElementSelected()
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context)!.elementsTitle,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: [
-                                        Text("tramos: "),
-                                        for (var sectionId in selectedSections)
-                                          EntityIdContainer(
-                                              id: sectionId.value),
-                                        const SizedBox(height: 10),
-                                        Text("captaciones: "),
-                                        for (var catchmentId
-                                            in selectedCatchments)
-                                          EntityIdContainer(
-                                              id: catchmentId.value),
-                                        const SizedBox(height: 10),
-                                        Text("registros: "),
-                                        for (var registerId
-                                            in selectedRegisters)
-                                          EntityIdContainer(
-                                              id: registerId.value),
-                                        const SizedBox(height: 10),
-                                        Text("parcelas: "),
-                                        for (var lotId in selectedLots)
-                                          EntityIdContainer(id: lotId.value),
-                                      ],
+                          const SizedBox(height: 24.0),
+                          SizedBox(
+                            height: 128,
+                            width: widthRow,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!
+                                          .createTaskPage_realizationDateTitle,
+                                      style: const TextStyle(fontSize: 16.0),
                                     ),
-                                  ),
-                                ],
-                              )
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context)!.elementsTitle,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  // Text(
-                  //   AppLocalizations.of(context)!
-                  //       .createTaskPage_selectUbicationTitle,
-                  //   style: const TextStyle(fontSize: 24.0),
-                  // ),
-                  // TextFormField(
-                  //   decoration: InputDecoration(
-                  //     hintText: AppLocalizations.of(context)!
-                  //         .default_placeHolderInputText,
-                  //     border: const OutlineInputBorder(),
-                  //   ),
-                  //   controller: locationController,
-                  // ),
-                  const SizedBox(height: 10.0),
-                  if (widget.detail)
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!
-                            .default_placeHolderInputText,
-                        border: const OutlineInputBorder(),
-                      ),
-                      controller: userAssignedController,
-                    ),
+                                    const SizedBox(height: 10.0),
+                                    SizedBox(
+                                      width: AppConstants.textFieldWidth,
+                                      child: InkWell(
+                                        overlayColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => Colors.transparent),
+                                        onTap: () async {
+                                          final DateTime? pickedDate =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: releasedDate!,
+                                            firstDate: DateTime(2000),
+                                            lastDate: DateTime(2100),
+                                          );
+                                          if (pickedDate != null) {
+                                            handleReleasedDateChange(
+                                                pickedDate);
+                                          }
+                                        },
+                                        child: IgnorePointer(
+                                          child: CustomTextFormField(
+                                            width: AppConstants.textFieldWidth,
+                                            hintText:
+                                                AppLocalizations.of(context)!
+                                                    .default_datepicker_hint,
+                                            controller: releasedDateController,
+                                            //enabled: false,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!
+                                          .createTaskPage_longitudeTitle,
+                                      style: const TextStyle(fontSize: 16.0),
+                                    ),
+                                    const SizedBox(height: 10.0),
+                                    CustomTextFormField(
+                                      width: AppConstants.textFieldWidth,
+                                      hintText: AppLocalizations.of(context)!
+                                          .default_descriptionPlaceholder,
+                                      controller: lengthController,
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!
+                                          .createTaskPage_materialTitle,
+                                      style: const TextStyle(fontSize: 16.0),
+                                    ),
+                                    const SizedBox(height: 10.0),
+                                    CustomTextFormField(
+                                      width: AppConstants.textFieldWidth,
+                                      hintText: AppLocalizations.of(context)!
+                                          .default_descriptionPlaceholder,
+                                      controller: materialController,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          //const SizedBox(height: AppConstants.taskColumnSpace),
 
-                  const SizedBox(height: 10.0),
-                  // Text(
-                  //   AppLocalizations.of(context)!.default_descriptionTitle,
-                  //   style: const TextStyle(fontSize: 24.0),
-                  // ),
-                  // TextFormField(
-                  //   decoration: InputDecoration(
-                  //     hintText: AppLocalizations.of(context)!
-                  //         .default_descriptionPlaceholder,
-                  //     border: const OutlineInputBorder(),
-                  //   ),
-                  //   controller: descriptionController,
-                  // ),
-                  if (widget.detail)
-                    Column(
-                      children: [
-                        const SizedBox(height: 10.0),
-                        Text(
-                          AppLocalizations.of(context)!
-                              .createTaskPage_longitudeTitle,
-                          style: const TextStyle(fontSize: 24.0),
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .default_descriptionPlaceholder,
-                            border: const OutlineInputBorder(),
+                          // Elementos seleccionados
+                          ElementsSelected(widget: widget),
+                          const SizedBox(height: 10.0),
+                          // Button elementos a seleccionar
+                          const MapModal(),
+                          const SizedBox(height: 10.0),
+                          if (widget.detail)
+                            Column(
+                              children: [
+                                const SizedBox(height: 10.0),
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .createTaskPage_observationsTitle,
+                                  style: const TextStyle(fontSize: 16.0),
+                                ),
+                                const SizedBox(height: 10.0),
+                                CustomTextFormField(
+                                  isTextBox: true,
+                                  maxLines: 10,
+                                  width: widthRow,
+                                  height: heightrow,
+                                  hintText: AppLocalizations.of(context)!
+                                      .default_observationsPlaceholder,
+                                  controller: observationsController,
+                                ),
+                                const SizedBox(height: 10.0),
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .createTaskPage_conclusionsTitle,
+                                  style: const TextStyle(fontSize: 16.0),
+                                ),
+                                const SizedBox(height: 10.0),
+                                CustomTextFormField(
+                                  isTextBox: true,
+                                  maxLines: 10,
+                                  width: widthRow,
+                                  height: heightrow,
+                                  hintText: AppLocalizations.of(context)!
+                                      .default_conclusionsPlaceholder,
+                                  controller: conclusionsController,
+                                ),
+                              ],
+                            ),
+                          Visibility(
+                            visible: widget.detail,
+                            child: UserImage(
+                                onFileChanged: (imagesFiles) {
+                                  this.imagesFiles = imagesFiles;
+                                },
+                                idTask: widget.idTask),
                           ),
-                          controller: lengthController,
-                        ),
-                        const SizedBox(height: 10.0),
-                        Text(
-                          AppLocalizations.of(context)!
-                              .createTaskPage_materialTitle,
-                          style: const TextStyle(fontSize: 24.0),
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .default_descriptionPlaceholder,
-                            border: const OutlineInputBorder(),
+                          Visibility(
+                            visible: widget.detail,
+                            child: ImageGalleryModal(idTask: widget.idTask!),
                           ),
-                          controller: materialController,
-                        ),
-                        const SizedBox(height: 10.0),
-                        Text(
-                          AppLocalizations.of(context)!
-                              .createTaskPage_observationsTitle,
-                          style: const TextStyle(fontSize: 24.0),
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .default_descriptionPlaceholder,
-                            border: const OutlineInputBorder(),
-                          ),
-                          controller: observationsController,
-                        ),
-                        const SizedBox(height: 10.0),
-                        Text(
-                          AppLocalizations.of(context)!
-                              .createTaskPage_conclusionsTitle,
-                          style: const TextStyle(fontSize: 24.0),
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .default_descriptionPlaceholder,
-                            border: const OutlineInputBorder(),
-                          ),
-                          controller: conclusionsController,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  Visibility(
-                    visible: widget.detail,
-                    child: UserImage(
-                        onFileChanged: (imagesFiles) {
-                          this.imagesFiles = imagesFiles;
-                        },
-                        idTask: widget.idTask),
-                  ),
-                  Visibility(
-                    visible: widget.detail,
-                    child: ImageGalleryModal(idTask: widget.idTask!),
                   ),
                   Container(
                     height: 50.0,
@@ -1173,24 +1117,121 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 }
 
-class EntityIdContainer extends StatelessWidget {
-  const EntityIdContainer({
+class ElementsSelected extends StatelessWidget {
+  const ElementsSelected({
     super.key,
-    required this.id,
+    required this.widget,
   });
 
-  final String id;
+  final TaskCreationScreen widget;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(8),
+    return Visibility(
+      visible: widget.detail,
+      child: Consumer<SelectedItemsProvider>(
+        builder: (context, selectedItemsProvider, child) {
+          final elementsList = <EntityIdContainer>[];
+
+          elementsList
+              .addAll(selectedItemsProvider.selectedPolylines.map((element) {
+            return EntityIdContainer(
+              id: element.value,
+              elementType: ElementType.section,
+            );
+          }));
+
+          elementsList
+              .addAll(selectedItemsProvider.selectedCatchments.map((element) {
+            return EntityIdContainer(
+              id: element.value,
+              elementType: ElementType.catchment,
+            );
+          }));
+
+          elementsList
+              .addAll(selectedItemsProvider.selectedRegisters.map((element) {
+            return EntityIdContainer(
+              id: element.value,
+              elementType: ElementType.register,
+            );
+          }));
+
+          elementsList.addAll(selectedItemsProvider.selectedLots.map((element) {
+            return EntityIdContainer(
+              id: element.value,
+              elementType: ElementType.lot,
+            );
+          }));
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.elementsTitle,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 12),
+              elementsList.isNotEmpty
+                  ? Container(
+                      padding: const EdgeInsets.all(8),
+                      //color: Colors.grey,
+                      decoration: BoxDecoration(
+                        color: softGrey,
+                        borderRadius: BorderRadius.circular(
+                            24.0), // Ajusta el valor según tus preferencias
+                      ),
+                      child: Wrap(
+                        spacing: 15.0,
+                        runSpacing: 15.0,
+                        children: elementsList,
+                      ),
+                    )
+                  : const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 12),
+                        Text(
+                          "No hay elementos registrados",
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      ],
+                    ),
+              const SizedBox(height: 12),
+            ],
+          );
+        },
       ),
-      child: Text(id),
+    );
+  }
+}
+
+class EntityIdContainer extends StatelessWidget {
+  const EntityIdContainer({
+    Key? key,
+    required this.id,
+    required this.elementType,
+  }) : super(key: key);
+
+  final String id;
+  final ElementType elementType;
+
+  @override
+  Widget build(BuildContext context) {
+    final initials = elementType.type;
+
+    return Chip(
+      backgroundColor: lightBackground,
+      avatar: CircleAvatar(
+        backgroundColor: Colors.blue,
+        child: Text(
+          initials,
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      label: Text(id),
     );
   }
 }

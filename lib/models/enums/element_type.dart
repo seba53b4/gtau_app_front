@@ -1,7 +1,7 @@
 enum ElementType {
   catchment(type: "C"),
   register(type: "R"),
-  section(type: "S"),
+  section(type: "T"),
   lot(type: "L");
 
   const ElementType({
