@@ -1,5 +1,6 @@
 {
     "@@locale": "es",
+    "titleApp": "PipeTracker",
     "searchPlaceHolder": "Ingrese su búsqueda...",
     "taskInformationTitle": "Información de tarea",
     "taskInspectionTitle": "Datos de inspección",
@@ -38,6 +39,7 @@
     "default_datepicker_hint": "Elija una fecha",
     "toast_warning_wrong_credentials": "Usuario y/o contraseña incorrectos",
     "login_warning_empty_input": "Por favor, ingrese usuario y contraseña",
+    "login_error_auth": "Hubo un error en la autenticación",
     "usernamePlaceholder": "Username",
     "passwordPlaceholder": "Password",
     "loginButton": "Log In",
@@ -48,8 +50,8 @@
     "dialogCancelButton": "Cancelar",
     "dialogCloseButton": "Cerrar",
     "dialogContent": "¿Está seguro de realizar esta acción?",
-    "taskListEditButtonLabel": "Editar",
-    "taskListDeleteButtonLabel": "Eliminar",
+    "editButtonLabel": "Editar",
+    "deleteButtonLabel": "Eliminar",
     "buttonCancelLabel": "Cancelar",
     "buttonAcceptLabel": "Aceptar",
     "map_component_map_view_tooltip": "Cambiar vista de mapa",
@@ -69,5 +71,14 @@
     "navigation_label_map": "Mapa",
     "navigation_label_profile": "Perfil",
     "navigation_label_home": "Inicio",
-    "navigation_label_task_add": "Agregar tareas"
+    "navigation_label_task_add": "Agregar tareas",
+    "modal_image_delete_selection": "Quitar selección",
+    "warning": "Advertencia",
+    "error" : "Error",
+    "see_more": "Ver más",
+    "images_title": "Imágenes",
+    "see_images": "Ver imágenes",
+    "from_camera": "Desde la cámara",
+    "pick_a_file": "Seleccionar desde dispositivo"
+
 }

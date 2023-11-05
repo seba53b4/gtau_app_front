@@ -13,7 +13,7 @@ import '../viewmodels/task_list_viewmodel.dart';
 class TaskStatusDashboard extends StatefulWidget {
   final String? userName;
 
-  const TaskStatusDashboard({Key? key, this.userName});
+  const TaskStatusDashboard({super.key, this.userName});
 
   @override
   _TaskStatusDashboard createState() => _TaskStatusDashboard();
@@ -35,7 +35,6 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     final taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setUserNameFilter(widget.userName);
-    //taskFilterProvider.setLastStatus(TaskStatus.Pending.value);
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
 
@@ -119,7 +118,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
       case 3:
         return _buildTaskList(TaskStatus.Done.value, _scaffoldKeyDashboard);
       default:
-        return Text("Ver más");
+        return Text(AppLocalizations.of(context)!.see_more);
     }
   }
 
@@ -155,8 +154,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
           style: TextStyle(
             fontSize: kIsWeb ? 20 : 13,
             color: isSelected ? Colors.white : Colors.white60,
-            height:
-                1.0, // Ajusta el espaciado entre líneas para centrar verticalmente
+            height: 1.0,
           ),
         ),
       ),

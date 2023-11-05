@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
@@ -1059,18 +1060,24 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                 ),
                               ],
                             ),
-                          Visibility(
-                            visible: widget.detail,
-                            child: UserImage(
-                                onFileChanged: (imagesFiles) {
-                                  this.imagesFiles = imagesFiles;
-                                },
-                                idTask: widget.idTask),
+                          const SizedBox(height: 10.0),
+                          Text(
+                            AppLocalizations.of(context)!.images_title,
+                            style: const TextStyle(fontSize: 16.0),
                           ),
-                          Visibility(
-                            visible: widget.detail,
-                            child: ImageGalleryModal(idTask: widget.idTask!),
-                          ),
+                          Container(
+                              padding: const EdgeInsets.all(12),
+                              width: widthRow,
+                              child: Column(
+                                children: [
+                                  UserImage(
+                                      onFileChanged: (imagesFiles) {
+                                        this.imagesFiles = imagesFiles;
+                                      },
+                                      idTask: widget.idTask),
+                                  ImageGalleryModal(idTask: widget.idTask!),
+                                ],
+                              ))
                         ],
                       ),
                     ),
@@ -1082,15 +1089,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (widget.detail)
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
+                          CustomElevatedButton(
+                            messageType: MessageType.error,
                             onPressed: handleCancel,
-                            child: Text(AppLocalizations.of(context)!
-                                .buttonCancelLabel),
+                            text:
+                                AppLocalizations.of(context)!.buttonCancelLabel,
                           ),
-                        const SizedBox(width: 10.0),
+                        const SizedBox(width: 12.0),
                         CustomElevatedButton(
                           onPressed: () {
                             widget.detail

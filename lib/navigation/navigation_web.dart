@@ -95,7 +95,7 @@ class _NavigationWeb extends State<NavigationWeb> {
                 colors: [
                   primarySwatch[100]!,
                   primarySwatch[50]!,
-                ], // Colores del gradiente
+                ],
               ),
             ),
             child: NavigationRail(
