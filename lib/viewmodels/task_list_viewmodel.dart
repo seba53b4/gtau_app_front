@@ -36,6 +36,7 @@ class TaskListViewModel extends ChangeNotifier {
 
   void clearListByStatus(String status) {
     _tasks[status]?.clear();
+    this.page = 0;
   }
 
   Future<List<Task>?> initializeTasks(
@@ -59,8 +60,9 @@ class TaskListViewModel extends ChangeNotifier {
 
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
-
+      
       _tasks[status] = responseListTask!;
+      page++;
 
       return responseListTask;
     } catch (error) {

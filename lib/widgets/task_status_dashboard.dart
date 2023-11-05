@@ -60,6 +60,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
                 _currentIndex = index;
               });
               String status = getTaskStatusSelected();
+              
               updateTaskListState(status);
             },
           ),

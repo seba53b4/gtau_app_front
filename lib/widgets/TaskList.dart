@@ -17,9 +17,16 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListComponentState extends State<TaskList> {
+  final controller = ScrollController();
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose(){
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -28,20 +35,34 @@ class _TaskListComponentState extends State<TaskList> {
         Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setLastStatus(widget.status);
     return Container(
-      margin: const EdgeInsets.only(bottom: 132),
+      margin: const EdgeInsets.only(bottom: 0),
       child: Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
-          final tasks = taskListViewModel.tasks[widget.status];
-
+          var tasks = taskListViewModel.tasks[widget.status];
+          controller.addListener(() {
+            if(controller.position.maxScrollExtent == controller.offset){
+              setState(() {
+                tasks?.addAll(taskListViewModel.tasks[widget.status]!);
+              });
+            }
+          });
           return Column(
             children: [
               Expanded(
                 child: ListView.builder(
-                  itemCount: tasks?.length ?? 0,
+                  controller:controller,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: tasks!.length + 1,
                   itemBuilder: (context, index) {
-                    final task = tasks?[index];
-                    return TaskListItem(
-                        task: task!, scaffoldKey: widget.scaffoldKey);
+                    if(index < tasks.length){
+                      final task = tasks[index];
+                      return TaskListItem(
+                        task: task, scaffoldKey: widget.scaffoldKey);
+                    } else {
+                      return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child:CircularProgressIndicator()));
+                    }
+                    
                   },
                 ),
               ),
