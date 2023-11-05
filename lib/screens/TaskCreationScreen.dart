@@ -1000,7 +1000,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             width: AppConstants.textFieldWidth,
                                             hintText: AppLocalizations.of(
                                                     context)!
-                                                .default_descriptionPlaceholder,
+                                                .createTaskPage_longitudeTitle,
                                             controller: lengthController,
                                           ),
                                         ],
@@ -1018,7 +1018,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             width: AppConstants.textFieldWidth,
                                             hintText: AppLocalizations.of(
                                                     context)!
-                                                .default_descriptionPlaceholder,
+                                                .createTaskPage_materialTitle,
                                             controller: materialController,
                                           ),
                                         ],
@@ -1094,7 +1094,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             fontSize: 12,
                                             hintText: AppLocalizations.of(
                                                     context)!
-                                                .default_descriptionPlaceholder,
+                                                .createTaskPage_longitudeTitle,
                                             controller: lengthController,
                                           ),
                                         ],
@@ -1115,7 +1115,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             fontSize: 12,
                                             hintText: AppLocalizations.of(
                                                     context)!
-                                                .default_descriptionPlaceholder,
+                                                .createTaskPage_materialTitle,
                                             controller: materialController,
                                           ),
                                         ],
