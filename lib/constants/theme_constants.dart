@@ -9,7 +9,7 @@ Color lightBackground = const Color.fromRGBO(253, 255, 252, 1);
 Color redColor = const Color.fromRGBO(219, 49, 13, 1);
 Color sectionDefaultColor = Colors.blueAccent;
 Color registerDefaultColor = Colors.deepPurpleAccent;
-Color lotDefaultColor = Colors.black87;
+Color lotDefaultColor = Colors.black38;
 Color lotDefaultColorChip = Colors.black45;
 Color catchmentDefaultColor = Colors.pink;
 

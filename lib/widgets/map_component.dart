@@ -505,9 +505,7 @@ class _MapComponentState extends State<MapComponent> {
                               ? mapWidth - modalWidth
                               : mapWidth,
                           child: GestureDetector(
-                            onTap: () {
-                              // Gestos generales si es necesario
-                            },
+                            onTap: () {},
                             child: GoogleMap(
                               mapType: _currentMapType,
                               initialCameraPosition: CameraPosition(
