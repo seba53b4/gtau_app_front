@@ -1176,18 +1176,19 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             style: const TextStyle(fontSize: 16.0),
                           ),
                           Container(
-                              padding: const EdgeInsets.all(12),
-                              width: widthRow,
-                              child: Column(
-                                children: [
-                                  UserImage(
-                                      onFileChanged: (imagesFiles) {
-                                        this.imagesFiles = imagesFiles;
-                                      },
-                                      idTask: widget.idTask),
-                                  ImageGalleryModal(idTask: widget.idTask!),
-                                ],
-                              ))
+                            padding: const EdgeInsets.all(12),
+                            width: widthRow,
+                            child: Column(
+                              children: [
+                                UserImage(
+                                    onFileChanged: (imagesFiles) {
+                                      this.imagesFiles = imagesFiles;
+                                    },
+                                    idTask: widget.idTask),
+                                ImageGalleryModal(idTask: widget.idTask!),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1202,8 +1203,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           CustomElevatedButton(
                             messageType: MessageType.error,
                             onPressed: handleCancel,
-                            text:
-                                AppLocalizations.of(context)!.buttonCancelLabel,
+                            text: AppLocalizations.of(context)!
+                                .no_elements_registered,
                           ),
                         const SizedBox(width: 12.0),
                         CustomElevatedButton(
@@ -1295,7 +1296,6 @@ class ElementsSelected extends StatelessWidget {
               elementsList.isNotEmpty
                   ? Container(
                       padding: const EdgeInsets.all(8),
-                      //color: Colors.grey,
                       decoration: BoxDecoration(
                         color: softGrey,
                         borderRadius: BorderRadius.circular(24.0),
@@ -1306,13 +1306,13 @@ class ElementsSelected extends StatelessWidget {
                         children: elementsList,
                       ),
                     )
-                  : const Column(
+                  : Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text(
-                          "No hay elementos registrados",
-                          style: TextStyle(fontSize: 16.0),
+                          AppLocalizations.of(context)!.no_elements_registered,
+                          style: const TextStyle(fontSize: 16.0),
                         ),
                       ],
                     ),
@@ -1345,7 +1345,7 @@ class EntityIdContainer extends StatelessWidget {
         backgroundColor: getElementDefaultColor(elementType),
         child: Text(
           initials,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
       label: Text(id),

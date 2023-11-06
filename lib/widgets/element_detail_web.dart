@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/element_type.dart';
 import 'package:gtau_app_front/widgets/common/button_circle.dart';
 
+import '../constants/theme_constants.dart';
 import 'common/detail_element_widget.dart';
 
 class ElementDetailWeb extends StatefulWidget {
@@ -34,7 +35,7 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
     return Column(
       children: [
         Container(
-          color: const Color.fromRGBO(96, 166, 27, 1),
+          color: primarySwatch,
           height: 50,
           child: Row(
             children: [
@@ -51,8 +52,8 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
                 child: Text(
                     AppLocalizations.of(context)!.component_detail_title,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        color: Color.fromRGBO(14, 45, 9, 1),
+                    style: TextStyle(
+                        color: titleColor,
                         letterSpacing: 1,
                         fontWeight: FontWeight.bold,
                         fontSize: 18)),
