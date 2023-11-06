@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/widgets/loading_component.dart';
 
+import '../constants/theme_constants.dart';
+
 class LoadingOverlay extends StatelessWidget {
   final Widget child;
   final bool isLoading;
@@ -20,10 +22,7 @@ class LoadingOverlay extends StatelessWidget {
           Stack(
             children: [
               child,
-              Container(
-                  color: const Color.fromRGBO(
-                      161, 180, 156, 0.3568627450980392),
-                  child: const LoadingWidget()),
+              Container(color: overlayColor, child: const LoadingWidget()),
             ],
           ),
       ],
