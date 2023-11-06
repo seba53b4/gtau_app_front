@@ -8,6 +8,8 @@ class CustomElevatedButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final MessageType? messageType;
+  final double? width;
+  final double? height;
 
   const CustomElevatedButton({
     Key? key,
@@ -16,43 +18,59 @@ class CustomElevatedButton extends StatelessWidget {
     this.backgroundColor,
     this.textColor,
     this.messageType,
+    this.width,
+    this.height,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Color? buttonBackgroundColor = backgroundColor;
+    //Color? buttonBackgroundColor = backgroundColor;
+    List<Color> colors = [primarySwatch[300]!, primarySwatch[100]!];
     if (backgroundColor == null) {
       switch (messageType) {
         case MessageType.success:
-          buttonBackgroundColor = primarySwatch[500];
+          colors = [primarySwatch[300]!, primarySwatch[100]!];
           break;
         case MessageType.error:
-          buttonBackgroundColor = Colors.red;
+          colors = [Colors.red[400]!, Colors.red[300]!];
           break;
         case MessageType.warning:
-          buttonBackgroundColor = Colors.orange;
+          colors = [Colors.orange, Colors.orangeAccent];
+          //buttonBackgroundColor = Colors.orange;
           break;
         case null:
-          buttonBackgroundColor = primarySwatch[500];
+          colors = [primarySwatch[300]!, primarySwatch[100]!];
       }
+    } else {
+      colors = [Colors.grey, Colors.grey[400]!];
     }
 
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        foregroundColor: textColor ?? Colors.white,
-        backgroundColor: backgroundColor ?? buttonBackgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24.0),
         ),
+        padding: EdgeInsets.zero,
       ),
-      child: Text(
-        text,
-        // style: TextStyle(
-        //   color: textColor ?? Colors.white,
-        //   fontSize: 16.0,
-        //   fontWeight: FontWeight.bold,
-        // ),
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: colors,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(28.0),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          child: Text(
+            text,
+            style: TextStyle(
+              color: textColor ?? Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
