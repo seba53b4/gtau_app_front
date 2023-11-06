@@ -36,12 +36,16 @@ class TaskListViewModel extends ChangeNotifier {
 
   void clearListByStatus(String status) {
     _tasks[status]?.clear();
-    this.page = 0;
+    page = 0;
   }
-
   Future<List<Task>?> initializeTasks(
       BuildContext context, String status, String? user) async {
     return await fetchTasksFromUser(context, status, user);
+  }
+
+  Future<List<Task>?> nextPageListByStatus(
+      BuildContext context, String status, String? user) async {
+    return await fetchNextPageTasksFromUser(context, status, user);
   }
 
   Future<List<Task>?> fetchTasksFromUser(
@@ -63,6 +67,40 @@ class TaskListViewModel extends ChangeNotifier {
       
       _tasks[status] = responseListTask!;
       page++;
+
+      return responseListTask;
+    } catch (error) {
+      _error = true;
+      print(error);
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<List<Task>?> fetchNextPageTasksFromUser(
+      BuildContext context, String status, String? user) async {
+    final token = context.read<UserProvider>().getToken;
+    String? userName;
+    if (user == null) {
+      userName = context.read<UserProvider>().userName;
+    } else {
+      userName = user;
+    }
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+
+      final responseListTask =
+          await _taskService.getTasks(token!, userName!, page, size, status);
+      
+      _tasks[status]?.addAll(responseListTask!);
+      if(responseListTask != null){
+        page++;
+      }
+      
 
       return responseListTask;
     } catch (error) {

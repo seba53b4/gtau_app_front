@@ -29,6 +29,16 @@ class _TaskListComponentState extends State<TaskList> {
     super.dispose();
   }
 
+  Future updateTaskListState(BuildContext context) async {
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final status =
+        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    await taskListViewModel.nextPageListByStatus(context, status!, userName);
+  }
+
   @override
   Widget build(BuildContext context) {
     final taskFilterProvider =
@@ -42,7 +52,7 @@ class _TaskListComponentState extends State<TaskList> {
           controller.addListener(() {
             if(controller.position.maxScrollExtent == controller.offset){
               setState(() {
-                tasks?.addAll(taskListViewModel.tasks[widget.status]!);
+                updateTaskListState(context);
               });
             }
           });
@@ -59,8 +69,11 @@ class _TaskListComponentState extends State<TaskList> {
                       return TaskListItem(
                         task: task, scaffoldKey: widget.scaffoldKey);
                     } else {
-                      return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(child:CircularProgressIndicator()));
+                      if(tasks.length == 10){
+                        return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(child:CircularProgressIndicator()));
+                      }
+                      
                     }
                     
                   },
