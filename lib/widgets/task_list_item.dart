@@ -29,9 +29,9 @@ class TaskListItem extends StatelessWidget {
 
     return Container(
       width: 80,
-      margin: const EdgeInsets.all(8), // Margen exterior
+      margin: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10), // Bordes redondeados
+        borderRadius: BorderRadius.circular(10),
         color: lightBackground,
         boxShadow: const [
           BoxShadow(
@@ -113,7 +113,6 @@ class TaskListItem extends StatelessWidget {
               },
               icon: const Icon(Icons.edit),
             ),
-            //const SizedBox(width: 4),
             Visibility(
               visible: isAdmin != null && isAdmin,
               child: IconButton(
