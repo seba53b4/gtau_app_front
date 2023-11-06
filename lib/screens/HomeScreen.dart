@@ -1,11 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
-
+import '../widgets/filter_tasks.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
@@ -48,44 +49,61 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return isAdmin!
         ? Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextFormField(
-              controller: _searchController,
-              onChanged: _updateSearch,
-              onFieldSubmitted: _updateSearchByEnter,
-              decoration: InputDecoration(
-                labelText: 'Ingrese un nombre de usuario',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder(
-              future: Future.delayed(const Duration(microseconds: 20)),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 6,
-                      ),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextFormField(
+                    controller: _searchController,
+                    onChanged: _updateSearch,
+                    onFieldSubmitted: _updateSearchByEnter,
+                    decoration: InputDecoration(
+                      labelText: 'Ingrese un nombre de usuario',
+                      border: OutlineInputBorder(),
                     ),
-                  );
+                  ),
+                ),
+                Expanded(
+                  child: FutureBuilder(
+                    future: Future.delayed(const Duration(microseconds: 20)),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 6,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return TaskStatusDashboard(userName: _enteredUsername);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                if (kIsWeb) {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => FilterTasks()));
                 } else {
-                  return TaskStatusDashboard(userName: _enteredUsername);
+                  showModalBottomSheet<void>(
+                    context: context,
+                    builder: (BuildContext context) => FilterTasks(),
+                  );
                 }
               },
+              foregroundColor: null,
+              backgroundColor: null,
+              shape: null,
+              child: const Icon(Icons.filter_alt_rounded),
             ),
-          ),
-        ],
-      ),
-    )
+          )
         : TaskStatusDashboard();
   }
 }

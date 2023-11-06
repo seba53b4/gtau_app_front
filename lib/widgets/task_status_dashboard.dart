@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/task_status.dart';
-import 'package:gtau_app_front/widgets/TaskList.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
@@ -78,33 +78,23 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   }
 
   String getTaskStatusSelected() {
-    switch (_currentIndex) {
-      case 0:
-        return TaskStatus.Pending.value;
-      case 1:
-        return TaskStatus.Doing.value;
-      case 2:
-        return TaskStatus.Blocked.value;
-      case 3:
-        return TaskStatus.Done.value;
-      default:
-        return "";
-    }
+    return switch (_currentIndex) {
+      0 => TaskStatus.Pending.value,
+      1 => TaskStatus.Doing.value,
+      2 => TaskStatus.Blocked.value,
+      3 => TaskStatus.Done.value,
+      _ => ""
+    };
   }
 
   Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
-    switch (_currentIndex) {
-      case 0:
-        return _buildTaskList(TaskStatus.Pending.value, _scaffoldKeyDashboard);
-      case 1:
-        return _buildTaskList(TaskStatus.Doing.value, _scaffoldKeyDashboard);
-      case 2:
-        return _buildTaskList(TaskStatus.Blocked.value, _scaffoldKeyDashboard);
-      case 3:
-        return _buildTaskList(TaskStatus.Done.value, _scaffoldKeyDashboard);
-      default:
-        return Container();
-    }
+    return switch (_currentIndex) {
+      0 => _buildTaskList(TaskStatus.Pending.value, _scaffoldKeyDashboard),
+      1 => _buildTaskList(TaskStatus.Doing.value, _scaffoldKeyDashboard),
+      2 => _buildTaskList(TaskStatus.Blocked.value, _scaffoldKeyDashboard),
+      3 => _buildTaskList(TaskStatus.Done.value, _scaffoldKeyDashboard),
+      _ => Container()
+    };
   }
 
   void updateTaskListState(status) async {
