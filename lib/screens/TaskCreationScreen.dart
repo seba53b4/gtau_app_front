@@ -998,6 +998,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           const SizedBox(height: 10.0),
                                           CustomTextFormField(
                                             width: AppConstants.textFieldWidth,
+                                            textInputType: TextInputType.number,
                                             hintText: AppLocalizations.of(
                                                     context)!
                                                 .createTaskPage_longitudeTitle,
@@ -1092,6 +1093,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             width: 148,
                                             height: 54,
                                             fontSize: 12,
+                                            textInputType: TextInputType.number,
                                             hintText: AppLocalizations.of(
                                                     context)!
                                                 .createTaskPage_longitudeTitle,
