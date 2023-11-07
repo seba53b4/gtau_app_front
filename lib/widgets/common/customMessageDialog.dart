@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum DialogMessageType {
   success,
@@ -53,20 +54,20 @@ class MessageDialog extends StatelessWidget {
     }
 
     return Column(
-      mainAxisSize: MainAxisSize.min, // Ajustar el tamaño al contenido
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           children: [
             Icon(iconData, color: iconColor),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Text(textContent),
           ],
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         ElevatedButton(
-          child: Text('Aceptar'),
+          child: Text(AppLocalizations.of(context)!.buttonAcceptLabel),
           onPressed: () {
-            Navigator.of(context).pop(); // Cerrar el diálogo
+            Navigator.of(context).pop();
             onAcceptPressed();
           },
         ),

@@ -51,7 +51,7 @@ class LoginScreen extends StatelessWidget {
   _showWrongCredentialsToast(BuildContext context) {
     CustomToast.show(
       context,
-      title: 'Advertencia',
+      title: AppLocalizations.of(context)!.warning,
       message: AppLocalizations.of(context)!.login_warning_empty_input,
       type: MessageType.warning,
     );
@@ -114,8 +114,8 @@ class LoginScreen extends StatelessWidget {
         Future.delayed(Duration.zero, () {
           CustomToast.show(
             context,
-            title: 'Error',
-            message: 'Hubo un error en la autenticación.',
+            title: AppLocalizations.of(context)!.error,
+            message: AppLocalizations.of(context)!.login_error_auth,
             type: MessageType.error,
           );
         });
@@ -135,7 +135,7 @@ class LoginScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('PipeTracker'),
+                    Text(AppLocalizations.of(context)!.titleApp),
                     const SizedBox(height: 24.0),
                     CustomTextField(
                       controller: usernameController,

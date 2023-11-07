@@ -27,28 +27,31 @@ class _TaskListComponentState extends State<TaskList> {
     final taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setLastStatus(widget.status);
-    return Container(
-      margin: const EdgeInsets.only(bottom: 132),
-      child: Consumer<TaskListViewModel>(
+    return Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
-          final tasks = taskListViewModel.tasks[widget.status];
+      final tasks = taskListViewModel.tasks[widget.status];
 
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: tasks?.length ?? 0,
-                  itemBuilder: (context, index) {
+      return SizedBox(
+        width: 600,
+        child: Center(
+          widthFactor: 0.5,
+          child: CustomScrollView(
+            scrollDirection: Axis.vertical,
+            slivers: <Widget>[
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
                     final task = tasks?[index];
                     return TaskListItem(
                         task: task!, scaffoldKey: widget.scaffoldKey);
                   },
+                  childCount: tasks?.length ?? 0,
                 ),
               ),
             ],
-          );
-        },
-      ),
-    );
+          ),
+        ),
+      );
+    });
   }
 }

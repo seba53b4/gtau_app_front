@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gallery_image_viewer/gallery_image_viewer.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -8,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
 import '../viewmodels/images_viewmodel.dart';
+import 'common/custom_elevated_button.dart';
 
 class ImageGalleryModal extends StatefulWidget {
   final int? idTask;
@@ -26,14 +29,14 @@ class _ImageGalleryModalState extends State<ImageGalleryModal> {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return CustomElevatedButton(
       onPressed: () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => _GelleryShow(idTask, photos)),
         );
       },
-      child: const Text("Imágenes"),
+      text: AppLocalizations.of(context)!.see_images,
     );
   }
 }
@@ -73,7 +76,8 @@ class _GelleryShowState extends State<_GelleryShow> {
       return LoadingOverlay(
           isLoading: imagesViewModel.isLoading,
           child: Scaffold(
-            appBar: AppBar(title: const Text("Imágenes")),
+            appBar:
+                AppBar(title: Text(AppLocalizations.of(context)!.images_title)),
             body: GridView.builder(
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
@@ -118,7 +122,7 @@ class _GelleryShowState extends State<_GelleryShow> {
                         imageUrl: photos[index].url,
                         fit: BoxFit.cover,
                         placeholder: (context, url) =>
-                            Container(color: Colors.grey),
+                            Container(color: softGrey),
                         errorWidget: (context, url, error) => Container(
                           color: !photos[index].isSelected
                               ? Colors.red.shade400
@@ -132,14 +136,15 @@ class _GelleryShowState extends State<_GelleryShow> {
             ),
             bottomNavigationBar: photos.any((photo) => photo.isSelected)
                 ? BottomNavigationBar(
-                    items: const [
+                    items: [
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.cleaning_services),
-                        label: 'Quitar seleccion',
+                        icon: const Icon(Icons.cleaning_services),
+                        label: AppLocalizations.of(context)!
+                            .modal_image_delete_selection,
                       ),
                       BottomNavigationBarItem(
-                        icon: Icon(Icons.delete),
-                        label: 'Eliminar',
+                        icon: const Icon(Icons.delete),
+                        label: AppLocalizations.of(context)!.deleteButtonLabel,
                       ),
                     ],
                     onTap: (index) {
@@ -215,7 +220,7 @@ class PhotoViewPage extends StatelessWidget {
           child: CachedNetworkImage(
             imageUrl: photos[index].url,
             placeholder: (context, url) => Container(
-              color: Colors.grey,
+              color: softGrey,
             ),
             errorWidget: (context, url, error) => Container(
               color: Colors.red.shade400,
