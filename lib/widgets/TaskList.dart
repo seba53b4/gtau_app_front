@@ -49,8 +49,10 @@ class _TaskListComponentState extends State<TaskList> {
       child: Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
           var tasks = taskListViewModel.tasks[widget.status];
+          var tasks_length = tasks?.length ?? 0;
+          tasks_length=tasks_length+1;
           controller.addListener(() {
-            if(controller.position.maxScrollExtent == controller.offset){
+            if((controller.position.maxScrollExtent == controller.offset) && tasks!.length % 10== 0){
               setState(() {
                 updateTaskListState(context);
               });
@@ -62,19 +64,25 @@ class _TaskListComponentState extends State<TaskList> {
                 child: ListView.builder(
                   controller:controller,
                   padding: const EdgeInsets.all(8),
-                  itemCount: tasks!.length + 1,
+                  itemCount: tasks_length,
                   itemBuilder: (context, index) {
-                    if(index < tasks.length){
-                      final task = tasks[index];
-                      return TaskListItem(
-                        task: task, scaffoldKey: widget.scaffoldKey);
-                    } else {
-                      if(tasks.length == 10){
-                        return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
-                        child: Center(child:CircularProgressIndicator()));
+                    
+                      if(index < tasks!.length){
+                        final task = tasks![index];
+                        return TaskListItem(
+                          task: task, scaffoldKey: widget.scaffoldKey);
+                      } else {
+                        if(tasks_length == 1){
+                          return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
+                            child: Center(child:Text("There's no items here to display")));
+                        }else{
+                          if(tasks!.length % 10== 0){
+                            return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
+                            child: Center(child:CircularProgressIndicator()));
+                          } 
                       }
-                      
                     }
+                    
                     
                   },
                 ),

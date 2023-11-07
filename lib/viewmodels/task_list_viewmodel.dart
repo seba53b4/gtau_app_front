@@ -58,8 +58,9 @@ class TaskListViewModel extends ChangeNotifier {
       userName = user;
     }
     try {
-      _isLoading = true;
       _error = false;
+      _isLoading = true;
+
       notifyListeners();
 
       final responseListTask =
