@@ -14,6 +14,7 @@ class CustomTextFormField extends StatelessWidget {
   final Color backgroundColor;
   final double fontSize;
   final bool useValidation;
+  final bool readOnly;
 
   const CustomTextFormField({
     required this.controller,
@@ -28,6 +29,7 @@ class CustomTextFormField extends StatelessWidget {
     this.backgroundColor = AppConstants.backgroundColor,
     this.fontSize = 16,
     this.useValidation = true,
+    this.readOnly = false,
   }) : super(key: key);
 
   String? _validateInput(String? value) {
@@ -71,10 +73,11 @@ class CustomTextFormField extends StatelessWidget {
           fontSize: fontSize,
         ),
         controller: controller,
+        enabled: !readOnly,
         //maxLength: maxLength,
         maxLengthEnforcement: MaxLengthEnforcement.none,
         validator: _validateInput,
-        autovalidateMode: AutovalidateMode.always,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
       ),
     );
   }
