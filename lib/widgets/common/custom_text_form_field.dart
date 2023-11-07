@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/app_constants.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -32,9 +33,9 @@ class CustomTextFormField extends StatelessWidget {
     this.readOnly = false,
   }) : super(key: key);
 
-  String? _validateInput(String? value) {
+  String? _validateInput(BuildContext context, String? value) {
     if (useValidation && (value == null || value.isEmpty)) {
-      return 'Campo obligatorio';
+      return AppLocalizations.of(context)!.form_field_mandatory;
     }
     return null;
   }
@@ -76,7 +77,7 @@ class CustomTextFormField extends StatelessWidget {
         enabled: !readOnly,
         //maxLength: maxLength,
         maxLengthEnforcement: MaxLengthEnforcement.none,
-        validator: _validateInput,
+        validator: (value) => _validateInput(context, value),
         autovalidateMode: AutovalidateMode.onUserInteraction,
       ),
     );

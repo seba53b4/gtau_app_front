@@ -80,5 +80,6 @@
     "see_images": "Ver imágenes",
     "from_camera": "Desde la cámara",
     "pick_a_file": "Seleccionar desde dispositivo",
-    "no_elements_registered": "No hay elementos registrados"
+    "no_elements_registered": "No hay elementos registrados",
+    "form_field_mandatory": "Campo obligatorio"
 }
