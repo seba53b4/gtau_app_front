@@ -429,6 +429,20 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     Navigator.of(context).pop();
   }
 
+  bool isFormValid() {
+    print(addDateController.text);
+    print(numWorkController.text);
+    print(applicantController.text);
+    print(locationController.text);
+    print(descriptionController.text);
+
+    return addDateController.text.isNotEmpty &&
+        numWorkController.text.isNotEmpty &&
+        applicantController.text.isNotEmpty &&
+        locationController.text.isNotEmpty &&
+        descriptionController.text.isNotEmpty;
+  }
+
   List<ImageDataDTO>? imagesFiles = null;
 
   @override
@@ -973,6 +987,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                               },
                                               child: IgnorePointer(
                                                 child: CustomTextFormField(
+                                                  useValidation: false,
                                                   width: AppConstants
                                                       .textFieldWidth,
                                                   hintText: AppLocalizations.of(
@@ -997,6 +1012,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           ),
                                           const SizedBox(height: 10.0),
                                           CustomTextFormField(
+                                            useValidation: false,
                                             width: AppConstants.textFieldWidth,
                                             textInputType: TextInputType.number,
                                             hintText: AppLocalizations.of(
@@ -1016,6 +1032,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           ),
                                           const SizedBox(height: 10.0),
                                           CustomTextFormField(
+                                            useValidation: false,
                                             width: AppConstants.textFieldWidth,
                                             hintText: AppLocalizations.of(
                                                     context)!
@@ -1064,6 +1081,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                               },
                                               child: IgnorePointer(
                                                 child: CustomTextFormField(
+                                                  useValidation: false,
                                                   width: 128,
                                                   height: 54,
                                                   fontSize: 12,
@@ -1090,6 +1108,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           ),
                                           const SizedBox(height: 10.0),
                                           CustomTextFormField(
+                                            useValidation: false,
                                             width: 148,
                                             height: 54,
                                             fontSize: 12,
@@ -1112,6 +1131,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           ),
                                           const SizedBox(height: 10.0),
                                           CustomTextFormField(
+                                            useValidation: false,
                                             width: 148,
                                             height: 54,
                                             fontSize: 12,
@@ -1144,6 +1164,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                 ),
                                 const SizedBox(height: 10.0),
                                 CustomTextFormField(
+                                  useValidation: false,
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
@@ -1160,6 +1181,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                 ),
                                 const SizedBox(height: 10.0),
                                 CustomTextFormField(
+                                  useValidation: false,
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
@@ -1209,13 +1231,17 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         const SizedBox(width: 12.0),
                         CustomElevatedButton(
                           onPressed: () {
-                            if (widget.detail) {
-                              handleEditTask();
-                            } else {
-                              // Se quita acción de creación en Programada
-                              if (selectedIndex == 1) {
-                                handleSubmit();
+                            if (isFormValid()) {
+                              if (widget.detail) {
+                                handleEditTask();
+                              } else {
+                                // Se quita acción de creación en Programada
+                                if (selectedIndex == 1) {
+                                  handleSubmit();
+                                }
                               }
+                            } else {
+                              print('FORM INVALIDO');
                             }
                           },
                           text: widget.detail

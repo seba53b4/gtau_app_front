@@ -13,6 +13,7 @@ class CustomTextFormField extends StatelessWidget {
   final int maxLines;
   final Color backgroundColor;
   final double fontSize;
+  final bool useValidation;
 
   const CustomTextFormField({
     required this.controller,
@@ -26,7 +27,15 @@ class CustomTextFormField extends StatelessWidget {
     this.height = 94,
     this.backgroundColor = AppConstants.backgroundColor,
     this.fontSize = 16,
+    this.useValidation = true,
   }) : super(key: key);
+
+  String? _validateInput(String? value) {
+    if (useValidation && (value == null || value.isEmpty)) {
+      return 'Campo obligatorio';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +73,8 @@ class CustomTextFormField extends StatelessWidget {
         controller: controller,
         //maxLength: maxLength,
         maxLengthEnforcement: MaxLengthEnforcement.none,
+        validator: _validateInput,
+        autovalidateMode: AutovalidateMode.always,
       ),
     );
   }
