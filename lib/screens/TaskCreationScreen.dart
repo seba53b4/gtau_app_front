@@ -698,133 +698,58 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   ),
                   Visibility(
                     visible: selectedIndex == 1 && !kIsWeb,
-                    child: BoxContainer(
-                      width: widthRow * 1.15,
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.taskInformationTitle,
-                            style: const TextStyle(fontSize: 24.0),
-                          ),
-                          const SizedBox(height: 16.0),
-                          // Primera fila
-                          SizedBox(
-                            height: 100,
-                            width: widthRow,
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!
-                                            .createTaskPage_numberWorkTitle,
-                                        style: const TextStyle(fontSize: 12.0),
-                                      ),
-                                      const SizedBox(
-                                          height: AppConstants.taskColumnSpace),
-                                      CustomTextFormField(
-                                        width: 148,
-                                        height: 54,
-                                        fontSize: 12,
-                                        readOnly: widget.detail,
-                                        hintText: AppLocalizations.of(context)!
-                                            .createTaskPage_numberWorkTitle,
-                                        controller: numWorkController,
-                                        textInputType: TextInputType.number,
-                                      ),
-                                    ],
-                                  ),
-                                  Column(children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .editTaskPage_statusTitle,
-                                      style: const TextStyle(fontSize: 12.0),
-                                    ),
-                                    const SizedBox(height: 12.0),
-                                    CustomDropdown(
-                                      width: 148,
-                                      //height: 54,
-                                      fontSize: 12,
-                                      value: taskStatus,
-                                      onChanged: (String? value) {
-                                        setState(() {
-                                          taskStatus = value!;
-                                        });
-                                      },
-                                      items: TaskStatus.values
-                                          .map((status) => status.value)
-                                          .toList(),
-                                    ),
-                                    // const SizedBox(
-                                    //     height: AppConstants.taskColumnSpace),
-                                  ]),
-                                ]),
-                          ),
-                          // Segunda fila
-                          SizedBox(
+                    child: Form(
+                      key: _formKey,
+                      child: BoxContainer(
+                        width: widthRow * 1.15,
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!
+                                  .taskInformationTitle,
+                              style: const TextStyle(fontSize: 24.0),
+                            ),
+                            const SizedBox(height: 16.0),
+                            // Primera fila
+                            SizedBox(
                               height: 100,
                               width: widthRow,
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!
-                                            .createTaskPage_startDateTitle,
-                                        style: const TextStyle(fontSize: 12.0),
-                                      ),
-                                      const SizedBox(height: 12.0),
-                                      SizedBox(
-                                        width: 148,
-                                        child: InkWell(
-                                          overlayColor:
-                                              MaterialStateColor.resolveWith(
-                                                  (states) =>
-                                                      Colors.transparent),
-                                          onTap: () async {
-                                            final DateTime? pickedDate =
-                                                await showDatePicker(
-                                              context: context,
-                                              initialDate: startDate!,
-                                              firstDate: DateTime(2000),
-                                              lastDate: DateTime(2100),
-                                            );
-                                            if (pickedDate != null) {
-                                              handleStartDateChange(pickedDate);
-                                            }
-                                          },
-                                          child: IgnorePointer(
-                                            child: CustomTextFormField(
-                                              width: 128,
-                                              height: 54,
-                                              fontSize: 12,
-                                              hintText: AppLocalizations.of(
-                                                      context)!
-                                                  .createTaskPage_startDateTitle,
-
-                                              controller: addDateController,
-                                              // enabled: false,
-                                              // readOnly: true,
-                                            ),
-                                          ),
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .createTaskPage_numberWorkTitle,
+                                          style:
+                                              const TextStyle(fontSize: 12.0),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
+                                        CustomTextFormField(
+                                          width: 148,
+                                          height: 54,
+                                          fontSize: 12,
+                                          readOnly: widget.detail,
+                                          hintText: AppLocalizations.of(
+                                                  context)!
+                                              .createTaskPage_numberWorkTitle,
+                                          controller: numWorkController,
+                                          textInputType: TextInputType.number,
+                                        ),
+                                      ],
+                                    ),
+                                    Column(children: [
                                       Text(
                                         AppLocalizations.of(context)!
-                                            .createTaskPage_assignedUserTitle,
+                                            .editTaskPage_statusTitle,
                                         style: const TextStyle(fontSize: 12.0),
                                       ),
                                       const SizedBox(height: 12.0),
@@ -832,93 +757,182 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                         width: 148,
                                         //height: 54,
                                         fontSize: 12,
-                                        value: userAssigned,
-                                        items: const [
-                                          notAssigned,
-                                          'gtau-oper',
-                                          'gtau-admin'
-                                        ],
+                                        value: taskStatus,
                                         onChanged: (String? value) {
                                           setState(() {
-                                            userAssigned = value!;
+                                            taskStatus = value!;
                                           });
                                         },
+                                        items: TaskStatus.values
+                                            .map((status) => status.value)
+                                            .toList(),
                                       ),
-                                      const SizedBox(
-                                          width: AppConstants.taskColumnSpace),
-                                    ],
-                                  ),
-                                ],
-                              )),
-                          //const SizedBox(height: 20.0),
-                          // Tercera columna
-                          SizedBox(
-                            height: 100,
-                            width: widthRow,
-                            child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!
-                                            .createTaskPage_solicitantTitle,
-                                        style: const TextStyle(fontSize: 14.0),
-                                      ),
-                                      const SizedBox(height: 12.0),
-                                      CustomTextFormField(
-                                        width: widthRow + 24,
-                                        height: 54,
-                                        fontSize: 12,
-                                        hintText: AppLocalizations.of(context)!
-                                            .createTaskPage_solicitantPlaceholder,
-                                        controller: applicantController,
-                                      ),
-                                    ],
-                                  )
-                                ]),
-                          ),
-                          // Cuarta columna
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!
-                                    .createTaskPage_selectUbicationTitle,
-                                style: const TextStyle(fontSize: 14.0),
-                              ),
-                              const SizedBox(height: 12.0),
-                              CustomTextFormField(
-                                width: widthRow + 24,
-                                height: 54,
-                                fontSize: 12,
-                                hintText: AppLocalizations.of(context)!
-                                    .createTaskPage_selectUbicationplaceholder,
-                                controller: locationController,
-                              ),
-                              const SizedBox(height: 12.0),
-                              Text(
-                                AppLocalizations.of(context)!
-                                    .default_descriptionTitle,
-                                style: const TextStyle(fontSize: 14.0),
-                              ),
-                              const SizedBox(height: 12.0),
-                              CustomTextFormField(
-                                isTextBox: true,
-                                maxLines: 10,
-                                fontSize: 12,
+                                      // const SizedBox(
+                                      //     height: AppConstants.taskColumnSpace),
+                                    ]),
+                                  ]),
+                            ),
+                            // Segunda fila
+                            SizedBox(
+                                height: 100,
                                 width: widthRow,
-                                height: heightrow,
-                                hintText: AppLocalizations.of(context)!
-                                    .default_descriptionPlaceholder,
-                                controller: descriptionController,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20.0),
-                        ],
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .createTaskPage_startDateTitle,
+                                          style:
+                                              const TextStyle(fontSize: 12.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        SizedBox(
+                                          width: 148,
+                                          child: InkWell(
+                                            overlayColor:
+                                                MaterialStateColor.resolveWith(
+                                                    (states) =>
+                                                        Colors.transparent),
+                                            onTap: () async {
+                                              final DateTime? pickedDate =
+                                                  await showDatePicker(
+                                                context: context,
+                                                initialDate: startDate!,
+                                                firstDate: DateTime(2000),
+                                                lastDate: DateTime(2100),
+                                              );
+                                              if (pickedDate != null) {
+                                                handleStartDateChange(
+                                                    pickedDate);
+                                              }
+                                            },
+                                            child: IgnorePointer(
+                                              child: CustomTextFormField(
+                                                width: 128,
+                                                height: 54,
+                                                fontSize: 12,
+                                                hintText: AppLocalizations.of(
+                                                        context)!
+                                                    .createTaskPage_startDateTitle,
+
+                                                controller: addDateController,
+                                                // enabled: false,
+                                                // readOnly: true,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .createTaskPage_assignedUserTitle,
+                                          style:
+                                              const TextStyle(fontSize: 12.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        CustomDropdown(
+                                          width: 148,
+                                          //height: 54,
+                                          fontSize: 12,
+                                          value: userAssigned,
+                                          items: const [
+                                            notAssigned,
+                                            'gtau-oper',
+                                            'gtau-admin'
+                                          ],
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              userAssigned = value!;
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(
+                                            width:
+                                                AppConstants.taskColumnSpace),
+                                      ],
+                                    ),
+                                  ],
+                                )),
+                            //const SizedBox(height: 20.0),
+                            // Tercera columna
+                            SizedBox(
+                              height: 120,
+                              width: widthRow,
+                              child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .createTaskPage_solicitantTitle,
+                                          style:
+                                              const TextStyle(fontSize: 14.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        CustomTextFormField(
+                                          width: widthRow + 24,
+                                          height: 80,
+                                          fontSize: 12,
+                                          hintText: AppLocalizations.of(
+                                                  context)!
+                                              .createTaskPage_solicitantPlaceholder,
+                                          controller: applicantController,
+                                        ),
+                                      ],
+                                    )
+                                  ]),
+                            ),
+                            // const SizedBox(height: 8),
+                            // Cuarta columna
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .createTaskPage_selectUbicationTitle,
+                                  style: const TextStyle(fontSize: 14.0),
+                                ),
+                                const SizedBox(height: 12.0),
+                                CustomTextFormField(
+                                  width: widthRow + 24,
+                                  height: 80,
+                                  fontSize: 12,
+                                  hintText: AppLocalizations.of(context)!
+                                      .createTaskPage_selectUbicationplaceholder,
+                                  controller: locationController,
+                                ),
+                                //      const SizedBox(height: 12.0),
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .default_descriptionTitle,
+                                  style: const TextStyle(fontSize: 14.0),
+                                ),
+                                const SizedBox(height: 12.0),
+                                CustomTextFormField(
+                                  isTextBox: true,
+                                  maxLines: 10,
+                                  fontSize: 12,
+                                  width: widthRow,
+                                  height: heightrow,
+                                  hintText: AppLocalizations.of(context)!
+                                      .default_descriptionPlaceholder,
+                                  controller: descriptionController,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20.0),
+                          ],
+                        ),
                       ),
                     ),
                   ),
