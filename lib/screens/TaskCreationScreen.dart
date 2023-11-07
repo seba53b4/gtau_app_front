@@ -430,12 +430,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   bool isFormValid() {
-    print(addDateController.text);
-    print(numWorkController.text);
-    print(applicantController.text);
-    print(locationController.text);
-    print(descriptionController.text);
-
     return addDateController.text.isNotEmpty &&
         numWorkController.text.isNotEmpty &&
         applicantController.text.isNotEmpty &&
