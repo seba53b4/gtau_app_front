@@ -1203,8 +1203,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           CustomElevatedButton(
                             messageType: MessageType.error,
                             onPressed: handleCancel,
-                            text: AppLocalizations.of(context)!
-                                .no_elements_registered,
+                            text:
+                                AppLocalizations.of(context)!.buttonCancelLabel,
                           ),
                         const SizedBox(width: 12.0),
                         CustomElevatedButton(
