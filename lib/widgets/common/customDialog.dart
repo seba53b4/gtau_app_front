@@ -20,8 +20,8 @@ Future<void> showCustomDialog({
             style: TextButton.styleFrom(
               textStyle: Theme.of(context).textTheme.labelLarge,
             ),
-            child: Text(cancelbuttonLabel),
             onPressed: onDisablePressed,
+            child: Text(cancelbuttonLabel),
           ),
           TextButton(
             style: TextButton.styleFrom(

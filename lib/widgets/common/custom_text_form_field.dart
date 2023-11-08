@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/app_constants.dart';
 
 class CustomTextFormField extends StatelessWidget {
@@ -13,6 +14,8 @@ class CustomTextFormField extends StatelessWidget {
   final int maxLines;
   final Color backgroundColor;
   final double fontSize;
+  final bool useValidation;
+  final bool readOnly;
 
   const CustomTextFormField({
     required this.controller,
@@ -26,7 +29,16 @@ class CustomTextFormField extends StatelessWidget {
     this.height = 94,
     this.backgroundColor = AppConstants.backgroundColor,
     this.fontSize = 16,
+    this.useValidation = true,
+    this.readOnly = false,
   }) : super(key: key);
+
+  String? _validateInput(BuildContext context, String? value) {
+    if (useValidation && (value == null || value.isEmpty)) {
+      return AppLocalizations.of(context)!.form_field_mandatory;
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +74,11 @@ class CustomTextFormField extends StatelessWidget {
           fontSize: fontSize,
         ),
         controller: controller,
+        enabled: !readOnly,
         //maxLength: maxLength,
         maxLengthEnforcement: MaxLengthEnforcement.none,
+        validator: (value) => _validateInput(context, value),
+        autovalidateMode: AutovalidateMode.onUserInteraction,
       ),
     );
   }
