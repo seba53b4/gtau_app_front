@@ -5,6 +5,7 @@ import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/widgets/TaskList.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
@@ -20,7 +21,7 @@ class TaskStatusDashboard extends StatefulWidget {
 
 class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   int _currentIndex = 0;
-
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   @override
   void initState() {
     super.initState();
@@ -77,7 +78,10 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
       ),
     );
   }
-
+  Future<void> resetScrollPosition() async{
+    final SharedPreferences prefs = await _prefs;
+    prefs.clear();
+  }
   String getTaskStatusSelected() {
     switch (_currentIndex) {
       case 0:
@@ -94,6 +98,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   }
 
   Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
+    /*resetScrollPosition();*/
     switch (_currentIndex) {
       case 0:
         return _buildTaskList(TaskStatus.Pending.value, _scaffoldKeyDashboard);

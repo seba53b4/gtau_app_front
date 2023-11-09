@@ -32,6 +32,7 @@ dependencies:
   cached_network_image: ^3.3.0
   photo_view: ^0.14.0
   google_fonts: ^4.0.4
+  shared_preferences: ^2.2.2
 dev_dependencies:
   hive_generator:
   build_runner:
