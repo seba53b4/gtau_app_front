@@ -21,106 +21,140 @@ class TaskListItem extends StatelessWidget {
   const TaskListItem({Key? key, required this.task, required this.scaffoldKey})
       : super(key: key);
 
+  void _goToTaskCreationPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TaskCreationScreen(
+          detail: true,
+          idTask: task!.getId,
+          type: 'inspection',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
     double fontSize = kIsWeb ? 15 : 12;
-    double fontSizeInfo = kIsWeb ? 12 : 8;
+    double fontSizeInfo = kIsWeb ? 12 : 9;
+    double titleSpace = kIsWeb ? 200 : 120;
+    double dividerHeight = kIsWeb ? 32 : 24;
+    double taskInfoSpace = kIsWeb ? 150 : 115;
+    double iconSize = kIsWeb ? 26 : 24;
 
-    return Container(
-      width: 80,
-      margin: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: lightBackground,
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(200, 217, 184, 0.5),
-            spreadRadius: 3,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(8),
-        tileColor: Colors.transparent,
-        horizontalTitleGap: 20,
-        title: Text('${task!.getWorkNumber}',
-            style: TextStyle(fontSize: fontSize)),
-        // subtitle: Text(
-        //   '${task!.inspectionType}',
-        //   style: TextStyle(fontSize: fontSize - 2),
-        // ),
-        leading: Padding(
-          padding: const EdgeInsetsDirectional.symmetric(horizontal: 4),
-          child: CircleAvatar(
-            backgroundColor: primarySwatch[900],
-            radius: 20,
-            child: Text(
-              'I',
-              style: GoogleFonts.merriweather(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+    return InkWell(
+      onTap: () {
+        _goToTaskCreationPage(context);
+      },
+      child: Container(
+        width: 80,
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: lightBackground,
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(200, 217, 184, 0.5),
+              spreadRadius: 3,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              child: CircleAvatar(
+                backgroundColor: primarySwatch[900],
+                radius: 20,
+                child: Text(
+                  'I',
+                  style: GoogleFonts.merriweather(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const VerticalDivider(
-              color: Colors.black,
-              width: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 18),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: Row(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      parseDateTimeOnFormatHour(task!.getAddDate!),
-                      style: TextStyle(fontSize: fontSizeInfo),
-                    ),
+                  SizedBox(
+                      width: titleSpace,
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: 8),
+                        child: Text(
+                          '${task!.getWorkNumber}',
+                          style: TextStyle(fontSize: fontSize),
+                        ),
+                      )),
+                  const SizedBox(width: 20),
+                  Container(
+                    height: dividerHeight,
+                    width: 1,
+                    color: Colors.black,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
                   ),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      task!.getUser!,
-                      style: TextStyle(fontSize: fontSizeInfo),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: taskInfoSpace,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                parseDateTimeOnFormatHour(task!.getAddDate!),
+                                style: TextStyle(fontSize: fontSizeInfo),
+                              ),
+                              Text(
+                                task!.getUser!,
+                                style: TextStyle(fontSize: fontSizeInfo),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            if (kIsWeb) const SizedBox(width: 24),
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TaskCreationScreen(
-                      detail: true,
-                      idTask: task!.getId,
-                      type: 'inspection',
-                    ),
+            const SizedBox(width: kIsWeb ? 24 : 0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Visibility(
+                  visible: isAdmin != null && !isAdmin,
+                  child: SizedBox(
+                    width: iconSize * 1,
+                    height: iconSize * 1,
                   ),
-                );
-              },
-              icon: const Icon(Icons.edit),
-            ),
-            Visibility(
-              visible: isAdmin != null && isAdmin,
-              child: IconButton(
-                onPressed: () async {
-                  await _showDeleteConfirmationDialog(context);
-                },
-                icon: const Icon(Icons.delete, color: Colors.red),
-              ),
+                ),
+                Visibility(
+                  visible: isAdmin != null && isAdmin,
+                  child: IconButton(
+                    padding:
+                        const EdgeInsetsDirectional.symmetric(horizontal: 12),
+                    splashColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    iconSize: iconSize,
+                    onPressed: () async {
+                      await _showDeleteConfirmationDialog(context);
+                    },
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
