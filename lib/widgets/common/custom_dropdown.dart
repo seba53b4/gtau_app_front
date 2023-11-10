@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/utils/task_utils.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String value;
@@ -9,6 +11,7 @@ class CustomDropdown extends StatelessWidget {
   final double circularBorderRadius;
   final Color backgroundColor;
   final double fontSize;
+  final bool isStatus;
 
   const CustomDropdown({
     required this.value,
@@ -18,8 +21,9 @@ class CustomDropdown extends StatelessWidget {
     this.circularBorderRadius = 48.0,
     this.height = 54,
     this.backgroundColor = const Color.fromRGBO(253, 255, 252, 1),
-    this.fontSize = 14.0,
+    this.fontSize = 16.0,
     Key? key,
+    this.isStatus = false,
   }) : super(key: key);
 
   @override
@@ -47,9 +51,9 @@ class CustomDropdown extends StatelessWidget {
             alignment: Alignment.center,
             child: Center(
               child: Text(
-                item,
+                isStatus ? parseTaskStatus(context, item) : item,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: GoogleFonts.sora(
                   fontSize: fontSize,
                 ),
               ),
