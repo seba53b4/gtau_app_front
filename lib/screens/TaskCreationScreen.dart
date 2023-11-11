@@ -566,6 +566,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                       ),
                                       const SizedBox(height: 12.0),
                                       CustomDropdown(
+                                        isStatus: true,
                                         value: taskStatus,
                                         onChanged: (String? value) {
                                           setState(() {
@@ -754,6 +755,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                       ),
                                       const SizedBox(height: 12.0),
                                       CustomDropdown(
+                                        isStatus: true,
                                         width: 148,
                                         //height: 54,
                                         fontSize: 12,

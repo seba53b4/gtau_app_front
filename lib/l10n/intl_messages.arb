@@ -81,5 +81,9 @@
     "from_camera": "Desde la cámara",
     "pick_a_file": "Seleccionar desde dispositivo",
     "no_elements_registered": "No hay elementos registrados",
-    "form_field_mandatory": "Campo obligatorio"
+    "form_field_mandatory": "Campo obligatorio",
+    "task_status_doing": "En curso",
+    "task_status_blocked": "Bloqueada",
+    "task_status_pending": "Pendiente",
+    "task_status_done": "Terminada"
 }
