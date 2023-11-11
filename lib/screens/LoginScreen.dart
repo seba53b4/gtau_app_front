@@ -158,12 +158,11 @@ class LoginScreen extends StatelessWidget {
                         onPressed: () => onLogInPressed(context),
                         text:
                             AppLocalizations.of(context)!.default_login_button),
-                    const SizedBox(height: 8.0),
-                    CustomElevatedButton(
+                    const SizedBox(height: 16.0),
+                    TextButton(
                         onPressed: () => onForgotPressed(context),
-                        backgroundColor: Colors.grey,
-                        text: AppLocalizations.of(context)!
-                            .default_forgot_password),
+                        child: Text(AppLocalizations.of(context)!
+                            .default_forgot_password)),
                   ],
                 ),
               ),
