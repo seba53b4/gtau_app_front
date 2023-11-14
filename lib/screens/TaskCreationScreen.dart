@@ -204,8 +204,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(ImageBundleAdapter());
     }
-
-    boxImages = await Hive.openBox<ImageBundle>('imagesBox');
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
 
     final taskListViewModel =

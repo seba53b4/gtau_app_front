@@ -85,5 +85,9 @@
     "task_status_doing": "En curso",
     "task_status_blocked": "Bloqueada",
     "task_status_pending": "Pendiente",
-    "task_status_done": "Terminada"
+    "task_status_done": "Terminada",
+    "sections": "Tramos",
+    "registers": "Registros",
+    "catchments": "Captaciones",
+    "lots": "Parcelas"
 }
