@@ -9,7 +9,6 @@ typedef void OnCloseCallback();
 void showScheduledElementModal(BuildContext context, ElementType elementType,
     OnCloseCallback? onClose) async {
   double dialogWidth = MediaQuery.of(context).size.width * 0.82;
-  final ScrollController _scrollController = ScrollController();
 
   await showDialog(
     context: context,
@@ -37,10 +36,7 @@ void showScheduledElementModal(BuildContext context, ElementType elementType,
           content: SizedBox(
             height: 500,
             width: dialogWidth,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: ScheduledFormWidget(elementType: elementType),
-            ),
+            child: ScheduledFormWidget(elementType: elementType),
           ),
           actions: <Widget>[
             TextButton(
