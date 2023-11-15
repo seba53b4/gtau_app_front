@@ -4,7 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/app_constants.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final FocusNode? focusNode;
   final String hintText;
   final TextInputType textInputType;
@@ -20,7 +20,7 @@ class CustomTextFormField extends StatelessWidget {
   final VoidCallback? onTap;
 
   const CustomTextFormField({
-    required this.controller,
+    this.controller,
     this.focusNode,
     required this.hintText,
     this.textInputType = TextInputType.text,
