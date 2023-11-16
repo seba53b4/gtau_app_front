@@ -211,10 +211,9 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
             ),
           ),
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          // Otra opción: MainAxisAlignment.spaceBetween
           children: [
             CustomElevatedButton(
                 onPressed: () {
@@ -222,7 +221,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                 },
                 messageType: MessageType.error,
                 text: 'Cancelar'),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             CustomElevatedButton(onPressed: () {}, text: 'Aceptar'),
           ],
         ),

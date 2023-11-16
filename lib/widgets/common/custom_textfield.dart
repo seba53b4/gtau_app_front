@@ -3,21 +3,23 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
-  final String hintText;
+  final String? hintText;
   final TextInputType keyboardType;
   final bool obscureText;
   final bool hasError;
   final bool? filledBackground;
   final Color? fillColor;
+  final double? width;
 
   CustomTextField({
     required this.controller,
-    required this.hintText,
+    this.hintText,
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     required this.hasError,
     this.filledBackground,
     this.fillColor,
+    this.width,
   });
 
   @override
@@ -29,7 +31,7 @@ class CustomTextField extends StatelessWidget {
       inputWidth = 220.0;
     }
     return Container(
-      width: inputWidth,
+      width: width ?? inputWidth,
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
         decoration: InputDecoration(
