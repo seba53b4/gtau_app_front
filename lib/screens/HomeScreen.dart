@@ -80,15 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: _constraintBoxTaskDashboard(context, _enteredUsername)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          if (kIsWeb) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => FilterTasks()));
-          } else {
-            showModalBottomSheet<void>(
-              context: context,
-              builder: (BuildContext context) => FilterTasks(),
-            );
-          }
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => FilterTasks()));
         },
         foregroundColor: null,
         backgroundColor: null,

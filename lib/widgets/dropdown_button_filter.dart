@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/constants/app_constants.dart';
 
 import '../models/value_label.dart';
 
@@ -43,6 +44,15 @@ class _DropdownButtonFilterState extends State<DropdownButtonFilter> {
         .toList();
 
     return DropdownMenu<String>(
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        filled: true,
+        fillColor: AppConstants.backgroundColor,
+      ),
       initialSelection: selectedValue,
       controller: TextEditingController(),
       label: Text(label),
