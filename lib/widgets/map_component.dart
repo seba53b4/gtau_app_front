@@ -339,6 +339,7 @@ class _MapComponentState extends State<MapComponent> {
     if (sections != null) {
       for (var section in sections) {
         Polyline pol = section.line!.copyWith(
+          zIndexParam: 0,
           colorParam: _onColorParamBehaviorSection(section),
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
@@ -356,6 +357,7 @@ class _MapComponentState extends State<MapComponent> {
     if (lots != null) {
       for (var lot in lots) {
         Polyline pol = lot.polyline!.copyWith(
+          zIndexParam: 0,
           colorParam: _onColorParamBehaviorLot(lot),
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
@@ -378,6 +380,7 @@ class _MapComponentState extends State<MapComponent> {
     if (catchments != null) {
       for (var catchment in catchments) {
         Circle circle = catchment.point!.copyWith(
+          zIndexParam: 1,
           centerParam: catchment.point!.center,
           radiusParam: catchment.point!.radius,
           strokeWidthParam: catchment.point!.strokeWidth,
@@ -396,6 +399,7 @@ class _MapComponentState extends State<MapComponent> {
     if (registers != null) {
       for (var register in registers) {
         Circle circle = register.point!.copyWith(
+          zIndexParam: 1,
           centerParam: register.point!.center,
           radiusParam: register.point!.radius,
           strokeWidthParam: register.point!.strokeWidth,
@@ -466,8 +470,8 @@ class _MapComponentState extends State<MapComponent> {
     });
 
     setState(() {
-      polylines = getPolylines(fetchedSections, fetchedLots);
       circles = getCircles(fetchedCatchments, fetchedRegisters);
+      polylines = getPolylines(fetchedSections, fetchedLots);
     });
   }
 
@@ -515,8 +519,8 @@ class _MapComponentState extends State<MapComponent> {
                                 zoom: zoomMap,
                               ),
                               polylines: polylines,
-                              circles: circles,
                               markers: markers,
+                              circles: circles,
                               onCameraMove: (CameraPosition cameraPosition) {
                                 setState(() {
                                   zoomMap = cameraPosition.zoom;
@@ -588,7 +592,7 @@ class _MapComponentState extends State<MapComponent> {
                                       .map_component_fetch_elements,
                                   icon: Icons.area_chart_outlined,
                                 ),
-                                if (kIsWeb) SizedBox(height: 6),
+                                if (kIsWeb) const SizedBox(height: 6),
                                 MenuElevatedButton(
                                     onPressed: () {
                                       markersGPS.clear();
@@ -642,11 +646,11 @@ class _MapComponentState extends State<MapComponent> {
                                 ),
                                 if (kIsWeb) const SizedBox(height: 6),
                                 MultiSelectPopupMenuButton(
-                                  texts: const [
-                                    'Tramos',
-                                    'Registros',
-                                    'Captaciones',
-                                    'Parcelas'
+                                  texts: [
+                                    AppLocalizations.of(context)!.sections,
+                                    AppLocalizations.of(context)!.registers,
+                                    AppLocalizations.of(context)!.catchments,
+                                    AppLocalizations.of(context)!.lots
                                   ],
                                   selectedIndices: selectedIndices,
                                   onIconsSelected: handleIconsSelected,
