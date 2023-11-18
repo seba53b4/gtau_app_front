@@ -1,4 +1,3 @@
-
 enum TaskStatus {
   Doing,
   Done,
@@ -31,6 +30,21 @@ TaskStatus getTaskStatusFromString(String statusString) {
       return TaskStatus.Blocked;
     case 'PENDING':
       return TaskStatus.Pending;
+    default:
+      throw Exception('Invalid status string: $statusString');
+  }
+}
+
+int getTabIndexByStatus(String statusString) {
+  switch (statusString) {
+    case 'DOING':
+      return 1;
+    case 'DONE':
+      return 3;
+    case 'BLOCKED':
+      return 2;
+    case 'PENDING':
+      return 0;
     default:
       throw Exception('Invalid status string: $statusString');
   }

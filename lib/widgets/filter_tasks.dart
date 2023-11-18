@@ -1,47 +1,101 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:searchfield/searchfield.dart';
+import 'package:gtau_app_front/widgets/text_field_filter.dart';
+import 'package:provider/provider.dart';
 
-class FilterTasks extends StatelessWidget {
+import '../providers/task_filters_provider.dart';
+import '../viewmodels/task_list_viewmodel.dart';
+import 'dropdown_button_filter.dart';
+
+class FilterTasks extends StatefulWidget {
   const FilterTasks({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    List<String> suggestionsUsers = ["gtau-admin", "gtau-oper", "no-asignada"];
-    List<String> suggestionsStatus = [
-      "Pendiente",
-      "En curso",
-      "Bloqueadas",
-      "Terminadas"
-    ];
+  State<FilterTasks> createState() => _FilterTasksState();
+}
 
+class _FilterTasksState extends State<FilterTasks> {
+  @override
+  Widget build(BuildContext context) {
+    final filterProvider = Provider.of<TaskFilterProvider>(context);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text("Filtrar inspecciones")),
       body: SizedBox(
-        height: 500,
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(kIsWeb ? 100.0 : 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              DropdownButtonExample(
-                suggestions: suggestionsUsers,
+              DropdownButtonFilter(
+                suggestions: filterProvider.inspectionType,
+                valueSetter: filterProvider.setInspectionTypeFilter,
+                dropdownValue: filterProvider.inspectionTypeFilter ??
+                    filterProvider.inspectionType.first.value,
+                label: "Tipo de inspección:",
               ),
-              SearchFieldSuggestions(
-                suggestions: suggestionsUsers,
-                hint: 'Usuario',
-                keyName: "userfield",
+              const SizedBox(height: 16),
+              DropdownButtonFilter(
+                suggestions: filterProvider.suggestionsUsers,
+                valueSetter: filterProvider.setUserNameFilter,
+                dropdownValue: filterProvider.userNameFilter ??
+                    filterProvider.suggestionsUsers.first.value,
+                label: "Usuario:",
               ),
-              SearchFieldSuggestions(
-                suggestions: suggestionsStatus,
-                hint: 'Status',
-                keyName: "statusfield",
+              const SizedBox(height: 16),
+              DropdownButtonFilter(
+                suggestions: filterProvider.suggestionsStatus,
+                valueSetter: filterProvider.setLastStatus,
+                dropdownValue: filterProvider.statusFilter ??
+                    filterProvider.suggestionsStatus.first.value,
+                label: "Estado:",
               ),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                valueSetter: filterProvider.setWorkNumberFilter,
+                value: filterProvider.workNumberFilter ?? "",
+                label: "Número de trabajo:",
+              ),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                  valueSetter: filterProvider.setApplicantFilter,
+                  value: filterProvider.applicantFilter ?? "",
+                  label: "Solicitante:"),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                  valueSetter: filterProvider.setLocationFilter,
+                  value: filterProvider.locationFilter ?? "",
+                  label: "Ubicación:"),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                  valueSetter: filterProvider.setDescriptionFilter,
+                  value: filterProvider.descriptionFilter ?? "",
+                  label: "Descripción:"),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                  valueSetter: filterProvider.setLengthFilter,
+                  value: filterProvider.lengthFilter ?? "",
+                  label: "Longitud:"),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                  valueSetter: filterProvider.setMaterialFilter,
+                  value: filterProvider.materialFilter ?? "",
+                  label: "Material:"),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                  valueSetter: filterProvider.setObservationsFilter,
+                  value: filterProvider.observationsFilter ?? "",
+                  label: "Observaciones:"),
+              const SizedBox(height: 16),
+              TextFieldFilter(
+                  valueSetter: filterProvider.setConclusionsFilter,
+                  value: filterProvider.conclusionsFilter ?? "",
+                  label: "Conclusiones:"),
+              const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -58,6 +112,9 @@ class FilterTasks extends StatelessWidget {
                                 backgroundColor: Colors.red,
                               ),
                               onPressed: () {
+                                context
+                                    .read<TaskFilterProvider>()
+                                    .resetFilters();
                                 Navigator.of(context).pop();
                               },
                               child: Text(AppLocalizations.of(context)!
@@ -66,6 +123,7 @@ class FilterTasks extends StatelessWidget {
                             const SizedBox(width: 10.0),
                             ElevatedButton(
                               onPressed: () {
+                                updateTaskList();
                                 Navigator.of(context).pop();
                               },
                               child: Text(AppLocalizations.of(context)!
@@ -82,110 +140,14 @@ class FilterTasks extends StatelessWidget {
       ),
     );
   }
-}
 
-class SearchFieldSuggestions extends StatelessWidget {
-  SearchFieldSuggestions({
-    super.key,
-    required this.suggestions,
-    required this.hint,
-    required this.keyName,
-  });
-
-  final List<String> suggestions;
-  final String hint;
-  final String keyName;
-  final focus = FocusNode();
-
-  @override
-  Widget build(BuildContext context) {
-    return SearchField(
-      onSearchTextChanged: (query) {
-        final filter = suggestions
-            .where((element) =>
-                element.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-        return filter
-            .map((e) => SearchFieldListItem<String>(e,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Text(e,
-                      style: TextStyle(fontSize: 24, color: Colors.black)),
-                )))
-            .toList();
-      },
-      key: Key(keyName),
-      hint: hint,
-      itemHeight: 50,
-      scrollbarDecoration: ScrollbarDecoration(
-        thumbVisibility: true,
-        thumbColor: Colors.blue,
-        fadeDuration: const Duration(milliseconds: 3000),
-        trackColor: Colors.blue,
-        trackRadius: const Radius.circular(10),
-      ),
-      searchInputDecoration:
-          InputDecoration(hintStyle: TextStyle(color: Colors.black54)),
-      suggestionsDecoration: SuggestionDecoration(
-          padding: const EdgeInsets.all(4),
-          border: Border.all(color: Colors.black12),
-          borderRadius: BorderRadius.all(Radius.circular(10))),
-      suggestions: suggestions
-          .map((e) => SearchFieldListItem<String>(e,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(e,
-                    style: TextStyle(fontSize: 24, color: Colors.black87)),
-              )))
-          .toList(),
-      focusNode: focus,
-      suggestionState: Suggestion.expand,
-      onSuggestionTap: (SearchFieldListItem<String> x) {
-        focus.unfocus();
-      },
-    );
-  }
-}
-
-class DropdownButtonExample extends StatefulWidget {
-  DropdownButtonExample({Key? key, required this.suggestions});
-
-  List<String> suggestions;
-
-  @override
-  State<DropdownButtonExample> createState() =>
-      _DropdownButtonExampleState(this.suggestions);
-}
-
-class _DropdownButtonExampleState extends State<DropdownButtonExample> {
-  _DropdownButtonExampleState(this.suggestions);
-
-  List<String> suggestions;
-
-  @override
-  Widget build(BuildContext context) {
-    String dropdownValue = suggestions.first;
-    return DropdownButton<String>(
-      value: dropdownValue,
-      icon: const Icon(Icons.arrow_downward),
-      elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),
-      onChanged: (String? value) {
-        // This is called when the user selects an item.
-        setState(() {
-          dropdownValue = value!;
-        });
-      },
-      items: this.suggestions.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
+  void updateTaskList() async {
+    final filterProvider =
+        Provider.of<TaskFilterProvider>(context, listen: false);
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.clearListByStatus(filterProvider.statusFilter!);
+    await taskListViewModel.fetchTasksFromFilters(context,
+        filterProvider.statusFilter!, filterProvider.buildSearchBody());
   }
 }

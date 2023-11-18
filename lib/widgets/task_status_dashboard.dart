@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
-import 'package:gtau_app_front/widgets/TaskList.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
@@ -75,13 +75,16 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
                 setState(() {
                   _currentIndex = index;
                 });
-                String status = getTaskStatusSelected();
+                String status = getTaskStatusSelected(_currentIndex);
+                taskFilterProvider
+                    .setLastStatus(getTaskStatusSelected(_currentIndex));
                 updateTaskListState(status);
               },
             ),
           ),
           body: Consumer<TaskListViewModel>(
               builder: (context, taskListViewModel, child) {
+            if (_currentIndex != taskFilterProvider.getCurrentIndex()) {}
             return LoadingOverlay(
               isLoading: taskListViewModel.isLoading,
               child: _buildTabContent(scaffoldKeyDashboard),
@@ -92,7 +95,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     );
   }
 
-  String getTaskStatusSelected() {
+  String getTaskStatusSelected(int currentIndex) {
     switch (_currentIndex) {
       case 0:
         return TaskStatus.Pending.value;
