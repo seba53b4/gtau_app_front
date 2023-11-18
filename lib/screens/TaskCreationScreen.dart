@@ -17,7 +17,6 @@ import '../models/enums/element_type.dart';
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
-import '../utils/boxes.dart';
 import '../utils/colorUtils.dart';
 import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
@@ -30,6 +29,7 @@ import '../widgets/common/custom_text_form_field.dart';
 import '../widgets/common/custom_toggle_buttons.dart';
 import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
+import '../widgets/map_modal_location_select.dart';
 import '../widgets/user_image.dart';
 
 class TaskCreationScreen extends StatefulWidget {
@@ -275,24 +275,27 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToCreate() {
-    final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+    var selectedItemsProvider = context.read<SelectedItemsProvider>();
+    final selectedSections = selectedItemsProvider.selectedPolylines;
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
 
-    final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+    final selectedCatchments = selectedItemsProvider.selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
 
-    final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+    final selectedRegisters = selectedItemsProvider.selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
 
-    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final selectedLots = selectedItemsProvider.selectedLots;
     final List<String> listSelectedLots =
         selectedLots.map((polylineId) => polylineId.value).toList();
+
+    final Map<String, dynamic> position = {
+      "lat": selectedItemsProvider.inspectionPosition.longitude.toString(),
+      "long": selectedItemsProvider.inspectionPosition.longitude.toString()
+    };
 
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
@@ -307,7 +310,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "tramos": listSelectedSections,
       "captaciones": listSelectedCatchments,
       "registros": listSelectedRegisters,
-      "parcelas": listSelectedLots
+      "parcelas": listSelectedLots,
+      "position": position
     };
     return requestBody;
   }
@@ -317,21 +321,26 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     late String? releasedDateSelected = releasedDateController.text.isNotEmpty
         ? formattedDateToUpdate(releasedDateController.text)
         : null;
-    final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+
+    var selectedItemsProvider = context.read<SelectedItemsProvider>();
+
+    final selectedSections = selectedItemsProvider.selectedPolylines;
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
-    final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+    final selectedCatchments = selectedItemsProvider.selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
-    final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+    final selectedRegisters = selectedItemsProvider.selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
-    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final selectedLots = selectedItemsProvider.selectedLots;
     final List<String> listSelectedLots =
         selectedLots.map((polylineId) => polylineId.value).toList();
+
+    final Map<String, dynamic> position = {
+      "lat": selectedItemsProvider.inspectionPosition.longitude.toString(),
+      "long": selectedItemsProvider.inspectionPosition.longitude.toString()
+    };
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -351,6 +360,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "captaciones": listSelectedCatchments,
       "registros": listSelectedRegisters,
       "parcelas": listSelectedLots,
+      "position": position
     };
     return requestBody;
   }
@@ -1177,6 +1187,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           // Button elementos a seleccionar
                           const MapModal(),
                           const SizedBox(height: 10.0),
+                          InspectionLocationSelect(
+                              selectedItemsProvider: selectedItemsProvider),
+                          const SizedBox(height: 10.0),
                           if (widget.detail)
                             Column(
                               children: [
@@ -1281,6 +1294,69 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
             ),
           ),
         ),
+      );
+    });
+  }
+}
+
+class InspectionLocationSelect extends StatelessWidget {
+  const InspectionLocationSelect({
+    super.key,
+    required this.selectedItemsProvider,
+  });
+
+  final SelectedItemsProvider? selectedItemsProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SelectedItemsProvider>(
+        builder: (context, selectedItemsProvider, child) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const MapModalLocationSelect(),
+          const SizedBox(width: 10.0),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: softGrey,
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            child: Wrap(
+              spacing: 15.0,
+              runSpacing: 15.0,
+              children: [
+                Chip(
+                  backgroundColor: Colors.white70,
+                  avatar: CircleAvatar(
+                    backgroundColor: Colors.black38,
+                    child: Icon(
+                      Icons.location_on_outlined,
+                      color: Colors.white70.withOpacity(1),
+                      size: 20,
+                    ),
+                  ),
+                  label: Text(
+                      "lat: ${selectedItemsProvider.inspectionPosition.latitude}"),
+                ),
+                Chip(
+                  backgroundColor: Colors.white70,
+                  avatar: CircleAvatar(
+                    backgroundColor: Colors.black38,
+                    child: Icon(
+                      Icons.location_on_outlined,
+                      color: Colors.white70.withOpacity(1),
+                      size: 20,
+                    ),
+                  ),
+                  label: Text(
+                      " long: ${selectedItemsProvider.inspectionPosition.longitude}"),
+                )
+              ],
+            ),
+          )
+        ],
       );
     });
   }

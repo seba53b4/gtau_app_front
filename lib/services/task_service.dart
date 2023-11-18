@@ -54,7 +54,11 @@ class TaskService {
               sections: _parseIntListToPolylineIdList(taskData['tramos']),
               catchments: _parseIntListToCircleIdList(taskData['captaciones']),
               registers: _parseIntListToCircleIdList(taskData['registros']),
-              lots: _parseIntListToPolylineIdList(taskData['parcelas']));
+              lots: _parseIntListToPolylineIdList(taskData['parcelas']),
+              position: taskData['position'] != null
+                  ? LatLng(
+                      taskData['position']['lat'], taskData['position']['long'])
+                  : const LatLng(0, 0));
         }).toList();
       } else {
         print('Error getTasks re null');
@@ -113,27 +117,30 @@ class TaskService {
         final taskData = json.decode(response.body);
 
         return Task(
-          id: taskData['id'],
-          status: taskData['status'],
-          inspectionType: taskData['inspectionType'],
-          workNumber: taskData['workNumber'],
-          addDate: DateTime.parse(taskData['addDate']),
-          applicant: taskData['applicant'],
-          location: taskData['location'],
-          description: taskData['description'],
-          releasedDate: taskData['releasedDate'] != null
-              ? DateTime.parse(taskData['releasedDate'])
-              : null,
-          user: taskData['user'],
-          length: taskData['length'],
-          material: taskData['material'],
-          observations: taskData['observations'],
-          conclusions: taskData['conclusions'],
-          sections: _parseIntListToPolylineIdList(taskData['tramos']),
-          catchments: _parseIntListToCircleIdList(taskData['captaciones']),
-          registers: _parseIntListToCircleIdList(taskData['registros']),
-          lots: _parseIntListToPolylineIdList(taskData['parcelas']),
-        );
+            id: taskData['id'],
+            status: taskData['status'],
+            inspectionType: taskData['inspectionType'],
+            workNumber: taskData['workNumber'],
+            addDate: DateTime.parse(taskData['addDate']),
+            applicant: taskData['applicant'],
+            location: taskData['location'],
+            description: taskData['description'],
+            releasedDate: taskData['releasedDate'] != null
+                ? DateTime.parse(taskData['releasedDate'])
+                : null,
+            user: taskData['user'],
+            length: taskData['length'],
+            material: taskData['material'],
+            observations: taskData['observations'],
+            conclusions: taskData['conclusions'],
+            sections: _parseIntListToPolylineIdList(taskData['tramos']),
+            catchments: _parseIntListToCircleIdList(taskData['captaciones']),
+            registers: _parseIntListToCircleIdList(taskData['registros']),
+            lots: _parseIntListToPolylineIdList(taskData['parcelas']),
+            position: taskData['position'] != null
+                ? LatLng(
+                    taskData['position']['lat'], taskData['position']['long'])
+                : const LatLng(0, 0));
       } else {
         if (kDebugMode) {
           print('No se pudieron traer datos');

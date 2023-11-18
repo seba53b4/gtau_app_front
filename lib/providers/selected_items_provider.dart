@@ -24,6 +24,15 @@ class SelectedItemsProvider with ChangeNotifier {
 
   Set<PolylineId> get selectedLots => _selectedLots;
 
+  LatLng _inspectionPosition = LatLng(0, 0);
+
+  LatLng get inspectionPosition => _inspectionPosition;
+
+  void setInspectionPosition(LatLng position) {
+    _inspectionPosition = position;
+    notifyListeners();
+  }
+
   void activateMultipleSelection() {
     _letMultipleItemsSelected = true;
   }
