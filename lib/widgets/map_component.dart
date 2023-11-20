@@ -226,30 +226,26 @@ class _MapComponentState extends State<MapComponent> {
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
     } else {
-      if (!(selectedItemsProvider.isSomePolylineSelected(type) ||
-          selectedItemsProvider.isSomeCircleSelected(type))) {
-        if (selectedItemsProvider.isSomeCircleSelected(type)) {
-          selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
-          if (ogcFid == elementSelectedId) {
-            isDetailsButtonVisible = false;
-            if (kIsWeb) {
-              viewDetailElementInfo = false;
-            }
-          }
-        } else {
-          selectedItemsProvider.clearAll();
-          selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
-          setState(() {
-            elementSelectedId = ogcFid;
-            elementSelectedType = type;
-            isDetailsButtonVisible = true;
-            if (kIsWeb) {
-              viewDetailElementInfo = true;
-            }
-          });
+      if (selectedItemsProvider.isSomeCircleSelected(type)) {
+        selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
+        if (ogcFid == elementSelectedId) {
+          isDetailsButtonVisible = false;
           if (kIsWeb) {
-            await _fetchElementInfo();
+            viewDetailElementInfo = false;
           }
+        }
+      } else {
+        selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
+        setState(() {
+          elementSelectedId = ogcFid;
+          elementSelectedType = type;
+          isDetailsButtonVisible = true;
+          if (kIsWeb) {
+            viewDetailElementInfo = true;
+          }
+        });
+        if (kIsWeb) {
+          await _fetchElementInfo();
         }
       }
     }
