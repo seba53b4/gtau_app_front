@@ -49,35 +49,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final isAdmin = context.read<UserProvider>().isAdmin;
 
     return Scaffold(
-      body: isAdmin!
-          ? Container(
-              color: lightBackground,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextFormField(
-                      controller: _searchController,
-                      onChanged: _updateSearch,
-                      onFieldSubmitted: _updateSearchByEnter,
-                      decoration: const InputDecoration(
-                        labelText: 'Ingrese un nombre de usuario',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  _constraintBoxTaskDashboard(context, _enteredUsername),
-                ],
-              ),
-            )
-          : Container(
-              width: MediaQuery.of(context).size.width,
-              height: kIsWeb
-                  ? MediaQuery.of(context).size.height * 0.78
-                  : MediaQuery.of(context).size.height - 72,
-              color: lightBackground,
-              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+      body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: kIsWeb
+              ? MediaQuery.of(context).size.height * 0.78
+              : MediaQuery.of(context).size.height - 72,
+          color: lightBackground,
+          child: _constraintBoxTaskDashboard(context, _enteredUsername)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

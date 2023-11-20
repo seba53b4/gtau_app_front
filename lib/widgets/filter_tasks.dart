@@ -123,6 +123,7 @@ class _FilterTasksState extends State<FilterTasks> {
                             const SizedBox(width: 10.0),
                             ElevatedButton(
                               onPressed: () {
+                                context.read<TaskFilterProvider>().search();
                                 updateTaskList();
                                 Navigator.of(context).pop();
                               },

@@ -35,21 +35,23 @@ class _TaskListComponentState extends State<TaskList> {
         width: 600,
         child: Center(
           widthFactor: 0.5,
-          child: CustomScrollView(
-            scrollDirection: Axis.vertical,
-            slivers: <Widget>[
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    final task = tasks?[index];
-                    return TaskListItem(
-                        task: task!, scaffoldKey: widget.scaffoldKey);
-                  },
-                  childCount: tasks?.length ?? 0,
+          child: (tasks!.isEmpty)
+              ? const Text("No se encontraron inspecciones.")
+              : CustomScrollView(
+                  scrollDirection: Axis.vertical,
+                  slivers: <Widget>[
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          final task = tasks[index];
+                          return TaskListItem(
+                              task: task, scaffoldKey: widget.scaffoldKey);
+                        },
+                        childCount: tasks.length ?? 0,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       );
     });

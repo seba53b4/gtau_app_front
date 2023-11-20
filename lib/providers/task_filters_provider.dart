@@ -181,4 +181,8 @@ class TaskFilterProvider with ChangeNotifier {
         ? 0
         : suggestionsStatus.map((e) => e.value).toList().indexOf(statusFilter!);
   }
+
+  void search() {
+    notifyListeners();
+  }
 }
