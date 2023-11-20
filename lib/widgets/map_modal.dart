@@ -26,6 +26,8 @@ double _getHeightModalOnDevice(BuildContext context) {
 }
 
 void _showMapModal(BuildContext context) {
+  SelectedItemsProvider selectedItemsProvider =
+      context.read<SelectedItemsProvider>();
   showGeneralDialog(
     context: context,
     barrierDismissible: false,
@@ -67,6 +69,7 @@ void _showMapModal(BuildContext context) {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   CustomElevatedButton(
                     onPressed: () {
+                      selectedItemsProvider.restoreInitialSelections();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.error,
@@ -75,6 +78,7 @@ void _showMapModal(BuildContext context) {
                   const SizedBox(width: 10.0),
                   CustomElevatedButton(
                     onPressed: () {
+                      selectedItemsProvider.saveCurrentSelectionsAsInitial();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.success,
