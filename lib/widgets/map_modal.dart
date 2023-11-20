@@ -78,6 +78,7 @@ void _showMapModal(BuildContext context) {
                   const SizedBox(width: 10.0),
                   CustomElevatedButton(
                     onPressed: () {
+                      selectedItemsProvider.saveCurrentSelectionsAsInitial();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.success,

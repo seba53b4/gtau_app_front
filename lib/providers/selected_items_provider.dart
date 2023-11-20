@@ -103,6 +103,14 @@ class SelectedItemsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void saveCurrentSelectionsAsInitial() {
+    _initialSelectedSections = Set<PolylineId>.from(_currentSelectedSections);
+    _initialSelectedRegisters = Set<CircleId>.from(_currentSelectedRegisters);
+    _initialSelectedCatchments = Set<CircleId>.from(_currentSelectedCatchments);
+    _initialSelectedLots = Set<PolylineId>.from(_currentSelectedLots);
+    notifyListeners();
+  }
+
 
   bool isPolylineSelected(PolylineId polylineId, ElementType type) {
     var polylineList = getPolylineList(type);
