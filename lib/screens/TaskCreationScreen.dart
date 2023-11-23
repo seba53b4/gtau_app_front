@@ -385,6 +385,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.clearListByStatus(initStatus);
     await taskListViewModel.initializeTasks(context, initStatus, userName);
   }
 

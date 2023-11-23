@@ -42,6 +42,7 @@
     "dialogCancelButton": "Cancelar",
     "dialogCloseButton": "Cerrar",
     "dialogContent": "¿Está seguro de realizar esta acción?",
+    "emptyTaskList" : "No hay tareas para mostrar",
     "taskListEditButtonLabel": "Editar",
     "taskListDeleteButtonLabel": "Eliminar",
     "buttonCancelLabel": "Cancelar",

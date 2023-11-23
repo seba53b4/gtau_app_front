@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/widgets/task_list_item.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -96,8 +96,8 @@ class _TaskListComponentState extends State<TaskList> {
                                   task: task, scaffoldKey: widget.scaffoldKey);
                               } else {
                                 if(tasks_length == 1){
-                                  return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
-                                    child: Center(child:Text("There's no items here to display")));
+                                  return Padding(padding: EdgeInsets.symmetric(vertical: 32),
+                                    child: Center(child:Text(AppLocalizations.of(context)!.emptyTaskList)));
                                 }else{
                                   if(tasks!.length % 10== 0){
                                     return const Padding(padding: EdgeInsets.symmetric(vertical: 32),

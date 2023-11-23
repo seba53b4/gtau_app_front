@@ -98,7 +98,8 @@ class TaskListViewModel extends ChangeNotifier {
           await _taskService.getTasks(token!, userName!, page, size, status);
       
       _tasks[status]?.addAll(responseListTask!);
-      if(responseListTask != null){
+      final size_list =  responseListTask?.length ?? 0;
+      if(size_list > 0){
         page++;
       }
       
