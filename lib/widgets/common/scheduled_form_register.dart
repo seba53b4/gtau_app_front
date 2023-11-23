@@ -7,9 +7,12 @@ import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/widgets/common/custom_dropdown.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:gtau_app_front/widgets/common/scheduled_form_common.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
+import '../../utils/element_functions.dart';
 import 'custom_labeled_checkbox.dart';
 import 'custom_text_form_field.dart';
+import 'custom_textfield.dart';
 
 class ScheduledFormRegister extends StatefulWidget {
   const ScheduledFormRegister({Key? key}) : super(key: key);
@@ -20,19 +23,22 @@ class ScheduledFormRegister extends StatefulWidget {
 
 class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   final observationsController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
+  final AutoScrollController _scrollController = AutoScrollController();
   final FocusNode _observationsFocusNode = FocusNode();
   late StreamSubscription<bool> keyboardSubscription;
+  final _cotaController = TextEditingController();
+  final _depthController = TextEditingController();
+  final _cotaDropdownFocusNode = FocusNode();
+  final _depthDropdownFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
+
     keyboardSubscription =
-        KeyboardVisibilityController().onChange.listen((bool visible) async {
+        KeyboardVisibilityController().onChange.listen((bool visible) {
       if (visible) {
-        _scrollController.jumpTo(0.0);
-        await Future.delayed(const Duration(milliseconds: 100));
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        scrollToFocusedDropdown();
       }
     });
   }
@@ -41,7 +47,30 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   void dispose() {
     keyboardSubscription.cancel();
     _observationsFocusNode.dispose();
+    _cotaController.dispose();
+    _depthController.dispose();
+    _cotaDropdownFocusNode.dispose();
+    _depthDropdownFocusNode.dispose();
     super.dispose();
+  }
+
+  void scrollToFocusedDropdown() {
+    if (_cotaDropdownFocusNode.hasFocus) {
+      scrollToFocusedElement(
+        focusedNode: _cotaDropdownFocusNode,
+        scrollController: _scrollController,
+      );
+    } else if (_depthDropdownFocusNode.hasFocus) {
+      scrollToFocusedElement(
+        focusedNode: _depthDropdownFocusNode,
+        scrollController: _scrollController,
+      );
+    } else if (_observationsFocusNode.hasFocus) {
+      scrollToFocusedElement(
+        focusedNode: _observationsFocusNode,
+        scrollController: _scrollController,
+      );
+    }
   }
 
   @override
@@ -114,39 +143,68 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                         EdgeInsetsDirectional.only(bottom: 8, start: 4, end: 4),
                     child: Divider(color: Colors.grey, thickness: 1),
                   ),
+                  const ScheduledFormTitle(titleText: 'Catastro'),
+                  const SizedBox(height: 8),
+                  CustomDropdown(
+                      fontSize: 12,
+                      value: 'Vacío',
+                      items: const ['Nuevo', 'Ajustado', 'Vacío'],
+                      onChanged: (str) {}),
+                  const SizedBox(height: 12),
                   // Tipo de pavimiento
                   const ScheduledFormTitle(titleText: 'Tipo de pavimiento'),
                   const SizedBox(height: 8),
                   CustomDropdown(
                       fontSize: 12,
                       value: 'Sin Datos',
-                      items: const [
-                        'Acera',
-                        'Hormigón',
-                        'Balastro',
-                        'Asfalto',
-                        'Sin Datos'
-                      ],
-                      onChanged: (str) {}),
-                  const SizedBox(height: 12),
-                  // Tipo de pavimiento - END
-                  const ScheduledFormTitle(titleText: 'Estado del pavimento'),
-                  const SizedBox(height: 8),
-                  CustomDropdown(
-                      fontSize: 12,
-                      value: 'No Apertura',
-                      items: const ['Buen Estado', 'Mal Estado', 'No Apertura'],
+                      items: const ['Acera', 'Calzada', 'Sin Datos'],
                       onChanged: (str) {}),
                   const SizedBox(height: 12),
                   const ScheduledFormTitle(titleText: 'Estado del registro'),
                   const SizedBox(height: 8),
                   CustomDropdown(
                       fontSize: 12,
-                      value: 'No Apertura',
-                      items: const ['Buen Estado', 'Mal Estado', 'No Apertura'],
+                      value: 'Sin Datos',
+                      items: const [
+                        'Bueno',
+                        'Malo',
+                        'No Apertura',
+                        'Sin Datos'
+                      ],
                       onChanged: (str) {}),
                   const SizedBox(height: 12),
-                  // Estado del registro - END
+                  const ScheduledFormTitle(titleText: 'Cota de tapa'),
+                  const SizedBox(height: 8),
+                  CustomTextField(
+                    controller: _cotaController,
+                    width: 98,
+                    keyboardType: TextInputType.number,
+                    focusNode: _cotaDropdownFocusNode,
+                    hasError: false,
+                  ),
+                  const SizedBox(height: 12),
+                  const ScheduledFormTitle(titleText: 'Profundidad (m)'),
+                  const SizedBox(height: 8),
+                  CustomTextField(
+                    controller: _depthController,
+                    width: 98,
+                    keyboardType: TextInputType.number,
+                    focusNode: _depthDropdownFocusNode,
+                    hasError: false,
+                  ),
+                  const SizedBox(height: 12),
+                  const ScheduledFormTitle(titleText: 'Apertura'),
+                  const SizedBox(height: 8),
+                  CustomDropdown(
+                      fontSize: 12,
+                      value: 'No Localizado',
+                      items: const [
+                        'Si Apertura',
+                        'No Apertura',
+                        'No Localizado'
+                      ],
+                      onChanged: (str) {}),
+                  const SizedBox(height: 12),
                   // Estado de la tapa
                   const ScheduledFormTitle(titleText: 'Estado de la tapa'),
                   CustomLabeledCheckbox(
@@ -191,13 +249,15 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     width: double.infinity,
                     child: CustomTextFormField(
                       focusNode: _observationsFocusNode,
-                      onTap: () {
-                        _scrollController.animateTo(
-                          _scrollController.position.maxScrollExtent,
-                          duration: const Duration(milliseconds: 10),
-                          curve: Curves.easeInOut,
-                        );
-                      },
+                      // onTap: () {
+                      //   Future.delayed(const Duration(milliseconds: 100), () {
+                      //     _scrollController.animateTo(
+                      //       _scrollController.position.maxScrollExtent,
+                      //       duration: const Duration(milliseconds: 300),
+                      //       curve: Curves.easeInOut,
+                      //     );
+                      //   });
+                      // },
                       useValidation: false,
                       isTextBox: true,
                       maxLines: 10,

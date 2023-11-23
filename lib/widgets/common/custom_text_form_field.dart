@@ -63,7 +63,6 @@ class CustomTextFormField extends StatelessWidget {
         onTap: onTap,
         focusNode: focusNode,
         keyboardType: keyboardType,
-
         inputFormatters: inputFormatters,
         maxLines: maxLines,
         decoration: InputDecoration(

@@ -17,7 +17,6 @@ import '../models/enums/element_type.dart';
 import '../models/task.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
-import '../utils/boxes.dart';
 import '../utils/colorUtils.dart';
 import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
@@ -28,6 +27,7 @@ import '../widgets/common/custom_dropdown.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_text_form_field.dart';
 import '../widgets/common/custom_toggle_buttons.dart';
+import '../widgets/element_scheduled_modal.dart';
 import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
 import '../widgets/user_image.dart';
@@ -443,7 +443,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   @override
   Widget build(BuildContext context) {
     double widthRow = 640;
-    double heightrow = 128;
+    double heightRow = 128;
 
     return Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
@@ -495,7 +495,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             const SizedBox(height: 24.0),
                             // Primera fila
                             SizedBox(
-                              height: heightrow,
+                              height: heightRow,
                               width: widthRow,
                               child: Row(
                                   mainAxisAlignment:
@@ -582,7 +582,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ),
                             // Segunda fila
                             SizedBox(
-                              height: heightrow,
+                              height: heightRow,
                               width: widthRow,
                               child: Row(
                                 mainAxisAlignment:
@@ -683,7 +683,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_descriptionPlaceholder,
                                   controller: descriptionController,
@@ -923,7 +923,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   maxLines: 10,
                                   fontSize: 12,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_descriptionPlaceholder,
                                   controller: descriptionController,
@@ -1192,7 +1192,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_observationsPlaceholder,
                                   controller: observationsController,
@@ -1209,7 +1209,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_conclusionsPlaceholder,
                                   controller: conclusionsController,

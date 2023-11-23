@@ -10,6 +10,7 @@ class CustomTextField extends StatelessWidget {
   final bool? filledBackground;
   final Color? fillColor;
   final double? width;
+  final FocusNode? focusNode;
 
   CustomTextField({
     required this.controller,
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.filledBackground,
     this.fillColor,
     this.width,
+    this.focusNode,
   });
 
   @override
@@ -34,6 +36,7 @@ class CustomTextField extends StatelessWidget {
       width: width ?? inputWidth,
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        focusNode: focusNode,
         decoration: InputDecoration(
             border: OutlineInputBorder(
               borderSide: const BorderSide(color: Colors.red),
