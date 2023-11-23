@@ -85,8 +85,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                   _currentIndex = index;
                 });
                 String status = getTaskStatusSelected(_currentIndex);
-                taskFilterProvider
-                    .setLastStatus(getTaskStatusSelected(_currentIndex));
+                taskFilterProvider.setLastStatus(status);
                 updateTaskListState(status);
               },
             ),

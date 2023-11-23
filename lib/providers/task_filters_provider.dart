@@ -136,9 +136,11 @@ class TaskFilterProvider with ChangeNotifier {
     };
   }
 
-  void resetFilters() {
-    _userNameFilter = null;
-    _statusFilter = null;
+  void resetFilters(bool updateUser) {
+    if (updateUser) {
+      _userNameFilter = "";
+    }
+    _statusFilter = TaskStatus.Pending.value;
     _inspectionTypeFilter = null;
     _workNumberFilter = null;
     _addDateFilter = null;

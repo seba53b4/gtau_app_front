@@ -9,34 +9,30 @@ class DropdownButtonFilter extends StatefulWidget {
       required this.suggestions,
       required this.valueSetter,
       required this.dropdownValue,
-      required this.label})
+      required this.label,
+      required this.enabled})
       : super(key: key);
 
   final List<ValueLabel> suggestions;
   final Function(String value) valueSetter;
   final String dropdownValue;
   final String label;
+  final bool enabled;
 
   @override
-  State<DropdownButtonFilter> createState() => _DropdownButtonFilterState(
-      suggestions, valueSetter, dropdownValue, label);
+  State<DropdownButtonFilter> createState() => _DropdownButtonFilterState();
 }
 
 class _DropdownButtonFilterState extends State<DropdownButtonFilter> {
-  _DropdownButtonFilterState(
-      this.suggestions, this.valueSetter, this.dropdownValue, this.label);
-
-  final Function(String value) valueSetter;
-  final String dropdownValue;
-  final List<ValueLabel> suggestions;
-  final String label;
+  _DropdownButtonFilterState();
 
   String selectedValue = "";
 
   @override
   Widget build(BuildContext context) {
-    selectedValue = selectedValue.isEmpty ? dropdownValue : selectedValue;
-    final List<DropdownMenuEntry<String>> entries = suggestions
+    selectedValue =
+        selectedValue.isEmpty ? widget.dropdownValue : selectedValue;
+    final List<DropdownMenuEntry<String>> entries = widget.suggestions
         .map(
           (e) => DropdownMenuEntry<String>(
               value: e.value, label: e.label, enabled: true),
@@ -55,12 +51,13 @@ class _DropdownButtonFilterState extends State<DropdownButtonFilter> {
       ),
       initialSelection: selectedValue,
       controller: TextEditingController(),
-      label: Text(label),
+      label: Text(widget.label),
+      enabled: widget.enabled,
       dropdownMenuEntries: entries,
       onSelected: (String? newValue) {
         setState(() {
           selectedValue = newValue!;
-          valueSetter(newValue);
+          widget.valueSetter(newValue);
         });
       },
     );
