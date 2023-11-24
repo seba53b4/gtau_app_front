@@ -50,7 +50,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
     keyboardSubscription =
         KeyboardVisibilityController().onChange.listen((bool visible) {
       if (visible) {
-        scrollToFocusedDropdown(focusNodes, _scrollController);
+        scrollToFocusedList(focusNodes, _scrollController);
       }
     });
   }

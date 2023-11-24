@@ -18,7 +18,7 @@ void scrollToFocusedElement({
   }
 }
 
-void scrollToFocusedDropdown(
+void scrollToFocusedList(
     List<FocusNode> focusNodes, AutoScrollController scrollController) {
   FocusNode? focusedNode;
 
