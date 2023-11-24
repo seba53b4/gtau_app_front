@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/user_provider.dart';
 import '../widgets/filter_tasks.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,26 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _updateSearch(String value) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(seconds: 2), () {
-      setState(() {
-        _enteredUsername = value;
-      });
-    });
-  }
-
-  void _updateSearchByEnter(String value) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    setState(() {
-      _enteredUsername = value;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isAdmin = context.read<UserProvider>().isAdmin;
-
     return Scaffold(
       body: Container(
           width: MediaQuery.of(context).size.width,
@@ -58,8 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: _constraintBoxTaskDashboard(context, _enteredUsername)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => FilterTasks()));
+          _showFilterModal(context);
         },
         foregroundColor: null,
         backgroundColor: null,
@@ -68,6 +47,20 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+void _showFilterModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        child: SizedBox(
+          width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
+          child: const FilterTasks(),
+        ),
+      );
+    },
+  );
 }
 
 Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
