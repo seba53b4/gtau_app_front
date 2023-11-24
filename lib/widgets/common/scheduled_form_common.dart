@@ -20,10 +20,6 @@ class _ScheduledFormTitleState extends State<ScheduledFormTitle> {
       children: [
         Text(widget.titleText, style: const TextStyle(fontSize: 18)),
         const SizedBox(height: 8),
-        const Padding(
-          padding: EdgeInsetsDirectional.symmetric(horizontal: 4),
-          child: Divider(color: Colors.grey, thickness: 1),
-        ),
       ],
     );
   }
