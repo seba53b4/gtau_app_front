@@ -102,11 +102,12 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                               ),
                             ],
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Text('ID:'),
-                              SizedBox(width: 8),
-                              Text('123456'),
+                              Text(AppLocalizations.of(context)!
+                                  .form_scheduled_id),
+                              const SizedBox(width: 8),
+                              const Text('HD123456'),
                             ],
                           ),
                         ),
@@ -119,7 +120,29 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     child: Divider(color: Colors.grey, thickness: 1),
                   ),
                   ContainerBottomDivider(children: [
-                    const ScheduledFormTitle(titleText: 'Tipo de Registro'),
+                    ScheduledFormTitle(
+                        titleText: AppLocalizations.of(context)!
+                            .form_scheduled_cadastre),
+                    CustomDropdown(
+                        fontSize: 12,
+                        value: AppLocalizations.of(context)!
+                            .form_scheduled_cadastre_type_empty,
+                        items: [
+                          AppLocalizations.of(context)!
+                              .form_scheduled_cadastre_type_new,
+                          AppLocalizations.of(context)!
+                              .form_scheduled_cadastre_type_adjust,
+                          AppLocalizations.of(context)!
+                              .form_scheduled_cadastre_type_empty
+                        ],
+                        onChanged: (str) {}),
+                    const SizedBox(height: 8)
+                  ]),
+                  const SizedBox(height: 12),
+                  ContainerBottomDivider(children: [
+                    ScheduledFormTitle(
+                        titleText: AppLocalizations.of(context)!
+                            .form_scheduled_register_type),
                     CustomTextField(
                       controller: _typeController,
                       width: 98,
@@ -129,47 +152,53 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     ),
                   ]),
                   const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    const ScheduledFormTitle(titleText: 'Catastro'),
-                    CustomTextField(
-                      controller: _catastroController,
-                      width: 98,
-                      keyboardType: TextInputType.number,
-                      focusNode: _catastroDropdownFocusNode,
-                      hasError: false,
-                    ),
-                  ]),
-                  const SizedBox(height: 12),
                   // Tipo de pavimiento
                   ContainerBottomDivider(children: [
-                    const ScheduledFormTitle(titleText: 'Tipo de pavimiento'),
+                    ScheduledFormTitle(
+                        titleText: AppLocalizations.of(context)!
+                            .form_scheduled_pav_type),
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: 'Sin Datos',
-                        items: const ['Acera', 'Calzada', 'Sin Datos'],
-                        onChanged: (str) {}),
-                    const SizedBox(height: 8),
-                  ]),
-                  const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    const ScheduledFormTitle(titleText: 'Estado del registro'),
-                    const SizedBox(height: 8),
-                    CustomDropdown(
-                        fontSize: 12,
-                        value: 'Sin Datos',
-                        items: const [
-                          'Bueno',
-                          'Malo',
-                          'No Apertura',
-                          'Sin Datos'
+                        value: AppLocalizations.of(context)!
+                            .form_scheduled_no_data,
+                        items: [
+                          AppLocalizations.of(context)!
+                              .form_scheduled_pav_type_type_1,
+                          AppLocalizations.of(context)!
+                              .form_scheduled_pav_type_type_2,
+                          AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
                         onChanged: (str) {}),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
                   ContainerBottomDivider(children: [
-                    const ScheduledFormTitle(titleText: 'Cota de tapa'),
+                    ScheduledFormTitle(
+                        titleText: AppLocalizations.of(context)!
+                            .form_scheduled_register_status),
+                    const SizedBox(height: 8),
+                    CustomDropdown(
+                        fontSize: 12,
+                        value: AppLocalizations.of(context)!
+                            .form_scheduled_no_data,
+                        items: [
+                          AppLocalizations.of(context)!
+                              .form_scheduled_register_status_1,
+                          AppLocalizations.of(context)!
+                              .form_scheduled_register_status_2,
+                          AppLocalizations.of(context)!
+                              .form_scheduled_register_status_3,
+                          AppLocalizations.of(context)!.form_scheduled_no_data
+                        ],
+                        onChanged: (str) {}),
+                    const SizedBox(height: 8),
+                  ]),
+                  const SizedBox(height: 12),
+                  ContainerBottomDivider(children: [
+                    ScheduledFormTitle(
+                        titleText:
+                            AppLocalizations.of(context)!.form_scheduled_cota),
                     CustomTextField(
                       controller: _cotaController,
                       width: 98,
@@ -180,7 +209,9 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                   ]),
                   const SizedBox(height: 12),
                   ContainerBottomDivider(children: [
-                    const ScheduledFormTitle(titleText: 'Profundidad (m)'),
+                    ScheduledFormTitle(
+                        titleText:
+                            AppLocalizations.of(context)!.form_scheduled_depth),
                     CustomTextField(
                       controller: _depthController,
                       width: 98,
@@ -191,15 +222,21 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                   ]),
                   const SizedBox(height: 12),
                   ContainerBottomDivider(children: [
-                    const ScheduledFormTitle(titleText: 'Apertura'),
+                    ScheduledFormTitle(
+                        titleText: AppLocalizations.of(context)!
+                            .form_scheduled_aperture),
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: 'No Localizado',
-                        items: const [
-                          'Si Apertura',
-                          'No Apertura',
-                          'No Localizado'
+                        value: AppLocalizations.of(context)!
+                            .form_scheduled_aperture_type_not_located,
+                        items: [
+                          AppLocalizations.of(context)!
+                              .form_scheduled_aperture_type_yes,
+                          AppLocalizations.of(context)!
+                              .form_scheduled_aperture_type_no,
+                          AppLocalizations.of(context)!
+                              .form_scheduled_aperture_type_not_located,
                         ],
                         onChanged: (str) {}),
                     const SizedBox(height: 8),
@@ -207,37 +244,47 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                   const SizedBox(height: 12),
                   ContainerBottomDivider(children: [
                     // Estado de la tapa
-                    const ScheduledFormTitle(titleText: 'Estado de la tapa'),
+                    ScheduledFormTitle(
+                        titleText: AppLocalizations.of(context)!
+                            .form_scheduled_top_status),
                     CustomLabeledCheckbox(
-                      label: 'Bien',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_good,
                       onChanged: (value) {},
                     ),
                     CustomLabeledCheckbox(
-                      label: 'Faltante',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_missing,
                       onChanged: (value) {},
                     ),
                     CustomLabeledCheckbox(
-                      label: 'Hundida',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_sunken,
                       onChanged: (value) {},
                     ),
                     CustomLabeledCheckbox(
-                      label: 'Marco descalzado',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_frame,
                       onChanged: (value) {},
                     ),
                     CustomLabeledCheckbox(
-                      label: 'Marco roto',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_broken_frame,
                       onChanged: (value) {},
                     ),
                     CustomLabeledCheckbox(
-                      label: 'Provisoria',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_provisional,
                       onChanged: (value) {},
                     ),
                     CustomLabeledCheckbox(
-                      label: 'Rota',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_broken,
                       onChanged: (value) {},
                     ),
                     CustomLabeledCheckbox(
-                      label: 'Soldada/Sellada',
+                      label: AppLocalizations.of(context)!
+                          .form_scheduled_top_status_welded_sealed,
                       onChanged: (value) {},
                     ),
                   ]),
@@ -273,9 +320,11 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                   Navigator.of(context).pop();
                 },
                 messageType: MessageType.error,
-                text: 'Cancelar'),
+                text: AppLocalizations.of(context)!.buttonCancelLabel),
             const SizedBox(width: 16),
-            CustomElevatedButton(onPressed: () {}, text: 'Aceptar'),
+            CustomElevatedButton(
+                onPressed: () {},
+                text: AppLocalizations.of(context)!.buttonAcceptLabel),
           ],
         ),
       ],
