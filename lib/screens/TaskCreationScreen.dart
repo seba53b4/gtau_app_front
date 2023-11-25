@@ -666,14 +666,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               children: [
                                 Text(
                                   AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationTitle,
+                                      .createTaskPage_selectAddressTitle,
                                   style: const TextStyle(fontSize: 16.0),
                                 ),
                                 const SizedBox(height: 12.0),
                                 CustomTextFormField(
                                   width: widthRow,
                                   hintText: AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationplaceholder,
+                                      .createTaskPage_selectAddressplaceholder,
                                   controller: locationController,
                                 ),
                                 const SizedBox(
@@ -904,7 +904,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               children: [
                                 Text(
                                   AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationTitle,
+                                      .createTaskPage_selectAddressTitle,
                                   style: const TextStyle(fontSize: 14.0),
                                 ),
                                 const SizedBox(height: 12.0),
@@ -913,7 +913,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   height: 80,
                                   fontSize: 12,
                                   hintText: AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationplaceholder,
+                                      .createTaskPage_selectAddressplaceholder,
                                   controller: locationController,
                                 ),
                                 //      const SizedBox(height: 12.0),
@@ -1180,8 +1180,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           ElementsSelected(widget: widget),
                           const SizedBox(height: 10.0),
                           // Button elementos a seleccionar
-                          const MapModal(),
-                          const SizedBox(height: 10.0),
                           InspectionLocationSelect(
                               selectedItemsProvider: selectedItemsProvider),
                           const SizedBox(height: 10.0),
@@ -1306,51 +1304,64 @@ class InspectionLocationSelect extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SelectedItemsProvider>(
         builder: (context, selectedItemsProvider, child) {
-      return Row(
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const MapModalLocationSelect(),
-          const SizedBox(width: 10.0),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: softGrey,
-              borderRadius: BorderRadius.circular(24.0),
+          Text(
+            AppLocalizations.of(context)!.createTaskPage_selectUbicationTitle,
+            style: const TextStyle(
+              fontSize: 18,
             ),
-            child: Wrap(
-              spacing: 15.0,
-              runSpacing: 15.0,
-              children: [
-                Chip(
-                  backgroundColor: Colors.white70,
-                  avatar: CircleAvatar(
-                    backgroundColor: Colors.black38,
-                    child: Icon(
-                      Icons.location_on_outlined,
-                      color: Colors.white70.withOpacity(1),
-                      size: 20,
-                    ),
-                  ),
-                  label: Text(
-                      "lat: ${selectedItemsProvider.inspectionPosition.latitude}"),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const MapModalLocationSelect(),
+              const SizedBox(width: 10.0),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: softGrey,
+                  borderRadius: BorderRadius.circular(24.0),
                 ),
-                Chip(
-                  backgroundColor: Colors.white70,
-                  avatar: CircleAvatar(
-                    backgroundColor: Colors.black38,
-                    child: Icon(
-                      Icons.location_on_outlined,
-                      color: Colors.white70.withOpacity(1),
-                      size: 20,
+                child: Wrap(
+                  direction: Axis.vertical,
+                  spacing: 8.0,
+                  runSpacing: 15.0,
+                  children: [
+                    Chip(
+                      backgroundColor: Colors.white70,
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.black38,
+                        child: Icon(
+                          Icons.location_on_outlined,
+                          color: Colors.white70.withOpacity(1),
+                          size: 20,
+                        ),
+                      ),
+                      label: Text(
+                          "lat: ${selectedItemsProvider.inspectionPosition.latitude}"),
                     ),
-                  ),
-                  label: Text(
-                      " long: ${selectedItemsProvider.inspectionPosition.longitude}"),
-                )
-              ],
-            ),
-          )
+                    Chip(
+                      backgroundColor: Colors.white70,
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.black38,
+                        child: Icon(
+                          Icons.location_on_outlined,
+                          color: Colors.white70.withOpacity(1),
+                          size: 20,
+                        ),
+                      ),
+                      label: Text(
+                          " long: ${selectedItemsProvider.inspectionPosition.longitude}"),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ],
       );
     });
@@ -1414,29 +1425,34 @@ class ElementsSelected extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              elementsList.isNotEmpty
-                  ? Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: softGrey,
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      child: Wrap(
-                        spacing: 15.0,
-                        runSpacing: 15.0,
-                        children: elementsList,
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 12),
-                        Text(
-                          AppLocalizations.of(context)!.no_elements_registered,
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                      ],
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const MapModal(),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: softGrey,
+                      borderRadius: BorderRadius.circular(24.0),
                     ),
+                    child: Wrap(
+                      spacing: 15.0,
+                      runSpacing: 15.0,
+                      children: elementsList.isNotEmpty
+                          ? elementsList
+                          : [
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .no_elements_registered,
+                                style: const TextStyle(fontSize: 16.0),
+                              )
+                            ],
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 12),
             ],
           );

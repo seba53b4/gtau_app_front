@@ -93,11 +93,24 @@ class MapModalLocationSelect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomElevatedButton(
-      onPressed: () {
-        _showMapModal(context);
-      },
-      text: AppLocalizations.of(context)!.map_modal_select_location,
+    final color = primarySwatch[300];
+    return Material(
+      color: Colors.white,
+      child: Center(
+        child: Ink(
+          decoration: ShapeDecoration(
+            color: color,
+            shape: const CircleBorder(),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.location_on),
+            color: Colors.white,
+            onPressed: () {
+              _showMapModal(context);
+            },
+          ),
+        ),
+      ),
     );
   }
 }

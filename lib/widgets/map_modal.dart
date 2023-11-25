@@ -101,11 +101,24 @@ class MapModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final selectedItemsProvider = context.read<SelectedItemsProvider>();
     selectedItemsProvider.activateMultipleSelection();
-    return CustomElevatedButton(
-      onPressed: () {
-        _showMapModal(context);
-      },
-      text: AppLocalizations.of(context)!.map_modal_add_elements_button,
+    final color = primarySwatch[300];
+    return Material(
+      color: Colors.white,
+      child: Center(
+        child: Ink(
+          decoration: ShapeDecoration(
+            color: color,
+            shape: const CircleBorder(),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.add_circle_outline_rounded),
+            color: Colors.white,
+            onPressed: () {
+              _showMapModal(context);
+            },
+          ),
+        ),
+      ),
     );
   }
 }
