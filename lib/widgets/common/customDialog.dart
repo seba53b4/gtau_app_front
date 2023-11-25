@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 Future<void> showCustomDialog({
@@ -12,25 +13,67 @@ Future<void> showCustomDialog({
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: <Widget>[
-          TextButton(
-            style: TextButton.styleFrom(
-              textStyle: Theme.of(context).textTheme.labelLarge,
+      return ScaleTransition(
+        scale: CurvedAnimation(
+          parent: ModalRoute.of(context)!.animation!,
+          curve: Curves.easeInOut,
+        ),
+        child: AlertDialog(
+          title: Container(
+            alignment: Alignment.center,
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: kIsWeb ? 28 : 22,
+              ),
             ),
-            child: Text(cancelbuttonLabel),
-            onPressed: onDisablePressed,
           ),
-          TextButton(
-            style: TextButton.styleFrom(
-              textStyle: Theme.of(context).textTheme.labelLarge,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Divider(
+                height: 8,
+                thickness: 2,
+                color: Colors.grey.shade100,
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 80,
+                child: Center(
+                  child: Text(
+                    content,
+                    style: const TextStyle(fontSize: kIsWeb ? 16 : 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Divider(
+                height: 8,
+                thickness: 2,
+                color: Colors.grey.shade100,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              onPressed: onDisablePressed,
+              child: Text(cancelbuttonLabel),
             ),
-            child: Text(acceptButtonLabel),
-            onPressed: onEnablePressed,
-          ),
-        ],
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              onPressed: onEnablePressed,
+              child: Text(acceptButtonLabel),
+            ),
+          ],
+        ),
       );
     },
   );

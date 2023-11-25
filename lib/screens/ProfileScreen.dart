@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../widgets/common/custom_elevated_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     void handleLogOutPress(BuildContext context) {
-      final userStateProvider = Provider.of<UserProvider>(context, listen: false);
+      final userStateProvider =
+          Provider.of<UserProvider>(context, listen: false);
       userStateProvider.logout();
 
       Navigator.pushReplacement(
@@ -22,6 +25,7 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
+        top: true,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -32,7 +36,8 @@ class ProfileScreen extends StatelessWidget {
                   'https://randomuser.me/api/portraits/men/36.jpg'),
             ),
             Text(
-              Provider.of<UserProvider>(context).userState?.getUsername ?? 'OperarioXX',
+              Provider.of<UserProvider>(context).userState?.getUsername ??
+                  'OperarioXX',
               style: Theme.of(context).textTheme.displaySmall,
             ),
             const Divider(
@@ -42,20 +47,10 @@ class ProfileScreen extends StatelessWidget {
               endIndent: 20,
             ),
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              width: 200,
-              child: ElevatedButton(
-                onPressed: () => handleLogOutPress(context), // Pasar el BuildContext
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromRGBO(78, 116, 289, 1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.default_logout_button,
-                  style: TextStyle(color: Colors.white),
-                ),
+              child: CustomElevatedButton(
+                onPressed: () => handleLogOutPress(context),
+                messageType: MessageType.error,
+                text: AppLocalizations.of(context)!.default_logout_button,
               ),
             ),
           ],

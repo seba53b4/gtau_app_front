@@ -226,30 +226,26 @@ class _MapComponentState extends State<MapComponent> {
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
     } else {
-      if (!(selectedItemsProvider.isSomePolylineSelected(type) ||
-          selectedItemsProvider.isSomeCircleSelected(type))) {
-        if (selectedItemsProvider.isSomeCircleSelected(type)) {
-          selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
-          if (ogcFid == elementSelectedId) {
-            isDetailsButtonVisible = false;
-            if (kIsWeb) {
-              viewDetailElementInfo = false;
-            }
-          }
-        } else {
-          selectedItemsProvider.clearAll();
-          selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
-          setState(() {
-            elementSelectedId = ogcFid;
-            elementSelectedType = type;
-            isDetailsButtonVisible = true;
-            if (kIsWeb) {
-              viewDetailElementInfo = true;
-            }
-          });
+      if (selectedItemsProvider.isSomeCircleSelected(type)) {
+        selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
+        if (ogcFid == elementSelectedId) {
+          isDetailsButtonVisible = false;
           if (kIsWeb) {
-            await _fetchElementInfo();
+            viewDetailElementInfo = false;
           }
+        }
+      } else {
+        selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
+        setState(() {
+          elementSelectedId = ogcFid;
+          elementSelectedType = type;
+          isDetailsButtonVisible = true;
+          if (kIsWeb) {
+            viewDetailElementInfo = true;
+          }
+        });
+        if (kIsWeb) {
+          await _fetchElementInfo();
         }
       }
     }
@@ -339,6 +335,7 @@ class _MapComponentState extends State<MapComponent> {
     if (sections != null) {
       for (var section in sections) {
         Polyline pol = section.line!.copyWith(
+          zIndexParam: 0,
           colorParam: _onColorParamBehaviorSection(section),
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
@@ -356,6 +353,7 @@ class _MapComponentState extends State<MapComponent> {
     if (lots != null) {
       for (var lot in lots) {
         Polyline pol = lot.polyline!.copyWith(
+          zIndexParam: 0,
           colorParam: _onColorParamBehaviorLot(lot),
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
@@ -378,6 +376,7 @@ class _MapComponentState extends State<MapComponent> {
     if (catchments != null) {
       for (var catchment in catchments) {
         Circle circle = catchment.point!.copyWith(
+          zIndexParam: 1,
           centerParam: catchment.point!.center,
           radiusParam: catchment.point!.radius,
           strokeWidthParam: catchment.point!.strokeWidth,
@@ -396,6 +395,7 @@ class _MapComponentState extends State<MapComponent> {
     if (registers != null) {
       for (var register in registers) {
         Circle circle = register.point!.copyWith(
+          zIndexParam: 1,
           centerParam: register.point!.center,
           radiusParam: register.point!.radius,
           strokeWidthParam: register.point!.strokeWidth,
@@ -466,8 +466,8 @@ class _MapComponentState extends State<MapComponent> {
     });
 
     setState(() {
-      polylines = getPolylines(fetchedSections, fetchedLots);
       circles = getCircles(fetchedCatchments, fetchedRegisters);
+      polylines = getPolylines(fetchedSections, fetchedLots);
     });
   }
 
@@ -487,225 +487,231 @@ class _MapComponentState extends State<MapComponent> {
           builder: (context, registerViewModel, child) {
         return Consumer<CatchmentViewModel>(
             builder: (context, catchmentViewModel, child) {
-          final isMapLoading = catchmentViewModel.isLoading ||
-              registerViewModel.isLoading ||
-              sectionViewModel.isLoading;
-          return Scaffold(
-            body: Row(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 0),
-                        width: viewDetailElementInfo && !widget.isModal
-                            ? mapWidth - modalWidth
-                            : mapWidth,
-                        child: GestureDetector(
-                          onTap: () {
-                            // Gestos generales si es necesario
-                          },
-                          child: GoogleMap(
-                            mapType: _currentMapType,
-                            initialCameraPosition: CameraPosition(
-                              target:
-                                  (location != null) ? location! : initLocation,
-                              zoom: zoomMap,
-                            ),
-                            polylines: polylines,
-                            circles: circles,
-                            markers: markers,
-                            onCameraMove: (CameraPosition cameraPosition) {
-                              setState(() {
-                                zoomMap = cameraPosition.zoom;
-                              });
-                            },
-                            onMapCreated: (GoogleMapController controller) {
-                              if (location != null &&
-                                  _mapController.isCompleted &&
-                                  !isMapLoading) {
-                                controller.moveCamera(
-                                    CameraUpdate.newLatLngZoom(
-                                        location!, zoomMap));
-                              }
-                              if (!_mapController.isCompleted) {
-                                _mapController.complete(controller);
-                              }
-                            },
-                            onTap: (LatLng latLng) {
-                              if (locationManual) {
+          return Consumer<LotViewModel>(
+              builder: (context, lotViewModel, child) {
+            final isMapLoading = catchmentViewModel.isLoading ||
+                registerViewModel.isLoading ||
+                lotViewModel.isLoading ||
+                sectionViewModel.isLoading;
+            return Scaffold(
+              body: Row(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 0),
+                          width: viewDetailElementInfo && !widget.isModal
+                              ? mapWidth - modalWidth
+                              : mapWidth,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: GoogleMap(
+                              mapType: _currentMapType,
+                              initialCameraPosition: CameraPosition(
+                                target: (location != null)
+                                    ? location!
+                                    : initLocation,
+                                zoom: zoomMap,
+                              ),
+                              polylines: polylines,
+                              markers: markers,
+                              circles: circles,
+                              onCameraMove: (CameraPosition cameraPosition) {
                                 setState(() {
-                                  final Marker newMarker = Marker(
-                                    onTap: () {},
-                                    markerId: const MarkerId(
-                                        'tapped_location_manual'),
-                                    position: latLng,
-                                  );
-                                  markersGPS.clear();
-                                  markersGPS.add(newMarker);
-                                  _getMarkers();
-                                  location =
-                                      LatLng(latLng.latitude, latLng.longitude);
+                                  zoomMap = cameraPosition.zoom;
                                 });
-                              }
-                            },
+                              },
+                              onMapCreated: (GoogleMapController controller) {
+                                if (location != null &&
+                                    _mapController.isCompleted &&
+                                    !isMapLoading) {
+                                  controller.moveCamera(
+                                      CameraUpdate.newLatLngZoom(
+                                          location!, zoomMap));
+                                }
+                                if (!_mapController.isCompleted) {
+                                  _mapController.complete(controller);
+                                }
+                              },
+                              onTap: (LatLng latLng) {
+                                if (locationManual) {
+                                  setState(() {
+                                    final Marker newMarker = Marker(
+                                      onTap: () {},
+                                      markerId: const MarkerId(
+                                          'tapped_location_manual'),
+                                      position: latLng,
+                                    );
+                                    markersGPS.clear();
+                                    markersGPS.add(newMarker);
+                                    _getMarkers();
+                                    location = LatLng(
+                                        latLng.latitude, latLng.longitude);
+                                  });
+                                }
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                      LoadingOverlay(
-                        isLoading: isMapLoading && !viewDetailElementInfo,
-                        child: Positioned(
-                          top: kIsWeb ? null : 80,
-                          right: kIsWeb ? null : 16,
-                          bottom: kIsWeb ? 80 : null,
-                          left: kIsWeb ? 16 : null,
-                          child: Column(
-                            children: [
-                              MenuElevatedButton(
-                                colorChangeOnPress: true,
-                                onPressed: () {
-                                  setState(() {
-                                    _currentMapType =
-                                        _currentMapType == MapType.normal
-                                            ? MapType.satellite
-                                            : MapType.normal;
-                                  });
-                                },
-                                tooltipMessage: AppLocalizations.of(context)!
-                                    .map_component_map_view_tooltip,
-                                icon: _currentMapType == MapType.normal
-                                    ? Icons.map
-                                    : Icons.satellite,
-                              ),
-                              if (kIsWeb) const SizedBox(height: 6),
-                              MenuElevatedButton(
-                                onPressed: () async {
-                                  await fetchAndUpdateData(token!);
-                                },
-                                tooltipMessage: AppLocalizations.of(context)!
-                                    .map_component_fetch_elements,
-                                icon: Icons.area_chart_outlined,
-                              ),
-                              if (kIsWeb) SizedBox(height: 6),
-                              MenuElevatedButton(
+                        LoadingOverlay(
+                          isLoading: isMapLoading && !viewDetailElementInfo,
+                          child: Positioned(
+                            top: kIsWeb ? null : 80,
+                            right: kIsWeb ? null : 16,
+                            bottom: kIsWeb ? 80 : null,
+                            left: kIsWeb ? 16 : null,
+                            child: Column(
+                              children: [
+                                MenuElevatedButton(
+                                  colorChangeOnPress: true,
                                   onPressed: () {
-                                    markersGPS.clear();
-                                    getCurrentLocation();
-                                    _getMarkers();
                                     setState(() {
-                                      polylines = {};
-                                      circles = {};
+                                      _currentMapType =
+                                          _currentMapType == MapType.normal
+                                              ? MapType.satellite
+                                              : MapType.normal;
                                     });
                                   },
-                                  icon: Icons.my_location,
                                   tooltipMessage: AppLocalizations.of(context)!
-                                      .map_component_get_location),
-                              if (kIsWeb) const SizedBox(height: 6),
-                              MenuElevatedButton(
-                                colorChangeOnPress: true,
-                                onPressed: () {
-                                  setState(() {
-                                    final selectedItemsProvider =
-                                        context.read<SelectedItemsProvider>();
-                                    selectedItemsProvider.clearAll();
-                                    isDetailsButtonVisible = false;
-                                    markersGPS.clear();
-                                    if (kIsWeb) {
-                                      viewDetailElementInfo = false;
-                                    }
-                                    polylines = {};
-                                    circles = {};
-                                    locationManual = !locationManual;
-                                  });
-                                },
-                                colorSelected: redColor,
-                                colorNotSelected: lightBackground,
-                                tooltipMessage: AppLocalizations.of(context)!
-                                    .map_component_select_location,
-                                icon: Icons.location_pin,
-                              ),
-                              if (kIsWeb) const SizedBox(height: 6),
-                              MenuElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    distanceSelected = (distanceSelected + 1) %
-                                        distances.length;
-                                  });
-                                },
-                                tooltipMessage: AppLocalizations.of(context)!
-                                    .map_component_diameter_tooltip,
-                                text: distances[distanceSelected],
-                              ),
-                              if (kIsWeb) const SizedBox(height: 6),
-                              MultiSelectPopupMenuButton(
-                                texts: const [
-                                  'Tramos',
-                                  'Registros',
-                                  'Captaciones',
-                                  'Parcelas'
-                                ],
-                                selectedIndices: selectedIndices,
-                                onIconsSelected: handleIconsSelected,
-                              ),
-                              if (kIsWeb) const SizedBox(height: 6),
-                              Visibility(
-                                visible: isDetailsButtonVisible &&
-                                    !kIsWeb &&
-                                    !widget.isModal,
-                                child: MenuElevatedButton(
-                                  onPressed: () async {
-                                    if (isSomeElementSelected() &&
-                                        elementSelectedType != null) {
-                                      showElementModal(
-                                        context,
-                                        elementSelectedType!,
-                                        () {},
-                                      );
-                                      await _fetchElementInfo();
-                                    }
-                                  },
-                                  icon: Icons.list_alt,
+                                      .map_component_map_view_tooltip,
+                                  icon: _currentMapType == MapType.normal
+                                      ? Icons.map
+                                      : Icons.satellite,
                                 ),
-                              ),
-                            ],
+                                if (kIsWeb) const SizedBox(height: 6),
+                                MenuElevatedButton(
+                                  onPressed: () async {
+                                    await fetchAndUpdateData(token!);
+                                  },
+                                  tooltipMessage: AppLocalizations.of(context)!
+                                      .map_component_fetch_elements,
+                                  icon: Icons.area_chart_outlined,
+                                ),
+                                if (kIsWeb) const SizedBox(height: 6),
+                                MenuElevatedButton(
+                                    onPressed: () {
+                                      markersGPS.clear();
+                                      getCurrentLocation();
+                                      _getMarkers();
+                                      setState(() {
+                                        polylines = {};
+                                        circles = {};
+                                      });
+                                    },
+                                    icon: Icons.my_location,
+                                    tooltipMessage:
+                                        AppLocalizations.of(context)!
+                                            .map_component_get_location),
+                                if (kIsWeb) const SizedBox(height: 6),
+                                MenuElevatedButton(
+                                  colorChangeOnPress: true,
+                                  onPressed: () {
+                                    setState(() {
+                                      final selectedItemsProvider =
+                                          context.read<SelectedItemsProvider>();
+                                      selectedItemsProvider.clearAll();
+                                      isDetailsButtonVisible = false;
+                                      markersGPS.clear();
+                                      if (kIsWeb) {
+                                        viewDetailElementInfo = false;
+                                      }
+                                      polylines = {};
+                                      circles = {};
+                                      locationManual = !locationManual;
+                                    });
+                                  },
+                                  colorSelected: redColor,
+                                  colorNotSelected: lightBackground,
+                                  tooltipMessage: AppLocalizations.of(context)!
+                                      .map_component_select_location,
+                                  icon: Icons.location_pin,
+                                ),
+                                if (kIsWeb) const SizedBox(height: 6),
+                                MenuElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      distanceSelected =
+                                          (distanceSelected + 1) %
+                                              distances.length;
+                                    });
+                                  },
+                                  tooltipMessage: AppLocalizations.of(context)!
+                                      .map_component_diameter_tooltip,
+                                  text: distances[distanceSelected],
+                                ),
+                                if (kIsWeb) const SizedBox(height: 6),
+                                MultiSelectPopupMenuButton(
+                                  texts: [
+                                    AppLocalizations.of(context)!.sections,
+                                    AppLocalizations.of(context)!.registers,
+                                    AppLocalizations.of(context)!.catchments,
+                                    AppLocalizations.of(context)!.lots
+                                  ],
+                                  selectedIndices: selectedIndices,
+                                  onIconsSelected: handleIconsSelected,
+                                ),
+                                if (kIsWeb) const SizedBox(height: 6),
+                                Visibility(
+                                  visible: isDetailsButtonVisible &&
+                                      !kIsWeb &&
+                                      !widget.isModal,
+                                  child: MenuElevatedButton(
+                                    onPressed: () async {
+                                      if (isSomeElementSelected() &&
+                                          elementSelectedType != null) {
+                                        showElementModal(
+                                          context,
+                                          elementSelectedType!,
+                                          () {},
+                                        );
+                                        await _fetchElementInfo();
+                                      }
+                                    },
+                                    icon: Icons.list_alt,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                if (elementSelectedType != null && elementSelectedId != null)
-                  Visibility(
-                    visible: kIsWeb && !widget.isModal && viewDetailElementInfo,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 0),
-                        onEnd: () {},
-                        curve: Curves.easeIn,
-                        width: viewDetailElementInfo ? modalWidth : 0,
-                        child: Container(
+                  if (elementSelectedType != null && elementSelectedId != null)
+                    Visibility(
+                      visible:
+                          kIsWeb && !widget.isModal && viewDetailElementInfo,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 0),
+                          onEnd: () {},
+                          curve: Curves.easeIn,
                           width: viewDetailElementInfo ? modalWidth : 0,
-                          color: const Color.fromRGBO(253, 255, 252, 1),
-                          child: Column(
-                            children: [
-                              ElementDetailWeb(
-                                elementType: elementSelectedType,
-                                onPressed: () {
-                                  setState(() {
-                                    viewDetailElementInfo = false;
-                                  });
-                                },
-                              ),
-                            ],
+                          child: Container(
+                            width: viewDetailElementInfo ? modalWidth : 0,
+                            color: const Color.fromRGBO(253, 255, 252, 1),
+                            child: Column(
+                              children: [
+                                ElementDetailWeb(
+                                  elementType: elementSelectedType,
+                                  onPressed: () {
+                                    setState(() {
+                                      viewDetailElementInfo = false;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-          );
+                ],
+              ),
+            );
+          });
         });
       });
     });

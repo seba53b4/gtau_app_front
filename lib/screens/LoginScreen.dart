@@ -51,7 +51,7 @@ class LoginScreen extends StatelessWidget {
   _showWrongCredentialsToast(BuildContext context) {
     CustomToast.show(
       context,
-      title: 'Advertencia',
+      title: AppLocalizations.of(context)!.warning,
       message: AppLocalizations.of(context)!.login_warning_empty_input,
       type: MessageType.warning,
     );
@@ -114,8 +114,8 @@ class LoginScreen extends StatelessWidget {
         Future.delayed(Duration.zero, () {
           CustomToast.show(
             context,
-            title: 'Error',
-            message: 'Hubo un error en la autenticación.',
+            title: AppLocalizations.of(context)!.error,
+            message: AppLocalizations.of(context)!.login_error_auth,
             type: MessageType.error,
           );
         });
@@ -135,7 +135,7 @@ class LoginScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('PipeTracker'),
+                    Text(AppLocalizations.of(context)!.titleApp),
                     const SizedBox(height: 24.0),
                     CustomTextField(
                       controller: usernameController,
@@ -158,12 +158,11 @@ class LoginScreen extends StatelessWidget {
                         onPressed: () => onLogInPressed(context),
                         text:
                             AppLocalizations.of(context)!.default_login_button),
-                    const SizedBox(height: 8.0),
-                    CustomElevatedButton(
+                    const SizedBox(height: 16.0),
+                    TextButton(
                         onPressed: () => onForgotPressed(context),
-                        backgroundColor: Colors.grey,
-                        text: AppLocalizations.of(context)!
-                            .default_forgot_password),
+                        child: Text(AppLocalizations.of(context)!
+                            .default_forgot_password)),
                   ],
                 ),
               ),

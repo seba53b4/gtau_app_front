@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 
@@ -27,20 +26,19 @@ class _TaskListComponentState extends State<TaskList> {
     prefs.setDouble("position", controller.position.pixels);
   }
 
-  Future<double> initScroll() async{
+  Future<double> initScroll() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getDouble("position") ?? 0.0);
   }
 
   @override
-  initState(){
+  initState() {
     /*initScroll();*/
     super.initState();
-    
   }
 
   @override
-  void dispose(){
+  void dispose() {
     controller.dispose();
     super.dispose();
   }
@@ -61,21 +59,23 @@ class _TaskListComponentState extends State<TaskList> {
         Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setLastStatus(widget.status);
     return Container(
-      margin: const EdgeInsets.only(bottom: 0),
-      child: FutureBuilder(
+        margin: const EdgeInsets.only(bottom: 0),
+        child: FutureBuilder(
           future: initScroll(),
           builder: (context, snapshot) {
-             if (snapshot.hasData) {
+            if (snapshot.hasData) {
               var position = snapshot.data as double;
               return Consumer<TaskListViewModel>(
                 builder: (context, taskListViewModel, child) {
                   var tasks = taskListViewModel.tasks[widget.status];
                   var tasks_length = tasks?.length ?? 0;
-                  tasks_length=tasks_length+1;
+                  tasks_length = tasks_length + 1;
                   controller = ScrollController(initialScrollOffset: position);
                   controller.addListener(_ScrollPosition);
                   controller.addListener(() {
-                    if((controller.position.maxScrollExtent == controller.offset) && tasks!.length % 10== 0){
+                    if ((controller.position.maxScrollExtent ==
+                            controller.offset) &&
+                        tasks!.length % 10 == 0) {
                       setState(() {
                         updateTaskListState(context);
                       });
@@ -85,28 +85,33 @@ class _TaskListComponentState extends State<TaskList> {
                     children: [
                       Expanded(
                         child: ListView.builder(
-                          controller:controller,
+                          controller: controller,
                           padding: const EdgeInsets.all(8),
                           itemCount: tasks_length,
                           itemBuilder: (context, index) {
-                            
-                              if(index < tasks!.length){
-                                final task = tasks![index];
-                                return TaskListItem(
+                            if (index < tasks!.length) {
+                              final task = tasks![index];
+                              return TaskListItem(
                                   task: task, scaffoldKey: widget.scaffoldKey);
+                            } else {
+                              if (tasks_length == 1) {
+                                return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 32),
+                                    child: Center(
+                                        child: Text(
+                                            AppLocalizations.of(context)!
+                                                .emptyTaskList)));
                               } else {
-                                if(tasks_length == 1){
-                                  return Padding(padding: EdgeInsets.symmetric(vertical: 32),
-                                    child: Center(child:Text(AppLocalizations.of(context)!.emptyTaskList)));
-                                }else{
-                                  if(tasks!.length % 10== 0){
-                                    return const Padding(padding: EdgeInsets.symmetric(vertical: 32),
-                                    child: Center(child:CircularProgressIndicator()));
-                                  } 
+                                if (tasks!.length % 10 == 0) {
+                                  return const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 32),
+                                      child: Center(
+                                          child: CircularProgressIndicator()));
+                                }
                               }
                             }
-                            
-                            
                           },
                         ),
                       ),
@@ -115,9 +120,8 @@ class _TaskListComponentState extends State<TaskList> {
                 },
               );
             }
-              return CircularProgressIndicator();
-            },
-          )
-        );
+            return CircularProgressIndicator();
+          },
+        ));
   }
 }
