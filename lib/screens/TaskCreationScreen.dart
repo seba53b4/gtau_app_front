@@ -150,10 +150,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         });
       }
 
-      selectedItemsProvider.setSections(task.sections);
-      selectedItemsProvider.setCatchments(task.catchments);
-      selectedItemsProvider.setRegisters(task.registers);
-      selectedItemsProvider.setLots(task.lots);
+      selectedItemsProvider.saveInitialSelections(
+          task.sections, task.registers, task.catchments, task.lots);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -263,7 +261,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         onEnablePressed: () async {
           Navigator.of(context).pop();
           await handleAcceptOnShowDialogCreateTask();
-          resetSelectionOnMap();
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
@@ -410,7 +407,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       onEnablePressed: () async {
         Navigator.of(context).pop();
         await handleAcceptOnShowDialogEditTask();
-        resetSelectionOnMap();
         Navigator.of(context).pop();
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
@@ -419,8 +415,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   void resetSelectionOnMap() {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.reset();
+    selectedItemsProvider?.restoreInitialSelections();
   }
 
   void handleCancel() {
