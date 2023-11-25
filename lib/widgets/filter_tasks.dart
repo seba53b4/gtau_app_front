@@ -31,10 +31,14 @@ class _FilterTasksState extends State<FilterTasks> {
     final filterProvider = Provider.of<TaskFilterProvider>(context);
     return Scaffold(
       appBar: AppBar(
-          title: Text(
-        "Filtrar tareas",
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: kIsWeb ? 18 : 22),
+          title: const Padding(
+        padding: EdgeInsets.only(right: 80),
+        child: Center(
+            child: Text(
+          "Filtrar tareas",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: kIsWeb ? 18 : 22),
+        )),
       )),
       body: Center(
         child: Padding(

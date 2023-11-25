@@ -54,6 +54,8 @@ void _showFilterModal(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return Dialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(50.0))),
         child: SizedBox(
           width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
           child: const FilterTasks(),
