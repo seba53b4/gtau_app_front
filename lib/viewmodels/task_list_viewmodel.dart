@@ -38,6 +38,7 @@ class TaskListViewModel extends ChangeNotifier {
     _tasks[status]?.clear();
     page = 0;
   }
+
   Future<List<Task>?> initializeTasks(
       BuildContext context, String status, String? user) async {
     return await fetchTasksFromUser(context, status, user);
@@ -65,7 +66,7 @@ class TaskListViewModel extends ChangeNotifier {
 
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
-      
+
       _tasks[status] = responseListTask!;
       page++;
 
@@ -96,13 +97,12 @@ class TaskListViewModel extends ChangeNotifier {
 
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
-      
+
       _tasks[status]?.addAll(responseListTask!);
-      final size_list =  responseListTask?.length ?? 0;
-      if(size_list > 0){
+      final size_list = responseListTask?.length ?? 0;
+      if (size_list > 0) {
         page++;
       }
-      
 
       return responseListTask;
     } catch (error) {
