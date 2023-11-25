@@ -91,5 +91,8 @@
     "sections": "Tramos",
     "registers": "Registros",
     "catchments": "Captaciones",
-    "lots": "Parcelas"
+    "lots": "Parcelas",
+    "filter_task_title": "Filtrar tareas",
+    "inspection_type": "Tipo de inspección",
+    "user": "Usuario"
 }

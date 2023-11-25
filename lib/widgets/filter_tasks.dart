@@ -27,17 +27,18 @@ class _FilterTasksState extends State<FilterTasks> {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
     final userProvider = context.read<UserProvider>();
     final filterProvider = Provider.of<TaskFilterProvider>(context);
     return Scaffold(
       appBar: AppBar(
-          title: const Padding(
-        padding: EdgeInsets.only(right: 80),
+          title: Padding(
+        padding: const EdgeInsets.only(right: 80),
         child: Center(
             child: Text(
-          "Filtrar tareas",
+          appLocalizations.filter_task_title,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: kIsWeb ? 18 : 22),
+          style: const TextStyle(fontSize: kIsWeb ? 18 : 22),
         )),
       )),
       body: Center(
@@ -58,8 +59,8 @@ class _FilterTasksState extends State<FilterTasks> {
                     valueSetter: filterProvider.setInspectionTypeFilter,
                     dropdownValue: filterProvider.inspectionTypeFilter ??
                         filterProvider.inspectionType.first.value,
-                    label: "Tipo de inspección",
-                    enabled: true,
+                    label: appLocalizations.inspection_type,
+                    enabled: false,
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFilter(
@@ -69,7 +70,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         ? userProvider.userName!
                         : (filterProvider.userNameFilter ??
                             filterProvider.suggestionsUsers.first.value),
-                    label: "Usuario",
+                    label: appLocalizations.user,
                     enabled: userProvider.isAdmin! ? true : false,
                   ),
                   const SizedBox(height: 16),
@@ -78,50 +79,51 @@ class _FilterTasksState extends State<FilterTasks> {
                     valueSetter: filterProvider.setLastStatus,
                     dropdownValue: filterProvider.statusFilter ??
                         filterProvider.suggestionsStatus.first.value,
-                    label: "Estado",
+                    label: appLocalizations.editTaskPage_statusTitle,
                     enabled: true,
                   ),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                     valueSetter: filterProvider.setWorkNumberFilter,
                     value: filterProvider.workNumberFilter ?? "",
-                    label: "Número de trabajo",
+                    label: appLocalizations.createTaskPage_numberWorkTitle,
                   ),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                       valueSetter: filterProvider.setApplicantFilter,
                       value: filterProvider.applicantFilter ?? "",
-                      label: "Solicitante"),
+                      label: appLocalizations.createTaskPage_solicitantTitle),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                       valueSetter: filterProvider.setLocationFilter,
                       value: filterProvider.locationFilter ?? "",
-                      label: "Ubicación"),
+                      label:
+                          appLocalizations.createTaskPage_selectUbicationTitle),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                       valueSetter: filterProvider.setDescriptionFilter,
                       value: filterProvider.descriptionFilter ?? "",
-                      label: "Descripción"),
+                      label: appLocalizations.default_descriptionTitle),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                       valueSetter: filterProvider.setLengthFilter,
                       value: filterProvider.lengthFilter ?? "",
-                      label: "Longitud"),
+                      label: appLocalizations.createTaskPage_longitudeTitle),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                       valueSetter: filterProvider.setMaterialFilter,
                       value: filterProvider.materialFilter ?? "",
-                      label: "Material"),
+                      label: appLocalizations.createTaskPage_materialTitle),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                       valueSetter: filterProvider.setObservationsFilter,
                       value: filterProvider.observationsFilter ?? "",
-                      label: "Observaciones"),
+                      label: appLocalizations.createTaskPage_observationsTitle),
                   const SizedBox(height: 16),
                   TextFieldFilter(
                       valueSetter: filterProvider.setConclusionsFilter,
                       value: filterProvider.conclusionsFilter ?? "",
-                      label: "Conclusiones"),
+                      label: appLocalizations.createTaskPage_conclusionsTitle),
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -146,8 +148,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                     Navigator.of(context).pop();
                                   },
                                   messageType: MessageType.error,
-                                  text: AppLocalizations.of(context)!
-                                      .buttonCleanLabel,
+                                  text: appLocalizations.buttonCleanLabel,
                                 ),
                                 const SizedBox(width: 10.0),
                                 CustomElevatedButton(
@@ -156,8 +157,7 @@ class _FilterTasksState extends State<FilterTasks> {
                                     updateTaskList();
                                     Navigator.of(context).pop();
                                   },
-                                  text: AppLocalizations.of(context)!
-                                      .buttonApplyLabel,
+                                  text: appLocalizations.buttonApplyLabel,
                                 ),
                               ]),
                         )
