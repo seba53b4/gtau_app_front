@@ -134,5 +134,14 @@
     "form_scheduled_top_status_broken_frame": "Marco roto",
     "form_scheduled_top_status_provisional": "Provisoria",
     "form_scheduled_top_status_broken": "Rota",
-    "form_scheduled_top_status_welded_sealed": "Soldada/Sellada"
+    "form_scheduled_top_status_welded_sealed": "Soldada/Sellada",
+    "form_scheduled_catchm_type": "Tipo de captación",
+    "form_scheduled_catchm_status": "Estado de captación",
+    "form_scheduled_catchm_conn": "Estado de conexión",
+    "form_scheduled_catchm_call_status": "Estado de la llamada",
+    "form_scheduled_catchm_slab": "Estado de losa",
+    "form_scheduled_catchm_partition": "Estado de tabique",
+    "form_scheduled_catchm_deposit": "Estado de depósito",
+    "form_scheduled_catchm_top_status_1": "Estado de la tapa 1",
+    "form_scheduled_catchm_top_status_2": "Estado de la tapa 2"
 }
