@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/task_list_item.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
+import 'loading_component.dart';
 
 class TaskList extends StatefulWidget {
   final String status;
@@ -21,6 +22,7 @@ class TaskList extends StatefulWidget {
 class _TaskListComponentState extends State<TaskList> {
   ScrollController controller = ScrollController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   _ScrollPosition() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setDouble("position", controller.position.pixels);
@@ -120,7 +122,7 @@ class _TaskListComponentState extends State<TaskList> {
                 },
               );
             }
-            return CircularProgressIndicator();
+            return const LoadingWidget();
           },
         ));
   }
