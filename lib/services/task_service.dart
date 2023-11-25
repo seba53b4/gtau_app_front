@@ -31,31 +31,7 @@ class TaskService {
       final response = await http.get(url, headers: _getHeaders(token));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final content = data['content'];
-        return content.map<Task>((taskData) {
-          return Task(
-              id: taskData['id'],
-              status: taskData['status'],
-              inspectionType: taskData['inspectionType'],
-              workNumber: taskData['workNumber'],
-              addDate: DateTime.parse(taskData['addDate']),
-              applicant: taskData['applicant'],
-              location: taskData['location'],
-              description: taskData['description'],
-              releasedDate: taskData['releasedDate'] != null
-                  ? DateTime.parse(taskData['releasedDate'])
-                  : null,
-              user: taskData['user'],
-              length: taskData['length'],
-              material: taskData['material'],
-              observations: taskData['observations'],
-              conclusions: taskData['conclusions'],
-              sections: _parseIntListToPolylineIdList(taskData['tramos']),
-              catchments: _parseIntListToCircleIdList(taskData['captaciones']),
-              registers: _parseIntListToCircleIdList(taskData['registros']),
-              lots: _parseIntListToPolylineIdList(taskData['parcelas']));
-        }).toList();
+        return parseTaskListResponse(response);
       } else {
         print('Error getTasks re null');
         return null;
@@ -311,5 +287,55 @@ class TaskService {
       }
       rethrow;
     }
+  }
+
+  Future<List<Task>?> searchTasks(
+      String token, Map<String, dynamic> body, int page, int size) async {
+    try {
+      final url = Uri.parse('$baseUrl/search?page=$page&size=$size');
+      final String jsonBody = jsonEncode(body);
+      final response =
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+
+      if (response.statusCode == 200) {
+        return parseTaskListResponse(response);
+      } else {
+        print('No se pudieron traer datos');
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in createTask: $error');
+      }
+      rethrow;
+    }
+  }
+
+  parseTaskListResponse(http.Response response) {
+    final data = json.decode(response.body);
+    final content = data['content'];
+    return content.map<Task>((taskData) {
+      return Task(
+          id: taskData['id'],
+          status: taskData['status'],
+          inspectionType: taskData['inspectionType'],
+          workNumber: taskData['workNumber'],
+          addDate: DateTime.parse(taskData['addDate']),
+          applicant: taskData['applicant'],
+          location: taskData['location'],
+          description: taskData['description'],
+          releasedDate: taskData['releasedDate'] != null
+              ? DateTime.parse(taskData['releasedDate'])
+              : null,
+          user: taskData['user'],
+          length: taskData['length'],
+          material: taskData['material'],
+          observations: taskData['observations'],
+          conclusions: taskData['conclusions'],
+          sections: _parseIntListToPolylineIdList(taskData['tramos']),
+          catchments: _parseIntListToCircleIdList(taskData['captaciones']),
+          registers: _parseIntListToCircleIdList(taskData['registros']),
+          lots: _parseIntListToPolylineIdList(taskData['parcelas']));
+    }).toList();
   }
 }

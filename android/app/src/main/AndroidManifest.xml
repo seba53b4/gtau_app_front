@@ -7,7 +7,7 @@
         android:label="gtau_app_front">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+            android:value="AIzaSyAtZvXMCcSD-WLWBxytSscflOCFhX_yF2o" />
 
         <activity
             android:name=".MainActivity"

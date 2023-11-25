@@ -54,6 +54,8 @@
     "deleteButtonLabel": "Eliminar",
     "buttonCancelLabel": "Cancelar",
     "buttonAcceptLabel": "Aceptar",
+    "buttonCleanLabel": "Limpiar",
+    "buttonApplyLabel": "Aplicar",
     "map_component_map_view_tooltip": "Cambiar vista de mapa",
     "map_component_fetch_elements": "Obtener los elementos en mapa",
     "map_component_get_location": "Obtener mi ubicación",
@@ -89,5 +91,8 @@
     "sections": "Tramos",
     "registers": "Registros",
     "catchments": "Captaciones",
-    "lots": "Parcelas"
+    "lots": "Parcelas",
+    "filter_task_title": "Filtrar tareas",
+    "inspection_type": "Tipo de inspección",
+    "user": "Usuario"
 }

@@ -11,6 +11,7 @@ import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
+import '../providers/task_filters_provider.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_taost.dart';
 import '../widgets/common/custom_textfield.dart';
@@ -60,6 +61,8 @@ class LoginScreen extends StatelessWidget {
   void setUserData(BuildContext context, bool isLoggedIn, String username,
       AuthData authData, bool isAdmin) {
     if (isLoggedIn) {
+      final filterProvider = context.read<TaskFilterProvider>();
+      filterProvider.setUserNameFilter(username);
       final userStateProvider = context.read<UserProvider>();
       userStateProvider.updateUserState(UserState(
           username: username,
