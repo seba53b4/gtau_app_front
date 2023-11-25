@@ -34,6 +34,7 @@ class TaskService {
         final data = json.decode(response.body);
         final content = data['content'];
         return content.map<Task>((taskData) {
+          var position = taskData['position'];
           return Task(
               id: taskData['id'],
               status: taskData['status'],
@@ -55,9 +56,8 @@ class TaskService {
               catchments: _parseIntListToCircleIdList(taskData['captaciones']),
               registers: _parseIntListToCircleIdList(taskData['registros']),
               lots: _parseIntListToPolylineIdList(taskData['parcelas']),
-              position: taskData['position'] != null
-                  ? LatLng(
-                      taskData['position']['lat'], taskData['position']['long'])
+              position: position != null && position['latitud'] != null
+                  ? LatLng(position['latitud'], position['longitud'])
                   : const LatLng(0, 0));
         }).toList();
       } else {
@@ -115,7 +115,7 @@ class TaskService {
       final response = await http.get(url, headers: _getHeaders(token));
       if (response.statusCode == 200) {
         final taskData = json.decode(response.body);
-
+        var position = taskData['position'];
         return Task(
             id: taskData['id'],
             status: taskData['status'],
@@ -137,9 +137,8 @@ class TaskService {
             catchments: _parseIntListToCircleIdList(taskData['captaciones']),
             registers: _parseIntListToCircleIdList(taskData['registros']),
             lots: _parseIntListToPolylineIdList(taskData['parcelas']),
-            position: taskData['position'] != null
-                ? LatLng(
-                    taskData['position']['lat'], taskData['position']['long'])
+            position: position != null && position['latitud'] != null
+                ? LatLng(position['latitud'], position['longitud'])
                 : const LatLng(0, 0));
       } else {
         if (kDebugMode) {

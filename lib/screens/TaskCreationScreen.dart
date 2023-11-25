@@ -150,8 +150,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         });
       }
 
-      selectedItemsProvider.saveInitialSelections(
-          task.sections, task.registers, task.catchments, task.lots);
+      selectedItemsProvider.saveInitialSelections(task.sections, task.registers,
+          task.catchments, task.lots, task.position!);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -290,8 +290,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         selectedLots.map((polylineId) => polylineId.value).toList();
 
     final Map<String, dynamic> position = {
-      "lat": selectedItemsProvider.inspectionPosition.longitude.toString(),
-      "long": selectedItemsProvider.inspectionPosition.longitude.toString()
+      "latitud": selectedItemsProvider.inspectionPosition.longitude.toString(),
+      "longitud": selectedItemsProvider.inspectionPosition.longitude.toString()
     };
 
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
@@ -335,8 +335,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         selectedLots.map((polylineId) => polylineId.value).toList();
 
     final Map<String, dynamic> position = {
-      "lat": selectedItemsProvider.inspectionPosition.longitude.toString(),
-      "long": selectedItemsProvider.inspectionPosition.longitude.toString()
+      "latitud": selectedItemsProvider.inspectionPosition.latitude,
+      "longitud": selectedItemsProvider.inspectionPosition.longitude
     };
 
     final Map<String, dynamic> requestBody = {
@@ -425,7 +425,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   void resetSelectionOnMap() {
-    selectedItemsProvider?.restoreInitialSelections();
+    selectedItemsProvider?.restoreInitialValues();
   }
 
   void handleCancel() {

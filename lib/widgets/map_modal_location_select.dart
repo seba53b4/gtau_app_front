@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/selected_items_provider.dart';
 import 'common/custom_elevated_button.dart';
 import 'map_component_location_select.dart';
 
@@ -24,6 +26,8 @@ double _getHeightModalOnDevice(BuildContext context) {
 }
 
 void _showMapModal(BuildContext context) {
+  SelectedItemsProvider selectedItemsProvider =
+      context.read<SelectedItemsProvider>();
   showGeneralDialog(
     context: context,
     barrierDismissible: false,
@@ -73,6 +77,7 @@ void _showMapModal(BuildContext context) {
                   const SizedBox(width: 10.0),
                   CustomElevatedButton(
                     onPressed: () {
+                      selectedItemsProvider.saveCurrentPositionAsInitial();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.success,

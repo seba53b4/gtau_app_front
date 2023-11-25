@@ -69,7 +69,7 @@ void _showMapModal(BuildContext context) {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   CustomElevatedButton(
                     onPressed: () {
-                      selectedItemsProvider.restoreInitialSelections();
+                      selectedItemsProvider.restoreInitialValues();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.error,
