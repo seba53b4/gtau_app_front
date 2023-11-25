@@ -34,6 +34,7 @@ dependencies:
   google_fonts: ^4.0.4
   flutter_keyboard_visibility: ^5.4.1
   scroll_to_index: ^3.0.1
+  searchfield: ^0.8.7
 dev_dependencies:
   hive_generator:
   build_runner:

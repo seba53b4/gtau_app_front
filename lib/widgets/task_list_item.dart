@@ -199,14 +199,12 @@ class TaskListItem extends StatelessWidget {
   }
 
   Future updateTaskListState(BuildContext context) async {
-    final userName =
-        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final status =
-        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+        Provider.of<TaskFilterProvider>(context, listen: false).statusFilter;
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status!);
-    await taskListViewModel.initializeTasks(context, status, userName);
+    await taskListViewModel.initializeTasks(context, status, "");
   }
 
   Future<bool> _deleteTask(BuildContext context, int id) async {

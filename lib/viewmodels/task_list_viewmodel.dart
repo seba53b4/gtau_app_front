@@ -73,6 +73,30 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
+  Future<List<Task>?> fetchTasksFromFilters(
+      BuildContext context, String status, Map<String, dynamic> body) async {
+    final token = context.read<UserProvider>().getToken;
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+
+      final responseListTask =
+          await _taskService.searchTasks(token!, body, page, size);
+
+      _tasks[status] = responseListTask!;
+
+      return responseListTask;
+    } catch (error) {
+      _error = true;
+      print(error);
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> deleteTask(String token, int id) async {
     try {
       _isLoading = true;
