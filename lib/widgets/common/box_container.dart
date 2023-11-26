@@ -5,7 +5,6 @@ import '../../constants/theme_constants.dart';
 class BoxContainer extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
-  final Color? color;
   final Decoration? decoration;
   final double? width;
   final double? height;
@@ -16,7 +15,6 @@ class BoxContainer extends StatelessWidget {
     Key? key,
     required this.child,
     this.padding,
-    this.color,
     this.decoration,
     this.width,
     this.height,
@@ -28,23 +26,24 @@ class BoxContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: padding ?? const EdgeInsets.all(8),
-      //color: color ?? const Color.fromRGBO(242, 242, 242, 1),
       decoration: decoration ??
           BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: Theme.of(context).primaryColor,
-            border: Border.all(
-              color: baseBorderColor,
-              width: 2.0, // Cambia el ancho del borde aquí
+            gradient: RadialGradient(
+              center: Alignment.center,
+              radius: 2.5,
+              focalRadius: 2,
+              // begin: Alignment.center,
+              // end: Alignment.centerRight,
+              colors: [
+                baseContainerG1,
+                baseContainerG2,
+              ],
             ),
-            // boxShadow: const [
-            //   BoxShadow(
-            //     color: Color.fromRGBO(200, 217, 184, 0.5),
-            //     spreadRadius: 3,
-            //     blurRadius: 7,
-            //     offset: Offset(0, 3),
-            //   ),
-            // ],
+            border: Border.all(
+              color: primarySwatch[100]!,
+              width: 1.0,
+            ),
           ),
       width: width,
       height: height,
