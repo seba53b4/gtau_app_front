@@ -169,6 +169,5 @@ class SelectedItemsProvider with ChangeNotifier {
   void reset() {
     clearAll();
     _letMultipleItemsSelected = false;
-    notifyListeners();
   }
 }
