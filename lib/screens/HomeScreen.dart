@@ -30,12 +30,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-          width: MediaQuery.of(context).size.width,
-          height: kIsWeb
-              ? MediaQuery.of(context).size.height * 0.78
-              : MediaQuery.of(context).size.height - 72,
-          color: lightBackground,
-          child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+        color: lightBackground,
+        child: Center(
+          child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: kIsWeb
+                  ? MediaQuery.of(context).size.height * 0.78
+                  : MediaQuery.of(context).size.height - 72,
+              color: lightBackground,
+              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showFilterModal(context);
