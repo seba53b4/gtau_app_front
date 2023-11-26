@@ -93,7 +93,7 @@ class TaskListItem extends StatelessWidget {
                           style: TextStyle(fontSize: fontSize),
                         ),
                       )),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: kIsWeb ? 20 : 12),
                   Container(
                     height: dividerHeight,
                     width: 1,
