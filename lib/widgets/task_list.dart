@@ -38,15 +38,15 @@ class _TaskListComponentState extends State<TaskList> {
   void _checkNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
-    if(newTasksLength == value-1){
-      nextPage=false;
+    if (newTasksLength == value - 1) {
+      nextPage = false;
     }
   }
 
   Future<bool> _checkExistNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
-    if(newTasksLength == value-1){
+    if (newTasksLength == value - 1) {
       return false;
     }
     return true;
@@ -98,21 +98,22 @@ class _TaskListComponentState extends State<TaskList> {
                   var tasks = taskListViewModel.tasks[widget.status];
                   var tasks_length = tasks?.length ?? 0;
                   _checkNextPage(tasks_length);
-              
+
                   tasks_length = tasks_length + 1;
                   controller = ScrollController(initialScrollOffset: position);
                   controller.addListener(_ScrollPosition);
                   controller.addListener(() {
                     if ((controller.position.maxScrollExtent ==
                             controller.offset) &&
-                        tasks!.length % 10 == 0 && nextPage) {
+                        tasks!.length % 10 == 0 &&
+                        nextPage) {
                       setState(() {
                         updateTaskListState(context);
                       });
                       _SetActualTasksLength(tasks_length);
                     }
                   });
-                  
+
                   return Column(
                     children: [
                       Expanded(
@@ -137,26 +138,27 @@ class _TaskListComponentState extends State<TaskList> {
                               } else {
                                 if (tasks.length % 10 == 0 && nextPage) {
                                   return FutureBuilder(
-                                    future: _checkExistNextPage(tasks.length),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        var existNextPage = snapshot.data as bool;
-                                        if(existNextPage == true){
-                                          return const Padding(
-                                          padding:
-                                              EdgeInsets.symmetric(vertical: 32),
-                                          child: Center(
-                                              child: CircularProgressIndicator()));
-                                        }else{
-                                          return const Padding(
-                                          padding:
-                                              EdgeInsets.symmetric(vertical: 0));
+                                      future: _checkExistNextPage(tasks.length),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          var existNextPage =
+                                              snapshot.data as bool;
+                                          if (existNextPage == true) {
+                                            return const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 32),
+                                                child: Center(
+                                                    child:
+                                                        CircularProgressIndicator()));
+                                          } else {
+                                            return const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 0));
+                                          }
+                                        } else {
+                                          return const LoadingWidget();
                                         }
-                                      }else{
-                                        return const LoadingWidget();
-                                      }
-                                    }
-                                  );
+                                      });
                                 }
                               }
                             }

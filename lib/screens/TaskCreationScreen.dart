@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
+import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
@@ -15,6 +16,7 @@ import '../constants/theme_constants.dart';
 import '../dto/image_data.dart';
 import '../models/enums/element_type.dart';
 import '../models/task.dart';
+import '../navigation/navigation.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../utils/colorUtils.dart';
@@ -111,9 +113,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     addDateController.dispose();
     releasedDateController.dispose();
     _scrollController.dispose();
-    if (selectedItemsProvider != null) {
-      selectedItemsProvider!.reset();
-    }
+    selectedItemsProvider?.reset();
+
     super.dispose();
   }
 
@@ -184,10 +185,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       final response = await taskListViewModel.createTask(token!, body);
       if (response) {
         print('Tarea ha sido creada correctamente');
-        showMessageDialog(DialogMessageType.success);
+        await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        showMessageDialog(DialogMessageType.error);
+        await showMessageDialog(DialogMessageType.error);
         print('No se pudieron traer datos');
         return false;
       }
@@ -227,7 +228,18 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<void> showMessageDialog(DialogMessageType type) async {
     await showCustomMessageDialog(
-        context: context, messageType: type, onAcceptPressed: () {});
+        context: context,
+        messageType: type,
+        onAcceptPressed: () {
+          if (type == DialogMessageType.success && !widget.detail) {
+            Widget nav =
+                kIsWeb ? const NavigationWeb() : const BottomNavigation();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => nav),
+            );
+          }
+        });
   }
 
   Future<void> initializeTask() async {
@@ -438,7 +450,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   @override
   Widget build(BuildContext context) {
     double widthRow = 640;
-    double heightrow = 128;
+    double heightRow = 128;
 
     return Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
@@ -490,7 +502,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             const SizedBox(height: 24.0),
                             // Primera fila
                             SizedBox(
-                              height: heightrow,
+                              height: heightRow,
                               width: widthRow,
                               child: Row(
                                   mainAxisAlignment:
@@ -577,7 +589,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ),
                             // Segunda fila
                             SizedBox(
-                              height: heightrow,
+                              height: heightRow,
                               width: widthRow,
                               child: Row(
                                 mainAxisAlignment:
@@ -678,7 +690,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_descriptionPlaceholder,
                                   controller: descriptionController,
@@ -918,7 +930,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   maxLines: 10,
                                   fontSize: 12,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_descriptionPlaceholder,
                                   controller: descriptionController,
@@ -1187,7 +1199,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_observationsPlaceholder,
                                   controller: observationsController,
@@ -1204,7 +1216,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_conclusionsPlaceholder,
                                   controller: conclusionsController,

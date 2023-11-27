@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
-import 'package:gtau_app_front/widgets/TaskList.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,15 +20,19 @@ class TaskStatusDashboard extends StatefulWidget {
   _TaskStatusDashboard createState() => _TaskStatusDashboard();
 }
 
-class _TaskStatusDashboard extends State<TaskStatusDashboard> {
+class _TaskStatusDashboard extends State<TaskStatusDashboard>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       updateTaskListState(TaskStatus.Pending.value);
     });
+    _tabController = TabController(vsync: this, length: 4);
   }
 
   Future<bool> _clearPref() async {
@@ -43,18 +47,24 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     taskFilterProvider.setUserNameFilter(widget.userName);
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
+    return Consumer<TaskFilterProvider>(
+        builder: (context, taskFilterProvider, child) {
+      var newIndex = taskFilterProvider.getCurrentIndex();
+      if (_currentIndex != newIndex) {
+        _currentIndex = newIndex;
+        _tabController.animateTo(_currentIndex);
+      }
 
-    return SizedBox(
-      width: 120,
-      child: DefaultTabController(
-        length: 4,
-        initialIndex: 0,
+      print(_currentIndex);
+      return SizedBox(
+        width: 120,
         child: Scaffold(
           key: scaffoldKeyDashboard,
           appBar: AppBar(
             backgroundColor: primarySwatch[200],
             toolbarHeight: 0,
             bottom: TabBar(
+              controller: _tabController,
               indicatorColor: lightBackground,
               labelColor: Colors.white,
               labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
@@ -78,7 +88,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
                 ),
               ],
               onTap: (index) {
-                if(_currentIndex != index){
+                if (_currentIndex != index) {
                   setState(() {
                     _currentIndex = index;
                   });
@@ -91,14 +101,15 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
           ),
           body: Consumer<TaskListViewModel>(
               builder: (context, taskListViewModel, child) {
+            if (_currentIndex != taskFilterProvider.getCurrentIndex()) {}
             return LoadingOverlay(
               isLoading: taskListViewModel.isLoading,
               child: _buildTabContent(scaffoldKeyDashboard),
             );
           }),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Future<void> resetScrollPosition() async {

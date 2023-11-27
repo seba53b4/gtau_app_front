@@ -12,6 +12,7 @@ class CustomDropdown extends StatelessWidget {
   final Color backgroundColor;
   final double fontSize;
   final bool isStatus;
+  final FocusNode? focusNode;
 
   const CustomDropdown({
     required this.value,
@@ -24,6 +25,7 @@ class CustomDropdown extends StatelessWidget {
     this.fontSize = 16.0,
     Key? key,
     this.isStatus = false,
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -32,6 +34,7 @@ class CustomDropdown extends StatelessWidget {
       width: width,
       height: height,
       child: DropdownButtonFormField<String>(
+        focusNode: focusNode,
         borderRadius: BorderRadius.circular(circularBorderRadius),
         decoration: InputDecoration(
           border: OutlineInputBorder(
