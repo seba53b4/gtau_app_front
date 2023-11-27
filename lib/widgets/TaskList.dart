@@ -44,6 +44,15 @@ class _TaskListComponentState extends State<TaskList> {
     print('{$value} / {$newTasksLength}');
   }
 
+  Future<bool> _checkExistNextPage(int newTasksLength) async {
+    final SharedPreferences prefs = await _prefs;
+    int value = prefs.getInt("tasks_length") ?? 0;
+    if(newTasksLength == value-1){
+      return false;
+    }
+    return true;
+  }
+
   Future<double> initScroll() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getDouble("position") ?? 0.0);
@@ -114,7 +123,7 @@ class _TaskListComponentState extends State<TaskList> {
                           itemCount: tasks_length,
                           itemBuilder: (context, index) {
                             if (index < tasks!.length) {
-                              final task = tasks![index];
+                              final task = tasks[index];
                               return TaskListItem(
                                   task: task, scaffoldKey: widget.scaffoldKey);
                             } else {
@@ -127,12 +136,28 @@ class _TaskListComponentState extends State<TaskList> {
                                             AppLocalizations.of(context)!
                                                 .emptyTaskList)));
                               } else {
-                                if (tasks!.length % 10 == 0 && nextPage) {
-                                  return const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 32),
-                                      child: Center(
-                                          child: CircularProgressIndicator()));
+                                if (tasks.length % 10 == 0 && nextPage) {
+                                  return FutureBuilder(
+                                    future: _checkExistNextPage(tasks.length),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        var existNextPage = snapshot.data as bool;
+                                        if(existNextPage == true){
+                                          return const Padding(
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 32),
+                                          child: Center(
+                                              child: CircularProgressIndicator()));
+                                        }else{
+                                          return const Padding(
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 0));
+                                        }
+                                      }else{
+                                        return const LoadingWidget();
+                                      }
+                                    }
+                                  );
                                 }
                               }
                             }

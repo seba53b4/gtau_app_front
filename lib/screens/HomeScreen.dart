@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/user_provider.dart';
 
@@ -43,9 +44,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<bool> _clearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
+    _clearPref();
 
     return isAdmin!
         ? Container(
