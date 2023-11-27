@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/task_list_item.dart';
@@ -28,6 +30,20 @@ class _TaskListComponentState extends State<TaskList> {
     prefs.setDouble("position", controller.position.pixels);
   }
 
+  _SetActualTasksLength(int length) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt("tasks_length", length);
+  }
+
+  void _checkNextPage(int newTasksLength) async {
+    final SharedPreferences prefs = await _prefs;
+    int value = prefs.getInt("tasks_length") ?? 0;
+    if(newTasksLength == value-1){
+      nextPage=false;
+    }
+    print('{$value} / {$newTasksLength}');
+  }
+
   Future<double> initScroll() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getDouble("position") ?? 0.0);
@@ -44,6 +60,8 @@ class _TaskListComponentState extends State<TaskList> {
     controller.dispose();
     super.dispose();
   }
+
+  bool nextPage = true;
 
   Future updateTaskListState(BuildContext context) async {
     final userName =
@@ -71,18 +89,22 @@ class _TaskListComponentState extends State<TaskList> {
                 builder: (context, taskListViewModel, child) {
                   var tasks = taskListViewModel.tasks[widget.status];
                   var tasks_length = tasks?.length ?? 0;
+                  _checkNextPage(tasks_length);
+              
                   tasks_length = tasks_length + 1;
                   controller = ScrollController(initialScrollOffset: position);
                   controller.addListener(_ScrollPosition);
                   controller.addListener(() {
                     if ((controller.position.maxScrollExtent ==
                             controller.offset) &&
-                        tasks!.length % 10 == 0) {
+                        tasks!.length % 10 == 0 && nextPage) {
                       setState(() {
                         updateTaskListState(context);
                       });
+                      _SetActualTasksLength(tasks_length);
                     }
                   });
+                  
                   return Column(
                     children: [
                       Expanded(
@@ -105,7 +127,7 @@ class _TaskListComponentState extends State<TaskList> {
                                             AppLocalizations.of(context)!
                                                 .emptyTaskList)));
                               } else {
-                                if (tasks!.length % 10 == 0) {
+                                if (tasks!.length % 10 == 0 && nextPage) {
                                   return const Padding(
                                       padding:
                                           EdgeInsets.symmetric(vertical: 32),
