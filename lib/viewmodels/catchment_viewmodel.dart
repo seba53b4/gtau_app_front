@@ -22,6 +22,13 @@ class CatchmentViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
+  void reset() {
+    _error = false;
+    _isLoading = false;
+    _catchmentForDetail = null;
+    _catchments.clear();
+  }
+
   Future<List<Catchment>?> fetchCatchmentsByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {

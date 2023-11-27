@@ -21,11 +21,20 @@ class RegisterViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
+  void reset() {
+    _error = false;
+    _isLoading = false;
+    _registerForDetail = null;
+    _registers.clear();
+  }
+
   Future<List<Register>?> fetchRegistersByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
       _isLoading = true;
       notifyListeners();
+      await Future.delayed(Duration(milliseconds: 1500));
+      throw Error();
       final responseListSection = await _registerService.fetchRegistersByRadius(
           token, longitude, latitude, radiusMtr);
       if (responseListSection != null) {

@@ -21,6 +21,7 @@ import '../models/lot_data.dart';
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
+import 'common/error_dialog_handler.dart';
 import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
 import 'element_detail_modal.dart';
@@ -58,7 +59,9 @@ class _MapComponentState extends State<MapComponent> {
   late double mapWidth;
   late double mapInit;
   SelectedItemsProvider? selectedItemsProvider;
+
   bool isDetailsButtonVisible = false;
+  bool showingError = true;
 
   // Indices { S, R, C, P};
   Set<int> selectedIndices = {0, 1, 2, 3};
@@ -71,6 +74,7 @@ class _MapComponentState extends State<MapComponent> {
     super.initState();
     _initializeLocation();
     _mapController = Completer<GoogleMapController>();
+    showingError = true;
   }
 
   @override
@@ -477,10 +481,15 @@ class _MapComponentState extends State<MapComponent> {
     });
   }
 
+  void _toggleError() {
+    setState(() {
+      showingError = !showingError;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final token = context.read<UserProvider>().getToken;
-
     return Consumer<SectionViewModel>(
         builder: (context, sectionViewModel, child) {
       return Consumer<RegisterViewModel>(
@@ -493,11 +502,18 @@ class _MapComponentState extends State<MapComponent> {
                 registerViewModel.isLoading ||
                 lotViewModel.isLoading ||
                 sectionViewModel.isLoading;
+
+            final someError = catchmentViewModel.error ||
+                registerViewModel.error ||
+                lotViewModel.error ||
+                sectionViewModel.error;
+
             return Scaffold(
               body: Row(
                 children: [
                   Expanded(
                     child: Stack(
+                      alignment: AlignmentDirectional.center,
                       children: [
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 0),
@@ -563,6 +579,17 @@ class _MapComponentState extends State<MapComponent> {
                             left: kIsWeb ? 16 : null,
                             child: Column(
                               children: [
+                                ErrorDialogHandler(
+                                    showError: someError && showingError,
+                                    customText: AppLocalizations.of(context)!
+                                        .generic_message_error,
+                                    onAcceptPressed: () {
+                                      _toggleError();
+                                      registerViewModel.reset();
+                                      catchmentViewModel.reset();
+                                      lotViewModel.reset();
+                                      sectionViewModel.reset();
+                                    }),
                                 MenuElevatedButton(
                                   colorChangeOnPress: true,
                                   onPressed: () {
@@ -583,6 +610,7 @@ class _MapComponentState extends State<MapComponent> {
                                 MenuElevatedButton(
                                   onPressed: () async {
                                     await fetchAndUpdateData(token!);
+                                    _toggleError();
                                   },
                                   tooltipMessage: AppLocalizations.of(context)!
                                       .map_component_fetch_elements,
