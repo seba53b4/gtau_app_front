@@ -31,6 +31,11 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     });
   }
 
+  Future<bool> _clearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     final taskFilterProvider =
@@ -73,11 +78,14 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
                 ),
               ],
               onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-                String status = getTaskStatusSelected();
-                updateTaskListState(status);
+                if(_currentIndex != index){
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  _clearPref();
+                  String status = getTaskStatusSelected();
+                  updateTaskListState(status);
+                }
               },
             ),
           ),
