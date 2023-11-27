@@ -41,7 +41,6 @@ class _TaskListComponentState extends State<TaskList> {
     if(newTasksLength == value-1){
       nextPage=false;
     }
-    print('{$value} / {$newTasksLength}');
   }
 
   Future<bool> _checkExistNextPage(int newTasksLength) async {
