@@ -93,7 +93,8 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                     _currentIndex = index;
                   });
                   _clearPref();
-                  String status = getTaskStatusSelected();
+                  String status = getTaskStatusSelected(index);
+                  taskFilterProvider.setLastStatus(status);
                   updateTaskListState(status);
                 }
               },
@@ -101,7 +102,6 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
           ),
           body: Consumer<TaskListViewModel>(
               builder: (context, taskListViewModel, child) {
-            if (_currentIndex != taskFilterProvider.getCurrentIndex()) {}
             return LoadingOverlay(
               isLoading: taskListViewModel.isLoading,
               child: _buildTabContent(scaffoldKeyDashboard),
@@ -117,8 +117,8 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
     prefs.clear();
   }
 
-  String getTaskStatusSelected() {
-    switch (_currentIndex) {
+  String getTaskStatusSelected(int index) {
+    switch (index) {
       case 0:
         return TaskStatus.Pending.value;
       case 1:
