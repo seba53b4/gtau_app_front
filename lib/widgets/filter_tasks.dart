@@ -5,6 +5,7 @@ import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/widgets/text_field_filter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
@@ -24,6 +25,22 @@ class FilterTasks extends StatefulWidget {
 
 class _FilterTasksState extends State<FilterTasks> {
   double widthRow = 640;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  _ResetScrollPosition() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setDouble("position", 0.0);
+  }
+
+  void _SetFilteredValue(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isFiltered", value);
+  }
+
+  Future<bool> _GetFilteredValue() async {
+    final SharedPreferences prefs = await _prefs;
+    return (prefs.getBool("isFiltered") ?? false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +170,8 @@ class _FilterTasksState extends State<FilterTasks> {
                                 const SizedBox(width: 10.0),
                                 CustomElevatedButton(
                                   onPressed: () {
+                                    _ResetScrollPosition();
+                                    _SetFilteredValue(true);
                                     context.read<TaskFilterProvider>().search();
                                     updateTaskList();
                                     Navigator.of(context).pop();

@@ -50,6 +50,16 @@ class _TaskListComponentState extends State<TaskList> {
     return true;
   }
 
+  void _SetFilteredValue(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isFiltered", value);
+  }
+
+  Future<bool> _GetFilteredValue() async {
+    final SharedPreferences prefs = await _prefs;
+    return (prefs.getBool("isFiltered") ?? false);
+  }
+
   Future<double> initScroll() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getDouble("position") ?? 0.0);
@@ -87,10 +97,11 @@ class _TaskListComponentState extends State<TaskList> {
     return Container(
         margin: const EdgeInsets.only(bottom: 0),
         child: FutureBuilder(
-          future: initScroll(),
+          future: Future.wait([ initScroll(), _GetFilteredValue()]),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              var position = snapshot.data as double;
+              var position = snapshot.data?[0] as double;
+              var isFiltered = snapshot.data?[1] ?? false;
               return Consumer<TaskListViewModel>(
                 builder: (context, taskListViewModel, child) {
                   var tasks = taskListViewModel.tasks[widget.status];
@@ -104,7 +115,7 @@ class _TaskListComponentState extends State<TaskList> {
                     if ((controller.position.maxScrollExtent ==
                             controller.offset) &&
                         tasks!.length % 10 == 0 &&
-                        nextPage) {
+                        nextPage && isFiltered == false) {
                       setState(() {
                         updateTaskListState(context);
                       });
@@ -136,12 +147,13 @@ class _TaskListComponentState extends State<TaskList> {
                               } else {
                                 if (tasks.length % 10 == 0 && nextPage) {
                                   return FutureBuilder(
-                                      future: _checkExistNextPage(tasks.length),
+                                      future: Future.wait([ _checkExistNextPage(tasks.length), _GetFilteredValue()]),
                                       builder: (context, snapshot) {
                                         if (snapshot.hasData) {
                                           var existNextPage =
-                                              snapshot.data as bool;
-                                          if (existNextPage == true) {
+                                              snapshot.data?[0] ?? true;
+                                          var isFiltered = snapshot.data?[1] ?? false;
+                                          if (existNextPage == true && isFiltered == false) {
                                             return const Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     vertical: 32),
@@ -149,6 +161,7 @@ class _TaskListComponentState extends State<TaskList> {
                                                     child:
                                                         CircularProgressIndicator()));
                                           } else {
+                                            _SetFilteredValue(false);
                                             return const Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     vertical: 0));
