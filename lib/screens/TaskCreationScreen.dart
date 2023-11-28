@@ -31,6 +31,7 @@ import '../widgets/element_scheduled_modal.dart';
 import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
 import '../widgets/user_image.dart';
+import '../widgets/informe_file_picker.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
