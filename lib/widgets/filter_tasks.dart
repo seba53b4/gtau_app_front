@@ -42,6 +42,22 @@ class _FilterTasksState extends State<FilterTasks> {
     return (prefs.getBool("isFiltered") ?? false);
   }
 
+  Future<bool> _ResetPrefs() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.clear();
+  }
+
+  Future resetTaskList() async {
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final status =
+        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.clearListByStatus(status!);
+    await taskListViewModel.initializeTasks(context, status, userName);
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
@@ -161,7 +177,8 @@ class _FilterTasksState extends State<FilterTasks> {
                                         .resetFilters(userProvider.isAdmin!);
                                     taskFilterProvider.setLastStatus(
                                         TaskStatus.Pending.value);
-
+                                    _ResetPrefs();
+                                    resetTaskList();
                                     Navigator.of(context).pop();
                                   },
                                   messageType: MessageType.error,
