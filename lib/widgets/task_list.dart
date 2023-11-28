@@ -22,6 +22,8 @@ class TaskList extends StatefulWidget {
 class _TaskListComponentState extends State<TaskList> {
   ScrollController controller = ScrollController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  TaskFilterProvider? taskFilterProvider;
+  TaskListViewModel? taskListViewModel;
 
   _ScrollPosition() async {
     final prefs = await SharedPreferences.getInstance();
@@ -72,6 +74,15 @@ class _TaskListComponentState extends State<TaskList> {
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    taskFilterProvider =
+        Provider.of<TaskFilterProvider>(context, listen: false);
+    taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -80,24 +91,19 @@ class _TaskListComponentState extends State<TaskList> {
   bool nextPage = true;
 
   Future updateTaskListState(BuildContext context) async {
-    final userName =
-        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
-    final status =
-        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    await taskListViewModel.nextPageListByStatus(context, status!, userName);
+    final userName = taskFilterProvider?.userNameFilter;
+    final status = taskFilterProvider?.lastStatus;
+    await taskListViewModel?.nextPageListByStatus(context, status!, userName);
   }
 
   @override
   Widget build(BuildContext context) {
-    final taskFilterProvider =
-        Provider.of<TaskFilterProvider>(context, listen: false);
-    taskFilterProvider.setLastStatus(widget.status);
+    taskFilterProvider?.setLastStatus(widget.status);
+    final taskListSize = taskListViewModel?.size;
     return Container(
         margin: const EdgeInsets.only(bottom: 0),
         child: FutureBuilder(
-          future: Future.wait([ initScroll(), _GetFilteredValue()]),
+          future: Future.wait([initScroll(), _GetFilteredValue()]),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var position = snapshot.data?[0] as double;
@@ -105,21 +111,22 @@ class _TaskListComponentState extends State<TaskList> {
               return Consumer<TaskListViewModel>(
                 builder: (context, taskListViewModel, child) {
                   var tasks = taskListViewModel.tasks[widget.status];
-                  var tasks_length = tasks?.length ?? 0;
-                  _checkNextPage(tasks_length);
+                  var tasksLength = tasks?.length ?? 0;
+                  _checkNextPage(tasksLength);
 
-                  tasks_length = tasks_length + 1;
+                  tasksLength = tasksLength + 1;
                   controller = ScrollController(initialScrollOffset: position);
                   controller.addListener(_ScrollPosition);
                   controller.addListener(() {
                     if ((controller.position.maxScrollExtent ==
                             controller.offset) &&
-                        tasks!.length % 10 == 0 &&
-                        nextPage && isFiltered == false) {
+                        tasks!.length % taskListSize! == 0 &&
+                        nextPage &&
+                        isFiltered == false) {
                       setState(() {
                         updateTaskListState(context);
                       });
-                      _SetActualTasksLength(tasks_length);
+                      _SetActualTasksLength(tasksLength);
                     }
                   });
 
@@ -129,14 +136,14 @@ class _TaskListComponentState extends State<TaskList> {
                         child: ListView.builder(
                           controller: controller,
                           padding: const EdgeInsets.all(8),
-                          itemCount: tasks_length,
+                          itemCount: tasksLength,
                           itemBuilder: (context, index) {
                             if (index < tasks!.length) {
                               final task = tasks[index];
                               return TaskListItem(
                                   task: task, scaffoldKey: widget.scaffoldKey);
                             } else {
-                              if (tasks_length == 1) {
+                              if (tasksLength == 1) {
                                 return Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 32),
@@ -145,15 +152,21 @@ class _TaskListComponentState extends State<TaskList> {
                                             AppLocalizations.of(context)!
                                                 .emptyTaskList)));
                               } else {
-                                if (tasks.length % 10 == 0 && nextPage) {
+                                if (tasks.length % taskListSize! == 0 &&
+                                    nextPage) {
                                   return FutureBuilder(
-                                      future: Future.wait([ _checkExistNextPage(tasks.length), _GetFilteredValue()]),
+                                      future: Future.wait([
+                                        _checkExistNextPage(tasks.length),
+                                        _GetFilteredValue()
+                                      ]),
                                       builder: (context, snapshot) {
                                         if (snapshot.hasData) {
                                           var existNextPage =
                                               snapshot.data?[0] ?? true;
-                                          var isFiltered = snapshot.data?[1] ?? false;
-                                          if (existNextPage == true && isFiltered == false) {
+                                          var isFiltered =
+                                              snapshot.data?[1] ?? false;
+                                          if (existNextPage == true &&
+                                              isFiltered == false) {
                                             return const Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     vertical: 32),
@@ -173,6 +186,7 @@ class _TaskListComponentState extends State<TaskList> {
                                 }
                               }
                             }
+                            return null;
                           },
                         ),
                       ),
