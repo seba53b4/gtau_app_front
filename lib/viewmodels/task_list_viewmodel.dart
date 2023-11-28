@@ -34,6 +34,10 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
+  void resetError() {
+    _error = false;
+  }
+
   void clearListByStatus(String status) {
     _tasks[status]?.clear();
   }

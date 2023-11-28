@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'customMessageDialog.dart';
 
-class ErrorDialogHandler extends StatefulWidget {
+class ErrorDialogHandler extends StatelessWidget {
   final bool showError;
   final VoidCallback onAcceptPressed;
   final String? customText;
@@ -15,36 +15,25 @@ class ErrorDialogHandler extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ErrorDialogHandlerState createState() => _ErrorDialogHandlerState();
-}
-
-class _ErrorDialogHandlerState extends State<ErrorDialogHandler>
-    with SingleTickerProviderStateMixin {
-  static bool errorDialogShown = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.showError && !errorDialogShown) {
-      errorDialogShown = true;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await showCustomMessageDialog(
-          context: context,
-          onAcceptPressed: () {
-            widget.onAcceptPressed();
-            errorDialogShown = false;
-          },
-          customText: widget.customText ?? '',
-          messageType: DialogMessageType.error,
-        );
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return const SizedBox.shrink();
+    return FutureBuilder(
+
+      future: showError ? Future.error("Simulated Error") : Future.value(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasError) {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await showCustomMessageDialog(
+              context: context,
+              onAcceptPressed: onAcceptPressed,
+              customText: customText ?? '',
+              messageType: DialogMessageType.error,
+            );
+          });
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
   }
 }

@@ -28,6 +28,10 @@ class RegisterViewModel extends ChangeNotifier {
     _registers.clear();
   }
 
+  void resetError() {
+    _error = false;
+  }
+
   Future<List<Register>?> fetchRegistersByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {

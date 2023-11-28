@@ -507,10 +507,22 @@ class _MapComponentState extends State<MapComponent> {
                 registerViewModel.error ||
                 lotViewModel.error ||
                 sectionViewModel.error;
-
+            // print("some error:${someError}");
+            // print("some showingError:${showingError}");
             return Scaffold(
               body: Row(
                 children: [
+                  ErrorDialogHandler(
+                      showError: someError,
+                      customText:
+                          AppLocalizations.of(context)!.generic_message_error,
+                      onAcceptPressed: () {
+                        _toggleError();
+                        registerViewModel.resetError();
+                        catchmentViewModel.resetError();
+                        lotViewModel.resetError();
+                        sectionViewModel.resetError();
+                      }),
                   Expanded(
                     child: Stack(
                       alignment: AlignmentDirectional.center,
@@ -579,17 +591,6 @@ class _MapComponentState extends State<MapComponent> {
                             left: kIsWeb ? 16 : null,
                             child: Column(
                               children: [
-                                ErrorDialogHandler(
-                                    showError: someError && showingError,
-                                    customText: AppLocalizations.of(context)!
-                                        .generic_message_error,
-                                    onAcceptPressed: () {
-                                      _toggleError();
-                                      registerViewModel.reset();
-                                      catchmentViewModel.reset();
-                                      lotViewModel.reset();
-                                      sectionViewModel.reset();
-                                    }),
                                 MenuElevatedButton(
                                   colorChangeOnPress: true,
                                   onPressed: () {
