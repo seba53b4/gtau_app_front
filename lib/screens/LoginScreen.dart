@@ -19,16 +19,21 @@ import '../widgets/common/custom_taost.dart';
 import '../widgets/common/custom_textfield.dart';
 import '../widgets/loading_overlay.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  LoginScreen({Key? key}) : super(key: key);
 
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   late AuthResult? authData;
-  final bool onError = false;
+  bool onError = false;
 
-  Future<AuthResult?> _fetchAuth(
-      BuildContext context, String username, String password) async {
+  Future<AuthResult?> _fetchAuth(BuildContext context, String username,
+      String password) async {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     return await authViewModel
         .fetchAuth(username, password)
@@ -96,7 +101,9 @@ class LoginScreen extends StatelessWidget {
           username == 'gtau-admin' ? true : false);
       goToNav(context);
     } else {
-      print(authResponse?.statusCode);
+      setState(() {
+        onError = true;
+      });
       if (authResponse!.statusCode == 401) {
         CustomToast.show(
           context,
@@ -121,18 +128,6 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthViewModel>(builder: (context, authviewModel, child) {
       bool isLoading = authviewModel.isLoading;
-      bool hasError = authviewModel.error;
-
-      if (hasError) {
-        Future.delayed(Duration.zero, () {
-          CustomToast.show(
-            context,
-            title: AppLocalizations.of(context)!.error,
-            message: AppLocalizations.of(context)!.login_error_auth,
-            type: MessageType.error,
-          );
-        });
-      }
 
       return LoadingOverlay(
         isLoading: isLoading,
@@ -142,8 +137,8 @@ class LoginScreen extends StatelessWidget {
             child: Center(
               child: BoxContainer(
                 width: kIsWeb ? 400 : 340,
-                height: kIsWeb ? 400 : 368,
-                padding: const EdgeInsets.all(16.0),
+                height: kIsWeb ? 400 : 360,
+                padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +151,7 @@ class LoginScreen extends StatelessWidget {
                           .default_input_username_hint,
                       keyboardType: TextInputType.text,
                       obscureText: false,
-                      hasError: hasError,
+                      hasError: onError,
                     ),
                     CustomTextField(
                       controller: passwordController,
@@ -164,14 +159,19 @@ class LoginScreen extends StatelessWidget {
                           .default_input_password_hint,
                       keyboardType: TextInputType.text,
                       obscureText: true,
-                      hasError: hasError,
+                      hasError: onError,
                     ),
                     const SizedBox(height: 16.0),
                     CustomElevatedButton(
-                        onPressed: () => onLogInPressed(context),
+                        onPressed: () {
+                          setState(() {
+                            onError = false;
+                          });
+                          onLogInPressed(context);
+                        },
                         text:
-                            AppLocalizations.of(context)!.default_login_button),
-                    const SizedBox(height: 16.0),
+                        AppLocalizations.of(context)!.default_login_button),
+                    const SizedBox(height: kIsWeb ? 24 : 4),
                     TextButton(
                         onPressed: () => onForgotPressed(context),
                         child: Text(AppLocalizations.of(context)!
