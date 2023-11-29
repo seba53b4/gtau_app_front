@@ -56,7 +56,7 @@ class TaskListViewModel extends ChangeNotifier {
       _isLoading = true;
       _error = false;
       notifyListeners();
-
+      //throw Error();
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
 
@@ -126,6 +126,7 @@ class TaskListViewModel extends ChangeNotifier {
       _isLoading = true;
       _error = false;
       notifyListeners();
+      throw Error();
       final responseTask = await _taskService.fetchTask(token, idTask);
       if (responseTask != null) {
         return responseTask;

@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
-import 'package:gtau_app_front/widgets/common/dialog_error.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
+import 'common/customMessageDialog.dart';
 
 class TaskStatusDashboard extends StatefulWidget {
   final String? userName;
@@ -95,21 +95,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
             if (_currentIndex != taskFilterProvider.getCurrentIndex()) {}
             return LoadingOverlay(
               isLoading: taskListViewModel.isLoading,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Visibility(
-                      visible: taskListViewModel.error,
-                      child: ErrorDialogHandler(
-                          showError: taskListViewModel.error,
-                          customText:
-                              AppLocalizations.of(context)!.error_generic_text,
-                          onAcceptPressed: () {})),
-                  Expanded(
-                    child: _buildTabContent(scaffoldKeyDashboard),
-                  ),
-                ],
-              ),
+              child: _buildTabContent(scaffoldKeyDashboard),
             );
           }),
         ),
@@ -153,7 +139,18 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status);
-    await taskListViewModel.initializeTasks(context, status, userName);
+    await taskListViewModel
+        .initializeTasks(context, status, userName)
+        .catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    });
+    ;
   }
 
   Widget _buildTaskList(

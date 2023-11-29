@@ -155,7 +155,7 @@ Future<void> showCustomMessageDialog({
             child: Text(
           messageType.value,
           style: const TextStyle(
-              fontSize: kIsWeb ? 28 : 24, fontWeight: FontWeight.w200),
+              fontSize: kIsWeb ? 24 : 20, fontWeight: FontWeight.w200),
         )),
         content: MessageDialog(
           messageType: messageType,

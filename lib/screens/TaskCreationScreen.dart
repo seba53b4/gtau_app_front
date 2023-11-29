@@ -124,9 +124,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-        initializeTask();
+        await initializeTask();
       });
       Hive.initFlutter().then((value) => null);
     } else {
@@ -141,17 +141,17 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
     try {
       final selectedItemsProvider = context.read<SelectedItemsProvider>();
-      final responseTask = await taskListViewModel
-          .fetchTask(token, widget.idTask!)
-          .catchError((error) async {
-        // Manejo de error
-        await showCustomMessageDialog(
-          context: context,
-          onAcceptPressed: () {},
-          customText: AppLocalizations.of(context)!.error_generic_text,
-          messageType: DialogMessageType.error,
-        );
-      });
+      final responseTask =
+          await taskListViewModel.fetchTask(token, widget.idTask!);
+      //     .catchError((error) async {
+      //   // Manejo de error
+      //   // await showCustomMessageDialog(
+      //   //   context: context,
+      //   //   onAcceptPressed: () {},
+      //   //   customText: AppLocalizations.of(context)!.error_generic_text,
+      //   //   messageType: DialogMessageType.error,
+      //   // );
+      // });
 
       if (responseTask != null) {
         setState(() {
@@ -252,7 +252,17 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<void> initializeTask() async {
-    await _fetchTask();
+    await _fetchTask().catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {
+          Navigator.of(context).pop();
+        },
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    });
   }
 
   void handleStartDateChange(DateTime date) {
