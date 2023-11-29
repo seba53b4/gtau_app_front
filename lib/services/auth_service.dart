@@ -6,19 +6,28 @@ import 'package:http/http.dart' as http;
 
 import '../models/auth_data.dart';
 
+class AuthResult {
+  final AuthData? authData;
+  final int statusCode;
+
+  AuthResult(this.authData, this.statusCode);
+}
+
 class AuthService {
   final String baseUrl;
 
-  AuthService({String? baseUrl}) : baseUrl = baseUrl ?? dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND');
+  AuthService({String? baseUrl})
+      : baseUrl = baseUrl ?? dotenv.get('API_TASKS_URL', fallback: 'NOT_FOUND');
 
   Map<String, String> _getHeaders() {
     return {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
+      'Authorization':
+          "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
     };
   }
 
-  Future<AuthData?> fetchAuth(String username, String password) async {
+  Future<AuthResult> fetchAuth(String username, String password) async {
     try {
       final response = await http.post(
         Uri.parse(dotenv.get('API_AUTH', fallback: 'NOT_FOUND')),
@@ -33,9 +42,10 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        return AuthData.fromJson(jsonResponse);
+        final authData = AuthData.fromJson(jsonResponse);
+        return AuthResult(authData, response.statusCode);
       } else {
-        throw Exception('Error en la autenticación');
+        return AuthResult(null, response.statusCode);
       }
     } catch (error) {
       if (kDebugMode) {
@@ -44,5 +54,4 @@ class AuthService {
       rethrow;
     }
   }
-
 }
