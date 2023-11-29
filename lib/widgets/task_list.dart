@@ -27,33 +27,36 @@ class _TaskListComponentState extends State<TaskList> {
     final taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
     taskFilterProvider.setLastStatus(widget.status);
-    return Consumer<TaskListViewModel>(
-        builder: (context, taskListViewModel, child) {
-      final tasks = taskListViewModel.tasks[widget.status];
 
-      return SizedBox(
-        width: 600,
-        child: Center(
-          widthFactor: 0.5,
-          child: (tasks!.isEmpty)
-              ? const Text("No se encontraron inspecciones.")
-              : CustomScrollView(
-                  scrollDirection: Axis.vertical,
-                  slivers: <Widget>[
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          final task = tasks[index];
-                          return TaskListItem(
-                              task: task, scaffoldKey: widget.scaffoldKey);
-                        },
-                        childCount: tasks.length ?? 0,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      width: 600,
+      child: Center(
+        widthFactor: 0.5,
+        child: Consumer<TaskListViewModel>(
+          builder: (context, taskListViewModel, child) {
+            final tasks = taskListViewModel.tasks[widget.status];
+
+            return (tasks!.isEmpty)
+                ? const Text("No se encontraron inspecciones.")
+                : CustomScrollView(
+                    scrollDirection: Axis.vertical,
+                    slivers: <Widget>[
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                            final task = tasks[index];
+                            return TaskListItem(
+                                task: task, scaffoldKey: widget.scaffoldKey);
+                          },
+                          childCount: tasks.length ?? 0,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+          },
         ),
-      );
-    });
+      ),
+    );
   }
 }

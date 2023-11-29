@@ -148,5 +148,6 @@
     "form_scheduled_catchm_top_status_2": "Estado de la tapa 2",
     "filter_task_title": "Filtrar tareas",
     "inspection_type": "Tipo de inspección",
-    "user": "Usuario"
+    "user": "Usuario",
+    "error_generic_text": "Algo salio mal"
 }

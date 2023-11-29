@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
+import 'package:gtau_app_front/widgets/common/dialog_error.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,6 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         _tabController.animateTo(_currentIndex);
       }
 
-      print(_currentIndex);
       return SizedBox(
         width: 120,
         child: Scaffold(
@@ -95,7 +95,21 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
             if (_currentIndex != taskFilterProvider.getCurrentIndex()) {}
             return LoadingOverlay(
               isLoading: taskListViewModel.isLoading,
-              child: _buildTabContent(scaffoldKeyDashboard),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Visibility(
+                      visible: taskListViewModel.error,
+                      child: ErrorDialogHandler(
+                          showError: taskListViewModel.error,
+                          customText:
+                              AppLocalizations.of(context)!.error_generic_text,
+                          onAcceptPressed: () {})),
+                  Expanded(
+                    child: _buildTabContent(scaffoldKeyDashboard),
+                  ),
+                ],
+              ),
             );
           }),
         ),

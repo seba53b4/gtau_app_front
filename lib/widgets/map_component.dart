@@ -466,7 +466,7 @@ class _MapComponentState extends State<MapComponent> {
       await showCustomMessageDialog(
         context: context,
         onAcceptPressed: () {},
-        customText: 'Algo salió mal',
+        customText: AppLocalizations.of(context)!.error_generic_text,
         messageType: DialogMessageType.error,
       );
     });
