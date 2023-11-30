@@ -680,6 +680,7 @@ class _MapComponentState extends State<MapComponent> {
                                   onPressed: () {
                                     setState(() {
                                       selectedItemsProvider.clearAll();
+                                      updateElementsOnMap();
                                       viewDetailElementInfo = false;
                                     });
                                   },
