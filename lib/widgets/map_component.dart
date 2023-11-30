@@ -57,7 +57,12 @@ class _MapComponentState extends State<MapComponent> {
   double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
-  SelectedItemsProvider? selectedItemsProvider;
+  late SelectedItemsProvider selectedItemsProvider;
+  late SectionViewModel sectionViewModel;
+  late LotViewModel lotViewModel;
+  late CatchmentViewModel catchmentViewModel;
+  late RegisterViewModel registerViewModel;
+  late String token;
   bool isDetailsButtonVisible = false;
 
   // Indices { S, R, C, P};
@@ -81,14 +86,20 @@ class _MapComponentState extends State<MapComponent> {
       mapWidth = mapInit;
     });
     selectedItemsProvider = context.read<SelectedItemsProvider>();
+    sectionViewModel = Provider.of<SectionViewModel>(context, listen: false);
+    lotViewModel = Provider.of<LotViewModel>(context, listen: false);
+    catchmentViewModel =
+        Provider.of<CatchmentViewModel>(context, listen: false);
+    registerViewModel = Provider.of<RegisterViewModel>(context, listen: false);
+    token = context.read<UserProvider>().getToken!;
   }
 
   @override
   void dispose() {
     super.dispose();
 
-    if (selectedItemsProvider != null && !widget.isModal) {
-      selectedItemsProvider!.reset();
+    if (!widget.isModal) {
+      selectedItemsProvider.reset();
     }
   }
 
@@ -145,8 +156,6 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Future<List<Section>?> fetchSectionsPolylines(String token) async {
-    final sectionViewModel =
-        Provider.of<SectionViewModel>(context, listen: false);
     LatLng? finalLocation = getFinalLocation();
     return await sectionViewModel.fetchSectionsByRadius(
         token,
@@ -156,16 +165,12 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Future<List<Lot>?> fetchLotsPolylines(String token) async {
-    final lotViewModel = Provider.of<LotViewModel>(context, listen: false);
     LatLng? finalLocation = getFinalLocation();
     return await lotViewModel.fetchLotsByRadius(token, finalLocation!.latitude,
         finalLocation!.longitude, int.parse(distances[distanceSelected]));
   }
 
   Future<List<Catchment>?> fetchCatchmentsCircles(String token) async {
-    final catchmentViewModel =
-        Provider.of<CatchmentViewModel>(context, listen: false);
-
     LatLng? finalLocation = getFinalLocation();
     return await catchmentViewModel.fetchCatchmentsByRadius(
         token,
@@ -175,9 +180,6 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Future<List<Register>?> fetchRegistersCircles(String token) async {
-    final registerViewModel =
-        Provider.of<RegisterViewModel>(context, listen: false);
-
     LatLng? finalLocation = getFinalLocation();
     return await registerViewModel.fetchRegistersByRadius(
         token, finalLocation!.latitude, finalLocation!.longitude, 200);
@@ -187,54 +189,46 @@ class _MapComponentState extends State<MapComponent> {
 
   Future<void> _onTapParamBehaviorPolyline(
       int ogcFid, Polyline? line, ElementType type) async {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
     } else {
-      if (!(selectedItemsProvider.isSomeCircleSelected(type) ||
-          selectedItemsProvider.isSomeCircleSelected(type))) {
-        if (selectedItemsProvider.isSomePolylineSelected(type)) {
-          selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
-          if (ogcFid == elementSelectedId) {
-            isDetailsButtonVisible = false;
-            if (kIsWeb) {
-              viewDetailElementInfo = false;
-            }
-          }
-        } else {
-          selectedItemsProvider.clearAll();
-          selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
-          setState(() {
-            elementSelectedId = ogcFid;
-            elementSelectedType = type;
-            isDetailsButtonVisible = true;
-            if (kIsWeb) {
-              viewDetailElementInfo = true;
-            }
-          });
-          if (kIsWeb) {
-            await _fetchElementInfo();
-          }
+      if (selectedItemsProvider.isPolylineSelected(line!.polylineId, type)) {
+        selectedItemsProvider.togglePolylineSelected(line.polylineId, type);
+        isDetailsButtonVisible = false;
+        if (kIsWeb) {
+          viewDetailElementInfo = false;
         }
+      } else {
+        selectedItemsProvider.clearAll();
+        selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
+        setState(() {
+          elementSelectedId = ogcFid;
+          elementSelectedType = type;
+          isDetailsButtonVisible = true;
+          if (kIsWeb) {
+            viewDetailElementInfo = true;
+          }
+        });
+      }
+      if (kIsWeb) {
+        await _fetchElementInfo();
       }
     }
   }
 
   Future<void> _onTapParamBehaviorCircle(
       int ogcFid, Circle? point, ElementType type) async {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     if (selectedItemsProvider.letMultipleItemsSelected) {
       selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
     } else {
-      if (selectedItemsProvider.isSomeCircleSelected(type)) {
-        selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
-        if (ogcFid == elementSelectedId) {
-          isDetailsButtonVisible = false;
-          if (kIsWeb) {
-            viewDetailElementInfo = false;
-          }
+      if (selectedItemsProvider.isCircleSelected(point!.circleId, type)) {
+        selectedItemsProvider.toggleCircleSelected(point.circleId, type);
+        isDetailsButtonVisible = false;
+        if (kIsWeb) {
+          viewDetailElementInfo = false;
         }
       } else {
+        selectedItemsProvider.clearAll();
         selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
         setState(() {
           elementSelectedId = ogcFid;
@@ -244,39 +238,40 @@ class _MapComponentState extends State<MapComponent> {
             viewDetailElementInfo = true;
           }
         });
-        if (kIsWeb) {
-          await _fetchElementInfo();
-        }
+      }
+      if (kIsWeb) {
+        await _fetchElementInfo();
       }
     }
   }
 
+  void updateElementsOnMap() {
+    setState(() {
+      polylines = getPolylines(sectionViewModel.sections, lotViewModel.lots);
+      circles = getCircles(
+          catchmentViewModel.catchments, registerViewModel.registers);
+    });
+  }
+
   bool isSomeElementSelected() {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isSomeElementSelected();
   }
 
   Future _fetchElementInfo() async {
     if (elementSelectedType != null && elementSelectedId != null) {
-      final token = context.read<UserProvider>().getToken;
-      final catchmentViewModel = context.read<CatchmentViewModel>();
-      final registerViewModel = context.read<RegisterViewModel>();
-      final sectionViewModel = context.read<SectionViewModel>();
-      final lotViewModel = context.read<LotViewModel>();
-
       switch (elementSelectedType) {
         case ElementType.catchment:
           await catchmentViewModel.fetchCatchmentById(
-              token!, elementSelectedId!);
+              token, elementSelectedId!);
           break;
         case ElementType.register:
-          await registerViewModel.fetchRegisterById(token!, elementSelectedId!);
+          await registerViewModel.fetchRegisterById(token, elementSelectedId!);
           break;
         case ElementType.section:
-          await sectionViewModel.fetchSectionById(token!, elementSelectedId!);
+          await sectionViewModel.fetchSectionById(token, elementSelectedId!);
           break;
         case ElementType.lot:
-          await lotViewModel.fetchLotById(token!, elementSelectedId!);
+          await lotViewModel.fetchLotById(token, elementSelectedId!);
           break;
         default:
           throw Exception('Invalid status string: $elementSelectedId');
@@ -285,7 +280,6 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Color _onColorParamBehaviorSection(Section section) {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isPolylineSelected(
             section.line!.polylineId, ElementType.section)
         ? selectedColor
@@ -293,7 +287,6 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Color _onColorParamBehaviorLot(Lot lot) {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isPolylineSelected(
             lot.polyline!.polylineId, ElementType.lot)
         ? selectedColor
@@ -301,7 +294,6 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Color _onColorParamBehaviorCatchment(Catchment catchment) {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isCircleSelected(
             catchment.point!.circleId, ElementType.catchment)
         ? selectedColor
@@ -309,7 +301,6 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   Color _onColorParamBehaviorRegister(Register register) {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
     return selectedItemsProvider.isCircleSelected(
             register.point!.circleId, ElementType.register)
         ? selectedColor
@@ -340,9 +331,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
                 section.ogcFid, section.line, ElementType.section);
-            setState(() {
-              polylines = getPolylines(sections, lots);
-            });
+            updateElementsOnMap();
           },
         );
         setPol.add(pol);
@@ -358,9 +347,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
                 lot.ogcFid, lot.polyline, ElementType.lot);
-            setState(() {
-              polylines = getPolylines(sections, lots);
-            });
+            updateElementsOnMap();
           },
         );
         setPol.add(pol);
@@ -384,9 +371,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
                 catchment.ogcFid, catchment.point, ElementType.catchment);
-            setState(() {
-              circles = getCircles(catchments, registers);
-            });
+            updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -403,9 +388,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
                 register.ogcFid, register.point, ElementType.register);
-            setState(() {
-              circles = getCircles(catchments, registers);
-            });
+            updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -608,8 +591,6 @@ class _MapComponentState extends State<MapComponent> {
                                   colorChangeOnPress: true,
                                   onPressed: () {
                                     setState(() {
-                                      final selectedItemsProvider =
-                                          context.read<SelectedItemsProvider>();
                                       selectedItemsProvider.clearAll();
                                       isDetailsButtonVisible = false;
                                       markersGPS.clear();
@@ -698,6 +679,7 @@ class _MapComponentState extends State<MapComponent> {
                                   elementType: elementSelectedType,
                                   onPressed: () {
                                     setState(() {
+                                      selectedItemsProvider.clearAll();
                                       viewDetailElementInfo = false;
                                     });
                                   },
