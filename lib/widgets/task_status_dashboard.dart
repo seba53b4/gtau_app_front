@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
+import 'common/customMessageDialog.dart';
 
 class TaskStatusDashboard extends StatefulWidget {
   final String? userName;
@@ -48,7 +49,6 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         _tabController.animateTo(_currentIndex);
       }
 
-      print(_currentIndex);
       return SizedBox(
         width: 120,
         child: Scaffold(
@@ -139,7 +139,18 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status);
-    await taskListViewModel.initializeTasks(context, status, userName);
+    await taskListViewModel
+        .initializeTasks(context, status, userName)
+        .catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    });
+    ;
   }
 
   Widget _buildTaskList(

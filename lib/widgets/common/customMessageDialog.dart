@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
@@ -24,10 +25,12 @@ extension DialogMessageTypeExtension on DialogMessageType {
 class MessageDialog extends StatefulWidget {
   final DialogMessageType messageType;
   final VoidCallback onAcceptPressed;
+  final String customText;
 
   const MessageDialog({
     required this.messageType,
     required this.onAcceptPressed,
+    this.customText = '',
   });
 
   @override
@@ -45,7 +48,7 @@ class _MessageDialogState extends State<MessageDialog>
 
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 300),
     );
 
     _scaleAnimation = Tween<double>(begin: 0, end: 1).animate(_controller);
@@ -63,64 +66,59 @@ class _MessageDialogState extends State<MessageDialog>
   Widget build(BuildContext context) {
     IconData iconData;
     Color iconColor;
-    String textContent;
 
     switch (widget.messageType) {
       case DialogMessageType.success:
         iconData = Icons.check_circle;
         iconColor = primarySwatch;
-        textContent = DialogMessageType.success.value;
         break;
       case DialogMessageType.error:
         iconData = Icons.error;
         iconColor = Colors.red;
-        textContent = DialogMessageType.error.value;
         break;
       case DialogMessageType.warning:
         iconData = Icons.warning;
         iconColor = Colors.orange;
-        textContent = DialogMessageType.warning.value;
         break;
     }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              textContent,
+        Divider(
+          height: 8,
+          thickness: 2,
+          color: Colors.grey.shade100,
+        ),
+        const SizedBox(height: 8),
+        AnimatedBuilder(
+          animation: _scaleAnimation,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey[200],
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Icon(iconData, color: iconColor, size: 62),
+              ),
+            );
+          },
+        ),
+        if (widget.customText.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              widget.customText,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w200,
               ),
             ),
-            const SizedBox(height: 8),
-            Divider(
-              height: 8,
-              thickness: 2,
-              color: Colors.grey.shade100,
-            ),
-            const SizedBox(height: 12),
-            AnimatedBuilder(
-              animation: _scaleAnimation,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey[200],
-                    ),
-                    padding: const EdgeInsets.all(24),
-                    child: Icon(iconData, color: iconColor, size: 62),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+          ),
         const SizedBox(height: 12),
         Divider(
           height: 8,
@@ -138,15 +136,6 @@ class _MessageDialogState extends State<MessageDialog>
           },
           child: Text(AppLocalizations.of(context)!.dialogCloseButton),
         ),
-        // CustomElevatedButton(
-        //   width: 60,
-        //   height: 60,
-        //   text: AppLocalizations.of(context)!.dialogCloseButton,
-        //   onPressed: () {
-        //     Navigator.of(context).pop();
-        //     widget.onAcceptPressed();
-        //   },
-        // ),
       ],
     );
   }
@@ -156,14 +145,22 @@ Future<void> showCustomMessageDialog({
   required BuildContext context,
   required DialogMessageType messageType,
   required VoidCallback onAcceptPressed,
+  String customText = '',
 }) {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
+        title: Center(
+            child: Text(
+          messageType.value,
+          style: const TextStyle(
+              fontSize: kIsWeb ? 24 : 20, fontWeight: FontWeight.w200),
+        )),
         content: MessageDialog(
           messageType: messageType,
           onAcceptPressed: onAcceptPressed,
+          customText: customText,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
