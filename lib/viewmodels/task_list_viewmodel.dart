@@ -27,7 +27,7 @@ class TaskListViewModel extends ChangeNotifier {
   Map<String, List<Task>> get tasks => _tasks;
 
   int page = 0;
-  int size = 10;
+  int size = kIsWeb ? 12 : 10;
 
   void clearLists() {
     for (var key in _tasks.keys) {
@@ -108,7 +108,6 @@ class TaskListViewModel extends ChangeNotifier {
       if (size_list > 0) {
         page++;
       }
-      print('page: {$page}');
       _SetActualPage(page);
 
       return responseListTask;

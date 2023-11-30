@@ -39,7 +39,6 @@ class _TaskListComponentState extends State<TaskList> {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
     int actualPage = prefs.getInt("actual_page") ?? 0;
-    print('{$newTasksLength} == {$value} - 1');
     if (newTasksLength == (value * actualPage) - 1) {
       nextPage = false;
     }
@@ -155,7 +154,6 @@ class _TaskListComponentState extends State<TaskList> {
                                                 .emptyTaskList)));
                               } else {
                                 var comp = tasks.length % taskListSize! == 0;
-                                print('NextPage: {$nextPage}');
                                 if (tasks.length % taskListSize! == 0 &&
                                     nextPage) {
                                   return FutureBuilder(

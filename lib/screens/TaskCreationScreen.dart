@@ -378,6 +378,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    _ResetPrefs();
     await updateTaskList();
   }
 
@@ -404,7 +405,19 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    _ResetPrefs();
     await updateTaskList();
+  }
+
+Future resetTaskList() async {
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final status =
+        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.clearListByStatus(status!);
+    await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   Future updateTaskList() async {
@@ -1271,7 +1284,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         CustomElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              _ResetPrefs();
+                              
                               if (widget.detail) {
                                 handleEditTask();
                               } else {
