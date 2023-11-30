@@ -38,7 +38,9 @@ class _TaskListComponentState extends State<TaskList> {
   void _checkNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
-    if (newTasksLength == value - 1) {
+    int actualPage = prefs.getInt("actual_page") ?? 0;
+    print('{$newTasksLength} == {$value} - 1');
+    if (newTasksLength == (value * actualPage) - 1) {
       nextPage = false;
     }
   }
@@ -152,6 +154,8 @@ class _TaskListComponentState extends State<TaskList> {
                                             AppLocalizations.of(context)!
                                                 .emptyTaskList)));
                               } else {
+                                var comp = tasks.length % taskListSize! == 0;
+                                print('NextPage: {$nextPage}');
                                 if (tasks.length % taskListSize! == 0 &&
                                     nextPage) {
                                   return FutureBuilder(
@@ -167,12 +171,12 @@ class _TaskListComponentState extends State<TaskList> {
                                               snapshot.data?[1] ?? false;
                                           if (existNextPage == true &&
                                               isFiltered == false) {
-                                            return const Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 32),
-                                                child: Center(
-                                                    child:
-                                                        CircularProgressIndicator()));
+                                                return const Padding(
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical: 32),
+                                                    child: Center(
+                                                        child:
+                                                            CircularProgressIndicator()));
                                           } else {
                                             _SetFilteredValue(false);
                                             return const Padding(

@@ -32,6 +32,7 @@ import '../widgets/common/custom_toggle_buttons.dart';
 import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
 import '../widgets/user_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -244,6 +245,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<void> initializeTask() async {
     await _fetchTask();
+  }
+
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  Future<bool> _ResetPrefs() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.clear();
   }
 
   void handleStartDateChange(DateTime date) {
@@ -1263,6 +1271,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                         CustomElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
+                              _ResetPrefs();
                               if (widget.detail) {
                                 handleEditTask();
                               } else {

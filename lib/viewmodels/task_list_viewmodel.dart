@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/services/task_service.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/user_provider.dart';
 
@@ -81,6 +82,11 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
+  _SetActualPage(int page) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt("actual_page", page);
+  }
+  
   Future<List<Task>?> fetchNextPageTasksFromUser(
       BuildContext context, String status, String? user) async {
     final token = context.read<UserProvider>().getToken;
@@ -102,6 +108,8 @@ class TaskListViewModel extends ChangeNotifier {
       if (size_list > 0) {
         page++;
       }
+      print('page: {$page}');
+      _SetActualPage(page);
 
       return responseListTask;
     } catch (error) {
