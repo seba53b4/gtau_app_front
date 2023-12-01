@@ -35,6 +35,10 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
+  void setPage(int newPage){
+    page=newPage;
+  }
+
   void clearListByStatus(String status) {
     _tasks[status]?.clear();
     page = 0;
@@ -60,6 +64,7 @@ class TaskListViewModel extends ChangeNotifier {
       userName = user;
     }
     try {
+      
       _error = false;
       _isLoading = true;
 
@@ -69,7 +74,7 @@ class TaskListViewModel extends ChangeNotifier {
           await _taskService.getTasks(token!, userName!, page, size, status);
 
       _tasks[status] = responseListTask!;
-      page++;
+      
 
       return responseListTask;
     } catch (error) {
@@ -78,6 +83,7 @@ class TaskListViewModel extends ChangeNotifier {
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
+      page++;
       notifyListeners();
     }
   }

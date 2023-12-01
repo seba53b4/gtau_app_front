@@ -406,7 +406,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       reset();
     }
     _ResetPrefs();
-    await updateTaskList();
   }
 
 Future resetTaskList() async {
@@ -421,12 +420,15 @@ Future resetTaskList() async {
   }
 
   Future updateTaskList() async {
+    final taskFilterProvider =
+        Provider.of<TaskFilterProvider>(context, listen: false);
     final userName =
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
-    taskListViewModel.clearListByStatus(initStatus);
-    await taskListViewModel.initializeTasks(context, initStatus, userName);
+    final status = taskFilterProvider.lastStatus;
+    taskListViewModel.clearListByStatus(status!);
+    await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   void handleEditTask() {
