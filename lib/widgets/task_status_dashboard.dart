@@ -6,6 +6,7 @@ import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
@@ -23,6 +24,7 @@ class TaskStatusDashboard extends StatefulWidget {
 class _TaskStatusDashboard extends State<TaskStatusDashboard>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   late TabController _tabController;
 
   @override
@@ -32,6 +34,11 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
       updateTaskListState(TaskStatus.Pending.value);
     });
     _tabController = TabController(vsync: this, length: 4);
+  }
+
+  Future<bool> _clearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
   }
 
   @override
@@ -81,18 +88,20 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                 ),
               ],
               onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-                String status = getTaskStatusSelected(_currentIndex);
-                taskFilterProvider.setLastStatus(status);
-                updateTaskListState(status);
+                if (_currentIndex != index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  _clearPref();
+                  String status = getTaskStatusSelected(index);
+                  taskFilterProvider.setLastStatus(status);
+                  updateTaskListState(status);
+                }
               },
             ),
           ),
           body: Consumer<TaskListViewModel>(
               builder: (context, taskListViewModel, child) {
-            if (_currentIndex != taskFilterProvider.getCurrentIndex()) {}
             return LoadingOverlay(
               isLoading: taskListViewModel.isLoading,
               child: _buildTabContent(scaffoldKeyDashboard),
@@ -103,8 +112,13 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
     });
   }
 
-  String getTaskStatusSelected(int currentIndex) {
-    switch (_currentIndex) {
+  Future<void> resetScrollPosition() async {
+    final SharedPreferences prefs = await _prefs;
+    prefs.clear();
+  }
+
+  String getTaskStatusSelected(int index) {
+    switch (index) {
       case 0:
         return TaskStatus.Pending.value;
       case 1:
@@ -119,6 +133,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   }
 
   Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
+    /*resetScrollPosition();*/
     switch (_currentIndex) {
       case 0:
         return _buildTaskList(TaskStatus.Pending.value, _scaffoldKeyDashboard);

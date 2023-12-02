@@ -32,6 +32,7 @@ import '../widgets/common/custom_toggle_buttons.dart';
 import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
 import '../widgets/user_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -143,16 +144,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       final selectedItemsProvider = context.read<SelectedItemsProvider>();
       final responseTask =
           await taskListViewModel.fetchTask(token, widget.idTask!);
-      //     .catchError((error) async {
-      //   // Manejo de error
-      //   // await showCustomMessageDialog(
-      //   //   context: context,
-      //   //   onAcceptPressed: () {},
-      //   //   customText: AppLocalizations.of(context)!.error_generic_text,
-      //   //   messageType: DialogMessageType.error,
-      //   // );
-      // });
-
       if (responseTask != null) {
         setState(() {
           task = responseTask;
@@ -263,6 +254,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         messageType: DialogMessageType.error,
       );
     });
+  }
+
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  Future<bool> _ResetPrefs() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.clear();
   }
 
   void handleStartDateChange(DateTime date) {
@@ -389,6 +387,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    _ResetPrefs();
     await updateTaskList();
   }
 
@@ -415,15 +414,30 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
-    await updateTaskList();
+    _ResetPrefs();
+  }
+
+  Future resetTaskList() async {
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final status =
+        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.clearListByStatus(status!);
+    await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   Future updateTaskList() async {
+    final taskFilterProvider =
+        Provider.of<TaskFilterProvider>(context, listen: false);
     final userName =
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
-    await taskListViewModel.initializeTasks(context, initStatus, userName);
+    final status = taskFilterProvider.lastStatus;
+    taskListViewModel.clearListByStatus(status!);
+    await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   void handleEditTask() {

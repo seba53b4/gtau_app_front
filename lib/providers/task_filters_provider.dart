@@ -17,6 +17,7 @@ class TaskFilterProvider with ChangeNotifier {
   String? get statusFilter => _statusFilter;
 
   void setLastStatus(String lastStatus) {
+    _lastStatus = lastStatus;
     _statusFilter = lastStatus;
   }
 
@@ -43,6 +44,9 @@ class TaskFilterProvider with ChangeNotifier {
   void setAddDateFilter(DateTime? newAddDate) {
     _addDateFilter = newAddDate;
   }
+
+  String? _lastStatus;
+  String? get lastStatus => _lastStatus;
 
   String? _applicantFilter;
 

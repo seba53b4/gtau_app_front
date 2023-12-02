@@ -102,8 +102,10 @@ class TaskListItem extends StatelessWidget {
                   ),
                   const SizedBox(width: 20),
                   Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                    child: Wrap(
+                      spacing: 8.0, // gap between adjacent chips
+                      runSpacing: 4.0, // gap between lines
+                      direction: Axis.vertical,
                       children: [
                         SizedBox(
                           width: taskInfoSpace,
