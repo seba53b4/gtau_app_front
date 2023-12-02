@@ -6,9 +6,9 @@ import '../services/lot_service.dart';
 class LotViewModel extends ChangeNotifier {
   final LotService _LotService = LotService();
 
-  List<Lot> _Lots = [];
+  List<Lot> _lots = [];
 
-  List<Lot> get Lots => _Lots;
+  List<Lot> get lots => _lots;
 
   late Lot? _lotForDetail = null;
 
@@ -30,7 +30,7 @@ class LotViewModel extends ChangeNotifier {
       final responseListSection = await _LotService.fetchLotsByRadius(
           token, longitude, latitude, radiusMtr);
       if (responseListSection != null) {
-        _Lots = responseListSection;
+        _lots = responseListSection;
       }
       _isLoading = false;
       return responseListSection;
