@@ -21,6 +21,7 @@ import '../models/lot_data.dart';
 import '../models/section_data.dart';
 import '../providers/user_provider.dart';
 import '../utils/map_functions.dart';
+import 'common/customMessageDialog.dart';
 import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
 import 'element_detail_modal.dart';
@@ -460,9 +461,14 @@ class _MapComponentState extends State<MapComponent> {
         fetchedLots = responses[iter]?.cast<Lot>();
         iter++;
       }
-    }).catchError((error) {
-      print(error);
+    }).catchError((error) async {
       // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
     });
 
     setState(() {

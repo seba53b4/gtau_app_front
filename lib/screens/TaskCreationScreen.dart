@@ -125,9 +125,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-        initializeTask();
+        await initializeTask();
       });
       Hive.initFlutter().then((value) => null);
     } else {
@@ -144,7 +144,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       final selectedItemsProvider = context.read<SelectedItemsProvider>();
       final responseTask =
           await taskListViewModel.fetchTask(token, widget.idTask!);
-
       if (responseTask != null) {
         setState(() {
           task = responseTask;
@@ -244,7 +243,17 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Future<void> initializeTask() async {
-    await _fetchTask();
+    await _fetchTask().catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {
+          Navigator.of(context).pop();
+        },
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    });
   }
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -408,7 +417,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     _ResetPrefs();
   }
 
-Future resetTaskList() async {
+  Future resetTaskList() async {
     final userName =
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final status =
@@ -1286,7 +1295,6 @@ Future resetTaskList() async {
                         CustomElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              
                               if (widget.detail) {
                                 handleEditTask();
                               } else {

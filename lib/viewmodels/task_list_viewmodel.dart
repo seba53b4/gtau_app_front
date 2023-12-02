@@ -87,7 +87,6 @@ class TaskListViewModel extends ChangeNotifier {
       _isLoading = true;
 
       notifyListeners();
-
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
 
