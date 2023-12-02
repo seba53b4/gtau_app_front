@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/task.dart';
@@ -25,9 +27,19 @@ class TaskListViewModel extends ChangeNotifier {
   bool get error => _error;
 
   Map<String, List<Task>> get tasks => _tasks;
-
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   int page = 0;
   int size = kIsWeb ? 12 : 10;
+
+  void _SetBodyPrefValue(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("bodyFiltered", value);
+  }
+
+  Future<String> _GetBodyPrefValue() async {
+    final SharedPreferences prefs = await _prefs;
+    return (prefs.getString("bodyFiltered") ?? "");
+  }
 
   void clearLists() {
     for (var key in _tasks.keys) {
@@ -52,6 +64,11 @@ class TaskListViewModel extends ChangeNotifier {
   Future<List<Task>?> nextPageListByStatus(
       BuildContext context, String status, String? user) async {
     return await fetchNextPageTasksFromUser(context, status, user);
+  }
+
+  Future<List<Task>?> nextPageFilteredListByStatus(
+      BuildContext context, String status, String? user, String encodedBody) async {
+    return await fetchNextPageFilteredTasksFromUser(context, status, user, encodedBody);
   }
 
   Future<List<Task>?> fetchTasksFromUser(
@@ -127,6 +144,41 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
+  Future<List<Task>?> fetchNextPageFilteredTasksFromUser(
+      BuildContext context, String status, String? user, String encodedBody) async {
+    final token = context.read<UserProvider>().getToken;
+    String? userName;
+    if (user == null) {
+      userName = context.read<UserProvider>().userName;
+    } else {
+      userName = user;
+    }
+    try {
+      _isLoading = true;
+      _error = false;
+      Map<String,dynamic> body = json.decode(encodedBody);
+
+      final responseListTask =
+          await _taskService.searchTasks(token!, body, page, size);
+
+      _tasks[status]?.addAll(responseListTask!);
+      final size_list = responseListTask?.length ?? 0;
+      if (size_list > 0) {
+        page++;
+      }
+      _SetActualPage(page);
+
+      return responseListTask;
+    } catch (error) {
+      _error = true;
+      print(error);
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<List<Task>?> fetchTasksFromFilters(
       BuildContext context, String status, Map<String, dynamic> body) async {
     final token = context.read<UserProvider>().getToken;
@@ -134,6 +186,8 @@ class TaskListViewModel extends ChangeNotifier {
       _isLoading = true;
       _error = false;
       notifyListeners();
+      String encodedMap = json.encode(body);
+      _SetBodyPrefValue(encodedMap);
 
       final responseListTask =
           await _taskService.searchTasks(token!, body, page, size);
@@ -147,6 +201,7 @@ class TaskListViewModel extends ChangeNotifier {
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
+      page++;
       notifyListeners();
     }
   }

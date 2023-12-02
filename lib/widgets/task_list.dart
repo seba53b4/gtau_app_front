@@ -30,6 +30,16 @@ class _TaskListComponentState extends State<TaskList> {
     prefs.setDouble("position", controller.position.pixels);
   }
 
+  void _SetBodyPrefValue(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("bodyFiltered", value);
+  }
+
+  Future<String> _GetBodyPrefValue() async {
+    final SharedPreferences prefs = await _prefs;
+    return (prefs.getString("bodyFiltered") ?? "");
+  }
+
   _SetActualTasksLength(int length) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt("tasks_length", length);
@@ -97,6 +107,12 @@ class _TaskListComponentState extends State<TaskList> {
     await taskListViewModel?.nextPageListByStatus(context, status!, userName);
   }
 
+  Future updateTaskListFilteredState(BuildContext context, String encodedBody) async {
+    final userName = taskFilterProvider?.userNameFilter;
+    final status = taskFilterProvider?.lastStatus;
+    await taskListViewModel?.nextPageFilteredListByStatus(context, status!, userName, encodedBody);
+  }
+
   @override
   Widget build(BuildContext context) {
     taskFilterProvider?.setLastStatus(widget.status);
@@ -104,7 +120,7 @@ class _TaskListComponentState extends State<TaskList> {
     return Container(
         margin: const EdgeInsets.only(bottom: 0),
         child: FutureBuilder(
-          future: Future.wait([initScroll(), _GetFilteredValue()]),
+          future: Future.wait([initScroll(), _GetFilteredValue(), _GetBodyPrefValue()]),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var position = snapshot.data?[0] as double;
@@ -122,11 +138,19 @@ class _TaskListComponentState extends State<TaskList> {
                     if ((controller.position.maxScrollExtent ==
                             controller.offset) &&
                         tasks!.length % taskListSize! == 0 &&
-                        nextPage &&
-                        isFiltered == false) {
-                      setState(() {
-                        updateTaskListState(context);
-                      });
+                        nextPage) {
+                          if(isFiltered == true){
+                            setState(() {
+                              final encodedBodyFiltered = snapshot.data?[2] as String;
+                              updateTaskListFilteredState(context, encodedBodyFiltered);
+                            });   
+                          }else{
+                            setState(() {
+                              updateTaskListState(context);
+                            });                            
+                          }
+                          
+                      
                       _SetActualTasksLength(tasksLength);
                     }
                   });
@@ -167,8 +191,7 @@ class _TaskListComponentState extends State<TaskList> {
                                               snapshot.data?[0] ?? true;
                                           var isFiltered =
                                               snapshot.data?[1] ?? false;
-                                          if (existNextPage == true &&
-                                              isFiltered == false) {
+                                          if (existNextPage == true) {
                                                 return const Padding(
                                                     padding: EdgeInsets.symmetric(
                                                         vertical: 32),
