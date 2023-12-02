@@ -55,7 +55,6 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         _tabController.animateTo(_currentIndex);
       }
 
-      print(_currentIndex);
       return SizedBox(
         width: 120,
         child: Scaffold(
