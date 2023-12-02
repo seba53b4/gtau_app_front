@@ -31,6 +31,7 @@ class TaskListViewModel extends ChangeNotifier {
   int page = 0;
   int size = kIsWeb ? 12 : 10;
 
+
   void _SetBodyPrefValue(String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("bodyFiltered", value);
