@@ -41,6 +41,11 @@ class _TaskListComponentState extends State<TaskList> {
     return (prefs.getString("bodyFiltered") ?? "");
   }
 
+  void _SetIsLoadingPrefValue(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("is_loading", value);
+  }
+
   Future<int> _GetActualPage() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getInt("actual_page") ?? 1);
@@ -79,6 +84,12 @@ class _TaskListComponentState extends State<TaskList> {
     return (prefs.getBool("isFiltered") ?? false);
   }
 
+  Future<bool> _GetIsLoadingValue() async {
+    final SharedPreferences prefs = await _prefs;
+    return (prefs.getBool("is_loading") ?? false);
+  }
+
+
   Future<double> initScroll() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getDouble("position") ?? 0.0);
@@ -106,6 +117,7 @@ class _TaskListComponentState extends State<TaskList> {
   }
 
   bool nextPage = true;
+  bool isLoadingNow = false;
 
   Future updateTaskListState(BuildContext context) async {
     final userName = taskFilterProvider?.userNameFilter;
@@ -131,12 +143,13 @@ class _TaskListComponentState extends State<TaskList> {
             widthFactor: 0.5,
             child: FutureBuilder(
               future: Future.wait(
-                  [initScroll(), _GetFilteredValue(), _GetBodyPrefValue(), _GetActualPage()]),
+                  [initScroll(), _GetFilteredValue(), _GetBodyPrefValue(), _GetActualPage(), _GetIsLoadingValue()]),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var position = snapshot.data?[0] as double;
                   var isFiltered = snapshot.data?[1] ?? false;
                   var actualPage = snapshot.data?[3] as int;
+                  var isLoading= snapshot.data?[4] as bool; 
                   return Consumer<TaskListViewModel>(
                     builder: (context, taskListViewModel, child) {
                       var tasks = taskListViewModel.tasks[widget.status];
@@ -184,7 +197,9 @@ class _TaskListComponentState extends State<TaskList> {
                                       scaffoldKey: widget.scaffoldKey);
                                 } else {
                                   if (tasksLength == 1) {
-                                    return Padding(
+                                    return Visibility(
+                                      visible: !isLoading,
+                                      child: Padding(
                                                     padding:
                                                         const EdgeInsets.symmetric(
                                                             vertical: 5, horizontal:15),
@@ -192,7 +207,7 @@ class _TaskListComponentState extends State<TaskList> {
                                                         child:Column(
                                                             children: <Widget>[
                                                               Padding(
-                                                                padding:EdgeInsets.symmetric(vertical: 10),
+                                                                padding:EdgeInsets.symmetric(vertical: 10, horizontal:15),
                                                                 child: SvgPicture.asset('lib/assets/taskslists_notfound_small.svg', width: 50, height: 50),
                                                               ),
                                                               isFiltered==true ? Text(AppLocalizations.of(context)!
@@ -205,7 +220,10 @@ class _TaskListComponentState extends State<TaskList> {
                                                         ]
                                                         )
                                                       )
-                                                    );
+                                                    ),
+                                    );
+                                    
+                                    ;
                                   } else {
                                     var comp =
                                         tasks.length % taskListSize! == 0;

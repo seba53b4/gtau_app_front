@@ -37,6 +37,11 @@ class TaskListViewModel extends ChangeNotifier {
     prefs.setString("bodyFiltered", value);
   }
 
+  void _SetIsLoadingPrefValue(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("is_loading", value);
+  }
+
   Future<String> _GetBodyPrefValue() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getString("bodyFiltered") ?? "");
@@ -82,9 +87,10 @@ class TaskListViewModel extends ChangeNotifier {
       userName = user;
     }
     try {
-      
+      _SetIsLoadingPrefValue(true);
       _error = false;
       _isLoading = true;
+      
 
       notifyListeners();
       final responseListTask =
@@ -97,9 +103,11 @@ class TaskListViewModel extends ChangeNotifier {
     } catch (error) {
       _error = true;
       print(error);
+      _SetIsLoadingPrefValue(false);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
+      _SetIsLoadingPrefValue(false);
       page++;
       notifyListeners();
     }
@@ -184,6 +192,7 @@ class TaskListViewModel extends ChangeNotifier {
     final token = context.read<UserProvider>().getToken;
     try {
       _isLoading = true;
+      _SetIsLoadingPrefValue(true);
       _error = false;
       notifyListeners();
       String encodedMap = json.encode(body);
@@ -197,10 +206,12 @@ class TaskListViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
+      _SetIsLoadingPrefValue(false);
       print(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
+      _SetIsLoadingPrefValue(false);
       page++;
       notifyListeners();
     }
@@ -232,6 +243,7 @@ class TaskListViewModel extends ChangeNotifier {
 
   Future<Task?> fetchTask(token, int idTask) async {
     try {
+      _SetIsLoadingPrefValue(true);
       _isLoading = true;
       _error = false;
       notifyListeners();
@@ -246,12 +258,14 @@ class TaskListViewModel extends ChangeNotifier {
         return null;
       }
     } catch (error) {
+      _SetIsLoadingPrefValue(false);
       _error = true;
       if (kDebugMode) {
         print(error);
       }
       throw Exception('Error al obtener los datos');
     } finally {
+      _SetIsLoadingPrefValue(false);
       _isLoading = false;
       notifyListeners();
     }
@@ -260,6 +274,7 @@ class TaskListViewModel extends ChangeNotifier {
   Future<bool> updateTask(
       String token, int idTask, Map<String, dynamic> body) async {
     try {
+      _SetIsLoadingPrefValue(true);
       _isLoading = true;
       _error = false;
       notifyListeners();
@@ -274,10 +289,12 @@ class TaskListViewModel extends ChangeNotifier {
         return false;
       }
     } catch (error) {
+      _SetIsLoadingPrefValue(false);
       _error = true;
       print(error);
       throw Exception('Error al obtener los datos');
     } finally {
+      _SetIsLoadingPrefValue(false);
       _isLoading = false;
       notifyListeners();
     }
