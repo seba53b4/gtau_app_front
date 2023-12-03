@@ -153,5 +153,5 @@
     "error_generic_text": "Algo salió mal",
     "error_service_not_available": "Servicio no disponible",
     "no_more_tasks_found": "No hay mas tareas para mostrar",
-    "no_tasks_found_filter": "No se ha encontrado ninguna tarea que cumpla con los requerimientos"
+    "no_tasks_found_filter": "No se ha encontrado ninguna tarea que cumpla con los requisitos"
 }
