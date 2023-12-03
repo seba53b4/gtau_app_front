@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/task_list_item.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import 'loading_component.dart';
@@ -38,6 +39,11 @@ class _TaskListComponentState extends State<TaskList> {
   Future<String> _GetBodyPrefValue() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getString("bodyFiltered") ?? "");
+  }
+
+  Future<int> _GetActualPage() async {
+    final SharedPreferences prefs = await _prefs;
+    return (prefs.getInt("actual_page") ?? 1);
   }
 
   _SetActualTasksLength(int length) async {
@@ -125,11 +131,12 @@ class _TaskListComponentState extends State<TaskList> {
             widthFactor: 0.5,
             child: FutureBuilder(
               future: Future.wait(
-                  [initScroll(), _GetFilteredValue(), _GetBodyPrefValue()]),
+                  [initScroll(), _GetFilteredValue(), _GetBodyPrefValue(), _GetActualPage()]),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var position = snapshot.data?[0] as double;
                   var isFiltered = snapshot.data?[1] ?? false;
+                  var actualPage = snapshot.data?[3] as int;
                   return Consumer<TaskListViewModel>(
                     builder: (context, taskListViewModel, child) {
                       var tasks = taskListViewModel.tasks[widget.status];
@@ -178,12 +185,27 @@ class _TaskListComponentState extends State<TaskList> {
                                 } else {
                                   if (tasksLength == 1) {
                                     return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 32),
-                                        child: Center(
-                                            child: Text(
-                                                AppLocalizations.of(context)!
-                                                    .emptyTaskList)));
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                            vertical: 5, horizontal:15),
+                                                    child: Center(
+                                                        child:Column(
+                                                            children: <Widget>[
+                                                              Padding(
+                                                                padding:EdgeInsets.symmetric(vertical: 10),
+                                                                child: SvgPicture.asset('lib/assets/taskslists_notfound_small.svg', width: 50, height: 50),
+                                                              ),
+                                                              isFiltered==true ? Text(AppLocalizations.of(context)!
+                                                              .no_tasks_found_filter, textAlign: TextAlign.center,
+                                                          style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15)) : 
+                                                          Text(AppLocalizations.of(context)!
+                                                              .emptyTaskList,
+                                                          style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15))
+                                                          ,
+                                                        ]
+                                                        )
+                                                      )
+                                                    );
                                   } else {
                                     var comp =
                                         tasks.length % taskListSize! == 0;
@@ -201,13 +223,15 @@ class _TaskListComponentState extends State<TaskList> {
                                               var isFiltered =
                                                   snapshot.data?[1] ?? false;
                                               if (existNextPage == true) {
-                                                return const Padding(
+                                                return Padding(
                                                     padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 32),
+                                                        const EdgeInsets.symmetric(
+                                                            vertical: 5),
                                                     child: Center(
                                                         child:
-                                                            CircularProgressIndicator()));
+                                                            Lottie.asset('lib/assets/three_dots_loading_fast.json',
+                                                            width: 64,
+                                                            height: 64,)));
                                               } else {
                                                 _SetFilteredValue(false);
                                                 return const Padding(
@@ -219,6 +243,33 @@ class _TaskListComponentState extends State<TaskList> {
                                               return const LoadingWidget();
                                             }
                                           });
+                                    }else{
+                                      if(actualPage > 1){
+                                        return Padding(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                            vertical: 5),
+                                                    child: Center(
+                                                        child:Column(
+                                                            children: <Widget>[
+                                                              Padding(
+                                                                padding:EdgeInsets.symmetric(vertical: 10),
+                                                                child: SvgPicture.asset('lib/assets/taskslist_empty.svg', width: 50, height: 50),
+                                                              ),
+                                                              Text(AppLocalizations.of(context)!
+                                                              .no_more_tasks_found,
+                                                          style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15)),
+                                                        ]
+                                                        )
+                                                      )
+                                                    );
+                                      }else{
+                                        return const Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 0),);
+                                      }
+                                                      
                                     }
                                   }
                                 }
