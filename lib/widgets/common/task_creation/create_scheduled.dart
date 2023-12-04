@@ -8,6 +8,7 @@ import '../../../utils/date_utils.dart';
 import '../custom_dropdown.dart';
 import '../custom_elevated_button.dart';
 import '../custom_text_form_field.dart';
+import '../file_upload_component.dart';
 
 class CreateScheduled extends StatefulWidget {
   const CreateScheduled({Key? key}) : super(key: key);
@@ -23,6 +24,7 @@ class _CreateScheduledState extends State<CreateScheduled> {
   final numWorkController = TextEditingController();
   final observationsController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late List<Map<String, dynamic>> geometriesFromFile = [];
   late String taskStatus = 'PENDING';
   late DateTime? startDate;
   late DateTime? endDate;
@@ -60,6 +62,7 @@ class _CreateScheduledState extends State<CreateScheduled> {
   @override
   Widget build(BuildContext context) {
     double widthRow = 640;
+    double heightRow = 128;
 
     return Column(children: [
       BoxContainer(
@@ -215,6 +218,16 @@ class _CreateScheduledState extends State<CreateScheduled> {
                         .default_observationsPlaceholder,
                     controller: observationsController,
                   ),
+                  const SizedBox(height: 10.0),
+                  FileUploadComponent(
+                    onFileAdded: (List<Map<String, dynamic>> geometries) {
+                      setState(() {
+                        geometriesFromFile = geometries;
+                      });
+                      print(
+                          'GeoJsonSrc en el widget padre: $geometriesFromFile');
+                    },
+                  ),
                 ],
               ),
             ],
@@ -223,7 +236,7 @@ class _CreateScheduledState extends State<CreateScheduled> {
       ),
       const SizedBox(height: AppConstants.taskColumnSpace),
       CustomElevatedButton(
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {}
         },
         text: AppLocalizations.of(context)!.buttonAcceptLabel,
