@@ -1,9 +1,15 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gallery_image_viewer/gallery_image_viewer.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:gtau_app_front/dto/image_data.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +32,8 @@ class _ImageGalleryModalState extends State<ImageGalleryModal> {
   List<Photo> photos;
 
   _ImageGalleryModalState(this.idTask, this.photos);
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +62,9 @@ class _GelleryShow extends StatefulWidget {
 class _GelleryShowState extends State<_GelleryShow> {
   int? idTask;
   List<Photo> photos;
+   _GelleryShowState(this.idTask, this.photos);
 
-  _GelleryShowState(this.idTask, this.photos);
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void didChangeDependencies() {
@@ -134,6 +143,13 @@ class _GelleryShowState extends State<_GelleryShow> {
                 );
               }),
             ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => _selectPhoto(),
+              foregroundColor: null,
+              backgroundColor: null,
+              shape: null,
+              child: const Icon(Icons.filter_alt_rounded),
+            ),
             bottomNavigationBar: photos.any((photo) => photo.isSelected)
                 ? BottomNavigationBar(
                     items: [
@@ -164,6 +180,106 @@ class _GelleryShowState extends State<_GelleryShow> {
                 : null,
           ));
     });
+  }
+
+  void _selectPhoto() async {
+    if (kIsWeb) {
+      await _pickImage(ImageSource.gallery);
+    } else {
+      await showModalBottomSheet(
+          context: context,
+          builder: (context) => BottomSheet(
+                builder: (context) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                        leading: const Icon(Icons.camera),
+                        title: Text(AppLocalizations.of(context)!.from_camera),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await _pickImage(ImageSource.camera);
+                        }),
+                    ListTile(
+                        leading: const Icon(Icons.filter),
+                        title: Text(AppLocalizations.of(context)!.pick_a_file),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await _pickImage(ImageSource.gallery);
+                        }),
+                  ],
+                ),
+                onClosing: () {},
+              ));
+    }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      if (source == ImageSource.camera) {
+        XFile? pickedFile =
+            await _picker.pickImage(source: source, imageQuality: 50);
+        if (pickedFile == null) {
+          // Manejo de caso en el que no se seleccionó ningún archivo.
+          return;
+        }
+        Image temporaryfile = kIsWeb
+            ? Image.network(pickedFile.path)
+            : Image.file(File(pickedFile.path));
+        ImageDataDTO imageDataDTO = ImageDataDTO(
+            image: temporaryfile, path: pickedFile.path, fromBlob: false);
+        setState(() {
+          print('hace algo con el imagedataDTO, camara');
+        });
+        print('notificar cambios');
+      } else {
+        final List<XFile> images =
+            await _picker.pickMultiImage(imageQuality: 50);
+        if (images.isEmpty) {
+          // Manejo de caso en el que no se seleccionó ningún archivo.
+          return;
+        }
+
+        List<ImageDataDTO>? temporaryFiles = images
+            .map((val) => kIsWeb
+                ? ImageDataDTO(
+                    image: Image.network(val.path),
+                    path: val.path,
+                    fromBlob: false)
+                : ImageDataDTO(
+                    image: Image.file(File(val.path)),
+                    path: val.path,
+                    fromBlob: false))
+            .toList();
+
+        setState(() {
+          this.processImages(temporaryFiles);
+        });
+        _initializeData();
+        print('await updateImages()');
+      }
+      // Resto del código para comprimir y establecer la imagen.
+    } on PlatformException catch (e) {
+      print('Error al seleccionar la imagen: $e');
+    } catch (error) {
+      print('Error inesperado: $error');
+    }
+  }
+
+  void processImages(List<ImageDataDTO> temporaryFilesToUpload) {
+    if (temporaryFilesToUpload != null) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final imagesViewModel =
+          Provider.of<ImagesViewModel>(context, listen: false);
+      temporaryFilesToUpload!.forEach((image) async {
+        try {
+          final response = await imagesViewModel.uploadImage(
+              token!, widget.idTask!, image.getPath);
+        } catch (error) {
+          print(error);
+          throw Exception('Error al subir imagen');
+        }
+      });
+    }
   }
 
   void _deleteSelectedImages(List<Photo> photos) {
