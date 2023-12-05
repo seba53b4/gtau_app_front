@@ -6,6 +6,7 @@ import '../../../constants/theme_constants.dart';
 import '../../../models/enums/element_type.dart';
 import '../../../providers/selected_items_provider.dart';
 import '../../../screens/TaskCreationScreen.dart';
+import '../../map_modal.dart';
 import 'entity_container.dart';
 
 class ElementsSelected extends StatelessWidget {
@@ -65,29 +66,34 @@ class ElementsSelected extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              elementsList.isNotEmpty
-                  ? Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: softGrey,
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      child: Wrap(
-                        spacing: 15.0,
-                        runSpacing: 15.0,
-                        children: elementsList,
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 12),
-                        Text(
-                          AppLocalizations.of(context)!.no_elements_registered,
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                      ],
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const MapModal(),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: softGrey,
+                      borderRadius: BorderRadius.circular(24.0),
                     ),
+                    child: Wrap(
+                      spacing: 15.0,
+                      runSpacing: 15.0,
+                      children: elementsList.isNotEmpty
+                          ? elementsList
+                          : [
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .no_elements_registered,
+                                style: const TextStyle(fontSize: 16.0),
+                              )
+                            ],
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 12),
             ],
           );
