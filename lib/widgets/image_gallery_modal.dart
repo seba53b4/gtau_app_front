@@ -9,6 +9,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gallery_image_viewer/gallery_image_viewer.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/dto/image_data.dart';
+import 'package:gtau_app_front/widgets/common/customDialog.dart';
+import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_view/photo_view.dart';
@@ -213,7 +215,7 @@ class _GelleryShowState extends State<_GelleryShow> {
                           this.photos = photos;
                         });
                       } else if (index == 1) {
-                        _deleteSelectedImages(photos);
+                        _showDeleteConfirmationDialog(context);
                       }
                     },
                     // Habilita o deshabilita el botón "Eliminar" según si hay imágenes seleccionadas o no
@@ -225,6 +227,43 @@ class _GelleryShowState extends State<_GelleryShow> {
       });
     
       
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    final showDialogContext = context;
+
+    await showCustomDialog(
+      context: showDialogContext,
+      title: AppLocalizations.of(showDialogContext)!.dialogWarning,
+      content: AppLocalizations.of(showDialogContext)!.dialogContent,
+      onDisablePressed: () {
+        Navigator.of(showDialogContext).pop();
+      },
+      onEnablePressed: () async {
+        Navigator.of(showDialogContext).pop();
+        bool result = await _deleteSelectedImages(photos);
+        print('resultado $result');
+
+        if (result == true) {
+          print('Imagen ha sido eliminada correctamente');
+          await showCustomMessageDialog(
+            context: showDialogContext,
+            messageType: DialogMessageType.success,
+            onAcceptPressed: () {},
+          );
+        } else {
+          print('No se pudo eliminar la imagen');
+          await showCustomMessageDialog(
+            context: showDialogContext,
+            messageType: DialogMessageType.error,
+            onAcceptPressed: () {},
+          );
+        }
+        await updateImageViewStateWithDelay(showDialogContext, 2);
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
   }
 
   void _selectPhoto() async {
@@ -388,26 +427,40 @@ class _GelleryShowState extends State<_GelleryShow> {
     
   }
 
-  void _deleteSelectedImages(List<Photo> photos) {
+  Future<bool> _deleteSelectedImages(List<Photo> photos) async{
+    bool isLoadingDelete;
+    bool deleteImage = false;
     final selectedImages = photos.where((photo) => photo.isSelected).toList();
     if (selectedImages.isNotEmpty) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
       final imagesViewModel =
           Provider.of<ImagesViewModel>(context, listen: false);
 
-      photos.forEach((photo) async {
+      final len = photos.length;
+      int cont = 0;
+      isLoadingDelete = true;
+      for(var photo in photos) {
+        cont++;
         if (photo.isSelected) {
-          bool deleteImage = await imagesViewModel.deleteImage(
+          deleteImage = await imagesViewModel.deleteImage(
               token!, this.idTask!, photo.url);
-          if (!deleteImage) {
+          print('resultado interno: $deleteImage');
+          /*if (deleteImage == false) {
             photo.isSelected = false;
-          }
+          }*/
         }
-      });
+        if(cont == len){
+          return deleteImage;
+        }
+      }
+      isLoadingDelete = false;
       setState(() {
         photos.removeWhere((photo) => photo.isSelected);
       });
+      return deleteImage;
     }
+    print('resultado interno2: $deleteImage');
+    return deleteImage;
   }
 }
 
