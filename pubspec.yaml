@@ -38,6 +38,7 @@ dependencies:
   searchfield: ^0.8.7
   lottie: ^2.7.0
   flutter_svg: ^2.0.9
+  file_picker: ^6.1.1
 dev_dependencies:
   hive_generator:
   build_runner:
