@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
+import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
@@ -15,6 +16,7 @@ import '../constants/theme_constants.dart';
 import '../dto/image_data.dart';
 import '../models/enums/element_type.dart';
 import '../models/task.dart';
+import '../navigation/navigation.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../utils/colorUtils.dart';
@@ -31,6 +33,7 @@ import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
 import '../widgets/map_modal_location_select.dart';
 import '../widgets/user_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -112,9 +115,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     addDateController.dispose();
     releasedDateController.dispose();
     _scrollController.dispose();
-    if (selectedItemsProvider != null) {
-      selectedItemsProvider!.reset();
-    }
+    selectedItemsProvider?.reset();
+
     super.dispose();
   }
 
@@ -124,9 +126,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-        initializeTask();
+        await initializeTask();
       });
       Hive.initFlutter().then((value) => null);
     } else {
@@ -143,7 +145,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       final selectedItemsProvider = context.read<SelectedItemsProvider>();
       final responseTask =
           await taskListViewModel.fetchTask(token, widget.idTask!);
-
       if (responseTask != null) {
         setState(() {
           task = responseTask;
@@ -185,10 +186,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       final response = await taskListViewModel.createTask(token!, body);
       if (response) {
         print('Tarea ha sido creada correctamente');
-        showMessageDialog(DialogMessageType.success);
+        await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        showMessageDialog(DialogMessageType.error);
+        await showMessageDialog(DialogMessageType.error);
         print('No se pudieron traer datos');
         return false;
       }
@@ -228,11 +229,39 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   Future<void> showMessageDialog(DialogMessageType type) async {
     await showCustomMessageDialog(
-        context: context, messageType: type, onAcceptPressed: () {});
+        context: context,
+        messageType: type,
+        onAcceptPressed: () {
+          if (type == DialogMessageType.success && !widget.detail) {
+            Widget nav =
+                kIsWeb ? const NavigationWeb() : const BottomNavigation();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => nav),
+            );
+          }
+        });
   }
 
   Future<void> initializeTask() async {
-    await _fetchTask();
+    await _fetchTask().catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {
+          Navigator.of(context).pop();
+        },
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    });
+  }
+
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  Future<bool> _ResetPrefs() async {
+    final SharedPreferences prefs = await _prefs;
+    return prefs.clear();
   }
 
   void handleStartDateChange(DateTime date) {
@@ -369,6 +398,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    _ResetPrefs();
     await updateTaskList();
   }
 
@@ -395,15 +425,30 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
-    await updateTaskList();
+    _ResetPrefs();
+  }
+
+  Future resetTaskList() async {
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final status =
+        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+    final taskListViewModel =
+        Provider.of<TaskListViewModel>(context, listen: false);
+    taskListViewModel.clearListByStatus(status!);
+    await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   Future updateTaskList() async {
+    final taskFilterProvider =
+        Provider.of<TaskFilterProvider>(context, listen: false);
     final userName =
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
-    await taskListViewModel.initializeTasks(context, initStatus, userName);
+    final status = taskFilterProvider.lastStatus;
+    taskListViewModel.clearListByStatus(status!);
+    await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   void handleEditTask() {
@@ -448,7 +493,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   @override
   Widget build(BuildContext context) {
     double widthRow = 640;
-    double heightrow = 128;
+    double heightRow = 128;
 
     return Consumer<TaskListViewModel>(
         builder: (context, taskListViewModel, child) {
@@ -500,7 +545,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             const SizedBox(height: 24.0),
                             // Primera fila
                             SizedBox(
-                              height: heightrow,
+                              height: heightRow,
                               width: widthRow,
                               child: Row(
                                   mainAxisAlignment:
@@ -587,7 +632,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ),
                             // Segunda fila
                             SizedBox(
-                              height: heightrow,
+                              height: heightRow,
                               width: widthRow,
                               child: Row(
                                 mainAxisAlignment:
@@ -688,7 +733,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_descriptionPlaceholder,
                                   controller: descriptionController,
@@ -928,7 +973,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   maxLines: 10,
                                   fontSize: 12,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_descriptionPlaceholder,
                                   controller: descriptionController,
@@ -1198,7 +1243,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_observationsPlaceholder,
                                   controller: observationsController,
@@ -1215,7 +1260,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   isTextBox: true,
                                   maxLines: 10,
                                   width: widthRow,
-                                  height: heightrow,
+                                  height: heightRow,
                                   hintText: AppLocalizations.of(context)!
                                       .default_conclusionsPlaceholder,
                                   controller: conclusionsController,

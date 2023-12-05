@@ -185,11 +185,11 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters.clear();
     _initialSelectedCatchments.clear();
     _initialSelectedLots.clear();
+    notifyListeners();
   }
 
   void reset() {
     clearAll();
     _letMultipleItemsSelected = false;
-    notifyListeners();
   }
 }

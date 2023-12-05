@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
-import 'package:gtau_app_front/widgets/TaskList.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
+import 'common/customMessageDialog.dart';
 
 class TaskStatusDashboard extends StatefulWidget {
   final String? userName;
@@ -19,8 +21,11 @@ class TaskStatusDashboard extends StatefulWidget {
   _TaskStatusDashboard createState() => _TaskStatusDashboard();
 }
 
-class _TaskStatusDashboard extends State<TaskStatusDashboard> {
+class _TaskStatusDashboard extends State<TaskStatusDashboard>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -28,6 +33,12 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       updateTaskListState(TaskStatus.Pending.value);
     });
+    _tabController = TabController(vsync: this, length: 4);
+  }
+
+  Future<bool> _clearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
   }
 
   @override
@@ -37,18 +48,23 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     taskFilterProvider.setUserNameFilter(widget.userName);
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
+    return Consumer<TaskFilterProvider>(
+        builder: (context, taskFilterProvider, child) {
+      var newIndex = taskFilterProvider.getCurrentIndex();
+      if (_currentIndex != newIndex) {
+        _currentIndex = newIndex;
+        _tabController.animateTo(_currentIndex);
+      }
 
-    return SizedBox(
-      width: 120,
-      child: DefaultTabController(
-        length: 4,
-        initialIndex: 0,
+      return SizedBox(
+        width: 120,
         child: Scaffold(
           key: scaffoldKeyDashboard,
           appBar: AppBar(
             backgroundColor: primarySwatch[200],
             toolbarHeight: 0,
             bottom: TabBar(
+              controller: _tabController,
               indicatorColor: lightBackground,
               labelColor: Colors.white,
               labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
@@ -72,11 +88,15 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
                 ),
               ],
               onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-                String status = getTaskStatusSelected();
-                updateTaskListState(status);
+                if (_currentIndex != index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                  _clearPref();
+                  String status = getTaskStatusSelected(index);
+                  taskFilterProvider.setLastStatus(status);
+                  updateTaskListState(status);
+                }
               },
             ),
           ),
@@ -88,12 +108,17 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
             );
           }),
         ),
-      ),
-    );
+      );
+    });
   }
 
-  String getTaskStatusSelected() {
-    switch (_currentIndex) {
+  Future<void> resetScrollPosition() async {
+    final SharedPreferences prefs = await _prefs;
+    prefs.clear();
+  }
+
+  String getTaskStatusSelected(int index) {
+    switch (index) {
       case 0:
         return TaskStatus.Pending.value;
       case 1:
@@ -108,6 +133,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
   }
 
   Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
+    /*resetScrollPosition();*/
     switch (_currentIndex) {
       case 0:
         return _buildTaskList(TaskStatus.Pending.value, _scaffoldKeyDashboard);
@@ -128,7 +154,18 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard> {
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status);
-    await taskListViewModel.initializeTasks(context, status, userName);
+    await taskListViewModel
+        .initializeTasks(context, status, userName)
+        .catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    });
+    ;
   }
 
   Widget _buildTaskList(

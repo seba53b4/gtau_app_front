@@ -11,41 +11,41 @@ import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
+import '../providers/task_filters_provider.dart';
+import '../services/auth_service.dart';
+import '../widgets/common/customMessageDialog.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_taost.dart';
 import '../widgets/common/custom_textfield.dart';
 import '../widgets/loading_overlay.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  LoginScreen({Key? key}) : super(key: key);
 
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  late AuthData? authData;
+  late AuthResult? authData;
+  bool onError = false;
 
-  Future<AuthData?> _fetchAuth(
-      BuildContext context, String username, String password) async {
-    if (username.isEmpty || password.isEmpty) {
-      _showWrongCredentialsToast(context);
-      return null;
-    }
-
-    try {
-      final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-      final responseAuthData =
-          await authViewModel.fetchAuth(username, password);
-
-      if (responseAuthData != null) {
-        return responseAuthData;
-      } else {
-        print('Contraseña incorrecta');
-        _showWrongCredentialsToast(context);
-        return null;
-      }
-    } catch (error) {
-      print(error);
-      throw Exception('Error al obtener los datos');
-    }
+  Future<AuthResult?> _fetchAuth(BuildContext context, String username,
+      String password) async {
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    return await authViewModel
+        .fetchAuth(username, password)
+        .catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_service_not_available,
+        messageType: DialogMessageType.error,
+      );
+    });
   }
 
   _showWrongCredentialsToast(BuildContext context) {
@@ -60,6 +60,8 @@ class LoginScreen extends StatelessWidget {
   void setUserData(BuildContext context, bool isLoggedIn, String username,
       AuthData authData, bool isAdmin) {
     if (isLoggedIn) {
+      final filterProvider = context.read<TaskFilterProvider>();
+      filterProvider.setUserNameFilter(username);
       final userStateProvider = context.read<UserProvider>();
       userStateProvider.updateUserState(UserState(
           username: username,
@@ -87,39 +89,45 @@ class LoginScreen extends StatelessWidget {
     final String username = usernameController.text;
     final String password = passwordController.text;
 
-    AuthData? authData = await _fetchAuth(context, username, password);
-    if (context.mounted && authData != null) {
-      setUserData(context, true, username, authData,
+    if ((username.isEmpty || password.isEmpty)) {
+      await _showWrongCredentialsToast(context);
+      return null;
+    }
+
+    AuthResult? authResponse = await _fetchAuth(context, username, password);
+
+    if (context.mounted && authResponse?.authData != null) {
+      setUserData(context, true, username, authResponse!.authData!,
           username == 'gtau-admin' ? true : false);
       goToNav(context);
+    } else {
+      setState(() {
+        onError = true;
+      });
+      if (authResponse!.statusCode == 401) {
+        CustomToast.show(
+          context,
+          title: AppLocalizations.of(context)!.error,
+          message: AppLocalizations.of(context)!.login_error_auth,
+          type: MessageType.error,
+        );
+      } else {
+        await showCustomMessageDialog(
+          context: context,
+          onAcceptPressed: () {},
+          customText: AppLocalizations.of(context)!.error_service_not_available,
+          messageType: DialogMessageType.error,
+        );
+      }
     }
   }
 
-  void onForgotPressed(BuildContext context) {
-    // CustomToast.show(
-    //   context,
-    //   title: 'Advertencia',
-    //   message: 'Olvidaste tu contraseña :D',
-    //   type: MessageType.warning,
-    // );
-  }
+  void onForgotPressed(BuildContext context) {}
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthViewModel>(builder: (context, authviewModel, child) {
       bool isLoading = authviewModel.isLoading;
-      bool hasError = authviewModel.error;
-
-      if (hasError) {
-        Future.delayed(Duration.zero, () {
-          CustomToast.show(
-            context,
-            title: AppLocalizations.of(context)!.error,
-            message: AppLocalizations.of(context)!.login_error_auth,
-            type: MessageType.error,
-          );
-        });
-      }
 
       return LoadingOverlay(
         isLoading: isLoading,
@@ -129,8 +137,8 @@ class LoginScreen extends StatelessWidget {
             child: Center(
               child: BoxContainer(
                 width: kIsWeb ? 400 : 340,
-                height: kIsWeb ? 400 : 368,
-                padding: const EdgeInsets.all(16.0),
+                height: kIsWeb ? 400 : 360,
+                padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -143,7 +151,7 @@ class LoginScreen extends StatelessWidget {
                           .default_input_username_hint,
                       keyboardType: TextInputType.text,
                       obscureText: false,
-                      hasError: hasError,
+                      hasError: onError,
                     ),
                     CustomTextField(
                       controller: passwordController,
@@ -151,14 +159,19 @@ class LoginScreen extends StatelessWidget {
                           .default_input_password_hint,
                       keyboardType: TextInputType.text,
                       obscureText: true,
-                      hasError: hasError,
+                      hasError: onError,
                     ),
                     const SizedBox(height: 16.0),
                     CustomElevatedButton(
-                        onPressed: () => onLogInPressed(context),
+                        onPressed: () {
+                          setState(() {
+                            onError = false;
+                          });
+                          onLogInPressed(context);
+                        },
                         text:
-                            AppLocalizations.of(context)!.default_login_button),
-                    const SizedBox(height: 16.0),
+                        AppLocalizations.of(context)!.default_login_button),
+                    const SizedBox(height: kIsWeb ? 24 : 4),
                     TextButton(
                         onPressed: () => onForgotPressed(context),
                         child: Text(AppLocalizations.of(context)!

@@ -93,7 +93,7 @@ class TaskListItem extends StatelessWidget {
                           style: TextStyle(fontSize: fontSize),
                         ),
                       )),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: kIsWeb ? 20 : 12),
                   Container(
                     height: dividerHeight,
                     width: 1,
@@ -102,8 +102,10 @@ class TaskListItem extends StatelessWidget {
                   ),
                   const SizedBox(width: 20),
                   Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                    child: Wrap(
+                      spacing: 8.0, // gap between adjacent chips
+                      runSpacing: 4.0, // gap between lines
+                      direction: Axis.vertical,
                       children: [
                         SizedBox(
                           width: taskInfoSpace,
@@ -199,14 +201,12 @@ class TaskListItem extends StatelessWidget {
   }
 
   Future updateTaskListState(BuildContext context) async {
-    final userName =
-        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final status =
-        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+        Provider.of<TaskFilterProvider>(context, listen: false).statusFilter;
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status!);
-    await taskListViewModel.initializeTasks(context, status, userName);
+    await taskListViewModel.initializeTasks(context, status, "");
   }
 
   Future<bool> _deleteTask(BuildContext context, int id) async {

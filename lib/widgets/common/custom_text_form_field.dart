@@ -4,7 +4,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/app_constants.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
   final String hintText;
   final TextInputType textInputType;
   final int maxLength;
@@ -16,9 +17,11 @@ class CustomTextFormField extends StatelessWidget {
   final double fontSize;
   final bool useValidation;
   final bool readOnly;
+  final VoidCallback? onTap;
 
   const CustomTextFormField({
-    required this.controller,
+    this.controller,
+    this.focusNode,
     required this.hintText,
     this.textInputType = TextInputType.text,
     this.maxLength = 12,
@@ -31,6 +34,7 @@ class CustomTextFormField extends StatelessWidget {
     this.fontSize = 16,
     this.useValidation = true,
     this.readOnly = false,
+    this.onTap,
   }) : super(key: key);
 
   String? _validateInput(BuildContext context, String? value) {
@@ -56,6 +60,8 @@ class CustomTextFormField extends StatelessWidget {
       width: width,
       height: height,
       child: TextFormField(
+        onTap: onTap,
+        focusNode: focusNode,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         maxLines: maxLines,
@@ -77,7 +83,8 @@ class CustomTextFormField extends StatelessWidget {
         enabled: !readOnly,
         //maxLength: maxLength,
         maxLengthEnforcement: MaxLengthEnforcement.none,
-        validator: (value) => _validateInput(context, value),
+        validator:
+            useValidation ? (value) => _validateInput(context, value) : null,
         autovalidateMode: AutovalidateMode.onUserInteraction,
       ),
     );

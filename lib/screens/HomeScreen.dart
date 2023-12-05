@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../providers/user_provider.dart';
+import '../widgets/filter_tasks.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
@@ -43,40 +44,54 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<bool> _clearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isAdmin = context.read<UserProvider>().isAdmin;
-
-    return isAdmin!
-        ? Container(
-            color: lightBackground,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextFormField(
-                    controller: _searchController,
-                    onChanged: _updateSearch,
-                    onFieldSubmitted: _updateSearchByEnter,
-                    decoration: const InputDecoration(
-                      labelText: 'Ingrese un nombre de usuario',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                _constraintBoxTaskDashboard(context, _enteredUsername)
-              ],
-            ),
-          )
-        : Container(
-            width: MediaQuery.of(context).size.width,
-            height: kIsWeb
-                ? MediaQuery.of(context).size.height * 0.78
-                : MediaQuery.of(context).size.height - 72,
-            color: lightBackground,
-            child: _constraintBoxTaskDashboard(context, _enteredUsername));
+    _clearPref();
+    return Scaffold(
+      body: Container(
+        color: lightBackground,
+        child: Center(
+          child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: kIsWeb
+                  ? MediaQuery.of(context).size.height * 0.78
+                  : MediaQuery.of(context).size.height - 72,
+              color: lightBackground,
+              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showFilterModal(context);
+        },
+        foregroundColor: null,
+        backgroundColor: null,
+        shape: null,
+        child: const Icon(Icons.filter_alt_rounded),
+      ),
+    );
   }
+}
+
+void _showFilterModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(50.0))),
+        child: SizedBox(
+          width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
+          child: const FilterTasks(),
+        ),
+      );
+    },
+  );
 }
 
 Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
