@@ -429,7 +429,7 @@ class _GelleryShowState extends State<_GelleryShow> {
 
   Future<bool> _deleteSelectedImages(List<Photo> photos) async{
     bool isLoadingDelete;
-    bool deleteImage = false;
+    bool deleteImage = true;
     final selectedImages = photos.where((photo) => photo.isSelected).toList();
     if (selectedImages.isNotEmpty) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
@@ -442,16 +442,15 @@ class _GelleryShowState extends State<_GelleryShow> {
       for(var photo in photos) {
         cont++;
         if (photo.isSelected) {
-          deleteImage = await imagesViewModel.deleteImage(
-              token!, this.idTask!, photo.url);
+          deleteImage = deleteImage && await imagesViewModel.deleteImage(token!, this.idTask!, photo.url);
           print('resultado interno: $deleteImage');
           /*if (deleteImage == false) {
             photo.isSelected = false;
           }*/
         }
-        if(cont == len){
+        /*if(cont == len){
           return deleteImage;
-        }
+        }*/
       }
       isLoadingDelete = false;
       setState(() {
@@ -459,8 +458,7 @@ class _GelleryShowState extends State<_GelleryShow> {
       });
       return deleteImage;
     }
-    print('resultado interno2: $deleteImage');
-    return deleteImage;
+    return false;
   }
 }
 
