@@ -73,16 +73,17 @@ class _CreateScheduledState extends State<CreateScheduled> {
           child: Column(
             children: [
               Text(
-                AppLocalizations.of(context)!.createTaskPage_scheduled,
+                AppLocalizations.of(context)!.scheduled_main_title,
                 style: const TextStyle(fontSize: 32.0),
               ),
               Column(
                 children: [
                   const SizedBox(height: 24.0),
-                  const Text(
-                    'Título',
-                    style: TextStyle(fontSize: 16.0),
+                  Text(
+                    AppLocalizations.of(context)!.scheduled_title_input,
+                    style: const TextStyle(fontSize: 16.0),
                   ),
+                  const SizedBox(height: 12.0),
                   CustomTextFormField(
                     width: widthRow,
                     hintText: AppLocalizations.of(context)!
@@ -140,7 +141,8 @@ class _CreateScheduledState extends State<CreateScheduled> {
                             const SizedBox(
                                 height: AppConstants.taskColumnSpace),
                             Text(
-                              'Fecha final',
+                              AppLocalizations.of(context)!
+                                  .scheduled_end_date_title,
                               style: const TextStyle(fontSize: 16.0),
                             ),
                             const SizedBox(height: 12.0),
@@ -165,7 +167,8 @@ class _CreateScheduledState extends State<CreateScheduled> {
                                   child: CustomTextFormField(
                                     useValidation: false,
                                     width: AppConstants.taskRowSpace,
-                                    hintText: 'Fecha fin',
+                                    hintText: AppLocalizations.of(context)!
+                                        .scheduled_end_date_title,
                                     controller: endDateController,
                                   ),
                                 ),
