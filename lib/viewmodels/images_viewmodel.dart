@@ -26,7 +26,7 @@ class ImagesViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
       final List<String> responseTask =
           await _taskService.fetchTaskImages(token, idTask);
       
