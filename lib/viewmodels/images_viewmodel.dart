@@ -41,6 +41,43 @@ class ImagesViewModel extends ChangeNotifier {
           print('No se pudieron traer datos');
         }
       }
+      
+      // Se usa Future.microtask para retrasar la llamada a notifyListeners()
+      Future.microtask(() {
+        _isLoading = false;
+        notifyListeners();
+      });
+      return responseTask;
+    } catch (error) {
+      _error = true;
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
+    }
+  }
+
+  Future<List<String>> fetchTaskImagesWithDelay(token, int idTask, int delaysec) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+      await new Future.delayed(Duration(seconds: delaysec));
+      final List<String> responseTask =
+          await _taskService.fetchTaskImages(token, idTask);
+      
+      final leng = responseTask.length;
+      print('largo response $leng');
+
+      if (responseTask.isNotEmpty) {
+        _photos = parsePhotos(responseTask);
+      } else {
+        _photos = [];
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+      }
+      
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
       Future.microtask(() {
         _isLoading = false;

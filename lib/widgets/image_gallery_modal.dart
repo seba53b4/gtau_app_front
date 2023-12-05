@@ -264,6 +264,12 @@ class _GelleryShowState extends State<_GelleryShow> {
         await imagesViewModel!.fetchTaskImages(token, idTask!);
   }
 
+  Future updateImageViewStateWithDelay(
+      BuildContext context, int delaysec) async {
+        final token = Provider.of<UserProvider>(context, listen: false).getToken;
+        await imagesViewModel!.fetchTaskImagesWithDelay(token, idTask!, delaysec);
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     try {
       if (source == ImageSource.camera) {
@@ -315,6 +321,7 @@ class _GelleryShowState extends State<_GelleryShow> {
   }
 
   void processImageSingular(ImageDataDTO temporaryFileToUpload) async {
+    final oldPhotosLength = photos.length;
     if (temporaryFileToUpload != null) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
       final imagesViewModel =
@@ -328,29 +335,19 @@ class _GelleryShowState extends State<_GelleryShow> {
         print(error);
         throw Exception('Error al subir imagen');
       }finally{
-        await new Future.delayed(const Duration(seconds: 2));
       }
       setState(() {
-        updateImageViewState(context);
+        updateImageViewStateWithDelay(context, 2);
+        if(photos.length != oldPhotosLength + 1){
+          updateImageViewStateWithDelay(context, 2);
+        }
       });
-      /*final tempFilesPaths = temporaryFilesToUpload.map((image) => {image.path}).toList(); 
-      try {
-          final response = await imagesViewModel.uploadImages(
-              token!, widget.idTask!, tempFilesPaths.cast<String>());
-          
-      } catch (error) {
-        print(error);
-        throw Exception('Error al subir imagen');
-      }finally{
-        setState(() {
-          updateImageViewState(context);
-        });
-      }*/
     }
     
   }
 
   void processImages(List<ImageDataDTO> temporaryFilesToUpload) async {
+    final oldPhotosLength = photos.length;
     if (temporaryFilesToUpload != null) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
       final imagesViewModel =
@@ -368,9 +365,11 @@ class _GelleryShowState extends State<_GelleryShow> {
           
         }
       });
-      await new Future.delayed(const Duration(seconds: 2));
       setState(() {
-        updateImageViewState(context);
+        updateImageViewStateWithDelay(context, temporaryFilesToUpload.length+1);
+        if(photos.length != oldPhotosLength + temporaryFilesToUpload.length){
+          updateImageViewStateWithDelay(context, 2);
+        }
       });
       /*final tempFilesPaths = temporaryFilesToUpload.map((image) => {image.path}).toList(); 
       try {
