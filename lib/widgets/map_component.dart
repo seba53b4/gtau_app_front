@@ -95,7 +95,14 @@ class _MapComponentState extends State<MapComponent> {
     _initializeLocation();
     if (widget.isModal) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        fetchAndUpdateData().then((value) => null);
+        if (sectionViewModel.hasSections() ||
+            lotViewModel.hasLots() ||
+            registerViewModel.hasRegisters() ||
+            catchmentViewModel.hasCatchment()) {
+          updateElementsOnMap();
+        } else {
+          fetchAndUpdateData().then((value) => null);
+        }
       });
     }
   }

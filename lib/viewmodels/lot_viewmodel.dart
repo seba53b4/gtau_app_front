@@ -22,8 +22,12 @@ class LotViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
-  Future<List<Lot>?> fetchLotsByRadius(
-      String token, double longitude, double latitude, int radiusMtr) async {
+  bool hasLots() {
+    return _lots.isNotEmpty;
+  }
+
+  Future<List<Lot>?> fetchLotsByRadius(String token, double longitude,
+      double latitude, int radiusMtr) async {
     try {
       _isLoading = true;
       notifyListeners();

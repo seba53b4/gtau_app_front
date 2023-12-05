@@ -21,6 +21,10 @@ class RegisterViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
+  bool hasRegisters() {
+    return _registers.isNotEmpty;
+  }
+
   Future<List<Register>?> fetchRegistersByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
