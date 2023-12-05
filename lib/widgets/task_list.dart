@@ -31,11 +31,6 @@ class _TaskListComponentState extends State<TaskList> {
     prefs.setDouble("position", controller.position.pixels);
   }
 
-  void _SetBodyPrefValue(String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString("bodyFiltered", value);
-  }
-
   Future<String> _GetBodyPrefValue() async {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getString("bodyFiltered") ?? "");
@@ -97,13 +92,11 @@ class _TaskListComponentState extends State<TaskList> {
 
   @override
   initState() {
-    /*initScroll();*/
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
@@ -225,8 +218,6 @@ class _TaskListComponentState extends State<TaskList> {
                                     
                                     ;
                                   } else {
-                                    var comp =
-                                        tasks.length % taskListSize! == 0;
                                     if (tasks.length % taskListSize! == 0 &&
                                         nextPage) {
                                       return FutureBuilder(
@@ -238,8 +229,6 @@ class _TaskListComponentState extends State<TaskList> {
                                             if (snapshot.hasData) {
                                               var existNextPage =
                                                   snapshot.data?[0] ?? true;
-                                              var isFiltered =
-                                                  snapshot.data?[1] ?? false;
                                               if (existNextPage == true) {
                                                 return Padding(
                                                     padding:

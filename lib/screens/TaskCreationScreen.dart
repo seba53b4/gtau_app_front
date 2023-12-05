@@ -10,16 +10,14 @@ import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
-import '../constants/theme_constants.dart';
 import '../dto/image_data.dart';
-import '../models/enums/element_type.dart';
 import '../models/task.dart';
 import '../navigation/navigation.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
-import '../utils/colorUtils.dart';
 import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
 import '../viewmodels/images_viewmodel.dart';
@@ -29,10 +27,11 @@ import '../widgets/common/custom_dropdown.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_text_form_field.dart';
 import '../widgets/common/custom_toggle_buttons.dart';
+import '../widgets/common/inspection_location_select.dart';
+import '../widgets/common/task_creation/create_scheduled.dart';
+import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/image_gallery_modal.dart';
-import '../widgets/map_modal.dart';
 import '../widgets/user_image.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -50,7 +49,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   late Task task;
   late DateTime? startDate;
   late DateTime? releasedDate;
-  int selectedIndex = 1;
+  int selectedIndex = 0;
   static const String notAssigned = "Sin asignar";
   String userAssigned = notAssigned;
   late String taskStatus = 'PENDING';
@@ -150,8 +149,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         });
       }
 
-      selectedItemsProvider.saveInitialSelections(
-          task.sections, task.registers, task.catchments, task.lots);
+      selectedItemsProvider.saveInitialSelections(task.sections, task.registers,
+          task.catchments, task.lots, task.position!);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -300,24 +299,27 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToCreate() {
-    final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+    var selectedItemsProvider = context.read<SelectedItemsProvider>();
+    final selectedSections = selectedItemsProvider.selectedPolylines;
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
 
-    final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+    final selectedCatchments = selectedItemsProvider.selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
 
-    final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+    final selectedRegisters = selectedItemsProvider.selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
 
-    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final selectedLots = selectedItemsProvider.selectedLots;
     final List<String> listSelectedLots =
         selectedLots.map((polylineId) => polylineId.value).toList();
+
+    final Map<String, dynamic> position = {
+      "latitud": selectedItemsProvider.inspectionPosition.longitude.toString(),
+      "longitud": selectedItemsProvider.inspectionPosition.longitude.toString()
+    };
 
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
@@ -332,7 +334,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "tramos": listSelectedSections,
       "captaciones": listSelectedCatchments,
       "registros": listSelectedRegisters,
-      "parcelas": listSelectedLots
+      "parcelas": listSelectedLots,
+      "position": position
     };
     return requestBody;
   }
@@ -342,21 +345,26 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     late String? releasedDateSelected = releasedDateController.text.isNotEmpty
         ? formattedDateToUpdate(releasedDateController.text)
         : null;
-    final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+
+    var selectedItemsProvider = context.read<SelectedItemsProvider>();
+
+    final selectedSections = selectedItemsProvider.selectedPolylines;
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
-    final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+    final selectedCatchments = selectedItemsProvider.selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
-    final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+    final selectedRegisters = selectedItemsProvider.selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
-    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final selectedLots = selectedItemsProvider.selectedLots;
     final List<String> listSelectedLots =
         selectedLots.map((polylineId) => polylineId.value).toList();
+
+    final Map<String, dynamic> position = {
+      "latitud": selectedItemsProvider.inspectionPosition.latitude,
+      "longitud": selectedItemsProvider.inspectionPosition.longitude
+    };
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -376,6 +384,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "captaciones": listSelectedCatchments,
       "registros": listSelectedRegisters,
       "parcelas": listSelectedLots,
+      "position": position
     };
     return requestBody;
   }
@@ -459,7 +468,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   void resetSelectionOnMap() {
-    selectedItemsProvider?.restoreInitialSelections();
+    selectedItemsProvider?.restoreInitialValues();
   }
 
   void handleCancel() {
@@ -700,14 +709,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               children: [
                                 Text(
                                   AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationTitle,
+                                      .createTaskPage_selectAddressTitle,
                                   style: const TextStyle(fontSize: 16.0),
                                 ),
                                 const SizedBox(height: 12.0),
                                 CustomTextFormField(
                                   width: widthRow,
                                   hintText: AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationplaceholder,
+                                      .createTaskPage_selectAddressplaceholder,
                                   controller: locationController,
                                 ),
                                 const SizedBox(
@@ -938,7 +947,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               children: [
                                 Text(
                                   AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationTitle,
+                                      .createTaskPage_selectAddressTitle,
                                   style: const TextStyle(fontSize: 14.0),
                                 ),
                                 const SizedBox(height: 12.0),
@@ -947,7 +956,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   height: 80,
                                   fontSize: 12,
                                   hintText: AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationplaceholder,
+                                      .createTaskPage_selectAddressplaceholder,
                                   controller: locationController,
                                 ),
                                 //      const SizedBox(height: 12.0),
@@ -976,25 +985,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                     ),
                   ),
                   Visibility(
-                    visible: selectedIndex == 0,
-                    child: Column(
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!
-                              .createTaskPage_scheduled,
-                          style: const TextStyle(fontSize: 24.0),
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)!
-                                .default_placeHolderInputText,
-                            border: const OutlineInputBorder(),
-                          ),
-                          controller: scheduledNumberController,
-                        ),
-                      ],
-                    ),
-                  ),
+                      visible: selectedIndex == 0,
+                      child: const CreateScheduled()),
                   Visibility(
                     visible: widget.detail,
                     child: Container(
@@ -1214,7 +1206,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           ElementsSelected(widget: widget),
                           const SizedBox(height: 10.0),
                           // Button elementos a seleccionar
-                          const MapModal(),
+                          InspectionLocationSelect(
+                              selectedItemsProvider: selectedItemsProvider),
                           const SizedBox(height: 10.0),
                           if (widget.detail)
                             Column(
@@ -1278,41 +1271,45 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                       ),
                     ),
                   ),
-                  Container(
-                    height: 50.0,
-                    margin: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (widget.detail)
+                  Visibility(
+                    visible: selectedIndex == 1,
+                    child: Container(
+                      height: 50.0,
+                      margin: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (widget.detail)
+                            CustomElevatedButton(
+                              messageType: MessageType.error,
+                              onPressed: handleCancel,
+                              text: AppLocalizations.of(context)!
+                                  .buttonCancelLabel,
+                            ),
+                          const SizedBox(width: 12.0),
                           CustomElevatedButton(
-                            messageType: MessageType.error,
-                            onPressed: handleCancel,
-                            text:
-                                AppLocalizations.of(context)!.buttonCancelLabel,
-                          ),
-                        const SizedBox(width: 12.0),
-                        CustomElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              if (widget.detail) {
-                                handleEditTask();
-                              } else {
-                                // Se quita acción de creación en Programada
-                                if (selectedIndex == 1) {
-                                  handleSubmit();
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                if (widget.detail) {
+                                  handleEditTask();
+                                } else {
+                                  // Se quita acción de creación en Programada
+                                  if (selectedIndex == 1) {
+                                    handleSubmit();
+                                  }
                                 }
+                              } else {
+                                scrollToTopScrollView();
                               }
-                            } else {
-                              scrollToTopScrollView();
-                            }
-                          },
-                          text: widget.detail
-                              ? AppLocalizations.of(context)!.buttonAcceptLabel
-                              : AppLocalizations.of(context)!
-                                  .createTaskPage_submitButton,
-                        ),
-                      ],
+                            },
+                            text: widget.detail
+                                ? AppLocalizations.of(context)!
+                                    .buttonAcceptLabel
+                                : AppLocalizations.of(context)!
+                                    .createTaskPage_submitButton,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -1322,122 +1319,5 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         ),
       );
     });
-  }
-}
-
-class ElementsSelected extends StatelessWidget {
-  const ElementsSelected({
-    super.key,
-    required this.widget,
-  });
-
-  final TaskCreationScreen widget;
-
-  @override
-  Widget build(BuildContext context) {
-    return Visibility(
-      visible: widget.detail,
-      child: Consumer<SelectedItemsProvider>(
-        builder: (context, selectedItemsProvider, child) {
-          final elementsList = <EntityIdContainer>[];
-
-          elementsList
-              .addAll(selectedItemsProvider.selectedPolylines.map((element) {
-            return EntityIdContainer(
-              id: element.value,
-              elementType: ElementType.section,
-            );
-          }));
-
-          elementsList
-              .addAll(selectedItemsProvider.selectedCatchments.map((element) {
-            return EntityIdContainer(
-              id: element.value,
-              elementType: ElementType.catchment,
-            );
-          }));
-
-          elementsList
-              .addAll(selectedItemsProvider.selectedRegisters.map((element) {
-            return EntityIdContainer(
-              id: element.value,
-              elementType: ElementType.register,
-            );
-          }));
-
-          elementsList.addAll(selectedItemsProvider.selectedLots.map((element) {
-            return EntityIdContainer(
-              id: element.value,
-              elementType: ElementType.lot,
-            );
-          }));
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.elementsTitle,
-                style: const TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 12),
-              elementsList.isNotEmpty
-                  ? Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: softGrey,
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      child: Wrap(
-                        spacing: 15.0,
-                        runSpacing: 15.0,
-                        children: elementsList,
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 12),
-                        Text(
-                          AppLocalizations.of(context)!.no_elements_registered,
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                      ],
-                    ),
-              const SizedBox(height: 12),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class EntityIdContainer extends StatelessWidget {
-  const EntityIdContainer({
-    Key? key,
-    required this.id,
-    required this.elementType,
-  }) : super(key: key);
-
-  final String id;
-  final ElementType elementType;
-
-  @override
-  Widget build(BuildContext context) {
-    final initials = elementType.type;
-
-    return Chip(
-      backgroundColor: lightBackground,
-      avatar: CircleAvatar(
-        backgroundColor: getElementDefaultColor(elementType),
-        child: Text(
-          initials,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      label: Text(id),
-    );
   }
 }

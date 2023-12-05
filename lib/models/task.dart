@@ -19,6 +19,11 @@ class Task {
   late Set<CircleId>? catchments;
   late Set<CircleId>? registers;
   late Set<PolylineId>? lots;
+  late LatLng? position;
+
+  LatLng? get Position => position;
+
+  set setPosition(LatLng? value) => position = value;
 
   Set<PolylineId>? get getSections => sections;
 
@@ -110,5 +115,6 @@ class Task {
       required this.sections,
       required this.catchments,
       required this.registers,
-      required this.lots});
+      required this.lots,
+      required this.position});
 }

@@ -2,7 +2,7 @@
     "@@locale": "es",
     "titleApp": "PipeTracker",
     "searchPlaceHolder": "Ingrese su búsqueda...",
-    "taskInformationTitle": "Información de tarea",
+    "taskInformationTitle": "Información de inspección",
     "taskInspectionTitle": "Datos de inspección",
     "createTaskPage_title" : "Creación de tarea",
     "createTaskPage_titleOnEdit": "Editar tarea",
@@ -13,7 +13,8 @@
     "createTaskPage_numberWorkTitle": "Número de Trabajo",
     "createTaskPage_startDateTitle": "Fecha de Ingreso",
     "createTaskPage_selectUbicationTitle": "Ubicación",
-    "createTaskPage_selectUbicationplaceholder": "Ingrese una ubicación",
+    "createTaskPage_selectAddressTitle": "Dirección",
+    "createTaskPage_selectAddressplaceholder": "Ingrese una dirección",
     "createTaskPage_assignedUserTitle": "Usuario asignado",
     "createTaskPage_orderServiceNumberTitle": "Orden de servicio",
     "createTaskPage_solicitantTitle": "Solicitante",
@@ -68,6 +69,7 @@
     "task_status_doingTitle" : "En curso",
     "elementsTitle": "Elementos Registrados",
     "map_modal_add_elements_button": "Añadir elementos",
+    "map_modal_select_location": "Seleccionar ubicación",
     "map_modal_add_elements_title": "Añadir elementos",
     "component_detail_title" : "Detalle del elemento",
     "component_detail_no_data": "Sin Datos",
@@ -154,5 +156,10 @@
     "error_service_not_available": "Servicio no disponible",
     "no_more_tasks_found": "No hay mas tareas para mostrar",
     "no_tasks_found_filter": "No se ha encontrado ninguna tarea que cumpla con los requisitos",
-    "empty_image_gallery": "Esta tarea no contiene imagenes"
+    "empty_image_gallery": "Esta tarea no contiene imagenes",
+    "scheduled_file_title": "Fuente de datos",
+    "scheduled_main_title": "Infromación de programada",
+    "scheduled_title_input": "Título",
+    "scheduled_end_date_title" : "Fecha de Fin",
+    "file_upload_btn": "Seleccionar"
 }
