@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
-import 'package:gtau_app_front/widgets/map_component.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/selected_items_provider.dart';
 import 'common/custom_elevated_button.dart';
+import 'map_component_location_select.dart';
 
 const double ratioWeb = 0.82;
 const double ratioTablet = 0.75;
@@ -60,7 +60,7 @@ void _showMapModal(BuildContext context) {
             children: [
               SizedBox(
                 height: _getHeightModalOnDevice(context),
-                child: const MapComponent(isModal: true),
+                child: const MapComponentLocationSelect(isModal: true),
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -69,7 +69,6 @@ void _showMapModal(BuildContext context) {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   CustomElevatedButton(
                     onPressed: () {
-                      selectedItemsProvider.restoreInitialValues();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.error,
@@ -78,7 +77,7 @@ void _showMapModal(BuildContext context) {
                   const SizedBox(width: 10.0),
                   CustomElevatedButton(
                     onPressed: () {
-                      selectedItemsProvider.saveCurrentSelectionsAsInitial();
+                      selectedItemsProvider.saveCurrentPositionAsInitial();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.success,
@@ -94,13 +93,11 @@ void _showMapModal(BuildContext context) {
   );
 }
 
-class MapModal extends StatelessWidget {
-  const MapModal({super.key});
+class MapModalLocationSelect extends StatelessWidget {
+  const MapModalLocationSelect({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final selectedItemsProvider = context.read<SelectedItemsProvider>();
-    selectedItemsProvider.activateMultipleSelection();
     final color = primarySwatch[300];
     return Material(
       color: Colors.white,
@@ -111,7 +108,7 @@ class MapModal extends StatelessWidget {
             shape: const CircleBorder(),
           ),
           child: IconButton(
-            icon: const Icon(Icons.add_circle_outline_rounded),
+            icon: const Icon(Icons.location_on),
             color: Colors.white,
             onPressed: () {
               _showMapModal(context);
