@@ -65,11 +65,14 @@ class _GelleryShowState extends State<_GelleryShow> {
    _GelleryShowState(this.idTask, this.photos);
 
   final ImagePicker _picker = ImagePicker();
+  ImagesViewModel? imagesViewModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    
     _initializeData();
+    imagesViewModel = Provider.of<ImagesViewModel>(context, listen: false);
   }
 
   void _initializeData() async {
@@ -213,6 +216,12 @@ class _GelleryShowState extends State<_GelleryShow> {
     }
   }
 
+  Future updateImageViewState(
+      BuildContext context) async {
+        final token = Provider.of<UserProvider>(context, listen: false).getToken;
+        await imagesViewModel!.fetchTaskImages(token, idTask!);
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     try {
       if (source == ImageSource.camera) {
@@ -228,9 +237,8 @@ class _GelleryShowState extends State<_GelleryShow> {
         ImageDataDTO imageDataDTO = ImageDataDTO(
             image: temporaryfile, path: pickedFile.path, fromBlob: false);
         setState(() {
-          print('hace algo con el imagedataDTO, camara');
+          processImageSingular(imageDataDTO);
         });
-        print('notificar cambios');
       } else {
         final List<XFile> images =
             await _picker.pickMultiImage(imageQuality: 50);
@@ -254,8 +262,7 @@ class _GelleryShowState extends State<_GelleryShow> {
         setState(() {
           this.processImages(temporaryFiles);
         });
-        _initializeData();
-        print('await updateImages()');
+        
       }
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
@@ -265,21 +272,79 @@ class _GelleryShowState extends State<_GelleryShow> {
     }
   }
 
-  void processImages(List<ImageDataDTO> temporaryFilesToUpload) {
+  void processImageSingular(ImageDataDTO temporaryFileToUpload) async {
+    if (temporaryFileToUpload != null) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final imagesViewModel =
+          Provider.of<ImagesViewModel>(context, listen: false);
+      
+      try {
+        final response = await imagesViewModel.uploadImage(
+              token!, widget.idTask!, temporaryFileToUpload.path);
+          
+      } catch (error) {
+        print(error);
+        throw Exception('Error al subir imagen');
+      }finally{
+        await new Future.delayed(const Duration(seconds: 2));
+      }
+      setState(() {
+        updateImageViewState(context);
+      });
+      /*final tempFilesPaths = temporaryFilesToUpload.map((image) => {image.path}).toList(); 
+      try {
+          final response = await imagesViewModel.uploadImages(
+              token!, widget.idTask!, tempFilesPaths.cast<String>());
+          
+      } catch (error) {
+        print(error);
+        throw Exception('Error al subir imagen');
+      }finally{
+        setState(() {
+          updateImageViewState(context);
+        });
+      }*/
+    }
+    
+  }
+
+  void processImages(List<ImageDataDTO> temporaryFilesToUpload) async {
     if (temporaryFilesToUpload != null) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
       final imagesViewModel =
           Provider.of<ImagesViewModel>(context, listen: false);
-      temporaryFilesToUpload!.forEach((image) async {
+      
+      temporaryFilesToUpload.forEach((image) async {
         try {
           final response = await imagesViewModel.uploadImage(
-              token!, widget.idTask!, image.getPath);
+              token!, widget.idTask!, image.path);
+          
         } catch (error) {
           print(error);
           throw Exception('Error al subir imagen');
+        }finally{
+          
         }
       });
+      await new Future.delayed(const Duration(seconds: 2));
+      setState(() {
+        updateImageViewState(context);
+      });
+      /*final tempFilesPaths = temporaryFilesToUpload.map((image) => {image.path}).toList(); 
+      try {
+          final response = await imagesViewModel.uploadImages(
+              token!, widget.idTask!, tempFilesPaths.cast<String>());
+          
+      } catch (error) {
+        print(error);
+        throw Exception('Error al subir imagen');
+      }finally{
+        setState(() {
+          updateImageViewState(context);
+        });
+      }*/
     }
+    
   }
 
   void _deleteSelectedImages(List<Photo> photos) {

@@ -29,11 +29,14 @@ class ImagesViewModel extends ChangeNotifier {
 
       final List<String> responseTask =
           await _taskService.fetchTaskImages(token, idTask);
+      
+      final leng = responseTask.length;
+      print('largo response $leng');
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
       } else {
-        _error = true;
+        _photos = [];
         if (kDebugMode) {
           print('No se pudieron traer datos');
         }
@@ -61,6 +64,21 @@ class ImagesViewModel extends ChangeNotifier {
     } else {
       _taskService.putMultipartImages(token, id, path);
     }
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  uploadImages(String token, int id, List<String> listpath) async{
+    _isLoading = true;
+    notifyListeners();
+    listpath!.forEach((path) async {
+      if (kIsWeb) {
+        _taskService.putBase64Images(token, id, path);
+      } else {
+        _taskService.putMultipartImages(token, id, path);
+      }
+    });
+    await new Future.delayed(const Duration(seconds: 2));
     _isLoading = false;
     notifyListeners();
   }
