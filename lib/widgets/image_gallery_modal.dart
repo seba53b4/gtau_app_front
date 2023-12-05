@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:gallery_image_viewer/gallery_image_viewer.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/dto/image_data.dart';
@@ -85,7 +86,44 @@ class _GelleryShowState extends State<_GelleryShow> {
         builder: (context, imagesViewModel, child) {
       photos = imagesViewModel.photos;
 
-      return LoadingOverlay(
+      if(photos.isEmpty){
+        return LoadingOverlay(
+          isLoading: imagesViewModel.isLoading,
+          child: Scaffold(
+            appBar:
+                AppBar(title: Text(AppLocalizations.of(context)!.images_title)),
+            body:Padding(
+              padding: const EdgeInsets.symmetric(horizontal:15),
+              child: Center(
+                  child:Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding:const EdgeInsets.symmetric(vertical: 25, horizontal:15),
+                        child: SvgPicture.asset('lib/assets/empty_gallery.svg', width: 128, height: 128, semanticsLabel: 'Empty Gallery'),
+                      ),
+                      Text(AppLocalizations.of(context)!
+                        .empty_image_gallery,
+                      style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 20))
+                      ,
+                      ]
+                  )
+              )
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => _selectPhoto(),
+              foregroundColor: null,
+              backgroundColor: null,
+              shape: null,
+              child: const Icon(Icons.add),
+            )
+          )
+        );
+
+      }else{
+        return LoadingOverlay(
           isLoading: imagesViewModel.isLoading,
           child: Scaffold(
             appBar:
@@ -146,12 +184,13 @@ class _GelleryShowState extends State<_GelleryShow> {
                 );
               }),
             ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             floatingActionButton: FloatingActionButton(
               onPressed: () => _selectPhoto(),
               foregroundColor: null,
               backgroundColor: null,
               shape: null,
-              child: const Icon(Icons.filter_alt_rounded),
+              child: const Icon(Icons.add),
             ),
             bottomNavigationBar: photos.any((photo) => photo.isSelected)
                 ? BottomNavigationBar(
@@ -182,7 +221,10 @@ class _GelleryShowState extends State<_GelleryShow> {
                   )
                 : null,
           ));
-    });
+        }
+      });
+    
+      
   }
 
   void _selectPhoto() async {
