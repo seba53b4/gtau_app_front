@@ -239,8 +239,6 @@ class _CreateScheduledState extends State<CreateScheduled> {
                             setState(() {
                               geometriesFromFile = geometries;
                             });
-                            print(
-                                'GeoJsonSrc en el widget padre: $geometriesFromFile');
                           },
                         ),
                       ),
