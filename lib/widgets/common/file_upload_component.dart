@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'custom_elevated_button.dart';
 
@@ -25,12 +26,7 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
     geoJsonSrc = [];
   }
 
-  _sendFile() {
-    print(geoJsonSrc);
-    widget.onFileAdded(geoJsonSrc); // Llama al callback aquí
-  }
-
-  _uploadFile() async {
+  _pickAFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['geojson'],
@@ -68,27 +64,63 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
     }
   }
 
+  _removeGeometry() {
+    setState(() {
+      geoJsonSrc.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CustomElevatedButton(
-          onPressed: _uploadFile,
-          text: 'Seleccionar Archivo',
-        ),
-        const SizedBox(height: 16),
-        if (geoJsonSrc.isNotEmpty)
-          Column(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Nombre del archivo: $fileName'),
-              const SizedBox(height: 16),
               CustomElevatedButton(
-                onPressed: _sendFile,
-                text: 'Subir Archivo',
+                onPressed: _pickAFile,
+                text: AppLocalizations.of(context)!.file_upload_btn,
               ),
+              const SizedBox(height: 8),
+              Visibility(
+                visible: geoJsonSrc.isNotEmpty,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: 24),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: [
+                        InputChip(
+                          label: Text(fileName),
+                          onDeleted: () => _removeGeometry(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -218,15 +218,30 @@ class _CreateScheduledState extends State<CreateScheduled> {
                         .default_observationsPlaceholder,
                     controller: observationsController,
                   ),
-                  const SizedBox(height: 10.0),
-                  FileUploadComponent(
-                    onFileAdded: (List<Map<String, dynamic>> geometries) {
-                      setState(() {
-                        geometriesFromFile = geometries;
-                      });
-                      print(
-                          'GeoJsonSrc en el widget padre: $geometriesFromFile');
-                    },
+                  const SizedBox(height: 24.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.scheduled_file_title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: widthRow,
+                        child: FileUploadComponent(
+                          onFileAdded: (List<Map<String, dynamic>> geometries) {
+                            setState(() {
+                              geometriesFromFile = geometries;
+                            });
+                            print(
+                                'GeoJsonSrc en el widget padre: $geometriesFromFile');
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
