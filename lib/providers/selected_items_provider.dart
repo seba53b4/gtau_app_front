@@ -185,7 +185,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters.clear();
     _initialSelectedCatchments.clear();
     _initialSelectedLots.clear();
-    notifyListeners();
+    _currentInspectionPosition = const LatLng(0, 0);
   }
 
   void reset() {
