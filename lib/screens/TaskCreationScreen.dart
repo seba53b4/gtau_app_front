@@ -31,6 +31,7 @@ import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/image_gallery_modal.dart';
 import '../widgets/map_modal.dart';
+import '../widgets/map_modal_location_select.dart';
 import '../widgets/user_image.dart';
 
 class TaskCreationScreen extends StatefulWidget {
@@ -149,8 +150,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         });
       }
 
-      selectedItemsProvider.saveInitialSelections(
-          task.sections, task.registers, task.catchments, task.lots);
+      selectedItemsProvider.saveInitialSelections(task.sections, task.registers,
+          task.catchments, task.lots, task.position!);
       numWorkController.text = task.workNumber!;
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
@@ -299,24 +300,27 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToCreate() {
-    final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+    var selectedItemsProvider = context.read<SelectedItemsProvider>();
+    final selectedSections = selectedItemsProvider.selectedPolylines;
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
 
-    final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+    final selectedCatchments = selectedItemsProvider.selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
 
-    final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+    final selectedRegisters = selectedItemsProvider.selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
 
-    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final selectedLots = selectedItemsProvider.selectedLots;
     final List<String> listSelectedLots =
         selectedLots.map((polylineId) => polylineId.value).toList();
+
+    final Map<String, dynamic> position = {
+      "latitud": selectedItemsProvider.inspectionPosition.longitude.toString(),
+      "longitud": selectedItemsProvider.inspectionPosition.longitude.toString()
+    };
 
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
@@ -331,7 +335,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "tramos": listSelectedSections,
       "captaciones": listSelectedCatchments,
       "registros": listSelectedRegisters,
-      "parcelas": listSelectedLots
+      "parcelas": listSelectedLots,
+      "position": position
     };
     return requestBody;
   }
@@ -341,21 +346,26 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     late String? releasedDateSelected = releasedDateController.text.isNotEmpty
         ? formattedDateToUpdate(releasedDateController.text)
         : null;
-    final selectedSections =
-        context.read<SelectedItemsProvider>().selectedPolylines;
+
+    var selectedItemsProvider = context.read<SelectedItemsProvider>();
+
+    final selectedSections = selectedItemsProvider.selectedPolylines;
     final List<String> listSelectedSections =
         selectedSections.map((polylineId) => polylineId.value).toList();
-    final selectedCatchments =
-        context.read<SelectedItemsProvider>().selectedCatchments;
+    final selectedCatchments = selectedItemsProvider.selectedCatchments;
     final List<String> listSelectedCatchments =
         selectedCatchments.map((circleId) => circleId.value).toList();
-    final selectedRegisters =
-        context.read<SelectedItemsProvider>().selectedRegisters;
+    final selectedRegisters = selectedItemsProvider.selectedRegisters;
     final List<String> listSelectedRegisters =
         selectedRegisters.map((circleId) => circleId.value).toList();
-    final selectedLots = context.read<SelectedItemsProvider>().selectedLots;
+    final selectedLots = selectedItemsProvider.selectedLots;
     final List<String> listSelectedLots =
         selectedLots.map((polylineId) => polylineId.value).toList();
+
+    final Map<String, dynamic> position = {
+      "latitud": selectedItemsProvider.inspectionPosition.latitude,
+      "longitud": selectedItemsProvider.inspectionPosition.longitude
+    };
 
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
@@ -375,6 +385,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "captaciones": listSelectedCatchments,
       "registros": listSelectedRegisters,
       "parcelas": listSelectedLots,
+      "position": position
     };
     return requestBody;
   }
@@ -458,7 +469,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   void resetSelectionOnMap() {
-    selectedItemsProvider?.restoreInitialSelections();
+    selectedItemsProvider?.restoreInitialValues();
   }
 
   void handleCancel() {
@@ -699,14 +710,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               children: [
                                 Text(
                                   AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationTitle,
+                                      .createTaskPage_selectAddressTitle,
                                   style: const TextStyle(fontSize: 16.0),
                                 ),
                                 const SizedBox(height: 12.0),
                                 CustomTextFormField(
                                   width: widthRow,
                                   hintText: AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationplaceholder,
+                                      .createTaskPage_selectAddressplaceholder,
                                   controller: locationController,
                                 ),
                                 const SizedBox(
@@ -937,7 +948,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               children: [
                                 Text(
                                   AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationTitle,
+                                      .createTaskPage_selectAddressTitle,
                                   style: const TextStyle(fontSize: 14.0),
                                 ),
                                 const SizedBox(height: 12.0),
@@ -946,7 +957,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   height: 80,
                                   fontSize: 12,
                                   hintText: AppLocalizations.of(context)!
-                                      .createTaskPage_selectUbicationplaceholder,
+                                      .createTaskPage_selectAddressplaceholder,
                                   controller: locationController,
                                 ),
                                 //      const SizedBox(height: 12.0),
@@ -1196,7 +1207,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                           ElementsSelected(widget: widget),
                           const SizedBox(height: 10.0),
                           // Button elementos a seleccionar
-                          const MapModal(),
+                          InspectionLocationSelect(
+                              selectedItemsProvider: selectedItemsProvider),
                           const SizedBox(height: 10.0),
                           if (widget.detail)
                             Column(
@@ -1306,6 +1318,82 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
             ),
           ),
         ),
+      );
+    });
+  }
+}
+
+class InspectionLocationSelect extends StatelessWidget {
+  const InspectionLocationSelect({
+    super.key,
+    required this.selectedItemsProvider,
+  });
+
+  final SelectedItemsProvider? selectedItemsProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SelectedItemsProvider>(
+        builder: (context, selectedItemsProvider, child) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            AppLocalizations.of(context)!.createTaskPage_selectUbicationTitle,
+            style: const TextStyle(
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const MapModalLocationSelect(),
+              const SizedBox(width: 10.0),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: softGrey,
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
+                child: Wrap(
+                  direction: Axis.vertical,
+                  spacing: 8.0,
+                  runSpacing: 15.0,
+                  children: [
+                    Chip(
+                      backgroundColor: Colors.white70,
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.black38,
+                        child: Icon(
+                          Icons.location_on_outlined,
+                          color: Colors.white70.withOpacity(1),
+                          size: 20,
+                        ),
+                      ),
+                      label: Text(
+                          "lat: ${selectedItemsProvider.inspectionPosition.latitude}"),
+                    ),
+                    Chip(
+                      backgroundColor: Colors.white70,
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.black38,
+                        child: Icon(
+                          Icons.location_on_outlined,
+                          color: Colors.white70.withOpacity(1),
+                          size: 20,
+                        ),
+                      ),
+                      label: Text(
+                          " long: ${selectedItemsProvider.inspectionPosition.longitude}"),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ],
       );
     });
   }
