@@ -26,12 +26,12 @@ class ImagesViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
+      /*notifyListeners();*/
       final List<String> responseTask =
           await _taskService.fetchTaskImages(token, idTask);
       
-      final leng = responseTask.length;
-      print('largo response $leng');
+      /*final leng = responseTask.length;
+      print('largo response $leng');*/
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
