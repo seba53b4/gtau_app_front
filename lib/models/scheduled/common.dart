@@ -1,0 +1,26 @@
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../../constants/theme_constants.dart';
+import '../enums/point_type_enum.dart';
+
+Circle? buildCircle(Map<String, dynamic> json, PointType type) {
+  if (json.containsKey('geoJSON') && json['geoJSON'] is Map<String, dynamic>) {
+    Map<String, dynamic> geoJson = json['geoJSON'];
+    List<dynamic> coordenates = geoJson['coordinates'];
+
+    double latitude = coordenates[1];
+    double longitude = coordenates[0];
+    LatLng latLngCenter = LatLng(latitude, longitude);
+
+    return Circle(
+        circleId: CircleId(json['ogcFid'].toString()),
+        center: latLngCenter,
+        radius: 2,
+        strokeWidth: 2,
+        consumeTapEvents: true,
+        strokeColor: catchmentDefaultColor,
+        fillColor: Colors.black);
+  }
+  return null;
+}

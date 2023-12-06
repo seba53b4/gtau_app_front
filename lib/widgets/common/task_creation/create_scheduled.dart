@@ -1,23 +1,30 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:provider/provider.dart';
 
 import '../../../constants/app_constants.dart';
 import '../../../models/task_status.dart';
+import '../../../providers/user_provider.dart';
+import '../../../services/scheduled_task_service.dart';
 import '../../../utils/date_utils.dart';
+import '../../scheduled_map_component.dart';
 import '../custom_dropdown.dart';
 import '../custom_elevated_button.dart';
 import '../custom_text_form_field.dart';
 import '../file_upload_component.dart';
 
-class CreateScheduled extends StatefulWidget {
-  const CreateScheduled({Key? key}) : super(key: key);
+class ScheduledComponent extends StatefulWidget {
+  final bool isEdit;
+
+  const ScheduledComponent({Key? key, required this.isEdit}) : super(key: key);
 
   @override
-  State<CreateScheduled> createState() => _CreateScheduledState();
+  State<ScheduledComponent> createState() => _CreateScheduledState();
 }
 
-class _CreateScheduledState extends State<CreateScheduled> {
+class _CreateScheduledState extends State<ScheduledComponent> {
   final scheduledNumberController = TextEditingController();
   final addDateController = TextEditingController();
   final endDateController = TextEditingController();
@@ -28,11 +35,18 @@ class _CreateScheduledState extends State<CreateScheduled> {
   late String taskStatus = 'PENDING';
   late DateTime? startDate;
   late DateTime? endDate;
+  late bool isAdmin;
 
   @override
   void initState() {
     super.initState();
     startDate = DateTime.now();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isAdmin = context.read<UserProvider>().isAdmin!;
   }
 
   @override
@@ -57,6 +71,25 @@ class _CreateScheduledState extends State<CreateScheduled> {
       endDate = date;
     });
     addDateController.text = parseDateTimeOnFormat(date);
+  }
+
+  void _showFilterModal(BuildContext context) {
+    double widthWindow = MediaQuery.of(context).size.width;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+          child: SizedBox(
+            width: kIsWeb ? widthWindow * 0.85 : widthWindow,
+            child: const Center(
+                widthFactor: kIsWeb ? 0.6 : 0.5,
+                child: ScheduledMapComponent()),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -204,7 +237,6 @@ class _CreateScheduledState extends State<CreateScheduled> {
                       ],
                     ),
                   ),
-                  //const SizedBox(height: 8.0),
                   Text(
                     AppLocalizations.of(context)!
                         .createTaskPage_observationsTitle,
@@ -232,30 +264,54 @@ class _CreateScheduledState extends State<CreateScheduled> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      SizedBox(
-                        width: widthRow,
-                        child: FileUploadComponent(
-                          onFileAdded: (List<Map<String, dynamic>> geometries) {
-                            setState(() {
-                              geometriesFromFile = geometries;
-                            });
-                          },
+                      Visibility(
+                        visible: isAdmin,
+                        child: SizedBox(
+                          width: widthRow,
+                          child: FileUploadComponent(
+                            onFileAdded:
+                                (List<Map<String, dynamic>> geometries) {
+                              setState(() {
+                                geometriesFromFile = geometries;
+                              });
+                            },
+                          ),
                         ),
                       ),
+                      const SizedBox(height: 12),
                     ],
                   ),
                 ],
               ),
+              Visibility(
+                visible: widget.isEdit,
+                child: Column(children: [
+                  Text(
+                    'Inspeccionar Zona',
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                  const SizedBox(height: 12),
+                  CustomElevatedButton(
+                    onPressed: () async {
+                      _showFilterModal(context);
+                    },
+                    text: 'Ver mapa',
+                  )
+                ]),
+              )
             ],
           ),
         ),
       ),
       const SizedBox(height: AppConstants.taskColumnSpace),
-      CustomElevatedButton(
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {}
-        },
-        text: AppLocalizations.of(context)!.buttonAcceptLabel,
+      Visibility(
+        visible: !widget.isEdit,
+        child: CustomElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {}
+          },
+          text: AppLocalizations.of(context)!.buttonAcceptLabel,
+        ),
       ),
     ]);
   }
