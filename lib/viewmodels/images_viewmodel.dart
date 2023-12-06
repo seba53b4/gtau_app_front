@@ -35,6 +35,10 @@ class ImagesViewModel extends ChangeNotifier {
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
+        await new Future.delayed(Duration(seconds: 2));
+        if(photos.length != responseTask.length){
+          await new Future.delayed(Duration(seconds: 3));
+        }
       } else {
         _photos = [];
         if (kDebugMode) {

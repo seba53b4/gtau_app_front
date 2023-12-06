@@ -76,6 +76,7 @@ class _GelleryShowState extends State<_GelleryShow> {
     
     _initializeData();
     imagesViewModel = Provider.of<ImagesViewModel>(context, listen: false);
+    /*updateImageViewStateWithDelay(context, 2);*/
   }
 
   void _initializeData() async {
