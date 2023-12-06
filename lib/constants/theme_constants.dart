@@ -14,6 +14,8 @@ Color registerDefaultColor = Colors.deepPurpleAccent;
 Color lotDefaultColor = Colors.black38;
 Color lotDefaultColorChip = Colors.black45;
 Color catchmentDefaultColor = Colors.pink;
+Color baseContainerG1 = const Color.fromRGBO(174, 213, 129, 0.25);
+Color baseContainerG2 = const Color.fromRGBO(174, 213, 129, 0.30);
 
 MaterialColor primarySwatch = const MaterialColor(
   0xFF60A61B,

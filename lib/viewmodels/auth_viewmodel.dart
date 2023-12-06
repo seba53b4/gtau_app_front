@@ -2,8 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/services/auth_service.dart';
 
-import '../models/auth_data.dart';
-
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
@@ -15,7 +13,7 @@ class AuthViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
-  Future<AuthData?> fetchAuth(String username, String password) async {
+  Future<AuthResult?> fetchAuth(String username, String password) async {
     try {
       _isLoading = true;
       _error = false;

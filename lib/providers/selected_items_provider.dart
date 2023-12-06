@@ -18,6 +18,9 @@ class SelectedItemsProvider with ChangeNotifier {
   Set<PolylineId> _initialSelectedLots = {};
   Set<PolylineId> _currentSelectedLots = {};
 
+  LatLng _initialInspectionPosition = LatLng(0, 0);
+  LatLng _currentInspectionPosition = LatLng(0, 0);
+
   bool get letMultipleItemsSelected => _letMultipleItemsSelected;
 
   Set<PolylineId> get selectedPolylines => _currentSelectedSections;
@@ -27,6 +30,13 @@ class SelectedItemsProvider with ChangeNotifier {
   Set<CircleId> get selectedCatchments => _currentSelectedCatchments;
 
   Set<PolylineId> get selectedLots => _currentSelectedLots;
+
+  LatLng get inspectionPosition => _currentInspectionPosition;
+
+  void setInspectionPosition(LatLng position) {
+    _currentInspectionPosition = position;
+    notifyListeners();
+  }
 
   void activateMultipleSelection() {
     _letMultipleItemsSelected = true;
@@ -84,18 +94,25 @@ class SelectedItemsProvider with ChangeNotifier {
     }
   }
 
-  void saveInitialSelections(Set<PolylineId>? sections, Set<CircleId>? registers, Set<CircleId>? catchments, Set<PolylineId>? lots) {
+  void saveInitialSelections(
+      Set<PolylineId>? sections,
+      Set<CircleId>? registers,
+      Set<CircleId>? catchments,
+      Set<PolylineId>? lots,
+      LatLng position) {
     _initialSelectedSections = Set<PolylineId>.from(sections ?? {});
     _initialSelectedRegisters = Set<CircleId>.from(registers ?? {});
     _initialSelectedCatchments = Set<CircleId>.from(catchments ?? {});
     _initialSelectedLots = Set<PolylineId>.from(lots ?? {});
+    _initialInspectionPosition = position;
     setLots(lots);
     setSections(sections);
     setCatchments(catchments);
     setRegisters(registers);
+    setInspectionPosition(position);
   }
 
-  void restoreInitialSelections() {
+  void restoreInitialValues() {
     _currentSelectedSections = Set<PolylineId>.from(_initialSelectedSections);
     _currentSelectedRegisters = Set<CircleId>.from(_initialSelectedRegisters);
     _currentSelectedCatchments = Set<CircleId>.from(_initialSelectedCatchments);
@@ -111,6 +128,10 @@ class SelectedItemsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void saveCurrentPositionAsInitial() {
+    _initialInspectionPosition = _currentInspectionPosition;
+    notifyListeners();
+  }
 
   bool isPolylineSelected(PolylineId polylineId, ElementType type) {
     var polylineList = getPolylineList(type);
@@ -141,18 +162,18 @@ class SelectedItemsProvider with ChangeNotifier {
 
   Set<CircleId> getCircleList(ElementType type) {
     return switch (type) {
-    ElementType.register => _currentSelectedRegisters,
-    ElementType.catchment => _currentSelectedCatchments,
-    _ => Set()
-  };
+      ElementType.register => _currentSelectedRegisters,
+      ElementType.catchment => _currentSelectedCatchments,
+      _ => Set()
+    };
   }
 
   Set<PolylineId> getPolylineList(ElementType type) {
     return switch (type) {
-    ElementType.section => _currentSelectedSections,
-    ElementType.lot => _currentSelectedLots,
-    _ => Set()
-  };
+      ElementType.section => _currentSelectedSections,
+      ElementType.lot => _currentSelectedLots,
+      _ => Set()
+    };
   }
 
   void clearAll() {
@@ -164,11 +185,11 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters.clear();
     _initialSelectedCatchments.clear();
     _initialSelectedLots.clear();
+    notifyListeners();
   }
 
   void reset() {
     clearAll();
     _letMultipleItemsSelected = false;
-    notifyListeners();
   }
 }
