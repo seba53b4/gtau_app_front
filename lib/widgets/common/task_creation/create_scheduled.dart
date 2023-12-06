@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/task_status.dart';
 import '../../../providers/user_provider.dart';
-import '../../../services/scheduled_task_service.dart';
 import '../../../utils/date_utils.dart';
 import '../../scheduled_map_component.dart';
 import '../custom_dropdown.dart';
@@ -85,7 +84,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
             width: kIsWeb ? widthWindow * 0.85 : widthWindow,
             child: const Center(
                 widthFactor: kIsWeb ? 0.6 : 0.5,
-                child: ScheduledMapComponent()),
+                child: ScheduledMapComponent(idSheduled: 3)),
           ),
         );
       },

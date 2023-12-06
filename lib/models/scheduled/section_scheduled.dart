@@ -4,7 +4,7 @@ import '../enums/section_color_enum.dart';
 
 class SectionScheduled {
   final int ogcFid;
-  final String? tipoTra;
+  final String tipoTra;
   final double? diametro;
   final double? longitud;
   final String? nivelSedimentacion;
@@ -20,7 +20,7 @@ class SectionScheduled {
 
   SectionScheduled({
     required this.ogcFid,
-    this.tipoTra,
+    required this.tipoTra,
     this.diametro,
     this.longitud,
     this.nivelSedimentacion,
@@ -38,7 +38,7 @@ class SectionScheduled {
   factory SectionScheduled.fromJson(Map<String, dynamic> json) {
     return SectionScheduled(
       ogcFid: json['ogcFid'] as int,
-      tipoTra: json['tipotra'] as String?,
+      tipoTra: json['tipotra'] as String,
       diametro: json['diametro'] as double?,
       longitud: json['longitud'] as double?,
       nivelSedimentacion: json['nivel_sedimentacion'] as String?,
@@ -52,7 +52,7 @@ class SectionScheduled {
           ? DateTime.parse(json['inspectioned_date'] as String)
           : null,
       username: json['username'] as String?,
-      line: _buildPolyline(json, json['tipotra']),
+      line: _buildPolyline(json, json['tipotra'] as String),
     );
   }
 
@@ -65,29 +65,26 @@ class SectionScheduled {
           geoJSON['type'] == 'MultiLineString' &&
           geoJSON.containsKey('coordinates') &&
           geoJSON['coordinates'] is List) {
-        List<dynamic> coordinatesList = geoJSON['coordinates'];
+        List<dynamic> multiLineCoordinates = geoJSON['coordinates'];
+        List<LatLng> latLngList = [];
 
-        List<LatLng> coordinates = [];
-
-        for (var sublist in coordinatesList) {
-          if (sublist is List) {
-            for (var coordinate in sublist) {
-              if (coordinate is List && coordinate.length == 2) {
-                double latitude = coordinate[1] as double;
-                double longitude = coordinate[0] as double;
-                coordinates.add(LatLng(latitude, longitude));
-              }
-            }
+        for (var coordinatesList in multiLineCoordinates) {
+          for (var coord in coordinatesList) {
+            double latitude = coord[1];
+            double longitude = coord[0];
+            latLngList.add(LatLng(latitude, longitude));
           }
         }
+
         SectionColor byName = getPolylineColor(tipoTra);
-        if (coordinates.isNotEmpty) {
+        if (multiLineCoordinates.isNotEmpty) {
           return Polyline(
-              polylineId: PolylineId('section_polyline_${json['ogcFid']}'),
-              points: coordinates,
-              color: byName.color,
-              width: 5,
-              consumeTapEvents: true);
+            polylineId: PolylineId('${json['ogcFid'].toString()}'),
+            points: latLngList,
+            color: byName.color,
+            width: 5,
+            consumeTapEvents: true,
+          );
         }
       }
     }

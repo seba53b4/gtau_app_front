@@ -5,21 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
-import 'package:gtau_app_front/models/catchment_data.dart';
-import 'package:gtau_app_front/models/register_data.dart';
+import 'package:gtau_app_front/models/scheduled/catchment_scheduled.dart';
+import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/element_type.dart';
-import '../models/lot_data.dart';
-import '../models/section_data.dart';
+import '../models/scheduled/register_scheduled.dart';
 import '../providers/user_provider.dart';
+import '../services/scheduled_service.dart';
+import '../utils/map_functions.dart';
+import '../viewmodels/scheduled_viewmodel.dart';
 import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
 
 class ScheduledMapComponent extends StatefulWidget {
-  const ScheduledMapComponent({super.key});
+  final int idSheduled;
+
+  const ScheduledMapComponent({super.key, required this.idSheduled});
 
   @override
   _ScheduledMapComponentState createState() => _ScheduledMapComponentState();
@@ -43,6 +47,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   late SelectedItemsProvider selectedItemsProvider;
   late String token;
   bool isDetailsButtonVisible = false;
+  late ScheduledViewModel scheduledViewModel;
 
   // Indices { S, R, C };
   Set<int> selectedIndices = {0, 1, 2};
@@ -53,7 +58,6 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   @override
   void initState() {
     super.initState();
-    _initializeLocation();
     _mapController = Completer<GoogleMapController>();
   }
 
@@ -61,7 +65,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     selectedItemsProvider = context.read<SelectedItemsProvider>();
+    scheduledViewModel = context.read<ScheduledViewModel>();
     token = context.read<UserProvider>().getToken!;
+    _initializeSheduledElements().then((value) => null);
   }
 
   @override
@@ -70,34 +76,29 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     selectedItemsProvider.reset();
   }
 
-  Future<void> _initializeLocation() async {
-    try {
-      //await getCurrentLocation();
-    } catch (e) {}
+  Future<void> _initializeSheduledElements() async {
+    ScheduledElements? entities =
+        await scheduledViewModel.fetchScheduledElements(token, 3);
+    if (entities != null) {
+      updateElementsOnMap(isCache: false, scheduledElements: entities);
+    }
   }
 
-  Color _onColorParamBehaviorSection(Section section) {
+  Color _onColorParamBehaviorSection(SectionScheduled section) {
     return selectedItemsProvider.isPolylineSelected(
             section.line!.polylineId, ElementType.section)
         ? selectedColor
         : section.line!.color;
   }
 
-  Color _onColorParamBehaviorLot(Lot lot) {
-    return selectedItemsProvider.isPolylineSelected(
-            lot.polyline!.polylineId, ElementType.lot)
-        ? selectedColor
-        : lot.polyline!.color;
-  }
-
-  Color _onColorParamBehaviorCatchment(Catchment catchment) {
+  Color _onColorParamBehaviorCatchment(CatchmentScheduled catchment) {
     return selectedItemsProvider.isCircleSelected(
             catchment.point!.circleId, ElementType.catchment)
         ? selectedColor
         : catchment.point!.strokeColor;
   }
 
-  Color _onColorParamBehaviorRegister(Register register) {
+  Color _onColorParamBehaviorRegister(RegisterScheduled register) {
     return selectedItemsProvider.isCircleSelected(
             register.point!.circleId, ElementType.register)
         ? selectedColor
@@ -117,83 +118,93 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     });
   }
 
-  //
-  // Set<Polyline> getPolylines(List<Section>? sections, List<Lot>? lots) {
-  //   Set<Polyline> setPol = {};
-  //
-  //   if (sections != null) {
-  //     for (var section in sections) {
-  //       Polyline pol = section.line!.copyWith(
-  //         zIndexParam: 0,
-  //         colorParam: _onColorParamBehaviorSection(section),
-  //         onTapParam: () async {
-  //           await _onTapParamBehaviorPolyline(
-  //               section.ogcFid, section.line, ElementType.section);
-  //           updateElementsOnMap();
-  //         },
-  //       );
-  //       setPol.add(pol);
-  //       setPol.addAll(
-  //           polylineArrows(section.line!.points, section.line!.polylineId));
-  //     }
-  //   }
-  //   if (lots != null) {
-  //     for (var lot in lots) {
-  //       Polyline pol = lot.polyline!.copyWith(
-  //         zIndexParam: 0,
-  //         colorParam: _onColorParamBehaviorLot(lot),
-  //         onTapParam: () async {
-  //           await _onTapParamBehaviorPolyline(
-  //               lot.ogcFid, lot.polyline, ElementType.lot);
-  //
-  //         },
-  //       );
-  //       setPol.add(pol);
-  //     }
-  //   }
-  //
-  //   return setPol;
-  // }
-  //
-  // Set<Circle> getCircles(
-  //     List<Catchment>? catchments, List<Register>? registers) {
-  //   Set<Circle> setCir = {};
-  //   if (catchments != null) {
-  //     for (var catchment in catchments) {
-  //       Circle circle = catchment.point!.copyWith(
-  //         zIndexParam: 1,
-  //         centerParam: catchment.point!.center,
-  //         radiusParam: catchment.point!.radius,
-  //         strokeWidthParam: catchment.point!.strokeWidth,
-  //         strokeColorParam: _onColorParamBehaviorCatchment(catchment),
-  //         onTapParam: () async {
-  //           await _onTapParamBehaviorCircle(
-  //               catchment.ogcFid, catchment.point, ElementType.catchment);
-  //           updateElementsOnMap();
-  //         },
-  //       );
-  //       setCir.add(circle);
-  //     }
-  //   }
-  //   if (registers != null) {
-  //     for (var register in registers) {
-  //       Circle circle = register.point!.copyWith(
-  //         zIndexParam: 1,
-  //         centerParam: register.point!.center,
-  //         radiusParam: register.point!.radius,
-  //         strokeWidthParam: register.point!.strokeWidth,
-  //         strokeColorParam: _onColorParamBehaviorRegister(register),
-  //         onTapParam: () async {
-  //           await _onTapParamBehaviorCircle(
-  //               register.ogcFid, register.point, ElementType.register);
-  //           updateElementsOnMap();
-  //         },
-  //       );
-  //       setCir.add(circle);
-  //     }
-  //   }
-  //   return setCir;
-  // }
+  Future<void> _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) async {}
+
+  Future<void> _onTapParamBehaviorCircle(
+      int ogcFid, Circle? point, ElementType type) async {}
+
+  void updateElementsOnMap(
+      {bool isCache = false, ScheduledElements? scheduledElements}) {
+    List<SectionScheduled>? sections;
+    List<RegisterScheduled>? registers;
+    List<CatchmentScheduled>? catchments;
+
+    if (isCache) {
+      sections = scheduledViewModel.sections;
+      catchments = scheduledViewModel.catchments;
+      registers = scheduledViewModel.registers;
+    } else {
+      sections = scheduledElements?.sections;
+      catchments = scheduledElements?.catchments;
+      registers = scheduledElements?.registers;
+    }
+
+    setState(() {
+      polylines = getPolylines(sections);
+      circles = getCircles(catchments, registers);
+    });
+  }
+
+  Set<Polyline> getPolylines(List<SectionScheduled>? sections) {
+    Set<Polyline> setPol = {};
+
+    if (sections != null) {
+      for (var section in sections) {
+        Polyline pol = section.line!.copyWith(
+          zIndexParam: 0,
+          colorParam: _onColorParamBehaviorSection(section),
+          onTapParam: () async {
+            await _onTapParamBehaviorPolyline(section.ogcFid, section.line);
+            updateElementsOnMap();
+          },
+        );
+        setPol.add(pol);
+        setPol.addAll(
+            polylineArrows(section.line!.points, section.line!.polylineId));
+      }
+    }
+    return setPol;
+  }
+
+  Set<Circle> getCircles(List<CatchmentScheduled>? catchments,
+      List<RegisterScheduled>? registers) {
+    Set<Circle> setCir = {};
+    if (catchments != null) {
+      for (var catchment in catchments) {
+        Circle circle = catchment.point!.copyWith(
+          zIndexParam: 1,
+          centerParam: catchment.point!.center,
+          radiusParam: catchment.point!.radius,
+          strokeWidthParam: catchment.point!.strokeWidth,
+          strokeColorParam: _onColorParamBehaviorCatchment(catchment),
+          onTapParam: () async {
+            await _onTapParamBehaviorCircle(
+                catchment.ogcFid, catchment.point, ElementType.catchment);
+            updateElementsOnMap();
+          },
+        );
+        setCir.add(circle);
+      }
+    }
+    if (registers != null) {
+      for (var register in registers) {
+        Circle circle = register.point!.copyWith(
+          zIndexParam: 1,
+          centerParam: register.point!.center,
+          radiusParam: register.point!.radius,
+          strokeWidthParam: register.point!.strokeWidth,
+          strokeColorParam: _onColorParamBehaviorRegister(register),
+          onTapParam: () async {
+            await _onTapParamBehaviorCircle(
+                register.ogcFid, register.point, ElementType.register);
+            updateElementsOnMap();
+          },
+        );
+        setCir.add(circle);
+      }
+    }
+    return setCir;
+  }
 
   // List<Future> getElementFutureSelected(String token) {
   //   List<Future> futures = [];
@@ -265,106 +276,112 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 0),
-                  //width: MediaQuery.of(context).size.width,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: GoogleMap(
-                      mapType: _currentMapType,
-                      initialCameraPosition: CameraPosition(
-                        target: (location != null) ? location! : initLocation,
-                        zoom: zoomMap,
+    return Consumer<ScheduledViewModel>(
+        builder: (context, scheduledViewModel, child) {
+      bool isLoading = scheduledViewModel.isLoading;
+      return Scaffold(
+        body: Row(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 0),
+                    //width: MediaQuery.of(context).size.width,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: GoogleMap(
+                        mapType: _currentMapType,
+                        initialCameraPosition: CameraPosition(
+                          target: (location != null) ? location! : initLocation,
+                          zoom: zoomMap,
+                        ),
+                        onCameraMove: (CameraPosition cameraPosition) {
+                          setState(() {
+                            zoomMap = cameraPosition.zoom;
+                          });
+                        },
+                        circles: circles,
+                        polylines: polylines,
+                        onMapCreated: (GoogleMapController controller) {
+                          if (location != null &&
+                              _mapController.isCompleted &&
+                              !(false)) {
+                            controller.moveCamera(
+                                CameraUpdate.newLatLngZoom(location!, zoomMap));
+                          }
+                          if (!_mapController.isCompleted) {
+                            _mapController.complete(controller);
+                          }
+                        },
+                        onTap: (LatLng latLng) {},
                       ),
-                      onCameraMove: (CameraPosition cameraPosition) {
-                        setState(() {
-                          zoomMap = cameraPosition.zoom;
-                        });
-                      },
-                      onMapCreated: (GoogleMapController controller) {
-                        if (location != null &&
-                            _mapController.isCompleted &&
-                            !(false)) {
-                          controller.moveCamera(
-                              CameraUpdate.newLatLngZoom(location!, zoomMap));
-                        }
-                        if (!_mapController.isCompleted) {
-                          _mapController.complete(controller);
-                        }
-                      },
-                      onTap: (LatLng latLng) {},
                     ),
                   ),
-                ),
-                Positioned(
-                  left: 16.0,
-                  top: 16.0,
-                  child: FloatingActionButton(
-                    foregroundColor: primarySwatch,
-                    backgroundColor: lightBackground,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    tooltip: 'Retroceder',
-                    child: const Icon(Icons.arrow_back),
+                  Positioned(
+                    left: 16.0,
+                    top: 16.0,
+                    child: FloatingActionButton(
+                      foregroundColor: primarySwatch,
+                      backgroundColor: lightBackground,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      tooltip: 'Retroceder',
+                      child: const Icon(Icons.arrow_back),
+                    ),
                   ),
-                ),
-                LoadingOverlay(
-                  isLoading: false,
-                  child: Positioned(
-                    top: kIsWeb ? null : 80,
-                    right: kIsWeb ? null : 16,
-                    bottom: kIsWeb ? 80 : null,
-                    left: kIsWeb ? 16 : null,
-                    child: Column(
-                      children: [
-                        MenuElevatedButton(
-                          colorChangeOnPress: true,
-                          onPressed: () {
-                            setState(() {
-                              _currentMapType =
-                                  _currentMapType == MapType.normal
-                                      ? MapType.satellite
-                                      : MapType.normal;
-                            });
-                          },
-                          tooltipMessage: AppLocalizations.of(context)!
-                              .map_component_map_view_tooltip,
-                          icon: _currentMapType == MapType.normal
-                              ? Icons.map
-                              : Icons.satellite,
-                        ),
-                        if (kIsWeb) const SizedBox(height: 6),
-                        MenuElevatedButton(
-                            onPressed: () {},
-                            icon: Icons.my_location,
+                  LoadingOverlay(
+                    isLoading: isLoading,
+                    child: Positioned(
+                      top: kIsWeb ? null : 80,
+                      right: kIsWeb ? null : 16,
+                      bottom: kIsWeb ? 80 : null,
+                      left: kIsWeb ? 16 : null,
+                      child: Column(
+                        children: [
+                          MenuElevatedButton(
+                            colorChangeOnPress: true,
+                            onPressed: () {
+                              setState(() {
+                                _currentMapType =
+                                    _currentMapType == MapType.normal
+                                        ? MapType.satellite
+                                        : MapType.normal;
+                              });
+                            },
                             tooltipMessage: AppLocalizations.of(context)!
-                                .map_component_get_location),
-                        if (kIsWeb) const SizedBox(height: 6),
-                        MultiSelectPopupMenuButton(
-                          texts: [
-                            AppLocalizations.of(context)!.sections,
-                            AppLocalizations.of(context)!.registers,
-                            AppLocalizations.of(context)!.catchments
-                          ],
-                          selectedIndices: selectedIndices,
-                          onIconsSelected: handleIconsSelected,
-                        ),
-                      ],
+                                .map_component_map_view_tooltip,
+                            icon: _currentMapType == MapType.normal
+                                ? Icons.map
+                                : Icons.satellite,
+                          ),
+                          if (kIsWeb) const SizedBox(height: 6),
+                          MenuElevatedButton(
+                              onPressed: () {},
+                              icon: Icons.my_location,
+                              tooltipMessage: AppLocalizations.of(context)!
+                                  .map_component_get_location),
+                          if (kIsWeb) const SizedBox(height: 6),
+                          MultiSelectPopupMenuButton(
+                            texts: [
+                              AppLocalizations.of(context)!.sections,
+                              AppLocalizations.of(context)!.registers,
+                              AppLocalizations.of(context)!.catchments
+                            ],
+                            selectedIndices: selectedIndices,
+                            onIconsSelected: handleIconsSelected,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }

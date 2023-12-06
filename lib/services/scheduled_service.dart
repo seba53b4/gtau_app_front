@@ -7,22 +7,22 @@ import 'package:gtau_app_front/models/scheduled/register_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:http/http.dart' as http;
 
-class TaskScheduledEntities {
-  List<RegisterScheduled> registerList;
-  List<SectionScheduled> sectionList;
-  List<CatchmentScheduled> catchmentList;
+class ScheduledElements {
+  List<RegisterScheduled> registers;
+  List<SectionScheduled> sections;
+  List<CatchmentScheduled> catchments;
 
-  TaskScheduledEntities({
-    required this.registerList,
-    required this.sectionList,
-    required this.catchmentList,
+  ScheduledElements({
+    required this.registers,
+    required this.sections,
+    required this.catchments,
   });
 }
 
-class ScheduledTaskService {
+class ScheduledService {
   final String baseUrl;
 
-  ScheduledTaskService({String? baseUrl})
+  ScheduledService({String? baseUrl})
       : baseUrl = baseUrl ??
             dotenv.get('API_SCHEDULED_TASKS_URL', fallback: 'NOT_FOUND');
 
@@ -33,7 +33,7 @@ class ScheduledTaskService {
     };
   }
 
-  Future<TaskScheduledEntities?> fetchTaskScheduledEntities(
+  Future<ScheduledElements?> fetchTaskScheduledEntities(
       String token, int idSchedTask) async {
     try {
       final url = Uri.parse('$baseUrl/$idSchedTask/entities');
@@ -59,12 +59,11 @@ class ScheduledTaskService {
           return CatchmentScheduled.fromJson(catchmentData);
         }).toList();
 
-        return TaskScheduledEntities(
-          registerList: registerList,
-          sectionList: sectionList,
-          catchmentList: catchmentList,
+        return ScheduledElements(
+          registers: registerList,
+          sections: sectionList,
+          catchments: catchmentList,
         );
-        ;
       } else {
         if (kDebugMode) {
           print('No se pudieron traer datos');

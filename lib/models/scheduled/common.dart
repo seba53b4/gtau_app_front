@@ -13,14 +13,28 @@ Circle? buildCircle(Map<String, dynamic> json, PointType type) {
     double longitude = coordenates[0];
     LatLng latLngCenter = LatLng(latitude, longitude);
 
-    return Circle(
-        circleId: CircleId(json['ogcFid'].toString()),
-        center: latLngCenter,
-        radius: 2,
-        strokeWidth: 2,
-        consumeTapEvents: true,
-        strokeColor: catchmentDefaultColor,
-        fillColor: Colors.black);
+    Circle circle;
+    if (type == PointType.register) {
+      circle = Circle(
+          circleId: CircleId('register:${json['ogcFid']}'),
+          center: latLngCenter,
+          radius: 1.3,
+          strokeWidth: 7,
+          consumeTapEvents: true,
+          strokeColor: registerDefaultColor,
+          fillColor: Colors.grey);
+    } else {
+      circle = Circle(
+          circleId: CircleId('catchment:${json['ogcFid']}'),
+          center: latLngCenter,
+          radius: 2,
+          strokeWidth: 2,
+          consumeTapEvents: true,
+          strokeColor: catchmentDefaultColor,
+          fillColor: Colors.black);
+    }
+
+    return circle;
   }
   return null;
 }

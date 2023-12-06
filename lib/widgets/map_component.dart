@@ -183,7 +183,10 @@ class _MapComponentState extends State<MapComponent> {
   Future<List<Register>?> fetchRegistersCircles(String token) async {
     LatLng? finalLocation = getFinalLocation();
     return await registerViewModel.fetchRegistersByRadius(
-        token, finalLocation!.latitude, finalLocation!.longitude, 200);
+        token,
+        finalLocation!.latitude,
+        finalLocation!.longitude,
+        int.parse(distances[distanceSelected]));
   }
 
   LatLng? getFinalLocation() => (location != null) ? location : initLocation;
