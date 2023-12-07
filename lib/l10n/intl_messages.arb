@@ -160,5 +160,6 @@
     "scheduled_main_title": "Infromación de programada",
     "scheduled_title_input": "Título",
     "scheduled_end_date_title" : "Fecha de Fin",
+    "createuser_main_title": "Creación de Usuario",
     "file_upload_btn": "Seleccionar"
 }
