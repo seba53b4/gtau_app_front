@@ -161,5 +161,6 @@
     "scheduled_main_title": "Infromación de programada",
     "scheduled_title_input": "Título",
     "scheduled_end_date_title" : "Fecha de Fin",
+    "dialogContent_deleteImage" : "¿Desea eliminar esta(s) imagen(es)?",
     "file_upload_btn": "Seleccionar"
 }

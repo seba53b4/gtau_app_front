@@ -94,7 +94,7 @@ class _GelleryShowState extends State<_GelleryShow> {
           isLoading: imagesViewModel.isLoading,
           child: Scaffold(
             appBar:
-                AppBar(title: Text(AppLocalizations.of(context)!.images_title)),
+                AppBar(title: Text(AppLocalizations.of(context)!.images_title), centerTitle: true,),
             body:Padding(
               padding: const EdgeInsets.symmetric(horizontal:15),
               child: Center(
@@ -130,7 +130,7 @@ class _GelleryShowState extends State<_GelleryShow> {
           isLoading: imagesViewModel.isLoading,
           child: Scaffold(
             appBar:
-                AppBar(title: Text(AppLocalizations.of(context)!.images_title)),
+                AppBar(title: Text(AppLocalizations.of(context)!.images_title), centerTitle: true),
             body: GridView.builder(
               physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics(),
@@ -236,24 +236,23 @@ class _GelleryShowState extends State<_GelleryShow> {
     await showCustomDialog(
       context: showDialogContext,
       title: AppLocalizations.of(showDialogContext)!.dialogWarning,
-      content: AppLocalizations.of(showDialogContext)!.dialogContent,
+      content: AppLocalizations.of(showDialogContext)!.dialogContent_deleteImage,
       onDisablePressed: () {
         Navigator.of(showDialogContext).pop();
       },
       onEnablePressed: () async {
         Navigator.of(showDialogContext).pop();
         bool result = await _deleteSelectedImages(photos);
-        print('resultado $result');
 
         if (result == true) {
-          print('Imagen ha sido eliminada correctamente');
+          /*print('Imagen ha sido eliminada correctamente');*/
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          print('No se pudo eliminar la imagen');
+          /*print('No se pudo eliminar la imagen');*/
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,
