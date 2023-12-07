@@ -19,6 +19,7 @@ import '../utils/map_functions.dart';
 import '../viewmodels/scheduled_viewmodel.dart';
 import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
+import 'element_scheduled_modal.dart';
 
 class ScheduledMapComponent extends StatefulWidget {
   final int idSheduled;
@@ -77,8 +78,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   Future<void> _initializeSheduledElements() async {
-    ScheduledElements? entities =
-        await scheduledViewModel.fetchScheduledElements(token, 3);
+    ScheduledElements? entities = await scheduledViewModel
+        .fetchScheduledElements(token, widget.idSheduled);
     if (entities != null) {
       updateElementsOnMap(isCache: false, scheduledElements: entities);
     }
@@ -118,10 +119,32 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     });
   }
 
-  Future<void> _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) async {}
+  void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) {
+    _showModalElement(context, ogcFid, ElementType.section);
+  }
 
   Future<void> _onTapParamBehaviorCircle(
       int ogcFid, Circle? point, ElementType type) async {}
+
+  void _showModalElement(BuildContext context, int ogcFid, ElementType type) {
+    double widthWindow = MediaQuery.of(context).size.width;
+    showScheduledElementModal(context, type, () {}, widget.idSheduled, ogcFid);
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return Dialog(
+    //       shape: const RoundedRectangleBorder(
+    //           borderRadius: BorderRadius.all(Radius.circular(50.0))),
+    //       child: SizedBox(
+    //         width: kIsWeb ? widthWindow * 0.85 : widthWindow,
+    //         child: const Center(
+    //             widthFactor: kIsWeb ? 0.6 : 0.5,
+    //             child: ScheduledMapComponent(idSheduled: 3)),
+    //       ),
+    //     );
+    //   },
+    // );
+  }
 
   void updateElementsOnMap(
       {bool isCache = false, ScheduledElements? scheduledElements}) {
@@ -153,9 +176,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
         Polyline pol = section.line!.copyWith(
           zIndexParam: 0,
           colorParam: _onColorParamBehaviorSection(section),
-          onTapParam: () async {
-            await _onTapParamBehaviorPolyline(section.ogcFid, section.line);
-            updateElementsOnMap();
+          onTapParam: () {
+            _onTapParamBehaviorPolyline(section.ogcFid!, section.line);
+            //updateElementsOnMap();
           },
         );
         setPol.add(pol);

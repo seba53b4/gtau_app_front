@@ -39,21 +39,21 @@ class CatchmentScheduled extends PointData {
   factory CatchmentScheduled.fromJson(Map<String, dynamic> json) {
     return CatchmentScheduled(
         ogcFid: json['ogcFid'] as int,
-        tipo: json['tipo'] as String,
-        catastro: json['catastro'] as String,
-        estadoConexion: json['estado_conexion'] as String,
-        estadoLlamada: json['estado_llamada'] as String,
-        estadoLosa: json['estado_losa'] as String,
-        estadoTabique: json['estado_tabique'] as String,
-        estadoDeposito: json['estado_deposito'] as String,
-        tapa1: json['tapa1'] as String,
-        tapa2: json['tapa2'] as String,
-        observaciones: json['observaciones'] as String,
+        tipo: json['tipo'] as String?,
+        catastro: json['catastro'] as String?,
+        estadoConexion: json['estado_conexion'] as String?,
+        estadoLlamada: json['estado_llamada'] as String?,
+        estadoLosa: json['estado_losa'] as String?,
+        estadoTabique: json['estado_tabique'] as String?,
+        estadoDeposito: json['estado_deposito'] as String?,
+        tapa1: json['tapa1'] as String?,
+        tapa2: json['tapa2'] as String?,
+        observaciones: json['observaciones'] as String?,
         inspectioned: json['inspectioned'] as bool,
         inspectionedDate: json['inspectioned_date'] != null
             ? DateTime.parse(json['inspectioned_date'] as String)
             : null,
-        username: json['username'] as String,
+        username: json['username'] as String?,
         type: PointType.catchment,
         point: buildCircle(json, PointType.catchment));
   }

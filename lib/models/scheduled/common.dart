@@ -16,7 +16,7 @@ Circle? buildCircle(Map<String, dynamic> json, PointType type) {
     Circle circle;
     if (type == PointType.register) {
       circle = Circle(
-          circleId: CircleId('register:${json['ogcFid']}'),
+          circleId: CircleId('${json['ogcFid']}'),
           center: latLngCenter,
           radius: 1.3,
           strokeWidth: 7,
@@ -25,7 +25,7 @@ Circle? buildCircle(Map<String, dynamic> json, PointType type) {
           fillColor: Colors.grey);
     } else {
       circle = Circle(
-          circleId: CircleId('catchment:${json['ogcFid']}'),
+          circleId: CircleId('${json['ogcFid']}'),
           center: latLngCenter,
           radius: 2,
           strokeWidth: 2,

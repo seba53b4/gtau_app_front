@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
@@ -74,21 +73,27 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   void _showFilterModal(BuildContext context) {
     double widthWindow = MediaQuery.of(context).size.width;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50.0))),
-          child: SizedBox(
-            width: kIsWeb ? widthWindow * 0.85 : widthWindow,
-            child: const Center(
-                widthFactor: kIsWeb ? 0.6 : 0.5,
-                child: ScheduledMapComponent(idSheduled: 3)),
-          ),
-        );
-      },
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => const ScheduledMapComponent(idSheduled: 1)),
     );
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return Dialog(
+    //       shape: const RoundedRectangleBorder(
+    //           borderRadius: BorderRadius.all(Radius.circular(50.0))),
+    //       child: SizedBox(
+    //         width: kIsWeb ? widthWindow * 0.85 : widthWindow,
+    //         child: const Center(
+    //             widthFactor: kIsWeb ? 0.6 : 0.5,
+    //             child: ScheduledMapComponent(idSheduled: 3)),
+    //       ),
+    //     );
+    //   },
+    // );
   }
 
   @override

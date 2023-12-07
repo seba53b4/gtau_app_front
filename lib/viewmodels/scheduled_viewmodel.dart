@@ -66,4 +66,36 @@ class ScheduledViewModel extends ChangeNotifier {
     }
     return null;
   }
+
+  Future<SectionScheduled?> fetchSectionScheduledById(
+      String token, int scheduledId, int sectionId) async {
+    try {
+      _isLoading = true;
+      _error = false;
+
+      SectionScheduled? sectionScheduledResp = await _scheduledService
+          .fetchSectionScheduledById(token, scheduledId, sectionId);
+
+      if (sectionScheduledResp != null) {
+        _isLoading = false;
+      } else {
+        _error = true;
+      }
+
+      Future.microtask(() {
+        _isLoading = false;
+        notifyListeners();
+      });
+
+      return sectionScheduledResp;
+    } catch (error) {
+      _isLoading = false;
+      _error = true;
+      Future.microtask(() {
+        notifyListeners();
+      });
+      print('Error in fetchScheduledElements: $error');
+    }
+    return null;
+  }
 }

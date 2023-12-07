@@ -51,7 +51,7 @@ class ScheduledService {
 
         List<SectionScheduled> sectionList =
             entitiesSection.map<SectionScheduled>((sectionData) {
-          return SectionScheduled.fromJson(sectionData);
+          return SectionScheduled.fromJson(json: sectionData);
         }).toList();
 
         List<CatchmentScheduled> catchmentList =
@@ -73,6 +73,28 @@ class ScheduledService {
     } catch (error) {
       if (kDebugMode) {
         print('Error in fetchTaskScheduledEntities: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<SectionScheduled?> fetchSectionScheduledById(
+      String token, int scheduledId, int sectionId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/tramo/$sectionId');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return SectionScheduled.fromJson(json: jsonResponse, isFetch: true);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener tramos: $error');
       }
       rethrow;
     }

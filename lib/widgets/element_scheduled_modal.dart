@@ -20,7 +20,7 @@ _parseTitle(BuildContext context, ElementType elementType) {
 }
 
 void showScheduledElementModal(BuildContext context, ElementType elementType,
-    OnCloseCallback? onClose) async {
+    OnCloseCallback? onClose, int scheduledId, int elementId) async {
   double dialogWidth = MediaQuery.of(context).size.width * 0.82;
   double scrollHeight = MediaQuery.of(context).size.height * 0.75;
 
@@ -60,7 +60,10 @@ void showScheduledElementModal(BuildContext context, ElementType elementType,
           content: SizedBox(
             height: scrollHeight,
             width: dialogWidth,
-            child: ScheduledFormWidget(elementType: elementType),
+            child: ScheduledFormWidget(
+                elementType: elementType,
+                elementId: elementId,
+                scheduledid: scheduledId),
           ),
           actions: null,
           // actions: <Widget>[

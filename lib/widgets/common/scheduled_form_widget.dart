@@ -7,9 +7,11 @@ import '../../models/enums/element_type.dart';
 
 class ScheduledFormWidget extends StatefulWidget {
   final ElementType? elementType;
+  final int scheduledid;
+  final int elementId;
   final VoidCallback? onAddButtonClick;
 
-  const ScheduledFormWidget({Key? key, this.elementType, this.onAddButtonClick}) : super(key: key);
+  const ScheduledFormWidget({Key? key, this.elementType, this.onAddButtonClick, required this.scheduledid, required this.elementId}) : super(key: key);
 
   @override
   State<ScheduledFormWidget> createState() => _ScheduledFormWidget();
@@ -21,7 +23,7 @@ class _ScheduledFormWidget extends State<ScheduledFormWidget> {
     return switch (widget.elementType) {
     ElementType.catchment => const ScheduledFormCatchment(),
     ElementType.register => const ScheduledFormRegister(),
-    ElementType.section => const ScheduledFormSection(),
+    ElementType.section =>  ScheduledFormSection(sectionId: widget.elementId, scheduledId: widget.scheduledid),
     _ => throw Exception('Invalid status string: ${widget.elementType}')
   };
   }

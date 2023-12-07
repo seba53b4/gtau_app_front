@@ -3,11 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
+import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/custom_textfield.dart';
 import 'package:gtau_app_front/widgets/common/scheduled_form_common.dart';
+import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../models/enums/message_type.dart';
+import '../../providers/user_provider.dart';
 import '../../utils/element_functions.dart';
 import 'container_divider.dart';
 import 'custom_dropdown.dart';
@@ -16,7 +20,12 @@ import 'custom_labeled_checkbox.dart';
 import 'custom_text_form_field.dart';
 
 class ScheduledFormSection extends StatefulWidget {
-  const ScheduledFormSection({Key? key}) : super(key: key);
+  final int sectionId;
+  final int scheduledId;
+
+  const ScheduledFormSection(
+      {Key? key, required this.sectionId, required this.scheduledId})
+      : super(key: key);
 
   @override
   State<ScheduledFormSection> createState() => _ScheduledFormSection();
@@ -26,22 +35,28 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   final AutoScrollController _scrollController = AutoScrollController();
   final FocusNode _observationsFocusNode = FocusNode();
   late StreamSubscription<bool> keyboardSubscription;
+  late String idSection = 'ID';
   final _typeController = TextEditingController();
   final _catastroController = TextEditingController();
   final _observationsController = TextEditingController();
-  final _diamController = TextEditingController();
+  final _diamController1 = TextEditingController();
+  final _diamController2 = TextEditingController();
   final _longitudeController = TextEditingController();
   final _longitudeFocusNode = FocusNode();
-  final _diamFocusNode = FocusNode();
+  final _diamFocusNode1 = FocusNode();
+  final _diamFocusNode2 = FocusNode();
   final _typeFocusNode = FocusNode();
   final _catastroDropdownFocusNode = FocusNode();
   List<FocusNode> focusNodes = [];
+  late String token;
+  late ScheduledViewModel? scheduledViewModel;
 
   @override
   void initState() {
     super.initState();
     focusNodes = [
-      _diamFocusNode,
+      _diamFocusNode1,
+      _diamFocusNode2,
       _observationsFocusNode,
       _typeFocusNode,
       _longitudeFocusNode,
@@ -53,6 +68,14 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
         scrollToFocusedList(focusNodes, _scrollController);
       }
     });
+    token = context.read<UserProvider>().getToken!;
+    scheduledViewModel = context.read<ScheduledViewModel>();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadSectionInfo();
   }
 
   @override
@@ -60,14 +83,32 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
     keyboardSubscription.cancel();
     _observationsFocusNode.dispose();
     _longitudeFocusNode.dispose();
-    _diamFocusNode.dispose();
-    _diamController.dispose();
+    _diamFocusNode1.dispose();
+    _diamController1.dispose();
+    _diamFocusNode2.dispose();
+    _diamController2.dispose();
     _typeController.dispose();
     _typeFocusNode.dispose();
     _longitudeController.dispose();
     _catastroController.dispose();
     _catastroDropdownFocusNode.dispose();
     super.dispose();
+  }
+
+  void _loadSectionInfo() async {
+    SectionScheduled? sectionScheduled =
+        await scheduledViewModel?.fetchSectionScheduledById(
+            token, widget.scheduledId, widget.sectionId);
+    if (sectionScheduled != null) {
+      setState(() {
+        idSection = sectionScheduled.idTramo.toString();
+      });
+      if (sectionScheduled.inspectioned) {
+        // si fue ya inspeccionado se carga la data sino se deja como está.
+        _catastroController.text = sectionScheduled.catastro ??
+            AppLocalizations.of(context)!.form_scheduled_cadastre_type_empty;
+      }
+    }
   }
 
   @override
@@ -107,7 +148,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                               Text(AppLocalizations.of(context)!
                                   .form_scheduled_id),
                               const SizedBox(width: 8),
-                              const Text('HD123456'),
+                              Text(idSection ?? 'ID'),
                             ],
                           ),
                         ),
@@ -156,10 +197,24 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                   ContainerBottomDivider(children: [
                     ScheduledFormTitle(
                         titleText:
-                            AppLocalizations.of(context)!.form_scheduled_diam),
+                            AppLocalizations.of(context)!.form_scheduled_diam1),
                     CustomTextField(
-                      controller: _diamController,
-                      focusNode: _diamFocusNode,
+                      controller: _diamController1,
+                      focusNode: _diamFocusNode1,
+                      width: 98,
+                      keyboardType: TextInputType.number,
+                      hasError: false,
+                    ),
+                  ]),
+                  const SizedBox(height: 12),
+                  // Diámentro (m)
+                  ContainerBottomDivider(children: [
+                    ScheduledFormTitle(
+                        titleText:
+                            AppLocalizations.of(context)!.form_scheduled_diam2),
+                    CustomTextField(
+                      controller: _diamController2,
+                      focusNode: _diamFocusNode2,
                       width: 98,
                       keyboardType: TextInputType.number,
                       hasError: false,
