@@ -42,6 +42,8 @@ class _MapComponentState extends State<MapComponent> {
   String? errorMsg;
   List<String> distances = ["100", "200", "300", "500"];
   int distanceSelected = 0;
+  int lastDistanceSelected = 8;
+  LatLng? lastLocation;
   MapType _currentMapType = MapType.satellite;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
@@ -114,8 +116,16 @@ class _MapComponentState extends State<MapComponent> {
   void dispose() {
     if (!widget.isModal) {
       selectedItemsProvider.reset();
+      clearElementsFetched();
     }
     super.dispose();
+  }
+
+  void clearElementsFetched() {
+    registerViewModel.reset();
+    sectionViewModel.reset();
+    lotViewModel.reset();
+    catchmentViewModel.reset();
   }
 
   Future<void> _initializeLocation() async {
@@ -227,7 +237,10 @@ class _MapComponentState extends State<MapComponent> {
   Future<List<Register>?> fetchRegistersCircles() async {
     LatLng? finalLocation = getFinalLocation();
     return await registerViewModel.fetchRegistersByRadius(
-        token, finalLocation!.latitude, finalLocation.longitude, 200);
+        token,
+        finalLocation!.latitude,
+        finalLocation.longitude,
+        int.parse(distances[distanceSelected]));
   }
 
   LatLng? getFinalLocation() => (location != null) ? location : initLocation;
@@ -389,7 +402,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
                 section.ogcFid, section.line, ElementType.section);
-            updateElementsOnMap();
+            getElements();
           },
         );
         setPol.add(pol);
@@ -405,7 +418,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
                 lot.ogcFid, lot.polyline, ElementType.lot);
-            updateElementsOnMap();
+            getElements();
           },
         );
         setPol.add(pol);
@@ -429,7 +442,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
                 catchment.ogcFid, catchment.point, ElementType.catchment);
-            updateElementsOnMap();
+            getElements();
           },
         );
         setCir.add(circle);
@@ -446,13 +459,28 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
                 register.ogcFid, register.point, ElementType.register);
-            updateElementsOnMap();
+            getElements();
           },
         );
         setCir.add(circle);
       }
     }
     return setCir;
+  }
+
+  void getElements() async {
+    LatLng? finalLocation = getFinalLocation();
+    if (lastDistanceSelected != distanceSelected ||
+        finalLocation != lastLocation) {
+      selectedIndices.addAll([0, 1, 2, 3]);
+      await fetchAndUpdateData();
+      lastLocation = finalLocation;
+    } else {
+      updateElementsOnMap();
+    }
+    setState(() {
+      lastDistanceSelected = distanceSelected;
+    });
   }
 
   List<Future> getElementFutureSelected() {
@@ -628,7 +656,7 @@ class _MapComponentState extends State<MapComponent> {
                                 if (kIsWeb) const SizedBox(height: 6),
                                 MenuElevatedButton(
                                   onPressed: () async {
-                                    await fetchAndUpdateData();
+                                    getElements();
                                   },
                                   tooltipMessage: AppLocalizations.of(context)!
                                       .map_component_fetch_elements,
