@@ -22,49 +22,16 @@ class ImagesViewModel extends ChangeNotifier {
     return urls.map((url) => Photo(url: url)).toList();
   }
 
+  void reset() {
+    _photos = [];
+  }
+
   Future<List<String>> fetchTaskImages(token, int idTask) async {
     try {
       _isLoading = true;
       _error = false;
-      _photos = [];
       final List<String> responseTask =
-          await _taskService.fetchTaskImages(token, idTask);
-
-      if (responseTask.isNotEmpty) {
-        _photos = parsePhotos(responseTask);
-      } else {
-        _photos = [];
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
-      }
-
-      // Se usa Future.microtask para retrasar la llamada a notifyListeners()
-      Future.microtask(() {
-        _isLoading = false;
-        notifyListeners();
-      });
-      return responseTask;
-    } catch (error) {
-      _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
-      throw Exception('Error al obtener los datos');
-    }
-  }
-
-  Future<List<String>> fetchTaskImagesWithDelay(
-      token, int idTask, int delaysec) async {
-    try {
-      _isLoading = true;
-      _error = false;
-      notifyListeners();
-      final List<String> responseTask =
-          await _taskService.fetchTaskImages(token, idTask);
-
-      final leng = responseTask.length;
-      print('largo response $leng');
+      await _taskService.fetchTaskImages(token, idTask);
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
@@ -118,7 +85,7 @@ class ImagesViewModel extends ChangeNotifier {
         }
       } else {
         final resultprocess =
-            await _taskService.putMultipartImages(token, id, path);
+        await _taskService.putMultipartImages(token, id, path);
         result = result && resultprocess;
       }
     }
