@@ -22,22 +22,26 @@ class ImagesViewModel extends ChangeNotifier {
     return urls.map((url) => Photo(url: url)).toList();
   }
 
+  void reset() {
+    _photos = [];
+  }
+
   Future<List<String>> fetchTaskImages(token, int idTask) async {
     try {
       _isLoading = true;
       _error = false;
-
       final List<String> responseTask =
-          await _taskService.fetchTaskImages(token, idTask);
+      await _taskService.fetchTaskImages(token, idTask);
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
       } else {
-        _error = true;
+        _photos = [];
         if (kDebugMode) {
           print('No se pudieron traer datos');
         }
       }
+
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
       Future.microtask(() {
         _isLoading = false;
@@ -53,22 +57,50 @@ class ImagesViewModel extends ChangeNotifier {
     }
   }
 
-  uploadImage(String token, int id, String path) {
+  Future<bool> uploadImage(String token, int id, String path) async {
     _isLoading = true;
+    bool result = true;
     notifyListeners();
     if (kIsWeb) {
-      _taskService.putBase64Images(token, id, path);
+      await _taskService.putBase64Images(token, id, path);
     } else {
-      _taskService.putMultipartImages(token, id, path);
+      result = await _taskService.putMultipartImages(token, id, path);
     }
     _isLoading = false;
     notifyListeners();
+    return result;
+  }
+
+  Future<bool> uploadImages(String token, int id, List<String> listpath) async {
+    _isLoading = true;
+    bool result = true;
+    notifyListeners();
+    for (var path in listpath!) {
+      if (kIsWeb) {
+        final finalList = await _taskService.putBase64Images(token, id, path);
+        if (finalList == null) {
+          result = result && false;
+        } else {
+          result = result && true;
+        }
+      } else {
+        final resultprocess =
+        await _taskService.putMultipartImages(token, id, path);
+        result = result && resultprocess;
+      }
+    }
+    print('jajxd');
+    /*await new Future.delayed(const Duration(seconds: 2));*/
+    _isLoading = false;
+    notifyListeners();
+    return result;
   }
 
   Future<bool> deleteImage(String token, int id, String path) async {
     try {
       _isLoading = true;
       _error = false;
+      notifyListeners();
 
       final bool response = await _taskService.deleteTaskImage(token, id, path);
 

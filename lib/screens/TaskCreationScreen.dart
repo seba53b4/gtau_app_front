@@ -1258,11 +1258,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             width: widthRow,
                             child: Column(
                               children: [
-                                UserImage(
+                                /*UserImage(
                                     onFileChanged: (imagesFiles) {
                                       this.imagesFiles = imagesFiles;
                                     },
-                                    idTask: widget.idTask),
+                                    idTask: widget.idTask),*/
                                 ImageGalleryModal(idTask: widget.idTask!),
                               ],
                             ),

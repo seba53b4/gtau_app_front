@@ -156,9 +156,11 @@
     "error_service_not_available": "Servicio no disponible",
     "no_more_tasks_found": "No hay mas tareas para mostrar",
     "no_tasks_found_filter": "No se ha encontrado ninguna tarea que cumpla con los requisitos",
+    "empty_image_gallery": "Esta tarea no contiene imagenes",
     "scheduled_file_title": "Fuente de datos",
     "scheduled_main_title": "Infromación de programada",
     "scheduled_title_input": "Título",
     "scheduled_end_date_title" : "Fecha de Fin",
+    "dialogContent_deleteImage" : "¿Desea eliminar esta(s) imagen(es)?",
     "file_upload_btn": "Seleccionar"
 }
