@@ -474,13 +474,13 @@ class _MapComponentState extends State<MapComponent> {
         finalLocation != lastLocation) {
       selectedIndices.addAll([0, 1, 2, 3]);
       await fetchAndUpdateData();
-      lastLocation = finalLocation;
+      setState(() {
+        lastDistanceSelected = distanceSelected;
+        lastLocation = finalLocation;
+      });
     } else {
       updateElementsOnMap();
     }
-    setState(() {
-      lastDistanceSelected = distanceSelected;
-    });
   }
 
   List<Future> getElementFutureSelected() {
