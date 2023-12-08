@@ -132,7 +132,32 @@ class TaskService {
       final response = await http.get(url, headers: _getHeaders(token));
       if (response.statusCode == 200) {
         List<dynamic> decode = json.decode(response.body) as List<dynamic>;
-        return decode.map((e) => e["image"].toString()).toList();
+        List<String> newList = await decode.map((e) => e["image"].toString()).toList();
+        await new Future.delayed(Duration(seconds: 1)); /*Simulamos el delay de una lenta conexion*/
+        return await newList;
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return [];
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in fetchTaskImages: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<String>> fetchTaskImagesWithDelay(token, int idTask, int delaysec) async {
+    try {
+      final url = Uri.parse('$baseUrl/$idTask/images');
+      final response = await http.get(url, headers: _getHeaders(token));
+      if (response.statusCode == 200) {
+        List<dynamic> decode = json.decode(response.body) as List<dynamic>;
+        List<String> newList = await decode.map((e) => e["image"].toString()).toList();
+        await new Future.delayed(Duration(seconds: delaysec)); /*Simulamos el delay de una lenta conexion*/
+        return await newList;
       } else {
         if (kDebugMode) {
           print('No se pudieron traer datos');
@@ -216,7 +241,7 @@ class TaskService {
         //Cuando ingresa a la galeria la imagen se renderiza de todas formas, no es necesario hacer nada aca.
         var image = jsonResponse['image'];
         var id = jsonResponse['inspectionTaskId'];
-
+        /*await new Future.delayed(Duration(seconds: 1));*/ /*Simulamos el delay de una lenta conexion*/
         return jsonResponse.entries.map<String>((entry) {
           return "${entry.key}: ${entry.value}"; //Agrego esto por aca solo para que no salte error
         }).toList();
@@ -256,6 +281,9 @@ class TaskService {
       request.files.add(await http.MultipartFile.fromPath('image', path,
           contentType: MediaType('image', 'jpg')));
       var response = await request.send();
+
+      /*await new Future.delayed(Duration(seconds: 1));*/ /*Simulamos el delay de una lenta conexion*/
+      
 
       return response.statusCode == 200;
     } catch (error) {

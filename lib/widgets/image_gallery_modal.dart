@@ -376,10 +376,7 @@ class _GelleryShowState extends State<_GelleryShow> {
       }finally{
       }
       setState(() {
-        updateImageViewStateWithDelay(context, 2);
-        if(photos.length != oldPhotosLength + 1){
-          updateImageViewStateWithDelay(context, 2);
-        }
+        updateImageViewState(context);
       });
     }
     
@@ -392,10 +389,15 @@ class _GelleryShowState extends State<_GelleryShow> {
       final imagesViewModel =
           Provider.of<ImagesViewModel>(context, listen: false);
       
-      temporaryFilesToUpload.forEach((image) async {
+      /*temporaryFilesToUpload.forEach((image) async {
         try {
           final response = await imagesViewModel.uploadImage(
               token!, widget.idTask!, image.path);
+          if(response == true){
+            setState(() {
+              updateImageViewState(context);
+            });
+          }
           
         } catch (error) {
           print(error);
@@ -403,28 +405,23 @@ class _GelleryShowState extends State<_GelleryShow> {
         }finally{
           
         }
-      });
-      setState(() {
-        updateImageViewStateWithDelay(context, temporaryFilesToUpload.length+1);
-        if(photos.length != oldPhotosLength + temporaryFilesToUpload.length){
-          updateImageViewStateWithDelay(context, 2);
-        }
-      });
-      /*final tempFilesPaths = temporaryFilesToUpload.map((image) => {image.path}).toList(); 
+      });*/
+      List<String> list = [];
+      final tempFilesPaths = temporaryFilesToUpload.map((image) => list.add(image.path)).toList(); 
       try {
           final response = await imagesViewModel.uploadImages(
-              token!, widget.idTask!, tempFilesPaths.cast<String>());
+              token!, widget.idTask!, list);
+          if(response == true){
+            setState(() {
+              updateImageViewState(context);
+            });
+          }
           
       } catch (error) {
         print(error);
         throw Exception('Error al subir imagen');
-      }finally{
-        setState(() {
-          updateImageViewState(context);
-        });
-      }*/
+      }
     }
-    
   }
 
   Future<bool> _deleteSelectedImages(List<Photo> photos) async{
