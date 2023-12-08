@@ -348,7 +348,7 @@ class _GelleryShowState extends State<_GelleryShow> {
             .toList();
 
         setState(() {
-          this.processImages(temporaryFiles);
+          processImages(temporaryFiles);
         });
       }
       // Resto del código para comprimir y establecer la imagen.
@@ -360,7 +360,6 @@ class _GelleryShowState extends State<_GelleryShow> {
   }
 
   void processImageSingular(ImageDataDTO temporaryFileToUpload) async {
-    final oldPhotosLength = photos.length;
     if (temporaryFileToUpload != null) {
       final token = Provider.of<UserProvider>(context, listen: false).getToken;
       final imagesViewModel =
@@ -386,23 +385,6 @@ class _GelleryShowState extends State<_GelleryShow> {
       final imagesViewModel =
           Provider.of<ImagesViewModel>(context, listen: false);
 
-      /*temporaryFilesToUpload.forEach((image) async {
-        try {
-          final response = await imagesViewModel.uploadImage(
-              token!, widget.idTask!, image.path);
-          if(response == true){
-            setState(() {
-              updateImageViewState(context);
-            });
-          }
-
-        } catch (error) {
-          print(error);
-          throw Exception('Error al subir imagen');
-        }finally{
-
-        }
-      });*/
       List<String> list = [];
       final tempFilesPaths =
           temporaryFilesToUpload.map((image) => list.add(image.path)).toList();
