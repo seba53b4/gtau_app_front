@@ -14,7 +14,6 @@ import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/theme_constants.dart';
-import '../providers/user_provider.dart';
 import 'common/menu_button_map.dart';
 
 class MapComponentLocationSelect extends StatefulWidget {
@@ -159,8 +158,6 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
 
   @override
   Widget build(BuildContext context) {
-    final token = context.read<UserProvider>().getToken;
-
     return Consumer<SectionViewModel>(
         builder: (context, sectionViewModel, child) {
       return Consumer<RegisterViewModel>(

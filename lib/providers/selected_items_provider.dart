@@ -33,6 +33,7 @@ class SelectedItemsProvider with ChangeNotifier {
 
   LatLng get inspectionPosition => _currentInspectionPosition;
 
+
   void setInspectionPosition(LatLng position) {
     _currentInspectionPosition = position;
     notifyListeners();
@@ -176,7 +177,7 @@ class SelectedItemsProvider with ChangeNotifier {
     };
   }
 
-  void clearAll() {
+  void clearAllElements() {
     _currentSelectedCatchments.clear();
     _currentSelectedSections.clear();
     _currentSelectedRegisters.clear();
@@ -185,12 +186,11 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters.clear();
     _initialSelectedCatchments.clear();
     _initialSelectedLots.clear();
-    _currentInspectionPosition = const LatLng(0, 0);
-    notifyListeners();
   }
 
   void reset() {
-    clearAll();
+    clearAllElements();
     _letMultipleItemsSelected = false;
+    _currentInspectionPosition = const LatLng(0, 0);
   }
 }

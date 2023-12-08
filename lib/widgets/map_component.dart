@@ -54,6 +54,7 @@ class _MapComponentState extends State<MapComponent> {
   Color defaultPolylineColor = Colors.redAccent;
   Color selectedButtonColor = Colors.green;
   bool locationManual = false;
+  bool locationManualSelected = false;
   double zoomMap = 16;
   late Completer<GoogleMapController> _mapController;
   bool viewDetailElementInfo = false;
@@ -95,6 +96,7 @@ class _MapComponentState extends State<MapComponent> {
     registerViewModel = Provider.of<RegisterViewModel>(context, listen: false);
     token = context.read<UserProvider>().getToken!;
     _initializeLocation();
+    lastLocation = getFinalLocation();
     if (widget.isModal) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (sectionViewModel.hasSections() ||
@@ -102,6 +104,9 @@ class _MapComponentState extends State<MapComponent> {
             registerViewModel.hasRegisters() ||
             catchmentViewModel.hasCatchment()) {
           updateElementsOnMap();
+          setState(() {
+            lastDistanceSelected = 0;
+          });
         } else {
           LatLng? loc = getFinalLocation();
           if (loc != initLocation) {
@@ -116,6 +121,8 @@ class _MapComponentState extends State<MapComponent> {
   void dispose() {
     if (!widget.isModal) {
       selectedItemsProvider.reset();
+    }
+    if (!widget.isModal || locationManualSelected) {
       clearElementsFetched();
     }
     super.dispose();
@@ -257,7 +264,7 @@ class _MapComponentState extends State<MapComponent> {
           viewDetailElementInfo = false;
         }
       } else {
-        selectedItemsProvider.clearAll();
+        selectedItemsProvider.clearAllElements();
         selectedItemsProvider.togglePolylineSelected(line.polylineId, type);
         setState(() {
           elementSelectedId = ogcFid;
@@ -286,7 +293,7 @@ class _MapComponentState extends State<MapComponent> {
           viewDetailElementInfo = false;
         }
       } else {
-        selectedItemsProvider.clearAll();
+        selectedItemsProvider.clearAllElements();
         selectedItemsProvider.toggleCircleSelected(point.circleId, type);
         setState(() {
           elementSelectedId = ogcFid;
@@ -402,7 +409,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
                 section.ogcFid, section.line, ElementType.section);
-            getElements();
+            updateElementsOnMap();
           },
         );
         setPol.add(pol);
@@ -418,7 +425,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorPolyline(
                 lot.ogcFid, lot.polyline, ElementType.lot);
-            getElements();
+            updateElementsOnMap();
           },
         );
         setPol.add(pol);
@@ -442,7 +449,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
                 catchment.ogcFid, catchment.point, ElementType.catchment);
-            getElements();
+            updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -459,7 +466,7 @@ class _MapComponentState extends State<MapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
                 register.ogcFid, register.point, ElementType.register);
-            getElements();
+            updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -470,6 +477,7 @@ class _MapComponentState extends State<MapComponent> {
 
   void getElements() async {
     LatLng? finalLocation = getFinalLocation();
+
     if (lastDistanceSelected != distanceSelected ||
         finalLocation != lastLocation) {
       selectedIndices.addAll([0, 1, 2, 3]);
@@ -620,8 +628,6 @@ class _MapComponentState extends State<MapComponent> {
                                     _getMarkers();
                                     location = LatLng(
                                         latLng.latitude, latLng.longitude);
-                                    selectedItemsProvider
-                                        .setInspectionPosition(location!);
                                   });
                                 }
                               },
@@ -682,7 +688,9 @@ class _MapComponentState extends State<MapComponent> {
                                   colorChangeOnPress: true,
                                   onPressed: () {
                                     setState(() {
-                                      selectedItemsProvider.clearAll();
+                                      selectedItemsProvider.clearAllElements();
+                                      locationManualSelected =
+                                          locationManualSelected || true;
                                       isDetailsButtonVisible = false;
                                       markersGPS.clear();
                                       if (kIsWeb) {
@@ -770,7 +778,7 @@ class _MapComponentState extends State<MapComponent> {
                                   elementType: elementSelectedType,
                                   onPressed: () {
                                     setState(() {
-                                      selectedItemsProvider.clearAll();
+                                      selectedItemsProvider.clearAllElements();
                                       updateElementsOnMap();
                                       viewDetailElementInfo = false;
                                     });

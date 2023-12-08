@@ -18,15 +18,9 @@ const double ratioTablet = 0.75;
 const double ratioMobile = 0.7780;
 
 double _getHeightModalOnDevice(BuildContext context) {
-  double screenHeight = MediaQuery
-      .of(context)
-      .size
-      .height;
+  double screenHeight = MediaQuery.of(context).size.height;
 
-  if (MediaQuery
-      .of(context)
-      .size
-      .shortestSide < 600) {
+  if (MediaQuery.of(context).size.shortestSide < 600) {
     return screenHeight * ratioMobile;
   } else if (kIsWeb) {
     return screenHeight * ratioWeb;
@@ -35,10 +29,9 @@ double _getHeightModalOnDevice(BuildContext context) {
   }
 }
 
-
 void _showMapModal(BuildContext context) {
   SelectedItemsProvider selectedItemsProvider =
-  context.read<SelectedItemsProvider>();
+      context.read<SelectedItemsProvider>();
 
   void clearElementsFetched() {
     context.read<RegisterViewModel>().reset();
@@ -85,10 +78,10 @@ void _showMapModal(BuildContext context) {
               SizedBox(
                 height: 50,
                 child:
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   CustomElevatedButton(
                     onPressed: () {
-                      selectedItemsProvider.clearAll();
+                      selectedItemsProvider.clearAllElements();
                       clearElementsFetched();
                       Navigator.of(context).pop();
                     },
