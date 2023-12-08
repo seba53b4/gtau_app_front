@@ -28,24 +28,17 @@ class ImagesViewModel extends ChangeNotifier {
       _error = false;
       /*notifyListeners();*/
       final List<String> responseTask =
-          await _taskService.fetchTaskImages(token, idTask);
-      
-      /*final leng = responseTask.length;
-      print('largo response $leng');*/
+      await _taskService.fetchTaskImages(token, idTask);
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
-        /*await new Future.delayed(Duration(seconds: 1));*/
-        /*if(photos.length != responseTask.length){
-          await new Future.delayed(Duration(seconds: 3));
-        }*/
       } else {
         _photos = [];
         if (kDebugMode) {
           print('No se pudieron traer datos');
         }
       }
-      
+
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
       Future.microtask(() {
         _isLoading = false;
@@ -61,15 +54,15 @@ class ImagesViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<String>> fetchTaskImagesWithDelay(token, int idTask, int delaysec) async {
+  Future<List<String>> fetchTaskImagesWithDelay(token, int idTask,
+      int delaysec) async {
     try {
       _isLoading = true;
       _error = false;
       notifyListeners();
-      await new Future.delayed(Duration(seconds: delaysec));
       final List<String> responseTask =
-          await _taskService.fetchTaskImages(token, idTask);
-      
+      await _taskService.fetchTaskImages(token, idTask);
+
       final leng = responseTask.length;
       print('largo response $leng');
 
@@ -81,7 +74,7 @@ class ImagesViewModel extends ChangeNotifier {
           print('No se pudieron traer datos');
         }
       }
-      
+
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
       Future.microtask(() {
         _isLoading = false;
@@ -105,27 +98,27 @@ class ImagesViewModel extends ChangeNotifier {
       await _taskService.putBase64Images(token, id, path);
     } else {
       result = await _taskService.putMultipartImages(token, id, path);
-      /*print('jajaxd2');*/
     }
     _isLoading = false;
     notifyListeners();
     return result;
   }
 
-  Future<bool> uploadImages(String token, int id, List<String> listpath) async{
+  Future<bool> uploadImages(String token, int id, List<String> listpath) async {
     _isLoading = true;
     bool result = true;
     notifyListeners();
     for (var path in listpath!) {
       if (kIsWeb) {
         final finalList = await _taskService.putBase64Images(token, id, path);
-        if(finalList == null){
+        if (finalList == null) {
           result = result && false;
-        }else{
+        } else {
           result = result && true;
         }
       } else {
-        final resultprocess = await _taskService.putMultipartImages(token, id, path);
+        final resultprocess =
+        await _taskService.putMultipartImages(token, id, path);
         result = result && resultprocess;
       }
     }

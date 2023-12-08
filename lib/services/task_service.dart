@@ -241,7 +241,7 @@ class TaskService {
         //Cuando ingresa a la galeria la imagen se renderiza de todas formas, no es necesario hacer nada aca.
         var image = jsonResponse['image'];
         var id = jsonResponse['inspectionTaskId'];
-        /*await new Future.delayed(Duration(seconds: 1));*/ /*Simulamos el delay de una lenta conexion*/
+       /
         return jsonResponse.entries.map<String>((entry) {
           return "${entry.key}: ${entry.value}"; //Agrego esto por aca solo para que no salte error
         }).toList();
@@ -281,8 +281,6 @@ class TaskService {
       request.files.add(await http.MultipartFile.fromPath('image', path,
           contentType: MediaType('image', 'jpg')));
       var response = await request.send();
-
-      /*await new Future.delayed(Duration(seconds: 1));*/ /*Simulamos el delay de una lenta conexion*/
       
 
       return response.statusCode == 200;
