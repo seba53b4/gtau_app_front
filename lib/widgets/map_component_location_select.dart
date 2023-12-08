@@ -52,10 +52,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    mapInit = MediaQuery
-        .of(context)
-        .size
-        .width;
+    mapInit = MediaQuery.of(context).size.width;
     setState(() {
       mapWidth = mapInit;
     });
@@ -65,7 +62,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
   @override
   void dispose() {
     super.dispose();
-    selectedItemsProvider.reset();
+    //selectedItemsProvider.reset();
   }
 
   Future<void> _initializeLocation() async {
@@ -119,7 +116,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
           desiredAccuracy: LocationAccuracy.best);
       setState(() {
         final locationGPS =
-        LatLng(currentPosition.latitude, currentPosition.longitude);
+            LatLng(currentPosition.latitude, currentPosition.longitude);
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
           position: locationGPS,
@@ -162,148 +159,131 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
 
   @override
   Widget build(BuildContext context) {
-    final token = context
-        .read<UserProvider>()
-        .getToken;
+    final token = context.read<UserProvider>().getToken;
 
     return Consumer<SectionViewModel>(
         builder: (context, sectionViewModel, child) {
-          return Consumer<RegisterViewModel>(
-              builder: (context, registerViewModel, child) {
-                return Consumer<CatchmentViewModel>(
-                    builder: (context, catchmentViewModel, child) {
-                      return Consumer<LotViewModel>(
-                          builder: (context, lotViewModel, child) {
-                            final isMapLoading = catchmentViewModel.isLoading ||
-                                registerViewModel.isLoading ||
-                                lotViewModel.isLoading ||
-                                sectionViewModel.isLoading;
-                            return Scaffold(
-                              body: Row(
-                                children: [
-                                  Expanded(
-                                    child: Stack(
-                                      children: [
-                                        AnimatedContainer(
-                                          duration: const Duration(
-                                              milliseconds: 0),
-                                          width: !widget.isModal
-                                              ? mapWidth - modalWidth
-                                              : mapWidth,
-                                          child: GestureDetector(
-                                            onTap: () {},
-                                            child: GoogleMap(
-                                              mapType: _currentMapType,
-                                              initialCameraPosition: CameraPosition(
-                                                target: (location != null)
-                                                    ? location!
-                                                    : initLocation,
-                                                zoom: zoomMap,
-                                              ),
-                                              markers: markers,
-                                              onCameraMove: (
-                                                  CameraPosition cameraPosition) {
-                                                setState(() {
-                                                  zoomMap = cameraPosition.zoom;
-                                                });
-                                              },
-                                              onMapCreated: (
-                                                  GoogleMapController controller) {
-                                                if (location != null &&
-                                                    _mapController
-                                                        .isCompleted &&
-                                                    !isMapLoading) {
-                                                  controller.moveCamera(
-                                                      CameraUpdate
-                                                          .newLatLngZoom(
-                                                          location!, zoomMap));
-                                                }
-                                                if (!_mapController
-                                                    .isCompleted) {
-                                                  _mapController.complete(
-                                                      controller);
-                                                }
-                                              },
-                                              onTap: (LatLng latLng) {
-                                                if (locationManual) {
-                                                  setState(() {
-                                                    final Marker newMarker = Marker(
-                                                      onTap: () {},
-                                                      markerId: const MarkerId(
-                                                          'tapped_location_manual'),
-                                                      position: latLng,
-                                                    );
-                                                    markersGPS.clear();
-                                                    markersGPS.add(newMarker);
-                                                    _getMarkers();
-                                                    location = LatLng(
-                                                        latLng.latitude,
-                                                        latLng.longitude);
-                                                    selectedItemsProvider
-                                                        .setInspectionPosition(
-                                                        location!);
-                                                  });
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        LoadingOverlay(
-                                          isLoading: isMapLoading,
-                                          child: Positioned(
-                                            top: kIsWeb ? null : 80,
-                                            right: kIsWeb ? null : 16,
-                                            bottom: kIsWeb ? 80 : null,
-                                            left: kIsWeb ? 16 : null,
-                                            child: Column(
-                                              children: [
-                                                MenuElevatedButton(
-                                                    onPressed: () {
-                                                      markersGPS.clear();
-                                                      getCurrentLocation();
-                                                      _getMarkers();
-                                                      setState(() {
-                                                        locationManual = false;
-                                                      });
-                                                    },
-                                                    icon: Icons.my_location,
-                                                    tooltipMessage:
-                                                    AppLocalizations.of(
-                                                        context)!
-                                                        .map_component_get_location),
-                                                if (kIsWeb) const SizedBox(
-                                                    height: 6),
-                                                MenuElevatedButton(
-                                                  colorChangeOnPress: true,
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      selectedItemsProvider
-                                                          .clearAll();
-                                                      markersGPS.clear();
-                                                      locationManual =
-                                                      !locationManual;
-                                                    });
-                                                  },
-                                                  colorSelected: redColor,
-                                                  colorNotSelected: lightBackground,
-                                                  tooltipMessage: AppLocalizations
-                                                      .of(context)!
-                                                      .map_component_select_location,
-                                                  icon: Icons.location_pin,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
+      return Consumer<RegisterViewModel>(
+          builder: (context, registerViewModel, child) {
+        return Consumer<CatchmentViewModel>(
+            builder: (context, catchmentViewModel, child) {
+          return Consumer<LotViewModel>(
+              builder: (context, lotViewModel, child) {
+            final isMapLoading = catchmentViewModel.isLoading ||
+                registerViewModel.isLoading ||
+                lotViewModel.isLoading ||
+                sectionViewModel.isLoading;
+            return Scaffold(
+              body: Row(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 0),
+                          width: !widget.isModal
+                              ? mapWidth - modalWidth
+                              : mapWidth,
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: GoogleMap(
+                              mapType: _currentMapType,
+                              initialCameraPosition: CameraPosition(
+                                target: (location != null)
+                                    ? location!
+                                    : initLocation,
+                                zoom: zoomMap,
                               ),
-                            );
-                          });
-                    });
-              });
+                              markers: markers,
+                              onCameraMove: (CameraPosition cameraPosition) {
+                                setState(() {
+                                  zoomMap = cameraPosition.zoom;
+                                });
+                              },
+                              onMapCreated: (GoogleMapController controller) {
+                                if (location != null &&
+                                    _mapController.isCompleted &&
+                                    !isMapLoading) {
+                                  controller.moveCamera(
+                                      CameraUpdate.newLatLngZoom(
+                                          location!, zoomMap));
+                                }
+                                if (!_mapController.isCompleted) {
+                                  _mapController.complete(controller);
+                                }
+                              },
+                              onTap: (LatLng latLng) {
+                                if (locationManual) {
+                                  setState(() {
+                                    final Marker newMarker = Marker(
+                                      onTap: () {},
+                                      markerId: const MarkerId(
+                                          'tapped_location_manual'),
+                                      position: latLng,
+                                    );
+                                    markersGPS.clear();
+                                    markersGPS.add(newMarker);
+                                    _getMarkers();
+                                    location = LatLng(
+                                        latLng.latitude, latLng.longitude);
+                                    selectedItemsProvider
+                                        .setInspectionPosition(location!);
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        LoadingOverlay(
+                          isLoading: isMapLoading,
+                          child: Positioned(
+                            top: kIsWeb ? null : 80,
+                            right: kIsWeb ? null : 16,
+                            bottom: kIsWeb ? 80 : null,
+                            left: kIsWeb ? 16 : null,
+                            child: Column(
+                              children: [
+                                MenuElevatedButton(
+                                    onPressed: () {
+                                      markersGPS.clear();
+                                      getCurrentLocation();
+                                      _getMarkers();
+                                      setState(() {
+                                        locationManual = false;
+                                      });
+                                    },
+                                    icon: Icons.my_location,
+                                    tooltipMessage:
+                                        AppLocalizations.of(context)!
+                                            .map_component_get_location),
+                                if (kIsWeb) const SizedBox(height: 6),
+                                MenuElevatedButton(
+                                  colorChangeOnPress: true,
+                                  onPressed: () {
+                                    setState(() {
+                                      markersGPS.clear();
+                                      locationManual = !locationManual;
+                                    });
+                                  },
+                                  colorSelected: redColor,
+                                  colorNotSelected: lightBackground,
+                                  tooltipMessage: AppLocalizations.of(context)!
+                                      .map_component_select_location,
+                                  icon: Icons.location_pin,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          });
         });
+      });
+    });
   }
 }

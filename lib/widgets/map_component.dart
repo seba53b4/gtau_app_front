@@ -101,7 +101,10 @@ class _MapComponentState extends State<MapComponent> {
             catchmentViewModel.hasCatchment()) {
           updateElementsOnMap();
         } else {
-          fetchAndUpdateData().then((value) => null);
+          LatLng? loc = getFinalLocation();
+          if (loc != initLocation) {
+            fetchAndUpdateData().then((value) => null);
+          }
         }
       });
     }
@@ -109,10 +112,10 @@ class _MapComponentState extends State<MapComponent> {
 
   @override
   void dispose() {
-    super.dispose();
     if (!widget.isModal) {
       selectedItemsProvider.reset();
     }
+    super.dispose();
   }
 
   Future<void> _initializeLocation() async {
@@ -175,8 +178,11 @@ class _MapComponentState extends State<MapComponent> {
         markersGPS.add(newMarker);
         _getMarkers();
       });
-      selectedItemsProvider.setInspectionPosition(
-          LatLng(currentPosition.latitude, currentPosition.longitude));
+      if (currentPosition.latitude != initLocation.latitude &&
+          currentPosition.longitude != initLocation.longitude) {
+        selectedItemsProvider.setInspectionPosition(
+            LatLng(currentPosition.latitude, currentPosition.longitude));
+      }
       // Actualiza la cámara del mapa para centrarse en la ubicación actual sin animación
       final GoogleMapController controller = await _mapController.future;
       controller.moveCamera(
@@ -285,10 +291,29 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   void updateElementsOnMap() {
+    List<Section>? sections;
+    List<Lot>? lots;
+    List<Catchment>? catchments;
+    List<Register>? registers;
+
+    if (selectedIndices.contains(0)) {
+      sections = sectionViewModel.sections;
+    }
+
+    if (selectedIndices.contains(1)) {
+      registers = registerViewModel.registers;
+    }
+
+    if (selectedIndices.contains(2)) {
+      catchments = catchmentViewModel.catchments;
+    }
+    if (selectedIndices.contains(3)) {
+      lots = lotViewModel.lots;
+    }
+
     setState(() {
-      polylines = getPolylines(sectionViewModel.sections, lotViewModel.lots);
-      circles = getCircles(
-          catchmentViewModel.catchments, registerViewModel.registers);
+      polylines = getPolylines(sections, lots);
+      circles = getCircles(catchments, registers);
     });
   }
 

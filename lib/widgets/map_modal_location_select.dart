@@ -6,6 +6,10 @@ import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/selected_items_provider.dart';
+import '../viewmodels/catchment_viewmodel.dart';
+import '../viewmodels/lot_viewmodel.dart';
+import '../viewmodels/register_viewmodel.dart';
+import '../viewmodels/section_viewmodel.dart';
 import 'common/custom_elevated_button.dart';
 import 'map_component_location_select.dart';
 
@@ -14,9 +18,15 @@ const double ratioTablet = 0.75;
 const double ratioMobile = 0.7780;
 
 double _getHeightModalOnDevice(BuildContext context) {
-  double screenHeight = MediaQuery.of(context).size.height;
+  double screenHeight = MediaQuery
+      .of(context)
+      .size
+      .height;
 
-  if (MediaQuery.of(context).size.shortestSide < 600) {
+  if (MediaQuery
+      .of(context)
+      .size
+      .shortestSide < 600) {
     return screenHeight * ratioMobile;
   } else if (kIsWeb) {
     return screenHeight * ratioWeb;
@@ -25,9 +35,18 @@ double _getHeightModalOnDevice(BuildContext context) {
   }
 }
 
+
 void _showMapModal(BuildContext context) {
   SelectedItemsProvider selectedItemsProvider =
-      context.read<SelectedItemsProvider>();
+  context.read<SelectedItemsProvider>();
+
+  void clearElementsFetched() {
+    context.read<RegisterViewModel>().reset();
+    context.read<SectionViewModel>().reset();
+    context.read<LotViewModel>().reset();
+    context.read<CatchmentViewModel>().reset();
+  }
+
   showGeneralDialog(
     context: context,
     barrierDismissible: false,
@@ -66,9 +85,11 @@ void _showMapModal(BuildContext context) {
               SizedBox(
                 height: 50,
                 child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   CustomElevatedButton(
                     onPressed: () {
+                      selectedItemsProvider.clearAll();
+                      clearElementsFetched();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.error,
@@ -78,6 +99,7 @@ void _showMapModal(BuildContext context) {
                   CustomElevatedButton(
                     onPressed: () {
                       selectedItemsProvider.saveCurrentPositionAsInitial();
+                      clearElementsFetched();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.success,

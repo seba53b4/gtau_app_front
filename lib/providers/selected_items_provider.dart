@@ -18,8 +18,8 @@ class SelectedItemsProvider with ChangeNotifier {
   Set<PolylineId> _initialSelectedLots = {};
   Set<PolylineId> _currentSelectedLots = {};
 
-  LatLng _initialInspectionPosition = LatLng(0, 0);
-  LatLng _currentInspectionPosition = LatLng(0, 0);
+  LatLng _initialInspectionPosition = const LatLng(0, 0);
+  LatLng _currentInspectionPosition = const LatLng(0, 0);
 
   bool get letMultipleItemsSelected => _letMultipleItemsSelected;
 
@@ -186,6 +186,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedCatchments.clear();
     _initialSelectedLots.clear();
     _currentInspectionPosition = const LatLng(0, 0);
+    notifyListeners();
   }
 
   void reset() {

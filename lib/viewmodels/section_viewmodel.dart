@@ -26,8 +26,13 @@ class SectionViewModel extends ChangeNotifier {
     return _sections.isNotEmpty;
   }
 
-  Future<List<Section>?> fetchSectionsByRadius(String token, double longitude,
-      double latitude, int radiusMtr) async {
+  void reset() {
+    _sectionForDetail = null;
+    _sections = [];
+  }
+
+  Future<List<Section>?> fetchSectionsByRadius(
+      String token, double longitude, double latitude, int radiusMtr) async {
     try {
       _isLoading = true;
       notifyListeners();
@@ -53,7 +58,7 @@ class SectionViewModel extends ChangeNotifier {
       _sectionForDetail = null;
       notifyListeners();
       final responseSection =
-      await _sectionService.fetchSectionById(token, sectionId);
+          await _sectionService.fetchSectionById(token, sectionId);
       if (responseSection != null) {
         _sectionForDetail = responseSection;
       }
