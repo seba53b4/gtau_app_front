@@ -26,9 +26,9 @@ class ImagesViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      /*notifyListeners();*/
+      _photos = [];
       final List<String> responseTask =
-      await _taskService.fetchTaskImages(token, idTask);
+          await _taskService.fetchTaskImages(token, idTask);
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
@@ -54,14 +54,14 @@ class ImagesViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<String>> fetchTaskImagesWithDelay(token, int idTask,
-      int delaysec) async {
+  Future<List<String>> fetchTaskImagesWithDelay(
+      token, int idTask, int delaysec) async {
     try {
       _isLoading = true;
       _error = false;
       notifyListeners();
       final List<String> responseTask =
-      await _taskService.fetchTaskImages(token, idTask);
+          await _taskService.fetchTaskImages(token, idTask);
 
       final leng = responseTask.length;
       print('largo response $leng');
@@ -118,7 +118,7 @@ class ImagesViewModel extends ChangeNotifier {
         }
       } else {
         final resultprocess =
-        await _taskService.putMultipartImages(token, id, path);
+            await _taskService.putMultipartImages(token, id, path);
         result = result && resultprocess;
       }
     }
