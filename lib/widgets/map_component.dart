@@ -96,7 +96,6 @@ class _MapComponentState extends State<MapComponent> {
     registerViewModel = Provider.of<RegisterViewModel>(context, listen: false);
     token = context.read<UserProvider>().getToken!;
     _initializeLocation();
-    lastLocation = getFinalLocation();
     if (widget.isModal) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (sectionViewModel.hasSections() ||
@@ -104,15 +103,15 @@ class _MapComponentState extends State<MapComponent> {
             registerViewModel.hasRegisters() ||
             catchmentViewModel.hasCatchment()) {
           updateElementsOnMap();
-          setState(() {
-            lastDistanceSelected = 0;
-          });
         } else {
           LatLng? loc = getFinalLocation();
           if (loc != initLocation) {
             fetchAndUpdateData().then((value) => null);
           }
         }
+      });
+      setState(() {
+        lastDistanceSelected = 0;
       });
     }
   }
@@ -143,6 +142,7 @@ class _MapComponentState extends State<MapComponent> {
       } else {
         setState(() {
           final locationGPS = selectedItemsProvider.inspectionPosition;
+          lastLocation = locationGPS;
           final Marker newMarker = Marker(
             markerId: const MarkerId('current_position'),
             position: locationGPS,
@@ -187,6 +187,7 @@ class _MapComponentState extends State<MapComponent> {
       setState(() {
         final locationGPS =
             LatLng(currentPosition.latitude, currentPosition.longitude);
+        lastLocation = locationGPS;
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
           position: locationGPS,
@@ -477,7 +478,10 @@ class _MapComponentState extends State<MapComponent> {
 
   void getElements() async {
     LatLng? finalLocation = getFinalLocation();
-
+    print('finalLocation' + finalLocation.toString());
+    print('lastLocation' + lastLocation.toString());
+    print('distance' + (lastDistanceSelected != distanceSelected).toString());
+    print('location' + (finalLocation != lastLocation).toString());
     if (lastDistanceSelected != distanceSelected ||
         finalLocation != lastLocation) {
       selectedIndices.addAll([0, 1, 2, 3]);

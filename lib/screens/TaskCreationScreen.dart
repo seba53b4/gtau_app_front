@@ -118,9 +118,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     releasedDateController.dispose();
     _scrollController.dispose();
     selectedItemsProvider?.reset();
-    if (context.mounted) {
-      clearElementsFetched();
-    }
     super.dispose();
   }
 
@@ -141,7 +138,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
         await initializeTask();
       });
-      Hive.initFlutter().then((value) => null);
     } else {
       startDate = DateTime.now();
     }
@@ -409,6 +405,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    clearElementsFetched();
     _ResetPrefs();
     await updateTaskList();
   }
@@ -436,6 +433,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    clearElementsFetched();
     _ResetPrefs();
   }
 
@@ -486,6 +484,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   void handleCancel() {
     resetSelectionOnMap();
+    clearElementsFetched();
     Navigator.of(context).pop();
   }
 
