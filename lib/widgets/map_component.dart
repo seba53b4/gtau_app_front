@@ -478,10 +478,6 @@ class _MapComponentState extends State<MapComponent> {
 
   void getElements() async {
     LatLng? finalLocation = getFinalLocation();
-    print('finalLocation' + finalLocation.toString());
-    print('lastLocation' + lastLocation.toString());
-    print('distance' + (lastDistanceSelected != distanceSelected).toString());
-    print('location' + (finalLocation != lastLocation).toString());
     if (lastDistanceSelected != distanceSelected ||
         finalLocation != lastLocation) {
       selectedIndices.addAll([0, 1, 2, 3]);
