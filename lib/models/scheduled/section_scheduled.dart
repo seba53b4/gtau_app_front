@@ -7,11 +7,12 @@ class SectionScheduled {
   final int? idTramo;
   final String? tipoTra;
   final double? diametro;
+  final double? diametro2;
   final double? longitud;
   final String? nivelSedimentacion;
   final bool? observacionAguaArriba;
   final bool? observacionAguaAbajo;
-  final String? patologias;
+  final List<String>? patologias;
   final String? catastro;
   final String? observaciones;
   final bool inspectioned;
@@ -20,6 +21,7 @@ class SectionScheduled {
   final Polyline? line;
 
   SectionScheduled({
+    this.diametro2,
     this.idTramo,
     this.ogcFid,
     this.tipoTra,
@@ -44,11 +46,12 @@ class SectionScheduled {
       idTramo: json['idTramo'] as int?,
       tipoTra: json['tipotra'] as String?,
       diametro: json['diametro'] as double?,
+      diametro2: json['diametro2'] as double?,
       longitud: json['longitud'] as double?,
       nivelSedimentacion: json['nivel_sedimentacion'] as String?,
       observacionAguaArriba: json['observacion_agua_arriba'] as bool?,
       observacionAguaAbajo: json['observacion_agua_abajo'] as bool?,
-      patologias: json['patologias'] as String?,
+      patologias: (json['patologias'] as List<dynamic>?)?.cast<String>(),
       catastro: json['catastro'] as String?,
       observaciones: json['observaciones'] as String?,
       inspectioned: json['inspectioned'] as bool,
