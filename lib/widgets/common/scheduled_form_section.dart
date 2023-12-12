@@ -53,6 +53,8 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   final _typeFocusNode = FocusNode();
   bool danioCheckboxValue = false;
   bool raizCheckboxValue = false;
+  bool upStreamCheckbox = false;
+  bool downStreamCheckbox = false;
   bool piedrasOEscombrosCheckboxValue = false;
   String? sedimentLevel = null;
   String? cadastre = null;
@@ -119,13 +121,16 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   }
 
   void _loadInfoFromResponse(SectionScheduled sectionScheduled) {
-    if (!sectionScheduled.inspectioned) {
+    if (sectionScheduled.inspectioned) {
       _catastroController.text = sectionScheduled.catastro ??
           AppLocalizations.of(context)!.form_scheduled_cadastre_type_empty;
       _typeController.text = sectionScheduled.tipoTra ?? '';
-      _diamController2.text = (sectionScheduled.diametro ?? '').toString();
+      _diamController1.text = (sectionScheduled.diametro ?? '').toString();
       _diamController2.text = (sectionScheduled.diametro2 ?? '').toString();
       _longitudeController.text = (sectionScheduled.longitud ?? '').toString();
+      _observationsController.text = sectionScheduled.observaciones ?? '';
+      downStreamCheckbox = sectionScheduled.observacionAguaAbajo ?? false;
+      upStreamCheckbox = sectionScheduled.observacionAguaArriba ?? false;
       sedimentLevel = sectionScheduled.nivelSedimentacion ??
           AppLocalizations.of(context)!.form_scheduled_sd;
       cadastre = sectionScheduled.catastro ??
@@ -135,15 +140,15 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   }
 
   void _loadPathologies(List<String> pathologies) {
-    Map<CheckboxStatePathology, bool> ret =
-        parseCheckboxPathologies(pathologies);
-
-    // Establecer los valores en las casillas de verificación según el estado
+    List<CheckboxStatePathology> pathologiesStates =
+        parseListPathologies(pathologies);
     setState(() {
-      danioCheckboxValue = ret[CheckboxStatePathology.Danio] ?? false;
-      raizCheckboxValue = ret[CheckboxStatePathology.Raiz] ?? false;
+      danioCheckboxValue =
+          pathologiesStates.contains(CheckboxStatePathology.Danio);
+      raizCheckboxValue =
+          pathologiesStates.contains(CheckboxStatePathology.Raiz);
       piedrasOEscombrosCheckboxValue =
-          ret[CheckboxStatePathology.PiedrasOEscombros] ?? false;
+          pathologiesStates.contains(CheckboxStatePathology.PiedrasOEscombros);
     });
   }
 
@@ -310,14 +315,24 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                             titleText: AppLocalizations.of(context)!
                                 .form_scheduled_inspect_from),
                         CustomLabeledCheckbox(
+                          initialValue: upStreamCheckbox,
                           label: AppLocalizations.of(context)!
                               .form_scheduled_inspect_from_upstream,
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            setState(() {
+                              upStreamCheckbox = value!;
+                            });
+                          },
                         ),
                         CustomLabeledCheckbox(
+                          initialValue: downStreamCheckbox,
                           label: AppLocalizations.of(context)!
                               .form_scheduled_inspect_from_downstream,
-                          onChanged: (value) {},
+                          onChanged: (value) {
+                            setState(() {
+                              downStreamCheckbox = value!;
+                            });
+                          },
                         ),
                       ]),
                       const SizedBox(height: 12),

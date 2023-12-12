@@ -19,24 +19,27 @@ class CheckboxHelper {
   }
 }
 
-List<String> checkboxValuesPathologies = [
-  "Daño",
-  "Raiz",
-  "Piedras o escombros",
-];
-
-Map<CheckboxStatePathology, bool> parseCheckboxPathologies(
-    List<String> listChecks) {
-  Map<CheckboxStatePathology, bool> estadoDeCheckbox = {};
-
-  List<CheckboxStatePathology> estadosDeCheckbox =
-      checkboxValuesPathologies.map((valor) {
-    return CheckboxHelper.parse(valor);
-  }).toList();
-
-  for (CheckboxStatePathology valor in estadosDeCheckbox) {
-    estadoDeCheckbox[valor] = listChecks.contains(valor.toString());
+CheckboxStatePathology parseStringToCheckboxStatePathology(String value) {
+  switch (value) {
+    case 'Danio':
+      return CheckboxStatePathology.Danio;
+    case 'Raiz':
+      return CheckboxStatePathology.Raiz;
+    case 'PiedrasOEscombros':
+      return CheckboxStatePathology.PiedrasOEscombros;
+    default:
+      throw ArgumentError('Valor desconocido: $value');
   }
+}
 
-  return estadoDeCheckbox;
+List<CheckboxStatePathology> parseListPathologies(List<String> values) {
+  return values
+      .map((value) => parseStringToCheckboxStatePathology(value))
+      .toList();
+}
+
+List<String> getPathologiesValues() {
+  return CheckboxStatePathology.values
+      .map((value) => value.toString().split('.').last)
+      .toList();
 }

@@ -44,19 +44,19 @@ class SectionScheduled {
     return SectionScheduled(
       ogcFid: json['ogcFid'] as int?,
       idTramo: json['idTramo'] as int?,
-      tipoTra: json['tipotra'] as String?,
+      tipoTra: json['tipoTra'] as String?,
       diametro: json['diametro'] as double?,
       diametro2: json['diametro2'] as double?,
       longitud: json['longitud'] as double?,
-      nivelSedimentacion: json['nivel_sedimentacion'] as String?,
-      observacionAguaArriba: json['observacion_agua_arriba'] as bool?,
-      observacionAguaAbajo: json['observacion_agua_abajo'] as bool?,
+      nivelSedimentacion: json['nivelSedimentacion'] as String?,
+      observacionAguaArriba: json['observacionAguaArriba'] as bool?,
+      observacionAguaAbajo: json['observacionAguaAbajo'] as bool?,
       patologias: (json['patologias'] as List<dynamic>?)?.cast<String>(),
       catastro: json['catastro'] as String?,
       observaciones: json['observaciones'] as String?,
       inspectioned: json['inspectioned'] as bool,
-      inspectionedDate: json['inspectioned_date'] != null
-          ? DateTime.parse(json['inspectioned_date'] as String)
+      inspectionedDate: json['inspectionedDate'] != null
+          ? DateTime.parse(json['inspectionedDate'] as String)
           : null,
       username: json['username'] as String?,
       line: isFetch ? null : _buildPolyline(json, json['tipotra'] as String?),
