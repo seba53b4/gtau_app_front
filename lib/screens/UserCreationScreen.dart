@@ -51,44 +51,32 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   late DateTime? releasedDate;
   int selectedIndex = 0;
   static const String notAssigned = "Sin asignar";
-  String userAssigned = notAssigned;
+  String userRole = notAssigned;
   late String taskStatus = 'PENDING';
   late String initStatus = 'PENDING';
-  final descriptionController = TextEditingController();
-  final numWorkController = TextEditingController();
-  final locationController = TextEditingController();
-  final scheduledNumberController = TextEditingController();
-  final contactController = TextEditingController();
-  final applicantController = TextEditingController();
-  final userAssignedController = TextEditingController();
-  final lengthController = TextEditingController();
-  final materialController = TextEditingController();
-  final observationsController = TextEditingController();
-  final conclusionsController = TextEditingController();
-  final addDateController = TextEditingController();
-  final releasedDateController = TextEditingController();
+  final roleController = TextEditingController();
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final firstnameController = TextEditingController();
+  final lastnameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final passconfirmController = TextEditingController();
 
   SelectedItemsProvider? selectedItemsProvider;
 
   String numOrder = "";
 
   void reset() {
-    descriptionController.text = '';
-    numWorkController.text = '';
-    locationController.text = '';
-    scheduledNumberController.text = '';
-    contactController.text = '';
-    applicantController.text = '';
-    userAssignedController.text = '';
-    lengthController.text = '';
-    materialController.text = '';
-    observationsController.text = '';
-    conclusionsController.text = '';
-    addDateController.text = '';
-    releasedDateController.text = '';
-    setState(() {
+    roleController.text = '';
+    usernameController.text = '';
+    emailController.text = '';
+    firstnameController.text = '';
+    lastnameController.text = '';
+    passwordController.text = '';
+    passconfirmController.text = '';
+    /*setState(() {
       userAssigned = notAssigned;
-    });
+    });*/
   }
 
   @override
@@ -99,19 +87,13 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   @override
   void dispose() {
-    descriptionController.dispose();
-    numWorkController.dispose();
-    locationController.dispose();
-    scheduledNumberController.dispose();
-    contactController.dispose();
-    applicantController.dispose();
-    userAssignedController.dispose();
-    lengthController.dispose();
-    materialController.dispose();
-    observationsController.dispose();
-    conclusionsController.dispose();
-    addDateController.dispose();
-    releasedDateController.dispose();
+    roleController.dispose();
+    usernameController.dispose();
+    emailController.dispose();
+    firstnameController.dispose();
+    lastnameController.dispose();
+    passwordController.dispose();
+    passconfirmController.dispose();
     _scrollController.dispose();
     selectedItemsProvider?.reset();
 
@@ -151,23 +133,16 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
       selectedItemsProvider.saveInitialSelections(task.sections, task.registers,
           task.catchments, task.lots, task.position!);
-      numWorkController.text = task.workNumber!;
-      descriptionController.text = task.description!;
-      applicantController.text = task.applicant!;
-      locationController.text = task.location!;
-      userAssignedController.text = task.user!;
-      lengthController.text = task.length ?? '';
-      materialController.text = task.material ?? '';
-      conclusionsController.text = task.conclusions ?? '';
-      observationsController.text = task.observations ?? '';
+      roleController.text = task.workNumber!;
+      usernameController.text = task.description!;
+      emailController.text = task.applicant!;
+      firstnameController.text = task.location!;
+      lastnameController.text = task.user!;
+      passwordController.text = task.length ?? '';
+      passconfirmController.text = task.material ?? '';
       startDate = task.addDate!;
       taskStatus = task.status!;
       initStatus = task.status!;
-      if (task.releasedDate != null) {
-        releasedDate = task.releasedDate!;
-        releasedDateController.text = parseDateTimeOnFormat(task.releasedDate!);
-      }
-      addDateController.text = parseDateTimeOnFormat(task.addDate!);
 
       return true;
     } catch (error) {
@@ -262,20 +237,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     return prefs.clear();
   }
 
-  void handleStartDateChange(DateTime date) {
-    setState(() {
-      startDate = date;
-    });
-    addDateController.text = parseDateTimeOnFormat(date);
-  }
-
-  void handleReleasedDateChange(DateTime dateReleased) {
-    setState(() {
-      releasedDate = dateReleased;
-    });
-    releasedDateController.text = parseDateTimeOnFormat(dateReleased);
-  }
-
   void handleSubmit() {
     if (selectedIndex == 1) {
       showCustomDialog(
@@ -292,99 +253,30 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
       );
-    } else {
-      print(
-          'Programada: ${scheduledNumberController.text} Descripcion: ${descriptionController.text}');
     }
   }
 
   Map<String, dynamic> createBodyToCreate() {
-    var selectedItemsProvider = context.read<SelectedItemsProvider>();
-    final selectedSections = selectedItemsProvider.selectedPolylines;
-    final List<String> listSelectedSections =
-        selectedSections.map((polylineId) => polylineId.value).toList();
-
-    final selectedCatchments = selectedItemsProvider.selectedCatchments;
-    final List<String> listSelectedCatchments =
-        selectedCatchments.map((circleId) => circleId.value).toList();
-
-    final selectedRegisters = selectedItemsProvider.selectedRegisters;
-    final List<String> listSelectedRegisters =
-        selectedRegisters.map((circleId) => circleId.value).toList();
-
-    final selectedLots = selectedItemsProvider.selectedLots;
-    final List<String> listSelectedLots =
-        selectedLots.map((polylineId) => polylineId.value).toList();
-
-    final Map<String, dynamic> position = {
-      "latitud": selectedItemsProvider.inspectionPosition.longitude.toString(),
-      "longitud": selectedItemsProvider.inspectionPosition.longitude.toString()
-    };
-
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     final Map<String, dynamic> requestBody = {
-      "status": taskStatus,
-      "inspectionType": "inspectionType Default",
-      "workNumber": numWorkController.text,
-      "addDate": addDateUpdated,
-      "applicant": applicantController.text,
-      "location": locationController.text,
-      "description": descriptionController.text,
-      "user": userAssigned,
-      "tramos": listSelectedSections,
-      "captaciones": listSelectedCatchments,
-      "registros": listSelectedRegisters,
-      "parcelas": listSelectedLots,
-      "position": position
+      "email": emailController.text,
+      "firstName": firstnameController.text,
+      "id": '0',
+      "lastName": lastnameController.text,
+      "username": usernameController.text,
+      "role": roleController.text
     };
     return requestBody;
   }
 
   Map<String, dynamic> createBodyToUpdate() {
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
-    late String? releasedDateSelected = releasedDateController.text.isNotEmpty
-        ? formattedDateToUpdate(releasedDateController.text)
-        : null;
-
-    var selectedItemsProvider = context.read<SelectedItemsProvider>();
-
-    final selectedSections = selectedItemsProvider.selectedPolylines;
-    final List<String> listSelectedSections =
-        selectedSections.map((polylineId) => polylineId.value).toList();
-    final selectedCatchments = selectedItemsProvider.selectedCatchments;
-    final List<String> listSelectedCatchments =
-        selectedCatchments.map((circleId) => circleId.value).toList();
-    final selectedRegisters = selectedItemsProvider.selectedRegisters;
-    final List<String> listSelectedRegisters =
-        selectedRegisters.map((circleId) => circleId.value).toList();
-    final selectedLots = selectedItemsProvider.selectedLots;
-    final List<String> listSelectedLots =
-        selectedLots.map((polylineId) => polylineId.value).toList();
-
-    final Map<String, dynamic> position = {
-      "latitud": selectedItemsProvider.inspectionPosition.latitude,
-      "longitud": selectedItemsProvider.inspectionPosition.longitude
-    };
-
+    
     final Map<String, dynamic> requestBody = {
-      "status": taskStatus,
-      "inspectionType": task.inspectionType,
-      "workNumber": numWorkController.text,
-      "addDate": addDateUpdated,
-      "applicant": applicantController.text,
-      "location": locationController.text,
-      "description": descriptionController.text,
-      "releasedDate": releasedDateSelected,
-      "user": userAssignedController.text,
-      "length": lengthController.text,
-      "material": materialController.text,
-      "observations": observationsController.text,
-      "conclusions": conclusionsController.text,
-      "tramos": listSelectedSections,
-      "captaciones": listSelectedCatchments,
-      "registros": listSelectedRegisters,
-      "parcelas": listSelectedLots,
-      "position": position
+      "email": emailController.text,
+      "firstName": firstnameController.text,
+      "id": '0',
+      "lastName": lastnameController.text,
+      "username": usernameController.text,
+      "role": roleController.text
     };
     return requestBody;
   }
@@ -392,29 +284,11 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   Future handleAcceptOnShowDialogEditTask() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
-    this.processImages();
     if (isUpdated) {
       reset();
     }
     _ResetPrefs();
     await updateTaskList();
-  }
-
-  void processImages() {
-    if (this.imagesFiles != null) {
-      final token = Provider.of<UserProvider>(context, listen: false).getToken;
-      final imagesViewModel =
-          Provider.of<ImagesViewModel>(context, listen: false);
-      this.imagesFiles!.forEach((image) async {
-        try {
-          final response = await imagesViewModel.uploadImage(
-              token!, widget.idTask!, image.getPath);
-        } catch (error) {
-          print(error);
-          throw Exception('Error al subir imagen');
-        }
-      });
-    }
   }
 
   Future handleAcceptOnShowDialogCreateTask() async {
@@ -526,6 +400,71 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                               ),
                               const SizedBox(height: 24.0),
                               // Primera fila
+                              // Segunda fila
+                              SizedBox(
+                                height: heightRow,
+                                width: widthRow,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                        children: [
+                                          const SizedBox(
+                                              width: AppConstants.taskRowSpace),
+                                          Column(
+                                            children: [
+                                              Text(
+                                                AppLocalizations.of(context)!
+                                      .createUserPage_roleTitle,
+                                                style: const TextStyle(
+                                                    fontSize: 16.0),
+                                              ),
+                                              const SizedBox(height: 12.0),
+                                              CustomDropdown(
+                                                value: userRole,
+                                                items: const [
+                                                  notAssigned,
+                                                  'USER',
+                                                  'ADMIN'
+                                                ],
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    roleController.text = value!;
+                                                  });
+                                                },
+                                              ),
+                                              const SizedBox(
+                                                  height: AppConstants
+                                                      .taskColumnSpace),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    const SizedBox(
+                                        width: AppConstants.taskRowSpace),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                      .createUserPage_usernameTitle,
+                                          style: const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        CustomTextFormField(
+                                          width: AppConstants.textFieldWidth * 2 +
+                                              AppConstants.taskRowSpace,
+                                          hintText: AppLocalizations.of(context)!
+                                              .createUserPage_usernamePlaceholder,
+                                          controller: usernameController,
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                              //const SizedBox(height: 20.0),
                               SizedBox(
                                 height: heightRow,
                                 width: widthRow,
@@ -538,7 +477,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                         children: [
                                           Text(
                                             AppLocalizations.of(context)!
-                                                .createTaskPage_numberWorkTitle,
+                                      .createUserPage_emailTitle,
                                             style:
                                                 const TextStyle(fontSize: 16.0),
                                           ),
@@ -546,73 +485,54 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                               height:
                                                   AppConstants.taskColumnSpace),
                                           CustomTextFormField(
-                                            readOnly: widget.detail,
                                             hintText: AppLocalizations.of(
                                                     context)!
-                                                .createTaskPage_numberWorkTitle,
-                                            controller: numWorkController,
-                                            textInputType: TextInputType.number,
+                                                .createUserPage_emailPlaceholder,
+                                            controller: emailController,
                                           ),
                                         ],
                                       ),
                                       Column(
                                         children: [
+                                          Text(
+                                            AppLocalizations.of(context)!
+                                      .createUserPage_firstnameTitle,
+                                            style:
+                                                const TextStyle(fontSize: 16.0),
+                                          ),
                                           const SizedBox(
-                                              width: AppConstants.taskRowSpace),
-                                          Column(
-                                            children: [
-                                              Text(
-                                                AppLocalizations.of(context)!
-                                                    .createTaskPage_assignedUserTitle,
-                                                style: const TextStyle(
-                                                    fontSize: 16.0),
-                                              ),
-                                              const SizedBox(height: 12.0),
-                                              CustomDropdown(
-                                                value: userAssigned,
-                                                items: const [
-                                                  notAssigned,
-                                                  'gtau-oper',
-                                                  'gtau-admin'
-                                                ],
-                                                onChanged: (String? value) {
-                                                  setState(() {
-                                                    userAssigned = value!;
-                                                  });
-                                                },
-                                              ),
-                                              const SizedBox(
-                                                  height: AppConstants
-                                                      .taskColumnSpace),
-                                            ],
+                                              height:
+                                                  AppConstants.taskColumnSpace),
+                                          CustomTextFormField(
+                                            hintText: AppLocalizations.of(
+                                                    context)!
+                                                .createUserPage_firstnamePlaceholder,
+                                            controller: firstnameController,
                                           ),
                                         ],
                                       ),
-                                      Column(children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .editTaskPage_statusTitle,
-                                          style: const TextStyle(fontSize: 16.0),
-                                        ),
-                                        const SizedBox(height: 12.0),
-                                        CustomDropdown(
-                                          isStatus: true,
-                                          value: taskStatus,
-                                          onChanged: (String? value) {
-                                            setState(() {
-                                              taskStatus = value!;
-                                            });
-                                          },
-                                          items: TaskStatus.values
-                                              .map((status) => status.value)
-                                              .toList(),
-                                        ),
-                                        const SizedBox(
-                                            height: AppConstants.taskColumnSpace),
-                                      ]),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!
+                                      .createUserPage_lastnameTitle,
+                                            style:
+                                                const TextStyle(fontSize: 16.0),
+                                          ),
+                                          const SizedBox(
+                                              height:
+                                                  AppConstants.taskColumnSpace),
+                                          CustomTextFormField(
+                                            hintText: AppLocalizations.of(
+                                                    context)!
+                                                .createUserPage_lastnamePlaceholder,
+                                            controller: lastnameController,
+                                          ),
+                                        ],
+                                      ),
                                     ]),
                               ),
-                              // Segunda fila
+                              // Tercera fila
                               SizedBox(
                                 height: heightRow,
                                 width: widthRow,
@@ -625,42 +545,16 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                       children: [
                                         Text(
                                           AppLocalizations.of(context)!
-                                              .createTaskPage_startDateTitle,
+                                      .createUserPage_passwordTitle,
                                           style: const TextStyle(fontSize: 16.0),
                                         ),
                                         const SizedBox(height: 12.0),
-                                        SizedBox(
-                                          width: AppConstants.textFieldWidth,
-                                          child: InkWell(
-                                            overlayColor:
-                                                MaterialStateColor.resolveWith(
-                                                    (states) =>
-                                                        Colors.transparent),
-                                            onTap: () async {
-                                              final DateTime? pickedDate =
-                                                  await showDatePicker(
-                                                context: context,
-                                                initialDate: startDate!,
-                                                firstDate: DateTime(2000),
-                                                lastDate: DateTime(2100),
-                                              );
-                                              if (pickedDate != null) {
-                                                handleStartDateChange(pickedDate);
-                                              }
-                                            },
-                                            child: IgnorePointer(
-                                              child: CustomTextFormField(
-                                                width: AppConstants.taskRowSpace,
-                                                hintText: AppLocalizations.of(
-                                                        context)!
-                                                    .createTaskPage_startDateTitle,
-
-                                                controller: addDateController,
-                                                // enabled: false,
-                                                // readOnly: true,
-                                              ),
-                                            ),
-                                          ),
+                                        CustomTextFormField(
+                                          width: (widthRow / 2) - (AppConstants.taskRowSpace / 2),
+                                          hintText: AppLocalizations.of(context)!
+                                              .createUserPage_passwordPlaceholder,
+                                          controller: passwordController,
+                                          obscureText: true
                                         ),
                                       ],
                                     ),
@@ -670,57 +564,59 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                       children: [
                                         Text(
                                           AppLocalizations.of(context)!
-                                              .createTaskPage_solicitantTitle,
+                                      .createUserPage_passconfirmTitle,
                                           style: const TextStyle(fontSize: 16.0),
                                         ),
                                         const SizedBox(height: 12.0),
                                         CustomTextFormField(
-                                          width: AppConstants.textFieldWidth * 2 +
-                                              AppConstants.taskRowSpace,
+                                          width: (widthRow / 2) - (AppConstants.taskRowSpace / 2),
                                           hintText: AppLocalizations.of(context)!
-                                              .createTaskPage_solicitantPlaceholder,
-                                          controller: applicantController,
+                                              .createUserPage_passconfirmPlaceholder,
+                                          controller: passconfirmController,
+                                          obscureText: true,
                                         ),
                                       ],
-                                    )
+                                    ),
+                                    Container(
+                      height: 50.0,
+                      margin: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (widget.detail)
+                            CustomElevatedButton(
+                              messageType: MessageType.error,
+                              onPressed: handleCancel,
+                              text: AppLocalizations.of(context)!
+                                  .buttonCancelLabel,
+                            ),
+                          const SizedBox(width: 12.0),
+                          CustomElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                if (widget.detail) {
+                                  handleEditTask();
+                                } else {
+                                  // Se quita acción de creación en Programada
+                                  if (selectedIndex == 1) {
+                                    handleSubmit();
+                                  }
+                                }
+                              } else {
+                                scrollToTopScrollView();
+                              }
+                            },
+                            text: widget.detail
+                                ? AppLocalizations.of(context)!
+                                    .buttonAcceptLabel
+                                : AppLocalizations.of(context)!
+                                    .createTaskPage_submitButton,
+                          ),
+                        ],
+                      ),
+                    ),
                                   ],
                                 ),
-                              ),
-                              //const SizedBox(height: 20.0),
-                              // Tercera fila
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    AppLocalizations.of(context)!
-                                        .createTaskPage_selectAddressTitle,
-                                    style: const TextStyle(fontSize: 16.0),
-                                  ),
-                                  const SizedBox(height: 12.0),
-                                  CustomTextFormField(
-                                    width: widthRow,
-                                    hintText: AppLocalizations.of(context)!
-                                        .createTaskPage_selectAddressplaceholder,
-                                    controller: locationController,
-                                  ),
-                                  const SizedBox(
-                                      width: AppConstants.taskRowSpace),
-                                  Text(
-                                    AppLocalizations.of(context)!
-                                        .default_descriptionTitle,
-                                    style: const TextStyle(fontSize: 16.0),
-                                  ),
-                                  const SizedBox(height: 12.0),
-                                  CustomTextFormField(
-                                    isTextBox: true,
-                                    maxLines: 10,
-                                    width: widthRow,
-                                    height: heightRow,
-                                    hintText: AppLocalizations.of(context)!
-                                        .default_descriptionPlaceholder,
-                                    controller: descriptionController,
-                                  ),
-                                ],
                               ),
                             ],
                           ),

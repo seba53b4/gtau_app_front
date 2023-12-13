@@ -161,5 +161,19 @@
     "scheduled_title_input": "Título",
     "scheduled_end_date_title" : "Fecha de Fin",
     "createuser_main_title": "Creación de Usuario",
-    "file_upload_btn": "Seleccionar"
+    "file_upload_btn": "Seleccionar",
+    "createUserPage_roleTitle": "Rol",
+    "createUserPage_usernameTitle": "Alias",
+    "createUserPage_emailTitle": "Correo Electronico",
+    "createUserPage_firstnameTitle": "Nombre",
+    "createUserPage_lastnameTitle": "Apellido",
+    "createUserPage_passwordTitle": "Contraseña",
+    "createUserPage_passconfirmTitle": "Confirmar Contraseña",
+    "createUserPage_rolePlaceholder": "Sin Asignar",
+    "createUserPage_usernamePlaceholder": "Ingrese Alias",
+    "createUserPage_emailPlaceholder": "Ingrese Direccion",
+    "createUserPage_firstnamePlaceholder": "Ingrese Nombre",
+    "createUserPage_lastnamePlaceholder": "Ingrese Apellido",
+    "createUserPage_passwordPlaceholder": "Ingrese Contraseña",
+    "createUserPage_passconfirmPlaceholder": "Confirmar Contraseña"
 }
