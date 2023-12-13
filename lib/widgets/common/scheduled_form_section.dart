@@ -210,12 +210,16 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
         await showCustomMessageDialog(
           context: context,
           messageType: DialogMessageType.success,
-          onAcceptPressed: () {},
+          onAcceptPressed: () {
+            Navigator.of(context).pop();
+          },
         );
       } else {
         await showCustomMessageDialog(
           context: context,
-          onAcceptPressed: () {},
+          onAcceptPressed: () {
+            Navigator.of(context).pop();
+          },
           customText: AppLocalizations.of(context)!.error_generic_text,
           messageType: DialogMessageType.error,
         );
@@ -224,7 +228,9 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
       print("Error: $error");
       await showCustomMessageDialog(
         context: context,
-        onAcceptPressed: () {},
+        onAcceptPressed: () {
+          Navigator.of(context).pop();
+        },
         customText: AppLocalizations.of(context)!.error_generic_text,
         messageType: DialogMessageType.error,
       );
