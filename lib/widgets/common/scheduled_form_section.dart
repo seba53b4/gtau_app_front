@@ -157,7 +157,17 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
 
   List<String> pathologiesSelectedToList() {
     List<String> ret = [];
-
+    if (danioCheckboxValue) {
+      ret.add(
+          parseCheckboxStatePathologyToString(CheckboxStatePathology.Danio));
+    }
+    if (raizCheckboxValue) {
+      ret.add(parseCheckboxStatePathologyToString(CheckboxStatePathology.Raiz));
+    }
+    if (piedrasOEscombrosCheckboxValue) {
+      ret.add(parseCheckboxStatePathologyToString(
+          CheckboxStatePathology.PiedrasOEscombros));
+    }
     return ret;
   }
 
@@ -176,7 +186,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
       "nivelSedimentacion": sedimentLevel,
       "observacionAguaArriba": upStreamCheckbox,
       "observacionAguaAbajo": downStreamCheckbox,
-      "patologias": ["Danio"],
+      "patologias": pathologiesSelectedToList(),
       "catastro": cadastre,
       "observaciones": _observationsController.text,
       "inspectioned": true,
@@ -198,7 +208,6 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
           onAcceptPressed: () {},
         );
       } else {
-        // Manejo de error
         await showCustomMessageDialog(
           context: context,
           onAcceptPressed: () {},
@@ -207,7 +216,6 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
         );
       }
     } catch (error) {
-      // Manejo de errores inesperados
       print("Error: $error");
       await showCustomMessageDialog(
         context: context,

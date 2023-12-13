@@ -19,13 +19,24 @@ class CheckboxHelper {
   }
 }
 
+String parseCheckboxStatePathologyToString(CheckboxStatePathology value) {
+  switch (value) {
+    case CheckboxStatePathology.Danio:
+      return 'Danio';
+    case CheckboxStatePathology.Raiz:
+      return 'Raiz';
+    case CheckboxStatePathology.PiedrasOEscombros:
+      return 'Piedras o escombros';
+  }
+}
+
 CheckboxStatePathology parseStringToCheckboxStatePathology(String value) {
   switch (value) {
     case 'Danio':
       return CheckboxStatePathology.Danio;
     case 'Raiz':
       return CheckboxStatePathology.Raiz;
-    case 'PiedrasOEscombros':
+    case 'Piedras o escombros':
       return CheckboxStatePathology.PiedrasOEscombros;
     default:
       throw ArgumentError('Valor desconocido: $value');
