@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gtau_app_front/models/scheduled/register_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/services/scheduled_service.dart';
@@ -97,5 +97,25 @@ class ScheduledViewModel extends ChangeNotifier {
       print('Error in fetchScheduledElements: $error');
     }
     return null;
+  }
+
+  Future<bool> updateSectionScheduled(String token, int scheduledId,
+      int sectionId, Map<String, dynamic> body) async {
+    try {
+      _isLoading = true;
+      _error = false;
+
+      final response = await _scheduledService.updateSectionScheduled(
+          token, scheduledId, sectionId, body);
+      _isLoading = false;
+      return response;
+    } catch (error) {
+      _isLoading = false;
+      _error = true;
+      if (kDebugMode) {
+        print('Error in updateSectionScheduledById: $error');
+      }
+      rethrow;
+    }
   }
 }

@@ -100,48 +100,48 @@ class ScheduledService {
     }
   }
 
-  Future<bool> updateTask(
-      String token, int idTask, Map<String, dynamic> body) async {
+  Future<bool> updateSectionScheduled(String token, int scheduledId,
+      int sectionId, Map<String, dynamic> body) async {
     try {
-      final url = Uri.parse('$baseUrl/$idTask');
+      final url = Uri.parse('$baseUrl/$scheduledId/tramo/$sectionId');
       final String jsonBody = jsonEncode(body);
       final response =
           await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
-        print('Tarea ha sido actualizada correctamente');
+        print('Tramo en programada ha sido actualizado correctamente');
         return true;
       } else {
-        print('Error en update de tarea');
+        print('Error al actualizar tramo en programada');
         return false;
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error in updateTask: $error');
+        print('Error in updateSectionScheduledById: $error');
       }
       rethrow;
     }
   }
 
-  Future<bool> createSheduledTask(
-      String token, Map<String, dynamic> body) async {
-    try {
-      final String jsonBody = jsonEncode(body);
-      final url = Uri.parse(baseUrl);
-      final response =
-          await http.post(url, headers: _getHeaders(token), body: jsonBody);
-
-      if (response.statusCode == 201) {
-        print('Tarea ha sido creada correctamente');
-        return true;
-      } else {
-        print('No se pudieron traer datos');
-        return false;
-      }
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error in createTask: $error');
-      }
-      rethrow;
-    }
-  }
+// Future<bool> createSheduledTask(
+//     String token, Map<String, dynamic> body) async {
+//   try {
+//     final String jsonBody = jsonEncode(body);
+//     final url = Uri.parse(baseUrl);
+//     final response =
+//         await http.post(url, headers: _getHeaders(token), body: jsonBody);
+//
+//     if (response.statusCode == 201) {
+//       print('Tarea ha sido creada correctamente');
+//       return true;
+//     } else {
+//       print('No se pudieron traer datos');
+//       return false;
+//     }
+//   } catch (error) {
+//     if (kDebugMode) {
+//       print('Error in createTask: $error');
+//     }
+//     rethrow;
+//   }
+// }
 }

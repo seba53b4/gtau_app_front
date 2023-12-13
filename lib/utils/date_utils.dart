@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 
 const formatDate = 'dd-MM-yyyy';
 const formatDateHour = 'dd-MM-yyyy HH:mm:ss';
+const formatDateBackendCompatible = 'yyyy-MM-ddTHH:mm:ss.SSSZ';
 
 String parseDateTimeOnFormat(DateTime dt) {
   return DateFormat(formatDate).format(dt);
@@ -21,4 +22,11 @@ String formattedDateToUpdate(String dateString) {
 
   String formattedDate = date.toUtc().toIso8601String();
   return formattedDate;
+}
+
+String getCurrentHour() {
+  DateTime now = DateTime.now();
+  String formattedDateHour =
+      DateFormat(formatDateBackendCompatible).format(now);
+  return formattedDateHour;
 }

@@ -7,7 +7,7 @@ enum CheckboxStatePathology {
 class CheckboxHelper {
   static CheckboxStatePathology parse(String value) {
     switch (value) {
-      case 'Daño':
+      case 'Danio':
         return CheckboxStatePathology.Danio;
       case 'Raiz':
         return CheckboxStatePathology.Raiz;

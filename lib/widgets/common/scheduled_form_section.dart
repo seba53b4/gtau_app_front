@@ -14,9 +14,12 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../models/enums/message_type.dart';
 import '../../providers/user_provider.dart';
+import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
 import 'chip_registered_element.dart';
 import 'container_divider.dart';
+import 'customDialog.dart';
+import 'customMessageDialog.dart';
 import 'custom_dropdown.dart';
 import 'custom_elevated_button.dart';
 import 'custom_labeled_checkbox.dart';
@@ -62,6 +65,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   List<FocusNode> focusNodes = [];
   late String token;
   late ScheduledViewModel? scheduledViewModel;
+  late UserProvider userStateProvider;
 
   @override
   void initState() {
@@ -82,6 +86,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
     });
     token = context.read<UserProvider>().getToken!;
     scheduledViewModel = context.read<ScheduledViewModel>();
+    userStateProvider = Provider.of<UserProvider>(context, listen: false);
   }
 
   @override
@@ -122,8 +127,6 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
 
   void _loadInfoFromResponse(SectionScheduled sectionScheduled) {
     if (sectionScheduled.inspectioned) {
-      _catastroController.text = sectionScheduled.catastro ??
-          AppLocalizations.of(context)!.form_scheduled_cadastre_type_empty;
       _typeController.text = sectionScheduled.tipoTra ?? '';
       _diamController1.text = (sectionScheduled.diametro ?? '').toString();
       _diamController2.text = (sectionScheduled.diametro2 ?? '').toString();
@@ -150,6 +153,86 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
       piedrasOEscombrosCheckboxValue =
           pathologiesStates.contains(CheckboxStatePathology.PiedrasOEscombros);
     });
+  }
+
+  List<String> pathologiesSelectedToList() {
+    List<String> ret = [];
+
+    return ret;
+  }
+
+  void updateSection() async {
+    final Map<String, dynamic> requestBody = {
+      "tipoTra": _typeController.text,
+      "diametro": _diamController1.text.isNotEmpty
+          ? double.parse(_diamController1.text)
+          : null,
+      "diametro2": _diamController2.text.isNotEmpty
+          ? double.parse(_diamController2.text)
+          : null,
+      "longitud": _longitudeController.text.isNotEmpty
+          ? double.parse(_longitudeController.text)
+          : null,
+      "nivelSedimentacion": sedimentLevel,
+      "observacionAguaArriba": upStreamCheckbox,
+      "observacionAguaAbajo": downStreamCheckbox,
+      "patologias": ["Danio"],
+      "catastro": cadastre,
+      "observaciones": _observationsController.text,
+      "inspectioned": true,
+      "inspectionedDate": getCurrentHour(),
+      "username": userStateProvider.userName
+    };
+    try {
+      bool? result = await scheduledViewModel?.updateSectionScheduled(
+        token,
+        widget.scheduledId,
+        widget.sectionId,
+        requestBody,
+      );
+
+      if (result != null && result) {
+        await showCustomMessageDialog(
+          context: context,
+          messageType: DialogMessageType.success,
+          onAcceptPressed: () {},
+        );
+      } else {
+        // Manejo de error
+        await showCustomMessageDialog(
+          context: context,
+          onAcceptPressed: () {},
+          customText: AppLocalizations.of(context)!.error_generic_text,
+          messageType: DialogMessageType.error,
+        );
+      }
+    } catch (error) {
+      // Manejo de errores inesperados
+      print("Error: $error");
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    }
+  }
+
+  void showConfirmationDialog() async {
+    await showCustomDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.dialogWarning,
+      content: AppLocalizations.of(context)!.dialogContent,
+      onDisablePressed: () {
+        Navigator.of(context).pop();
+      },
+      onEnablePressed: () {
+        Navigator.of(context).pop();
+        updateSection();
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
   }
 
   @override
@@ -228,7 +311,11 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                               AppLocalizations.of(context)!
                                   .form_scheduled_cadastre_type_empty
                             ],
-                            onChanged: (str) {}),
+                            onChanged: (str) {
+                              setState(() {
+                                cadastre = str;
+                              });
+                            }),
                         const SizedBox(height: 8)
                       ]),
                       const SizedBox(height: 12),
@@ -305,7 +392,11 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                               AppLocalizations.of(context)!
                                   .form_scheduled_sediment_level_3
                             ],
-                            onChanged: (str) {}),
+                            onChanged: (str) {
+                              setState(() {
+                                sedimentLevel = str;
+                              });
+                            }),
                         const SizedBox(height: 8),
                       ]),
                       const SizedBox(height: 12),
@@ -408,7 +499,9 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                     text: AppLocalizations.of(context)!.buttonCancelLabel),
                 const SizedBox(width: 16),
                 CustomElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showConfirmationDialog();
+                    },
                     text: AppLocalizations.of(context)!.buttonAcceptLabel),
               ],
             ),
