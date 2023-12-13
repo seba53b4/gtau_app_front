@@ -50,10 +50,12 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   final _diamController1 = TextEditingController();
   final _diamController2 = TextEditingController();
   final _longitudeController = TextEditingController();
+  final _userNameController = TextEditingController();
   final _longitudeFocusNode = FocusNode();
   final _diamFocusNode1 = FocusNode();
   final _diamFocusNode2 = FocusNode();
   final _typeFocusNode = FocusNode();
+  final _userNameFocusNode = FocusNode();
   bool danioCheckboxValue = false;
   bool raizCheckboxValue = false;
   bool upStreamCheckbox = false;
@@ -77,6 +79,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
       _typeFocusNode,
       _longitudeFocusNode,
       _catastroDropdownFocusNode,
+      _userNameFocusNode
     ];
     keyboardSubscription =
         KeyboardVisibilityController().onChange.listen((bool visible) {
@@ -127,6 +130,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
 
   void _loadInfoFromResponse(SectionScheduled sectionScheduled) {
     if (sectionScheduled.inspectioned) {
+      _userNameController.text = sectionScheduled.username!;
       _typeController.text = sectionScheduled.tipoTra ?? '';
       _diamController1.text = (sectionScheduled.diametro ?? '').toString();
       _diamController2.text = (sectionScheduled.diametro2 ?? '').toString();
@@ -302,11 +306,28 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                             bottom: 8, start: 4, end: 4),
                         child: Divider(color: Colors.grey, thickness: 1),
                       ),
+                      Visibility(
+                        visible: sectionScheduled.inspectioned,
+                        child: ContainerBottomDivider(children: [
+                          ScheduledFormTitle(titleText: 'Inspeccionado por'),
+                          CustomTextField(
+                            controller: _userNameController,
+                            width: 120,
+                            readOnly: true,
+                            keyboardType: TextInputType.number,
+                            focusNode: _userNameFocusNode,
+                            hasError: false,
+                          ),
+                        ]),
+                      ),
+                      if (sectionScheduled.inspectioned)
+                        const SizedBox(height: 12),
                       ContainerBottomDivider(children: [
                         ScheduledFormTitle(
                             titleText: AppLocalizations.of(context)!
                                 .form_scheduled_cadastre),
                         CustomDropdown(
+                            width: 120,
                             fontSize: 12,
                             value: cadastre ??
                                 AppLocalizations.of(context)!
