@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/checkbox_state_patologias.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
@@ -308,17 +309,40 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                       ),
                       Visibility(
                         visible: sectionScheduled.inspectioned,
-                        child: ContainerBottomDivider(children: [
-                          ScheduledFormTitle(titleText: 'Inspeccionado por'),
-                          CustomTextField(
-                            controller: _userNameController,
-                            width: 120,
-                            readOnly: true,
-                            keyboardType: TextInputType.number,
-                            focusNode: _userNameFocusNode,
-                            hasError: false,
+                        child: SizedBox(
+                          height: 128,
+                          child: ContainerBottomDivider(
+                            children: [
+                              ScheduledFormTitle(
+                                  titleText: AppLocalizations.of(context)!
+                                      .taskInspectionTitle),
+                              Center(
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '${AppLocalizations.of(context)!.user}: ${sectionScheduled.username}',
+                                      style: TextStyle(
+                                        color: primarySwatch[400],
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '${AppLocalizations.of(context)!.createTaskPage_realizationDateTitle}: ${parseDateTimeOnFormatHour(sectionScheduled.inspectionedDate)}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ]),
+                        ),
                       ),
                       if (sectionScheduled.inspectioned)
                         const SizedBox(height: 12),
