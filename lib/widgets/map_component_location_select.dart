@@ -14,7 +14,6 @@ import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/theme_constants.dart';
-import '../providers/user_provider.dart';
 import 'common/menu_button_map.dart';
 
 class MapComponentLocationSelect extends StatefulWidget {
@@ -30,7 +29,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
   String? errorMsg;
-  MapType _currentMapType = MapType.satellite;
+  final MapType _currentMapType = MapType.satellite;
   Set<Marker> markers = {};
   Set<Marker> markersGPS = {};
   bool locationManual = false;
@@ -39,12 +38,14 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
   double modalWidth = 300.0;
   late double mapWidth;
   late double mapInit;
+  late SelectedItemsProvider selectedItemsProvider;
 
   @override
   void initState() {
     super.initState();
-    _initializeLocation();
+
     _mapController = Completer<GoogleMapController>();
+    selectedItemsProvider = context.read<SelectedItemsProvider>();
   }
 
   @override
@@ -54,11 +55,16 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
     setState(() {
       mapWidth = mapInit;
     });
+    _initializeLocation();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    //selectedItemsProvider.reset();
   }
 
   Future<void> _initializeLocation() async {
-    SelectedItemsProvider selectedItemsProvider =
-        context.read<SelectedItemsProvider>();
     try {
       if (selectedItemsProvider.inspectionPosition.latitude == 0 &&
           selectedItemsProvider.inspectionPosition.longitude == 0) {
@@ -118,8 +124,6 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
         markersGPS.add(newMarker);
         _getMarkers();
       });
-      SelectedItemsProvider selectedItemsProvider =
-          context.read<SelectedItemsProvider>();
       selectedItemsProvider.setInspectionPosition(
           LatLng(currentPosition.latitude, currentPosition.longitude));
       // Actualiza la cámara del mapa para centrarse en la ubicación actual sin animación
@@ -154,8 +158,6 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
 
   @override
   Widget build(BuildContext context) {
-    final token = context.read<UserProvider>().getToken;
-
     return Consumer<SectionViewModel>(
         builder: (context, sectionViewModel, child) {
       return Consumer<RegisterViewModel>(
@@ -221,9 +223,6 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                                     _getMarkers();
                                     location = LatLng(
                                         latLng.latitude, latLng.longitude);
-                                    SelectedItemsProvider
-                                        selectedItemsProvider =
-                                        context.read<SelectedItemsProvider>();
                                     selectedItemsProvider
                                         .setInspectionPosition(location!);
                                   });
@@ -259,9 +258,6 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                                   colorChangeOnPress: true,
                                   onPressed: () {
                                     setState(() {
-                                      final selectedItemsProvider =
-                                          context.read<SelectedItemsProvider>();
-                                      selectedItemsProvider.clearAll();
                                       markersGPS.clear();
                                       locationManual = !locationManual;
                                     });

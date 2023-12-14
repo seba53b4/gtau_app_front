@@ -22,6 +22,15 @@ class SectionViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
+  bool hasSections() {
+    return _sections.isNotEmpty;
+  }
+
+  void reset() {
+    _sectionForDetail = null;
+    _sections = [];
+  }
+
   Future<List<Section>?> fetchSectionsByRadius(
       String token, double longitude, double latitude, int radiusMtr) async {
     try {
