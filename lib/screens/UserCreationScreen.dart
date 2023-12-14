@@ -67,7 +67,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   String numOrder = "";
 
   void reset() {
-    roleController.text = '';
+    roleController.text = notAssigned;
     usernameController.text = '';
     emailController.text = '';
     firstnameController.text = '';
@@ -102,54 +102,17 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   @override
   void initState() {
-    super.initState();
-    if (widget.detail) {
-      widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
-      releasedDate = DateTime.now();
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-        await initializeTask();
-      });
-      Hive.initFlutter().then((value) => null);
-    } else {
-      startDate = DateTime.now();
-    }
+    Hive.initFlutter().then((value) => null);
+    roleController.text = notAssigned;
+    usernameController.text = '';
+    emailController.text = '';
+    firstnameController.text = '';
+    lastnameController.text = '';
+    passwordController.text = '';
+    passconfirmController.text = '';
   }
 
-  Future<bool> _fetchTask() async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-
-    try {
-      final selectedItemsProvider = context.read<SelectedItemsProvider>();
-      final responseTask =
-          await taskListViewModel.fetchTask(token, widget.idTask!);
-      if (responseTask != null) {
-        setState(() {
-          task = responseTask;
-        });
-      }
-
-      selectedItemsProvider.saveInitialSelections(task.sections, task.registers,
-          task.catchments, task.lots, task.position!);
-      roleController.text = task.workNumber!;
-      usernameController.text = task.description!;
-      emailController.text = task.applicant!;
-      firstnameController.text = task.location!;
-      lastnameController.text = task.user!;
-      passwordController.text = task.length ?? '';
-      passconfirmController.text = task.material ?? '';
-      startDate = task.addDate!;
-      taskStatus = task.status!;
-      initStatus = task.status!;
-
-      return true;
-    } catch (error) {
-      print(error);
-      throw Exception('Error al obtener los datos');
-    }
-  }
+  
 
   Future<bool> _createTask(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
@@ -216,20 +179,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         });
   }
 
-  Future<void> initializeTask() async {
-    await _fetchTask().catchError((error) async {
-      // Manejo de error
-      await showCustomMessageDialog(
-        context: context,
-        onAcceptPressed: () {
-          Navigator.of(context).pop();
-        },
-        customText: AppLocalizations.of(context)!.error_generic_text,
-        messageType: DialogMessageType.error,
-      );
-    });
-  }
-
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<bool> _ResetPrefs() async {
@@ -288,7 +237,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       reset();
     }
     _ResetPrefs();
-    await updateTaskList();
   }
 
   Future handleAcceptOnShowDialogCreateTask() async {
@@ -298,29 +246,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       reset();
     }
     _ResetPrefs();
-  }
-
-  Future resetTaskList() async {
-    final userName =
-        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
-    final status =
-        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    taskListViewModel.clearListByStatus(status!);
-    await taskListViewModel.initializeTasks(context, status, userName);
-  }
-
-  Future updateTaskList() async {
-    final taskFilterProvider =
-        Provider.of<TaskFilterProvider>(context, listen: false);
-    final userName =
-        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    final status = taskFilterProvider.lastStatus;
-    taskListViewModel.clearListByStatus(status!);
-    await taskListViewModel.initializeTasks(context, status, userName);
   }
 
   void handleEditTask() {
@@ -350,7 +275,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     Navigator.of(context).pop();
   }
 
-  List<ImageDataDTO>? imagesFiles = null;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ScrollController _scrollController = ScrollController();
 
@@ -577,7 +501,16 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                         ),
                                       ],
                                     ),
-                                    Container(
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
                       height: 50.0,
                       margin: const EdgeInsets.symmetric(vertical: 20.0),
                       child: Row(
@@ -594,14 +527,40 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                           CustomElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                if (widget.detail) {
+                                String bodyMsg = '';
+                                final bool emailValid = 
+                                RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(emailController.text);
+                                final bool isPassValid = passwordController.text == passconfirmController.text;
+                                final bool isRoleValid = roleController.text != notAssigned;
+                                if(emailValid == false) bodyMsg = bodyMsg + 'Mail is NOT Valid\n';
+                                if(isPassValid == false) bodyMsg = bodyMsg + 'Password do NOT match\n';
+                                if(isRoleValid == false) bodyMsg = bodyMsg + 'Role must be selected\n';
+
+                                if(emailValid == false || isPassValid == false || isRoleValid == false){
+                                  showCustomDialog(
+                                    context: context,
+                                    title: AppLocalizations.of(context)!.dialogWarning,
+                                    content: bodyMsg,
+                                    onDisablePressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    onEnablePressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+                                    cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+                                  );
+                                }
+                                
+                                /*if (widget.detail) {
                                   handleEditTask();
                                 } else {
                                   // Se quita acción de creación en Programada
                                   if (selectedIndex == 1) {
                                     handleSubmit();
                                   }
-                                }
+                                }*/
                               } else {
                                 scrollToTopScrollView();
                               }
@@ -615,15 +574,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                         ],
                       ),
                     ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
