@@ -35,7 +35,6 @@ import '../widgets/common/inspection_location_select.dart';
 import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/image_gallery_modal.dart';
-import '../widgets/user_image.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -384,7 +383,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "location": locationController.text,
       "description": descriptionController.text,
       "releasedDate": releasedDateSelected,
-      "user": userAssignedController.text,
+      "user": userAssigned,
       "length": lengthController.text,
       "material": materialController.text,
       "observations": observationsController.text,
