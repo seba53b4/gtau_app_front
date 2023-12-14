@@ -15,9 +15,12 @@ import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../providers/user_provider.dart';
+import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
 import 'chip_registered_element.dart';
 import 'container_scheduled_info.dart';
+import 'customDialog.dart';
+import 'customMessageDialog.dart';
 import 'custom_text_form_field.dart';
 import 'custom_textfield.dart';
 
@@ -139,6 +142,79 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
 
   Map<String, bool> initialValueTop(List<String> labels) {
     return {for (var label in labels) label: true};
+  }
+
+  void updateRegister() async {
+    final Map<String, dynamic> requestBody = {
+      "tipo": _typeController.text,
+      "tipoPavimento": paviment,
+      "estadoRegistro": registerStatus,
+      "cotaTapa": _cotaController.text,
+      "profundidad": _depthController.text,
+      "apertura": aperture,
+      "estadoTapa": topStatusChecks.keys
+          .where((key) => topStatusChecks[key] == true)
+          .toList(),
+      "catastro": cadastre,
+      "observaciones": observationsController.text,
+      "inspectioned": true,
+      "inspectionedDate": getCurrentHour(),
+      "username": userStateProvider.userName
+    };
+    try {
+      bool? result = await scheduledViewModel?.updateRegisterScheduled(
+        token,
+        widget.scheduledId,
+        widget.registerId,
+        requestBody,
+      );
+
+      if (result != null && result) {
+        await showCustomMessageDialog(
+          context: context,
+          messageType: DialogMessageType.success,
+          onAcceptPressed: () {
+            Navigator.of(context).pop();
+          },
+        );
+      } else {
+        await showCustomMessageDialog(
+          context: context,
+          onAcceptPressed: () {
+            Navigator.of(context).pop();
+          },
+          customText: AppLocalizations.of(context)!.error_generic_text,
+          messageType: DialogMessageType.error,
+        );
+      }
+    } catch (error) {
+      print("Error: $error");
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {
+          Navigator.of(context).pop();
+        },
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    }
+  }
+
+  void showConfirmationDialog() async {
+    await showCustomDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.dialogWarning,
+      content: AppLocalizations.of(context)!.dialogContent,
+      onDisablePressed: () {
+        Navigator.of(context).pop();
+      },
+      onEnablePressed: () {
+        Navigator.of(context).pop();
+        updateRegister();
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
   }
 
   @override
@@ -349,6 +425,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                       onChanged: (Map<String, bool> checks) {
                         setState(() {
                           topStatusChecks = checks;
+                          print(topStatusChecks);
                         });
                       },
                     ),
@@ -388,7 +465,9 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                 text: AppLocalizations.of(context)!.buttonCancelLabel),
             const SizedBox(width: 16),
             CustomElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showConfirmationDialog();
+                },
                 text: AppLocalizations.of(context)!.buttonAcceptLabel),
           ],
         ),
