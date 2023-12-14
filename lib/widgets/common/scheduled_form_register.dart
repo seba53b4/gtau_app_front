@@ -4,19 +4,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
+import 'package:gtau_app_front/models/scheduled/register_scheduled.dart';
+import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/container_divider.dart';
 import 'package:gtau_app_front/widgets/common/custom_dropdown.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:gtau_app_front/widgets/common/scheduled_form_common.dart';
+import 'package:gtau_app_front/widgets/common/top_status_scheduled.dart';
+import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
+import '../../providers/user_provider.dart';
 import '../../utils/element_functions.dart';
-import 'custom_labeled_checkbox.dart';
+import 'chip_registered_element.dart';
+import 'container_scheduled_info.dart';
 import 'custom_text_form_field.dart';
 import 'custom_textfield.dart';
 
 class ScheduledFormRegister extends StatefulWidget {
-  const ScheduledFormRegister({Key? key}) : super(key: key);
+  final int registerId;
+  final int scheduledId;
+
+  const ScheduledFormRegister(
+      {Key? key, required this.registerId, required this.scheduledId})
+      : super(key: key);
 
   @override
   State<ScheduledFormRegister> createState() => _ScheduledFormRegisterState();
@@ -25,6 +36,7 @@ class ScheduledFormRegister extends StatefulWidget {
 class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   final observationsController = TextEditingController();
   final AutoScrollController _scrollController = AutoScrollController();
+  late String idRegister = '';
   final FocusNode _observationsFocusNode = FocusNode();
   late StreamSubscription<bool> keyboardSubscription;
   final _typeController = TextEditingController();
@@ -35,7 +47,17 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   final _depthDropdownFocusNode = FocusNode();
   final _typeDropdownFocusNode = FocusNode();
   final _catastroDropdownFocusNode = FocusNode();
+  String? cadastre = null;
+  String? paviment = null;
+  String? registerStatus = null;
+  String? aperture = null;
+  Map<String, bool> topStatusChecks = {};
   List<FocusNode> focusNodes = [];
+  late RegisterScheduled registerScheduled =
+      RegisterScheduled(inspectioned: false, ogcFid: -1);
+  late String token;
+  late ScheduledViewModel? scheduledViewModel;
+  late UserProvider userStateProvider;
 
   @override
   void initState() {
@@ -53,6 +75,15 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
         scrollToFocusedList(focusNodes, _scrollController);
       }
     });
+    token = context.read<UserProvider>().getToken!;
+    scheduledViewModel = context.read<ScheduledViewModel>();
+    userStateProvider = Provider.of<UserProvider>(context, listen: false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadSectionInfo();
   }
 
   @override
@@ -68,6 +99,46 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
     _catastroController.dispose();
     _catastroDropdownFocusNode.dispose();
     super.dispose();
+  }
+
+  void _loadSectionInfo() async {
+    RegisterScheduled? registerScheduledResponse =
+        await scheduledViewModel?.fetchRegisterScheduledById(
+            token, widget.scheduledId, widget.registerId);
+    if (registerScheduledResponse != null) {
+      setState(() {
+        registerScheduled = registerScheduledResponse;
+        idRegister = registerScheduledResponse.idRegistro.toString();
+      });
+      _loadInfoFromResponse(registerScheduledResponse);
+    }
+  }
+
+  void _loadInfoFromResponse(RegisterScheduled registerScheduled) {
+    if (registerScheduled.inspectioned) {
+      _typeController.text = registerScheduled.tipoPto ?? '';
+      _cotaController.text = registerScheduled.cotaTapa ?? '';
+      _depthController.text = registerScheduled.profundidad ?? '';
+      aperture = registerScheduled.apertura ??
+          AppLocalizations.of(context)!
+              .form_scheduled_aperture_type_not_located;
+      observationsController.text = registerScheduled.observaciones ?? '';
+      registerStatus = registerScheduled.estadoRegistro ??
+          AppLocalizations.of(context)!.form_scheduled_no_data;
+      paviment = registerScheduled.tipoPavimento ??
+          AppLocalizations.of(context)!.form_scheduled_no_data;
+      cadastre = registerScheduled.catastro ??
+          AppLocalizations.of(context)!.form_scheduled_cadastre_type_empty;
+      setState(() {
+        topStatusChecks = {};
+        topStatusChecks
+            .addAll(initialValueTop(registerScheduled.estadoTapa ?? []));
+      });
+    }
+  }
+
+  Map<String, bool> initialValueTop(List<String> labels) {
+    return {for (var label in labels) label: true};
   }
 
   @override
@@ -86,7 +157,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
@@ -107,10 +178,12 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                               Text(AppLocalizations.of(context)!
                                   .form_scheduled_id),
                               const SizedBox(width: 8),
-                              const Text('HD123456'),
+                              Text(idRegister),
                             ],
                           ),
                         ),
+                        RegistrationChip(
+                            isRegistered: registerScheduled.inspectioned),
                       ],
                     ),
                   ),
@@ -119,14 +192,23 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                         EdgeInsetsDirectional.only(bottom: 8, start: 4, end: 4),
                     child: Divider(color: Colors.grey, thickness: 1),
                   ),
+                  Visibility(
+                    visible: registerScheduled.inspectioned,
+                    child: ScheduledInspectionDetails(
+                      username: registerScheduled.username ?? '',
+                      inspectionedDate:
+                          registerScheduled.inspectionedDate ?? DateTime.now(),
+                    ),
+                  ),
                   ContainerBottomDivider(children: [
                     ScheduledFormTitle(
                         titleText: AppLocalizations.of(context)!
                             .form_scheduled_cadastre),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_cadastre_type_empty,
+                        value: cadastre ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_cadastre_type_empty,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_cadastre_type_new,
@@ -160,8 +242,9 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_no_data,
+                        value: paviment ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_no_data,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_pav_type_type_1,
@@ -169,7 +252,11 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                               .form_scheduled_pav_type_type_2,
                           AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            paviment = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
@@ -180,8 +267,9 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_no_data,
+                        value: registerStatus ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_no_data,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_register_status_1,
@@ -191,7 +279,11 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                               .form_scheduled_register_status_3,
                           AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            registerStatus = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
@@ -228,8 +320,9 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_aperture_type_not_located,
+                        value: aperture ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_aperture_type_not_located,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_aperture_type_yes,
@@ -238,7 +331,11 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                           AppLocalizations.of(context)!
                               .form_scheduled_aperture_type_not_located,
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            aperture = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
@@ -247,45 +344,13 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                     ScheduledFormTitle(
                         titleText: AppLocalizations.of(context)!
                             .form_scheduled_top_status),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_good,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_missing,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_sunken,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_frame,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_broken_frame,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_provisional,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_broken,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_welded_sealed,
-                      onChanged: (value) {},
+                    TopStatusOptions(
+                      initialCheckboxStates: topStatusChecks,
+                      onChanged: (Map<String, bool> checks) {
+                        setState(() {
+                          topStatusChecks = checks;
+                        });
+                      },
                     ),
                   ]),
                   // Estado de la tapa - END

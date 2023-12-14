@@ -66,19 +66,6 @@ void showScheduledElementModal(BuildContext context, ElementType elementType,
                 scheduledid: scheduledId),
           ),
           actions: null,
-          // actions: <Widget>[
-          //   TextButton(
-          //     onPressed: () {
-          //       Navigator.of(context).pop();
-          //       onClose!();
-          //     },
-          //     child: Text(
-          //       AppLocalizations.of(context)!.dialogCloseButton,
-          //       style: const TextStyle(
-          //           fontSize: 18, color: Color.fromRGBO(96, 166, 27, 1)),
-          //     ),
-          //   ),
-          // ],
           backgroundColor: lightBackground);
     },
   );

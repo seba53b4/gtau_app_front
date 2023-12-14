@@ -3,14 +3,15 @@ import 'package:gtau_app_front/models/point_data.dart';
 
 import 'common.dart';
 
-class RegisterScheduled extends PointData {
+class RegisterScheduled extends PointDataScheduled {
   final String? tipoPto;
+  final int? idRegistro;
   final String? tipoPavimento;
   final String? estadoRegistro;
   final String? cotaTapa;
   final String? profundidad;
   final String? apertura;
-  final String? estadoTapa;
+  final List<String>? estadoTapa;
   final String? observaciones;
   final String? catastro;
   final bool inspectioned;
@@ -32,25 +33,28 @@ class RegisterScheduled extends PointData {
       this.username,
       required super.ogcFid,
       super.type = PointType.register,
+      this.idRegistro,
       super.point});
 
-  factory RegisterScheduled.fromJson(Map<String, dynamic> json) {
+  factory RegisterScheduled.fromJson(
+      {required Map<String, dynamic> json, bool isFetch = false}) {
     return RegisterScheduled(
-        tipoPto: json['tipo_pto'] as String?,
-        tipoPavimento: json['tipo_pavimento'] as String?,
-        estadoRegistro: json['estado_registro'] as String?,
-        cotaTapa: json['cota_tapa'] as String?,
+        tipoPto: json['tipo'] as String?,
+        idRegistro: json['idRegistro'] as int?,
+        tipoPavimento: json['tipoPavimento'] as String?,
+        estadoRegistro: json['estadoRegistro'] as String?,
+        cotaTapa: json['cotaTapa'] as String?,
         profundidad: json['profundidad'] as String?,
         apertura: json['apertura'] as String?,
-        estadoTapa: json['estado_tapa'] as String?,
+        estadoTapa: (json['estadoTapa'] as List<dynamic>?)?.cast<String>(),
         observaciones: json['observaciones'] as String?,
         catastro: json['catastro'] as String?,
         inspectioned: json['inspectioned'] as bool,
-        inspectionedDate: json['inspectioned_date'] != null
-            ? DateTime.parse(json['inspectioned_date'] as String)
+        inspectionedDate: json['inspectionedDate'] != null
+            ? DateTime.parse(json['inspectionedDate'] as String)
             : null,
         username: json['username'] as String?,
-        ogcFid: json['ogcFid'] as int,
-        point: buildCircle(json, PointType.register));
+        ogcFid: json['ogcFid'] as int?,
+        point: isFetch ? null : buildCircle(json, PointType.register));
   }
 }

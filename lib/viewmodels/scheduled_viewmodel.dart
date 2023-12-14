@@ -118,4 +118,56 @@ class ScheduledViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<RegisterScheduled?> fetchRegisterScheduledById(
+      String token, int scheduledId, int registerId) async {
+    try {
+      _isLoading = true;
+      _error = false;
+
+      RegisterScheduled? registerScheduledResp = await _scheduledService
+          .fetchRegisterScheduledById(token, scheduledId, registerId);
+
+      if (registerScheduledResp != null) {
+        _isLoading = false;
+      } else {
+        _error = true;
+      }
+
+      Future.microtask(() {
+        _isLoading = false;
+        notifyListeners();
+      });
+
+      return registerScheduledResp;
+    } catch (error) {
+      _isLoading = false;
+      _error = true;
+      Future.microtask(() {
+        notifyListeners();
+      });
+      print('Error in fetchRegisterScheduledById: $error');
+    }
+    return null;
+  }
+
+  Future<bool> updateRegisterScheduled(String token, int scheduledId,
+      int registerId, Map<String, dynamic> body) async {
+    try {
+      _isLoading = true;
+      _error = false;
+
+      final response = await _scheduledService.updateRegisterScheduled(
+          token, scheduledId, registerId, body);
+      _isLoading = false;
+      return response;
+    } catch (error) {
+      _isLoading = false;
+      _error = true;
+      if (kDebugMode) {
+        print('Error in updateRegisterScheduled: $error');
+      }
+      rethrow;
+    }
+  }
 }

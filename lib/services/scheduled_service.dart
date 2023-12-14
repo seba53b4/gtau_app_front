@@ -46,7 +46,7 @@ class ScheduledService {
 
         List<RegisterScheduled> registerList =
             entitiesRegister.map<RegisterScheduled>((registerData) {
-          return RegisterScheduled.fromJson(registerData);
+          return RegisterScheduled.fromJson(json: registerData);
         }).toList();
 
         List<SectionScheduled> sectionList =
@@ -117,6 +117,50 @@ class ScheduledService {
     } catch (error) {
       if (kDebugMode) {
         print('Error in updateSectionScheduledById: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<RegisterScheduled?> fetchRegisterScheduledById(
+      String token, int scheduledId, int registerId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/registro/$registerId');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return RegisterScheduled.fromJson(json: jsonResponse, isFetch: true);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener registro en programada: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> updateRegisterScheduled(String token, int scheduledId,
+      int registerId, Map<String, dynamic> body) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/registro/$registerId');
+      final String jsonBody = jsonEncode(body);
+      final response =
+          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      if (response.statusCode == 200) {
+        print('Registro en programada ha sido actualizado correctamente');
+        return true;
+      } else {
+        print('Error al actualizar registro en programada');
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in updateRegisterScheduled: $error');
       }
       rethrow;
     }

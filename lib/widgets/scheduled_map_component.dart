@@ -124,26 +124,12 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   Future<void> _onTapParamBehaviorCircle(
-      int ogcFid, Circle? point, ElementType type) async {}
+      int ogcFid, Circle? point, ElementType type) async {
+    _showModalElement(context, ogcFid, type);
+  }
 
   void _showModalElement(BuildContext context, int ogcFid, ElementType type) {
-    double widthWindow = MediaQuery.of(context).size.width;
     showScheduledElementModal(context, type, () {}, widget.idSheduled, ogcFid);
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return Dialog(
-    //       shape: const RoundedRectangleBorder(
-    //           borderRadius: BorderRadius.all(Radius.circular(50.0))),
-    //       child: SizedBox(
-    //         width: kIsWeb ? widthWindow * 0.85 : widthWindow,
-    //         child: const Center(
-    //             widthFactor: kIsWeb ? 0.6 : 0.5,
-    //             child: ScheduledMapComponent(idSheduled: 3)),
-    //       ),
-    //     );
-    //   },
-    // );
   }
 
   void updateElementsOnMap(
@@ -203,7 +189,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
                 catchment.ogcFid, catchment.point, ElementType.catchment);
-            updateElementsOnMap();
+            //updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -219,8 +205,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           strokeColorParam: _onColorParamBehaviorRegister(register),
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
-                register.ogcFid, register.point, ElementType.register);
-            updateElementsOnMap();
+                register.ogcFid!, register.point, ElementType.register);
+            //updateElementsOnMap();
           },
         );
         setCir.add(circle);
