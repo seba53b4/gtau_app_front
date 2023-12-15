@@ -176,31 +176,39 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
         requestBody,
       );
 
-      if (result != null && result) {
-        await showCustomMessageDialog(
-          context: context,
-          messageType: DialogMessageType.success,
-          onAcceptPressed: () {
-            if (widget.onAccept != null) {
-              widget.onAccept!();
-            }
-            if (!kIsWeb) {
-              Navigator.of(context).pop();
-            }
-          },
-        );
-      } else {
-        await showCustomMessageDialog(
-          context: context,
-          onAcceptPressed: () {
-            Navigator.of(context).pop();
-          },
-          customText: AppLocalizations.of(context)!.error_generic_text,
-          messageType: DialogMessageType.error,
-        );
-      }
+      showMessageOnScreen(result);
     } catch (error) {
       print("Error: $error");
+      showMessageErrorOnFetch();
+    }
+  }
+
+  void showMessageErrorOnFetch() async {
+    await showCustomMessageDialog(
+      context: context,
+      onAcceptPressed: () {
+        Navigator.of(context).pop();
+      },
+      customText: AppLocalizations.of(context)!.error_generic_text,
+      messageType: DialogMessageType.error,
+    );
+  }
+
+  void showMessageOnScreen(bool? result) async {
+    if (result != null && result) {
+      await showCustomMessageDialog(
+        context: context,
+        messageType: DialogMessageType.success,
+        onAcceptPressed: () {
+          if (widget.onAccept != null) {
+            widget.onAccept!();
+          }
+          if (!kIsWeb) {
+            Navigator.of(context).pop();
+          }
+        },
+      );
+    } else {
       await showCustomMessageDialog(
         context: context,
         onAcceptPressed: () {
