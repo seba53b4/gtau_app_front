@@ -87,3 +87,28 @@ Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
 
   return ret;
 }
+
+LatLng getRandomPoint(List<LatLng> points) {
+  if (points.isEmpty) {
+    return const LatLng(-34.88773, -56.13955);
+  }
+
+  final randomIndex = Random().nextInt(points.length);
+  return points[randomIndex];
+}
+
+LatLng? getRandomPointOfMap(Set<Polyline> polylines, Set<Circle> circles) {
+  List<LatLng> allPoints = [];
+  int numberOfElements = 10;
+  // Agregar hasta 20 puntos de las polilíneas
+  for (var polyline in polylines.take(numberOfElements)) {
+    allPoints.addAll(polyline.points);
+  }
+
+  // Agregar hasta 20 puntos de los círculos
+  for (var circle in circles.take(numberOfElements)) {
+    allPoints.add(circle.center);
+  }
+
+  return getRandomPoint(allPoints);
+}

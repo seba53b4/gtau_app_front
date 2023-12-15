@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/scheduled/register_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/services/scheduled_service.dart';
@@ -7,6 +8,8 @@ import '../models/scheduled/catchment_scheduled.dart';
 
 class ScheduledViewModel extends ChangeNotifier {
   final ScheduledService _scheduledService = ScheduledService();
+
+  static const LatLng initLocation = LatLng(-34.88773, -56.13955);
 
   List<CatchmentScheduled> _catchments = [];
 
@@ -28,14 +31,33 @@ class ScheduledViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
-  Future<ScheduledElements?> fetchScheduledElements(String token,
-      int scheduledId) async {
+  LatLng _initPosition = LatLng(-34.88773, -56.13955);
+
+  LatLng get initPosition => _initPosition;
+
+  void setInitPosition(LatLng? pos) {
+    if (pos != null && initLocation.longitude != pos.longitude ||
+        initLocation.latitude != pos!.latitude) {
+      _initPosition = pos;
+    }
+  }
+
+  reset() {
+    _catchments.clear();
+    _sections.clear();
+    _registers.clear();
+    _error = false;
+    _isLoading = false;
+  }
+
+  Future<ScheduledElements?> fetchScheduledElements(
+      String token, int scheduledId) async {
     try {
       _isLoading = true;
       _error = false;
 
       ScheduledElements? entities =
-      await _scheduledService.fetchTaskScheduledEntities(
+          await _scheduledService.fetchTaskScheduledEntities(
         token,
         scheduledId,
       );
@@ -67,8 +89,8 @@ class ScheduledViewModel extends ChangeNotifier {
     return null;
   }
 
-  Future<SectionScheduled?> fetchSectionScheduledById(String token,
-      int scheduledId, int sectionId) async {
+  Future<SectionScheduled?> fetchSectionScheduledById(
+      String token, int scheduledId, int sectionId) async {
     try {
       _isLoading = true;
       _error = false;
@@ -119,8 +141,8 @@ class ScheduledViewModel extends ChangeNotifier {
     }
   }
 
-  Future<RegisterScheduled?> fetchRegisterScheduledById(String token,
-      int scheduledId, int registerId) async {
+  Future<RegisterScheduled?> fetchRegisterScheduledById(
+      String token, int scheduledId, int registerId) async {
     try {
       _isLoading = true;
       _error = false;
@@ -171,8 +193,8 @@ class ScheduledViewModel extends ChangeNotifier {
     }
   }
 
-  Future<CatchmentScheduled?> fetchCatchmentScheduledById(String token,
-      int scheduledId, int catchmentId) async {
+  Future<CatchmentScheduled?> fetchCatchmentScheduledById(
+      String token, int scheduledId, int catchmentId) async {
     try {
       _isLoading = true;
       _error = false;
@@ -222,5 +244,4 @@ class ScheduledViewModel extends ChangeNotifier {
       rethrow;
     }
   }
-
 }

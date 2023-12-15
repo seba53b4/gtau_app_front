@@ -43,7 +43,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   Color defaultPolylineColor = Colors.redAccent;
   Color selectedButtonColor = Colors.green;
   bool locationManual = false;
-  double zoomMap = 16;
+  double zoomMap = 15.36;
   late Completer<GoogleMapController> _mapController;
   late SelectedItemsProvider selectedItemsProvider;
   late String token;
@@ -106,19 +106,6 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
         : register.point!.strokeColor;
   }
 
-  void _getMarkers() {
-    setState(() {
-      markers.clear();
-      markers.addAll(markersGPS);
-    });
-  }
-
-  void _clearMarkersGPS() {
-    setState(() {
-      markersGPS.clear();
-    });
-  }
-
   void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) {
     _showModalElement(context, ogcFid, ElementType.section);
   }
@@ -132,8 +119,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     showScheduledElementModal(context, type, () {}, widget.idSheduled, ogcFid);
   }
 
-  void updateElementsOnMap(
-      {bool isCache = false, ScheduledElements? scheduledElements}) {
+  Future<void> updateElementsOnMap(
+      {bool isCache = false, ScheduledElements? scheduledElements}) async {
     List<SectionScheduled>? sections;
     List<RegisterScheduled>? registers;
     List<CatchmentScheduled>? catchments;
@@ -147,11 +134,26 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       catchments = scheduledElements?.catchments;
       registers = scheduledElements?.registers;
     }
-
     setState(() {
       polylines = getPolylines(sections);
       circles = getCircles(catchments, registers);
     });
+
+    scheduledViewModel.setInitPosition(
+        getRandomPointOfMap(polylines, circles) ?? initLocation);
+
+    setState(() {
+      location = scheduledViewModel.initPosition;
+    });
+    final GoogleMapController controller = await _mapController.future;
+    controller.moveCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(location!.latitude, location!.longitude),
+          zoom: zoomMap,
+        ),
+      ),
+    );
   }
 
   Set<Polyline> getPolylines(List<SectionScheduled>? sections) {
@@ -215,68 +217,6 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     return setCir;
   }
 
-  // List<Future> getElementFutureSelected(String token) {
-  //   List<Future> futures = [];
-  //   // Agregar tramos a búsqueda
-  //   if (selectedIndices.contains(0)) {
-  //     futures.add(fetchSectionsPolylines(token));
-  //   }
-  //   // Agregar tramos a búsqueda
-  //   if (selectedIndices.contains(1)) {
-  //     futures.add(fetchRegistersCircles(token));
-  //   }
-  //   // Agregar tramos a búsqueda
-  //   if (selectedIndices.contains(2)) {
-  //     futures.add(fetchCatchmentsCircles(token));
-  //   }
-  //   if (selectedIndices.contains(3)) {
-  //     //lo mismo pero para parcela
-  //     futures.add(fetchLotsPolylines(token));
-  //   }
-  //   return futures;
-  // }
-  //
-  // Future<void> fetchAndUpdateData(String token) async {
-  //   List<Section>? fetchedSections;
-  //   List<Register>? fetchedRegisters;
-  //   List<Catchment>? fetchedCatchments;
-  //   List<Lot>? fetchedLots;
-  //
-  //   List<Future> futuresElementsSelected = getElementFutureSelected(token);
-  //   await Future.wait(futuresElementsSelected).then((responses) {
-  //     int iter = 0;
-  //     if (selectedIndices.contains(0)) {
-  //       fetchedSections = responses[iter]?.cast<Section>();
-  //       iter++;
-  //     }
-  //     if (selectedIndices.contains(1)) {
-  //       fetchedRegisters = responses[iter]?.cast<Register>();
-  //       iter++;
-  //     }
-  //     if (selectedIndices.contains(2)) {
-  //       fetchedCatchments = responses[iter]?.cast<Catchment>();
-  //       iter++;
-  //     }
-  //     if (selectedIndices.contains(3)) {
-  //       fetchedLots = responses[iter]?.cast<Lot>();
-  //       iter++;
-  //     }
-  //   }).catchError((error) async {
-  //     // Manejo de error
-  //     await showCustomMessageDialog(
-  //       context: context,
-  //       onAcceptPressed: () {},
-  //       customText: AppLocalizations.of(context)!.error_generic_text,
-  //       messageType: DialogMessageType.error,
-  //     );
-  //   });
-  //
-  //   setState(() {
-  //     circles = getCircles(fetchedCatchments, fetchedRegisters);
-  //     polylines = getPolylines(fetchedSections, fetchedLots);
-  //   });
-  // }
-
   void handleIconsSelected(Set<int> indices) {
     setState(() {
       selectedIndices = indices;
@@ -302,7 +242,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                       child: GoogleMap(
                         mapType: _currentMapType,
                         initialCameraPosition: CameraPosition(
-                          target: (location != null) ? location! : initLocation,
+                          target: initLocation,
                           zoom: zoomMap,
                         ),
                         onCameraMove: (CameraPosition cameraPosition) {
