@@ -188,7 +188,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
           onTapParam: () async {
             await _onTapParamBehaviorCircle(
-                catchment.ogcFid, catchment.point, ElementType.catchment);
+                catchment.ogcFid!, catchment.point, ElementType.catchment);
             //updateElementsOnMap();
           },
         );

@@ -56,7 +56,7 @@ class ScheduledService {
 
         List<CatchmentScheduled> catchmentList =
             entitiesCatchment.map<CatchmentScheduled>((catchmentData) {
-          return CatchmentScheduled.fromJson(catchmentData);
+          return CatchmentScheduled.fromJson(json: catchmentData);
         }).toList();
 
         return ScheduledElements(
@@ -161,6 +161,50 @@ class ScheduledService {
     } catch (error) {
       if (kDebugMode) {
         print('Error in updateRegisterScheduled: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<CatchmentScheduled?> fetchCatchmentScheduledById(
+      String token, int scheduledId, int catchmentId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/captacion/$catchmentId');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return CatchmentScheduled.fromJson(json: jsonResponse, isFetch: true);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener captacion en programada: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> updateCatchmentScheduled(String token, int scheduledId,
+      int catchmentId, Map<String, dynamic> body) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/captacion/$catchmentId');
+      final String jsonBody = jsonEncode(body);
+      final response =
+          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      if (response.statusCode == 200) {
+        print('Captacion en programada ha sido actualizado correctamente');
+        return true;
+      } else {
+        print('Error al actualizar captacion en programada');
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in updateCatchmentScheduled: $error');
       }
       rethrow;
     }

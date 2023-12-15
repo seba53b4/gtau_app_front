@@ -21,7 +21,7 @@ class _ScheduledFormWidget extends State<ScheduledFormWidget> {
   @override
   Widget build(BuildContext context) {
     return switch (widget.elementType) {
-    ElementType.catchment => const ScheduledFormCatchment(),
+    ElementType.catchment => ScheduledFormCatchment(catchmentId: widget.elementId, scheduledId: widget.scheduledid),
     ElementType.register => ScheduledFormRegister(registerId: widget.elementId, scheduledId: widget.scheduledid),
     ElementType.section =>  ScheduledFormSection(sectionId: widget.elementId, scheduledId: widget.scheduledid),
     _ => throw Exception('Invalid status string: ${widget.elementType}')

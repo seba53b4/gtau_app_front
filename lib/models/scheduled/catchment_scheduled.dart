@@ -3,16 +3,17 @@ import 'package:gtau_app_front/models/enums/point_type_enum.dart';
 import '../point_data.dart';
 import 'common.dart';
 
-class CatchmentScheduled extends PointData {
+class CatchmentScheduled extends PointDataScheduled {
   final String? tipo;
+  final int? idCaptacion;
   final String? catastro;
   final String? estadoConexion;
   final String? estadoLlamada;
   final String? estadoLosa;
   final String? estadoTabique;
   final String? estadoDeposito;
-  final String? tapa1;
-  final String? tapa2;
+  final List<String>? tapa1;
+  final List<String>? tapa2;
   final String? observaciones;
   final bool inspectioned;
   final DateTime? inspectionedDate;
@@ -20,6 +21,7 @@ class CatchmentScheduled extends PointData {
 
   CatchmentScheduled(
       {this.tipo,
+      this.idCaptacion,
       this.catastro,
       this.estadoConexion,
       this.estadoLlamada,
@@ -32,29 +34,31 @@ class CatchmentScheduled extends PointData {
       required this.inspectioned,
       this.inspectionedDate,
       this.username,
-      required super.ogcFid,
-      required super.type,
+      super.ogcFid,
+      super.type = PointType.catchment,
       super.point});
 
-  factory CatchmentScheduled.fromJson(Map<String, dynamic> json) {
+  factory CatchmentScheduled.fromJson(
+      {required Map<String, dynamic> json, bool isFetch = false}) {
     return CatchmentScheduled(
-        ogcFid: json['ogcFid'] as int,
+        ogcFid: json['ogcFid'] as int?,
         tipo: json['tipo'] as String?,
+        idCaptacion: json['idCaptacion'] as int?,
         catastro: json['catastro'] as String?,
-        estadoConexion: json['estado_conexion'] as String?,
-        estadoLlamada: json['estado_llamada'] as String?,
-        estadoLosa: json['estado_losa'] as String?,
-        estadoTabique: json['estado_tabique'] as String?,
-        estadoDeposito: json['estado_deposito'] as String?,
-        tapa1: json['tapa1'] as String?,
-        tapa2: json['tapa2'] as String?,
+        estadoConexion: json['estadoConexion'] as String?,
+        estadoLlamada: json['estadoLlamada'] as String?,
+        estadoLosa: json['estadoLosa'] as String?,
+        estadoTabique: json['estadoTabique'] as String?,
+        estadoDeposito: json['estadoDeposito'] as String?,
+        tapa1: (json['tapa1'] as List<dynamic>?)?.cast<String>(),
+        tapa2: (json['tapa2'] as List<dynamic>?)?.cast<String>(),
         observaciones: json['observaciones'] as String?,
         inspectioned: json['inspectioned'] as bool,
-        inspectionedDate: json['inspectioned_date'] != null
-            ? DateTime.parse(json['inspectioned_date'] as String)
+        inspectionedDate: json['inspectionedDate'] != null
+            ? DateTime.parse(json['inspectionedDate'] as String)
             : null,
         username: json['username'] as String?,
         type: PointType.catchment,
-        point: buildCircle(json, PointType.catchment));
+        point: isFetch ? null : buildCircle(json, PointType.catchment));
   }
 }

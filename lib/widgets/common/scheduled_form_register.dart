@@ -425,7 +425,6 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                       onChanged: (Map<String, bool> checks) {
                         setState(() {
                           topStatusChecks = checks;
-                          print(topStatusChecks);
                         });
                       },
                     ),

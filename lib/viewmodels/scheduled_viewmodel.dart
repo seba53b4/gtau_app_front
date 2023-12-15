@@ -28,14 +28,14 @@ class ScheduledViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
-  Future<ScheduledElements?> fetchScheduledElements(
-      String token, int scheduledId) async {
+  Future<ScheduledElements?> fetchScheduledElements(String token,
+      int scheduledId) async {
     try {
       _isLoading = true;
       _error = false;
 
       ScheduledElements? entities =
-          await _scheduledService.fetchTaskScheduledEntities(
+      await _scheduledService.fetchTaskScheduledEntities(
         token,
         scheduledId,
       );
@@ -67,8 +67,8 @@ class ScheduledViewModel extends ChangeNotifier {
     return null;
   }
 
-  Future<SectionScheduled?> fetchSectionScheduledById(
-      String token, int scheduledId, int sectionId) async {
+  Future<SectionScheduled?> fetchSectionScheduledById(String token,
+      int scheduledId, int sectionId) async {
     try {
       _isLoading = true;
       _error = false;
@@ -119,8 +119,8 @@ class ScheduledViewModel extends ChangeNotifier {
     }
   }
 
-  Future<RegisterScheduled?> fetchRegisterScheduledById(
-      String token, int scheduledId, int registerId) async {
+  Future<RegisterScheduled?> fetchRegisterScheduledById(String token,
+      int scheduledId, int registerId) async {
     try {
       _isLoading = true;
       _error = false;
@@ -170,4 +170,57 @@ class ScheduledViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<CatchmentScheduled?> fetchCatchmentScheduledById(String token,
+      int scheduledId, int catchmentId) async {
+    try {
+      _isLoading = true;
+      _error = false;
+
+      CatchmentScheduled? catchmentScheduledResp = await _scheduledService
+          .fetchCatchmentScheduledById(token, scheduledId, catchmentId);
+
+      if (catchmentScheduledResp != null) {
+        _isLoading = false;
+      } else {
+        _error = true;
+      }
+
+      Future.microtask(() {
+        _isLoading = false;
+        notifyListeners();
+      });
+
+      return catchmentScheduledResp;
+    } catch (error) {
+      _isLoading = false;
+      _error = true;
+      Future.microtask(() {
+        notifyListeners();
+      });
+      print('Error in fetchCatchmentScheduledById: $error');
+    }
+    return null;
+  }
+
+  Future<bool> updateCatchmentScheduled(String token, int scheduledId,
+      int catchmentId, Map<String, dynamic> body) async {
+    try {
+      _isLoading = true;
+      _error = false;
+
+      final response = await _scheduledService.updateCatchmentScheduled(
+          token, scheduledId, catchmentId, body);
+      _isLoading = false;
+      return response;
+    } catch (error) {
+      _isLoading = false;
+      _error = true;
+      if (kDebugMode) {
+        print('Error in updateCatchmentScheduled: $error');
+      }
+      rethrow;
+    }
+  }
+
 }

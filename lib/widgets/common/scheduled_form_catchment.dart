@@ -3,20 +3,34 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:gtau_app_front/models/scheduled/catchment_scheduled.dart';
 import 'package:gtau_app_front/widgets/common/scheduled_form_common.dart';
+import 'package:gtau_app_front/widgets/common/top_status_scheduled.dart';
+import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../models/enums/message_type.dart';
+import '../../providers/user_provider.dart';
+import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
+import '../../viewmodels/scheduled_viewmodel.dart';
+import 'chip_registered_element.dart';
 import 'container_divider.dart';
+import 'container_scheduled_info.dart';
+import 'customDialog.dart';
+import 'customMessageDialog.dart';
 import 'custom_dropdown.dart';
 import 'custom_elevated_button.dart';
-import 'custom_labeled_checkbox.dart';
 import 'custom_text_form_field.dart';
 import 'custom_textfield.dart';
 
 class ScheduledFormCatchment extends StatefulWidget {
-  const ScheduledFormCatchment({Key? key}) : super(key: key);
+  final int catchmentId;
+  final int scheduledId;
+
+  const ScheduledFormCatchment(
+      {Key? key, required this.catchmentId, required this.scheduledId})
+      : super(key: key);
 
   @override
   State<ScheduledFormCatchment> createState() => _ScheduledFormCatchment();
@@ -26,6 +40,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
   final observationsController = TextEditingController();
   final AutoScrollController _scrollController = AutoScrollController();
   final FocusNode _observationsFocusNode = FocusNode();
+  late String idCatchment = '';
   late StreamSubscription<bool> keyboardSubscription;
   final _typeController = TextEditingController();
   final _cotaController = TextEditingController();
@@ -36,6 +51,19 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
   final _typeDropdownFocusNode = FocusNode();
   final _catastroDropdownFocusNode = FocusNode();
   List<FocusNode> focusNodes = [];
+  late CatchmentScheduled catchmentScheduled =
+      CatchmentScheduled(inspectioned: false, ogcFid: -1);
+  late String token;
+  late ScheduledViewModel? scheduledViewModel;
+  late UserProvider userStateProvider;
+  Map<String, bool> topStatusChecks_1 = {};
+  Map<String, bool> topStatusChecks_2 = {};
+  String? cadastre = null;
+  String? catchmentConn = null;
+  String? catchmentCallStatus = null;
+  String? catchmentSlab = null;
+  String? catchmentPartition = null;
+  String? catchmentDeposit = null;
 
   @override
   void initState() {
@@ -53,6 +81,15 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
         scrollToFocusedList(focusNodes, _scrollController);
       }
     });
+    token = context.read<UserProvider>().getToken!;
+    scheduledViewModel = context.read<ScheduledViewModel>();
+    userStateProvider = Provider.of<UserProvider>(context, listen: false);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadSectionInfo();
   }
 
   @override
@@ -68,6 +105,127 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
     _catastroController.dispose();
     _catastroDropdownFocusNode.dispose();
     super.dispose();
+  }
+
+  void _loadSectionInfo() async {
+    CatchmentScheduled? catchmentScheduledResponse =
+        await scheduledViewModel?.fetchCatchmentScheduledById(
+            token, widget.scheduledId, widget.catchmentId);
+    if (catchmentScheduledResponse != null) {
+      setState(() {
+        catchmentScheduled = catchmentScheduledResponse;
+        idCatchment = catchmentScheduledResponse.idCaptacion.toString();
+      });
+      _loadInfoFromResponse(catchmentScheduledResponse);
+    }
+  }
+
+  void _loadInfoFromResponse(CatchmentScheduled catchmentScheduled) {
+    if (catchmentScheduled.inspectioned) {
+      setState(() {
+        cadastre = catchmentScheduled.catastro ??
+            AppLocalizations.of(context)!.form_scheduled_cadastre_type_empty;
+        _typeController.text = catchmentScheduled.tipo ?? '';
+        catchmentConn = catchmentScheduled.estadoConexion ??
+            AppLocalizations.of(context)!.form_scheduled_no_data;
+        catchmentCallStatus = catchmentScheduled.estadoLlamada ??
+            AppLocalizations.of(context)!.form_scheduled_no_data;
+        catchmentSlab = catchmentScheduled.estadoLosa ??
+            AppLocalizations.of(context)!.form_scheduled_no_data;
+        catchmentPartition = catchmentScheduled.estadoTabique ??
+            AppLocalizations.of(context)!.form_scheduled_no_data;
+        catchmentDeposit = catchmentScheduled.estadoDeposito ??
+            AppLocalizations.of(context)!.form_scheduled_no_data;
+        observationsController.text = catchmentScheduled.observaciones ?? '';
+
+        topStatusChecks_1 = {};
+        topStatusChecks_1
+            .addAll(initialValueTop(catchmentScheduled.tapa1 ?? []));
+        topStatusChecks_2 = {};
+        topStatusChecks_2
+            .addAll(initialValueTop(catchmentScheduled.tapa2 ?? []));
+      });
+    }
+  }
+
+  Map<String, bool> initialValueTop(List<String> labels) {
+    return {for (var label in labels) label: true};
+  }
+
+  void updateCatchment() async {
+    final Map<String, dynamic> requestBody = {
+      "tipo": _typeController.text,
+      "catastro": cadastre,
+      "estadoConexion": catchmentConn,
+      "estadoLlamada": catchmentCallStatus,
+      "estadoLosa": catchmentSlab,
+      "estadoTabique": catchmentPartition,
+      "estadoDeposito": catchmentDeposit,
+      "tapa1": topStatusChecks_1.keys
+          .where((key) => topStatusChecks_1[key] == true)
+          .toList(),
+      "tapa2": topStatusChecks_2.keys
+          .where((key) => topStatusChecks_2[key] == true)
+          .toList(),
+      "observaciones": observationsController.text,
+      "inspectioned": true,
+      "inspectionedDate": getCurrentHour(),
+      "username": userStateProvider.userName
+    };
+    try {
+      bool? result = await scheduledViewModel?.updateCatchmentScheduled(
+        token,
+        widget.scheduledId,
+        widget.catchmentId,
+        requestBody,
+      );
+
+      if (result != null && result) {
+        await showCustomMessageDialog(
+          context: context,
+          messageType: DialogMessageType.success,
+          onAcceptPressed: () {
+            Navigator.of(context).pop();
+          },
+        );
+      } else {
+        await showCustomMessageDialog(
+          context: context,
+          onAcceptPressed: () {
+            Navigator.of(context).pop();
+          },
+          customText: AppLocalizations.of(context)!.error_generic_text,
+          messageType: DialogMessageType.error,
+        );
+      }
+    } catch (error) {
+      print("Error: $error");
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {
+          Navigator.of(context).pop();
+        },
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+    }
+  }
+
+  void showConfirmationDialog() async {
+    await showCustomDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.dialogWarning,
+      content: AppLocalizations.of(context)!.dialogContent,
+      onDisablePressed: () {
+        Navigator.of(context).pop();
+      },
+      onEnablePressed: () {
+        Navigator.of(context).pop();
+        updateCatchment();
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
   }
 
   @override
@@ -86,7 +244,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
@@ -107,10 +265,12 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                               Text(AppLocalizations.of(context)!
                                   .form_scheduled_id),
                               const SizedBox(width: 8),
-                              const Text('HD123456'),
+                              Text(idCatchment),
                             ],
                           ),
                         ),
+                        RegistrationChip(
+                            isRegistered: catchmentScheduled.inspectioned),
                       ],
                     ),
                   ),
@@ -119,14 +279,23 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                         EdgeInsetsDirectional.only(bottom: 8, start: 4, end: 4),
                     child: Divider(color: Colors.grey, thickness: 1),
                   ),
+                  Visibility(
+                    visible: catchmentScheduled.inspectioned,
+                    child: ScheduledInspectionDetails(
+                      username: catchmentScheduled.username ?? '',
+                      inspectionedDate:
+                          catchmentScheduled.inspectionedDate ?? DateTime.now(),
+                    ),
+                  ),
                   ContainerBottomDivider(children: [
                     ScheduledFormTitle(
                         titleText: AppLocalizations.of(context)!
                             .form_scheduled_cadastre),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_cadastre_type_empty,
+                        value: cadastre ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_cadastre_type_empty,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_cadastre_type_new,
@@ -135,7 +304,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                           AppLocalizations.of(context)!
                               .form_scheduled_cadastre_type_empty
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            cadastre = str;
+                          });
+                        }),
                     const SizedBox(height: 8)
                   ]),
                   const SizedBox(height: 12),
@@ -159,8 +332,9 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_no_data,
+                        value: catchmentConn ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_no_data,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_register_status_1,
@@ -170,7 +344,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                               .form_scheduled_register_status_3,
                           AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            catchmentConn = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
@@ -181,8 +359,9 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_no_data,
+                        value: catchmentCallStatus ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_no_data,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_register_status_1,
@@ -192,7 +371,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                               .form_scheduled_register_status_3,
                           AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            catchmentCallStatus = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
@@ -203,8 +386,9 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_no_data,
+                        value: catchmentSlab ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_no_data,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_register_status_1,
@@ -214,7 +398,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                               .form_scheduled_register_status_3,
                           AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            catchmentSlab = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
@@ -225,8 +413,9 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_no_data,
+                        value: catchmentPartition ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_no_data,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_register_status_1,
@@ -236,7 +425,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                               .form_scheduled_register_status_3,
                           AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            catchmentPartition = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   ContainerBottomDivider(children: [
@@ -246,8 +439,9 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     const SizedBox(height: 8),
                     CustomDropdown(
                         fontSize: 12,
-                        value: AppLocalizations.of(context)!
-                            .form_scheduled_no_data,
+                        value: catchmentDeposit ??
+                            AppLocalizations.of(context)!
+                                .form_scheduled_no_data,
                         items: [
                           AppLocalizations.of(context)!
                               .form_scheduled_register_status_1,
@@ -257,7 +451,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                               .form_scheduled_register_status_3,
                           AppLocalizations.of(context)!.form_scheduled_no_data
                         ],
-                        onChanged: (str) {}),
+                        onChanged: (str) {
+                          setState(() {
+                            catchmentDeposit = str;
+                          });
+                        }),
                     const SizedBox(height: 8),
                   ]),
                   const SizedBox(height: 12),
@@ -266,45 +464,13 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     ScheduledFormTitle(
                         titleText: AppLocalizations.of(context)!
                             .form_scheduled_catchm_top_status_1),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_good,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_missing,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_sunken,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_frame,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_broken_frame,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_provisional,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_broken,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_welded_sealed,
-                      onChanged: (value) {},
+                    TopStatusOptions(
+                      initialCheckboxStates: topStatusChecks_1,
+                      onChanged: (Map<String, bool> checks) {
+                        setState(() {
+                          topStatusChecks_1 = checks;
+                        });
+                      },
                     ),
                   ]),
                   // Estado de la tapa - END
@@ -314,45 +480,13 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                     ScheduledFormTitle(
                         titleText: AppLocalizations.of(context)!
                             .form_scheduled_catchm_top_status_2),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_good,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_missing,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_sunken,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_frame,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_broken_frame,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_provisional,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_broken,
-                      onChanged: (value) {},
-                    ),
-                    CustomLabeledCheckbox(
-                      label: AppLocalizations.of(context)!
-                          .form_scheduled_top_status_welded_sealed,
-                      onChanged: (value) {},
+                    TopStatusOptions(
+                      initialCheckboxStates: topStatusChecks_2,
+                      onChanged: (Map<String, bool> checks) {
+                        setState(() {
+                          topStatusChecks_2 = checks;
+                        });
+                      },
                     ),
                   ]),
                   // Estado de la tapa - END
@@ -389,7 +523,9 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                 text: AppLocalizations.of(context)!.buttonCancelLabel),
             const SizedBox(width: 16),
             CustomElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showConfirmationDialog();
+                },
                 text: AppLocalizations.of(context)!.buttonAcceptLabel),
           ],
         ),
