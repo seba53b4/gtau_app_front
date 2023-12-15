@@ -33,7 +33,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (_paths != null) {
         if (_paths != null) {
           //passing file bytes and file name for API call
-          TaskService.uploadFile(_paths!.first.bytes!, _paths!.first.name);
+          // TaskService.uploadFile(_paths!.first.bytes!, _paths!.first.name);
+          
         }
       }
     });
