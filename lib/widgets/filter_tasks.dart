@@ -93,7 +93,7 @@ class _FilterTasksState extends State<FilterTasks> {
                     dropdownValue: filterProvider.inspectionTypeFilter ??
                         filterProvider.inspectionType.first.value,
                     label: appLocalizations.inspection_type,
-                    enabled: false,
+                    enabled: true,
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFilter(
