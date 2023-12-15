@@ -5,6 +5,9 @@ import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
@@ -21,6 +24,7 @@ import '../providers/task_filters_provider.dart';
 import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
 import '../viewmodels/images_viewmodel.dart';
+import '../viewmodels/section_viewmodel.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/common/custom_dropdown.dart';
@@ -114,8 +118,14 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     releasedDateController.dispose();
     _scrollController.dispose();
     selectedItemsProvider?.reset();
-
     super.dispose();
+  }
+
+  void clearElementsFetched() {
+    context.read<RegisterViewModel>().reset();
+    context.read<SectionViewModel>().reset();
+    context.read<LotViewModel>().reset();
+    context.read<CatchmentViewModel>().reset();
   }
 
   @override
@@ -128,7 +138,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
         await initializeTask();
       });
-      Hive.initFlutter().then((value) => null);
     } else {
       startDate = DateTime.now();
     }
@@ -396,6 +405,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    clearElementsFetched();
     _ResetPrefs();
     await updateTaskList();
   }
@@ -423,6 +433,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    clearElementsFetched();
     _ResetPrefs();
   }
 
@@ -473,6 +484,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   void handleCancel() {
     resetSelectionOnMap();
+    clearElementsFetched();
     Navigator.of(context).pop();
   }
 
@@ -1258,11 +1270,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             width: widthRow,
                             child: Column(
                               children: [
-                                UserImage(
+                                /*UserImage(
                                     onFileChanged: (imagesFiles) {
                                       this.imagesFiles = imagesFiles;
                                     },
-                                    idTask: widget.idTask),
+                                    idTask: widget.idTask),*/
                                 ImageGalleryModal(idTask: widget.idTask!),
                               ],
                             ),
