@@ -187,7 +187,24 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   }
 
   void handleSubmit() {
-    if (selectedIndex == 1) {
+    String bodyMsg = '';
+    final bool emailValid = 
+    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+    .hasMatch(emailController.text);
+    final bool isPassValid = passwordController.text == passconfirmController.text;
+    final bool isRoleValid = roleController.text != notAssigned;
+    if(emailValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_emailWarning + '\n';
+    if(isPassValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_passwordWarning + '\n';
+    if(isRoleValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_roleWarning;
+    if(emailValid == false || isPassValid == false || isRoleValid == false){
+      showCustomMessageDialog(
+        context: context,
+        customText: bodyMsg,
+        onAcceptPressed: () {
+        }, 
+        messageType: DialogMessageType.error,
+      );
+    }else{
       showCustomDialog(
         context: context,
         title: AppLocalizations.of(context)!.dialogWarning,
@@ -197,12 +214,13 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         },
         onEnablePressed: () async {
           Navigator.of(context).pop();
-          await handleAcceptOnShowDialogCreateTask();
+          /*await handleAcceptOnShowDialogCreateUser();*/
+          print('user created');
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
       );
-    }
+    }      
   }
 
   Map<String, dynamic> createBodyToCreate() {
@@ -230,7 +248,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     return requestBody;
   }
 
-  Future handleAcceptOnShowDialogEditTask() async {
+  Future handleAcceptOnShowDialogEditUser() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateTask(requestBody);
     if (isUpdated) {
@@ -239,7 +257,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     _ResetPrefs();
   }
 
-  Future handleAcceptOnShowDialogCreateTask() async {
+  Future handleAcceptOnShowDialogCreateUser() async {
     Map<String, dynamic> requestBody = createBodyToCreate();
     bool isUpdated = await _createTask(requestBody);
     if (isUpdated) {
@@ -258,8 +276,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       },
       onEnablePressed: () async {
         Navigator.of(context).pop();
-        await handleAcceptOnShowDialogEditTask();
-        Navigator.of(context).pop();
+        /*await handleAcceptOnShowDialogEditTask();*/
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
       cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
@@ -527,31 +544,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                           CustomElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                String bodyMsg = '';
-                                final bool emailValid = 
-                                RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                .hasMatch(emailController.text);
-                                final bool isPassValid = passwordController.text == passconfirmController.text;
-                                final bool isRoleValid = roleController.text != notAssigned;
-                                if(emailValid == false) bodyMsg = bodyMsg + 'Mail is NOT Valid\n';
-                                if(isPassValid == false) bodyMsg = bodyMsg + 'Password do NOT match\n';
-                                if(isRoleValid == false) bodyMsg = bodyMsg + 'Role must be selected\n';
-
-                                if(emailValid == false || isPassValid == false || isRoleValid == false){
-                                  showCustomDialog(
-                                    context: context,
-                                    title: AppLocalizations.of(context)!.dialogWarning,
-                                    content: bodyMsg,
-                                    onDisablePressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    onEnablePressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
-                                    cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
-                                  );
-                                }
+                                handleSubmit();
                                 
                                 /*if (widget.detail) {
                                   handleEditTask();

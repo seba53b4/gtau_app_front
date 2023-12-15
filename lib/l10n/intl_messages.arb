@@ -175,5 +175,8 @@
     "createUserPage_firstnamePlaceholder": "Ingrese Nombre",
     "createUserPage_lastnamePlaceholder": "Ingrese Apellido",
     "createUserPage_passwordPlaceholder": "Ingrese Contraseña",
-    "createUserPage_passconfirmPlaceholder": "Confirmar Contraseña"
+    "createUserPage_passconfirmPlaceholder": "Confirmar Contraseña",
+    "createUserPage_passwordWarning": "Las contraseñas no coinciden entre si",
+    "createUserPage_emailWarning": "El correo electronico ingresado no es valido",
+    "createUserPage_roleWarning": "El rol seleccionado no es valido"
 }
