@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -29,9 +30,15 @@ import 'custom_text_form_field.dart';
 class ScheduledFormSection extends StatefulWidget {
   final int sectionId;
   final int scheduledId;
+  final Function()? onCancel;
+  final Function()? onAccept;
 
   const ScheduledFormSection(
-      {Key? key, required this.sectionId, required this.scheduledId})
+      {Key? key,
+      required this.sectionId,
+      required this.scheduledId,
+      this.onCancel,
+      this.onAccept})
       : super(key: key);
 
   @override
@@ -211,7 +218,12 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
           context: context,
           messageType: DialogMessageType.success,
           onAcceptPressed: () {
-            Navigator.of(context).pop();
+            if (widget.onAccept != null) {
+              widget.onAccept!();
+            }
+            if (!kIsWeb) {
+              Navigator.of(context).pop();
+            }
           },
         );
       } else {
@@ -523,7 +535,11 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
               children: [
                 CustomElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      if (widget.onCancel != null) {
+                        widget.onCancel!();
+                      } else {
+                        Navigator.of(context).pop();
+                      }
                     },
                     messageType: MessageType.error,
                     text: AppLocalizations.of(context)!.buttonCancelLabel),

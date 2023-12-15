@@ -100,12 +100,13 @@ LatLng getRandomPoint(List<LatLng> points) {
 LatLng? getRandomPointOfMap(Set<Polyline> polylines, Set<Circle> circles) {
   List<LatLng> allPoints = [];
   int numberOfElements = 2;
-  // Agregar hasta 20 puntos de las polilíneas
+
+  // Agregan de las polilíneas
   for (var polyline in polylines.take(numberOfElements)) {
     allPoints.addAll(polyline.points);
   }
 
-  // Agregar hasta 20 puntos de los círculos
+  // Agregan de los círculos
   for (var circle in circles.take(numberOfElements)) {
     allPoints.add(circle.center);
   }

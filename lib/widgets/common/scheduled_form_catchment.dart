@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -27,10 +28,16 @@ import 'custom_textfield.dart';
 class ScheduledFormCatchment extends StatefulWidget {
   final int catchmentId;
   final int scheduledId;
+  final Function()? onCancel;
+  final Function()? onAccept;
 
-  const ScheduledFormCatchment(
-      {Key? key, required this.catchmentId, required this.scheduledId})
-      : super(key: key);
+  const ScheduledFormCatchment({
+    Key? key,
+    required this.catchmentId,
+    required this.scheduledId,
+    this.onCancel,
+    this.onAccept,
+  }) : super(key: key);
 
   @override
   State<ScheduledFormCatchment> createState() => _ScheduledFormCatchment();
@@ -185,14 +192,19 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
           context: context,
           messageType: DialogMessageType.success,
           onAcceptPressed: () {
-            Navigator.of(context).pop();
+            if (widget.onAccept != null) {
+              widget.onAccept!();
+            }
+            if (!kIsWeb) {
+              Navigator.of(context).pop();
+            }
           },
         );
       } else {
         await showCustomMessageDialog(
           context: context,
           onAcceptPressed: () {
-            Navigator.of(context).pop();
+            if (!kIsWeb) Navigator.of(context).pop();
           },
           customText: AppLocalizations.of(context)!.error_generic_text,
           messageType: DialogMessageType.error,
@@ -203,7 +215,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
       await showCustomMessageDialog(
         context: context,
         onAcceptPressed: () {
-          Navigator.of(context).pop();
+          if (!kIsWeb) Navigator.of(context).pop();
         },
         customText: AppLocalizations.of(context)!.error_generic_text,
         messageType: DialogMessageType.error,
@@ -517,7 +529,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
           children: [
             CustomElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  if (widget.onCancel != null) {
+                    widget.onCancel!();
+                  } else {
+                    Navigator.of(context).pop();
+                  }
                 },
                 messageType: MessageType.error,
                 text: AppLocalizations.of(context)!.buttonCancelLabel),

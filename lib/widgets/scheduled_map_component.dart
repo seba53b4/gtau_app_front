@@ -17,8 +17,10 @@ import '../providers/user_provider.dart';
 import '../services/scheduled_service.dart';
 import '../utils/map_functions.dart';
 import '../viewmodels/scheduled_viewmodel.dart';
+import 'common/button_circle.dart';
 import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
+import 'common/scheduled_form_widget.dart';
 import 'element_scheduled_modal.dart';
 
 class ScheduledMapComponent extends StatefulWidget {
@@ -49,6 +51,12 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   late String token;
   bool isDetailsButtonVisible = false;
   late ScheduledViewModel scheduledViewModel;
+  late double mapWidth;
+  late double mapInit;
+  double modalWidth = 380.0;
+  bool viewDetailElementInfo = false;
+  int elementId = -1;
+  ElementType elementType = ElementType.section;
 
   // Indices { S, R, C };
   Set<int> selectedIndices = {0, 1, 2};
@@ -69,6 +77,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     scheduledViewModel = context.read<ScheduledViewModel>();
     token = context.read<UserProvider>().getToken!;
     _initializeSheduledElements().then((value) => null);
+    mapInit = MediaQuery.of(context).size.width;
+    setState(() {
+      mapWidth = mapInit;
+    });
   }
 
   @override
@@ -107,12 +119,28 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) {
-    _showModalElement(context, ogcFid, ElementType.section);
+    if (kIsWeb) {
+      setState(() {
+        elementId = ogcFid;
+        elementType = ElementType.section;
+        viewDetailElementInfo = true;
+      });
+    } else {
+      _showModalElement(context, ogcFid, ElementType.section);
+    }
   }
 
   Future<void> _onTapParamBehaviorCircle(
       int ogcFid, Circle? point, ElementType type) async {
-    _showModalElement(context, ogcFid, type);
+    if (kIsWeb) {
+      setState(() {
+        elementId = ogcFid;
+        elementType = type;
+        viewDetailElementInfo = true;
+      });
+    } else {
+      _showModalElement(context, ogcFid, type);
+    }
   }
 
   void _showModalElement(BuildContext context, int ogcFid, ElementType type) {
@@ -236,7 +264,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                 children: [
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 0),
-                    //width: MediaQuery.of(context).size.width,
+                    width: viewDetailElementInfo
+                        ? mapWidth - modalWidth
+                        : mapWidth,
                     child: GestureDetector(
                       onTap: () {},
                       child: GoogleMap(
@@ -326,6 +356,76 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                     ),
                   )
                 ],
+              ),
+            ),
+            Visibility(
+              visible: kIsWeb && viewDetailElementInfo,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 0),
+                  onEnd: () {},
+                  curve: Curves.easeIn,
+                  width: viewDetailElementInfo ? modalWidth : 0,
+                  child: Container(
+                    width: viewDetailElementInfo ? modalWidth : 0,
+                    color: const Color.fromRGBO(253, 255, 252, 1),
+                    child: Column(
+                      children: [
+                        Container(
+                          color: primarySwatch,
+                          height: 50,
+                          child: Row(
+                            children: [
+                              ButtonCircle(
+                                  icon: Icons.close,
+                                  size: 50,
+                                  onPressed: () {
+                                    setState(() {
+                                      viewDetailElementInfo = false;
+                                    });
+                                  }),
+                              Container(
+                                width: 250,
+                                padding: const EdgeInsetsDirectional.symmetric(
+                                    horizontal: 20),
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                    AppLocalizations.of(context)!
+                                        .component_detail_title,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: titleColor,
+                                        letterSpacing: 1,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 4),
+                              child: ScheduledFormWidget(
+                                  onAccept: () {
+                                    setState(() {
+                                      viewDetailElementInfo = false;
+                                    });
+                                  },
+                                  onCancel: () {
+                                    setState(() {
+                                      viewDetailElementInfo = false;
+                                    });
+                                  },
+                                  elementType: elementType,
+                                  elementId: elementId,
+                                  scheduledid: widget.idSheduled)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
