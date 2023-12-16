@@ -544,7 +544,8 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                     onPressed: () {
                       if (widget.onCancel != null) {
                         widget.onCancel!();
-                      } else {
+                      }
+                      if (!kIsWeb) {
                         Navigator.of(context).pop();
                       }
                     },

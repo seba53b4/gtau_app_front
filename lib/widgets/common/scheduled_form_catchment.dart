@@ -539,7 +539,8 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                 onPressed: () {
                   if (widget.onCancel != null) {
                     widget.onCancel!();
-                  } else {
+                  }
+                  if (!kIsWeb) {
                     Navigator.of(context).pop();
                   }
                 },

@@ -71,7 +71,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     addDateController.text = parseDateTimeOnFormat(date);
   }
 
-  void _showFilterModal(BuildContext context) {
+  void _showMapElement(BuildContext context) {
     double widthWindow = MediaQuery.of(context).size.width;
 
     Navigator.push(
@@ -297,7 +297,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                   const SizedBox(height: 12),
                   CustomElevatedButton(
                     onPressed: () async {
-                      _showFilterModal(context);
+                      _showMapElement(context);
                     },
                     text: 'Ver mapa',
                   )

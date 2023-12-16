@@ -480,7 +480,8 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                 onPressed: () {
                   if (widget.onCancel != null) {
                     widget.onCancel!();
-                  } else {
+                  }
+                  if (!kIsWeb) {
                     Navigator.of(context).pop();
                   }
                 },

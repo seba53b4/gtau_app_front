@@ -18,6 +18,7 @@ import '../services/scheduled_service.dart';
 import '../utils/map_functions.dart';
 import '../viewmodels/scheduled_viewmodel.dart';
 import 'common/button_circle.dart';
+import 'common/customMessageDialog.dart';
 import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
 import 'common/scheduled_form_widget.dart';
@@ -69,19 +70,19 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   void initState() {
     super.initState();
     _mapController = Completer<GoogleMapController>();
+    selectedItemsProvider = context.read<SelectedItemsProvider>();
+    scheduledViewModel = context.read<ScheduledViewModel>();
+    token = context.read<UserProvider>().getToken!;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    selectedItemsProvider = context.read<SelectedItemsProvider>();
-    scheduledViewModel = context.read<ScheduledViewModel>();
-    token = context.read<UserProvider>().getToken!;
-    _initializeSheduledElements(isNewLocation: true).then((value) => null);
     mapInit = MediaQuery.of(context).size.width;
     setState(() {
       mapWidth = mapInit;
     });
+    _initializeSheduledElements(isNewLocation: true).then((value) => null);
   }
 
   @override
@@ -91,14 +92,26 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
-    ScheduledElements? entities = await scheduledViewModel
-        .fetchScheduledElements(token, widget.idSheduled);
-    if (entities != null) {
-      updateElementsOnMap(
-          isCache: false,
-          isNewLocation: isNewLocation,
-          scheduledElements: entities);
-    }
+    await scheduledViewModel
+        .fetchScheduledElements(token, widget.idSheduled)
+        .then((entities) {
+      if (entities != null) {
+        updateElementsOnMap(
+            isCache: false,
+            isNewLocation: isNewLocation,
+            scheduledElements: entities);
+      }
+      return entities;
+    }).catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_service_not_available,
+        messageType: DialogMessageType.error,
+      );
+      return null;
+    });
   }
 
   Color _onColorParamBehaviorSection(SectionScheduled section) {
@@ -193,7 +206,21 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   void _showModalElement(BuildContext context, int ogcFid, ElementType type) {
-    showScheduledElementModal(context, type, () {}, widget.idSheduled, ogcFid);
+    showScheduledElementModal(
+      context: context,
+      scheduledId: widget.idSheduled,
+      elementType: type,
+      elementId: ogcFid,
+      onAccept: () async {
+        openFormElementWeb(false);
+        resetSelectionsOnMap();
+        await _initializeSheduledElements();
+      },
+      onCancel: () {
+        openFormElementWeb(false);
+        resetSelectionsOnMap();
+      },
+    );
   }
 
   Future<void> updateElementsOnMap(
