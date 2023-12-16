@@ -124,7 +124,6 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   Color _commonColorBehaviorOnCircle(
       CircleId circleId, bool inspectioned, ElementType type) {
     if (selectedItemsProvider.isCircleSelected(circleId, type)) {
-      print('selected $circleId');
       return selectedColor;
     }
     return inspectioned

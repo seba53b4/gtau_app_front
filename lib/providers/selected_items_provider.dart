@@ -61,9 +61,7 @@ class SelectedItemsProvider with ChangeNotifier {
     if (circleList.contains(circleId)) {
       circleList.remove(circleId);
     } else {
-      print('lista vacia ${circleList.isEmpty}');
       if (circleList.isEmpty || _letMultipleItemsSelected) {
-        print('agrega $circleId ${type.name}');
         circleList.add(circleId);
       }
     }
