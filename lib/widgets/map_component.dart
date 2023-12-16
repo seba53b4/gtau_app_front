@@ -637,7 +637,7 @@ class _MapComponentState extends State<MapComponent> {
                         LoadingOverlay(
                           isLoading: isMapLoading && !viewDetailElementInfo,
                           child: Positioned(
-                            top: kIsWeb ? null : 80,
+                            top: kIsWeb ? null : 50,
                             right: kIsWeb ? null : 16,
                             bottom: kIsWeb ? 80 : null,
                             left: kIsWeb ? 16 : null,

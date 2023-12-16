@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../constants/theme_constants.dart';
 import 'custom_elevated_button.dart';
@@ -89,7 +90,7 @@ class _MultiSelectPopupMenuButtonState
                     }
                     Navigator.of(context).pop(Set<int>.from(selectedIndices));
                   },
-                  text: "Cerrar",
+                  text: AppLocalizations.of(context)!.dialogCloseButton,
                 ),
               ],
             ),
