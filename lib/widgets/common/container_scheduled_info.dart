@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/widgets/common/scheduled_form_common.dart';
@@ -10,7 +11,8 @@ class ScheduledInspectionDetails extends StatelessWidget {
   final String username;
   final DateTime inspectionedDate;
 
-  const ScheduledInspectionDetails({super.key,
+  const ScheduledInspectionDetails({
+    super.key,
     required this.username,
     required this.inspectionedDate,
   });
@@ -37,15 +39,13 @@ class ScheduledInspectionDetails extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${AppLocalizations.of(context)!
-                      .createTaskPage_realizationDateTitle}: ${parseDateTimeOnFormatHour(
-                      inspectionedDate)}',
+                  '${AppLocalizations.of(context)!.createTaskPage_realizationDateTitle}: ${parseDateTimeOnFormatHour(inspectionedDate)}',
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: kIsWeb ? 12 : 6),
               ],
             ),
           ),

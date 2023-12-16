@@ -147,7 +147,6 @@ class SelectedItemsProvider with ChangeNotifier {
 
   bool isCircleSelected(CircleId circleId, ElementType type) {
     var circleList = getCircleList(type);
-    print(circleList.toList().toString());
     return circleList.contains(circleId);
   }
 
