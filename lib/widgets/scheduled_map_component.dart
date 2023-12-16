@@ -263,6 +263,29 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     }
   }
 
+  void updateElementsOnMapOnFilter() {
+    List<SectionScheduled>? sectionsFilter = [];
+    List<CatchmentScheduled>? catchmentsFilter = [];
+    List<RegisterScheduled>? registersFilter = [];
+
+    if (selectedIndices.contains(0)) {
+      sectionsFilter = scheduledViewModel.sections;
+    }
+
+    if (selectedIndices.contains(1)) {
+      registersFilter = scheduledViewModel.registers;
+    }
+
+    if (selectedIndices.contains(2)) {
+      catchmentsFilter = scheduledViewModel.catchments;
+    }
+
+    setState(() {
+      polylines = getPolylines(sectionsFilter);
+      circles = getCircles(catchmentsFilter, registersFilter);
+    });
+  }
+
   void resetSelectionsOnMap() {
     if (selectedItemsProvider.isSomeElementSelected()) {
       selectedItemsProvider.clearAllElements();
@@ -434,6 +457,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                               AppLocalizations.of(context)!.registers,
                               AppLocalizations.of(context)!.catchments
                             ],
+                            onClose: () {
+                              updateElementsOnMapOnFilter();
+                            },
                             selectedIndices: selectedIndices,
                             onIconsSelected: handleIconsSelected,
                           ),

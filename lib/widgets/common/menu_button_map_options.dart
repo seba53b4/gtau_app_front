@@ -8,11 +8,13 @@ class MultiSelectPopupMenuButton extends StatefulWidget {
   final List<String> texts;
   final Function(Set<int>) onIconsSelected;
   final Set<int> selectedIndices;
+  final Function()? onClose;
 
   MultiSelectPopupMenuButton({
     required this.texts,
     required this.onIconsSelected,
     required this.selectedIndices,
+    this.onClose,
   });
 
   @override
@@ -82,6 +84,9 @@ class _MultiSelectPopupMenuButtonState
                   ),
                 CustomElevatedButton(
                   onPressed: () {
+                    if (widget.onClose != null) {
+                      widget.onClose!();
+                    }
                     Navigator.of(context).pop(Set<int>.from(selectedIndices));
                   },
                   text: "Cerrar",
