@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/scheduled/catchment_scheduled.dart';
@@ -72,18 +73,13 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     _mapController = Completer<GoogleMapController>();
     selectedItemsProvider = context.read<SelectedItemsProvider>();
     scheduledViewModel = context.read<ScheduledViewModel>();
-    token = context
-        .read<UserProvider>()
-        .getToken!;
+    token = context.read<UserProvider>().getToken!;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    mapInit = MediaQuery
-        .of(context)
-        .size
-        .width;
+    mapInit = MediaQuery.of(context).size.width;
     setState(() {
       mapWidth = mapInit;
     });
@@ -94,6 +90,42 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   void dispose() {
     super.dispose();
     selectedItemsProvider.reset();
+  }
+
+  Future<void> getCurrentLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        return;
+      }
+
+      Position currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+      setState(() {
+        final locationGPS =
+            LatLng(currentPosition.latitude, currentPosition.longitude);
+
+        final Marker newMarker = Marker(
+          markerId: const MarkerId('current_gps_location'),
+          position: locationGPS,
+        );
+        markers.add(newMarker);
+      });
+
+      // Actualiza la cámara del mapa para centrarse en la ubicación actual sin animación
+      final GoogleMapController controller = await _mapController.future;
+      controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(currentPosition.latitude, currentPosition.longitude),
+            zoom: zoomMap,
+          ),
+        ),
+      );
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
@@ -139,8 +171,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
         register.point!.circleId, register.inspectioned, ElementType.register);
   }
 
-  Color _commonColorBehaviorOnCircle(CircleId circleId, bool inspectioned,
-      ElementType type) {
+  Color _commonColorBehaviorOnCircle(
+      CircleId circleId, bool inspectioned, ElementType type) {
     if (selectedItemsProvider.isCircleSelected(circleId, type)) {
       return selectedColor;
     }
@@ -228,9 +260,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     );
   }
 
-  Future<void> updateElementsOnMap({bool isCache = true,
-    bool isNewLocation = false,
-    ScheduledElements? scheduledElements}) async {
+  Future<void> updateElementsOnMap(
+      {bool isCache = true,
+      bool isNewLocation = false,
+      ScheduledElements? scheduledElements}) async {
     List<SectionScheduled>? sections;
     List<RegisterScheduled>? registers;
     List<CatchmentScheduled>? catchments;
@@ -370,187 +403,191 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
     return Consumer<ScheduledViewModel>(
         builder: (context, scheduledViewModel, child) {
-          bool isLoading = scheduledViewModel.isLoading;
-          return Scaffold(
-            body: Row(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 0),
-                        width: viewDetailElementInfo
-                            ? mapWidth - modalWidth
-                            : mapWidth,
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: GoogleMap(
-                            mapType: _currentMapType,
-                            initialCameraPosition: CameraPosition(
-                              target: initLocation,
-                              zoom: zoomMap,
-                            ),
-                            onCameraMove: (CameraPosition cameraPosition) {
+      bool isLoading = scheduledViewModel.isLoading;
+      return Scaffold(
+        body: Row(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 0),
+                    width: viewDetailElementInfo
+                        ? mapWidth - modalWidth
+                        : mapWidth,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: GoogleMap(
+                        mapType: _currentMapType,
+                        initialCameraPosition: CameraPosition(
+                          target: initLocation,
+                          zoom: zoomMap,
+                        ),
+                        onCameraMove: (CameraPosition cameraPosition) {
+                          setState(() {
+                            zoomMap = cameraPosition.zoom;
+                          });
+                        },
+                        circles: circles,
+                        polylines: polylines,
+                        markers: markers,
+                        onMapCreated: (GoogleMapController controller) {
+                          if (location != null &&
+                              _mapController.isCompleted &&
+                              !(false)) {
+                            controller.moveCamera(
+                                CameraUpdate.newLatLngZoom(location!, zoomMap));
+                          }
+                          if (!_mapController.isCompleted) {
+                            _mapController.complete(controller);
+                          }
+                        },
+                        onTap: (LatLng latLng) {},
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 16.0,
+                    top: 50,
+                    bottom: null,
+                    right: null,
+                    child: FloatingActionButton(
+                      foregroundColor: primarySwatch,
+                      backgroundColor: lightBackground,
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      tooltip: appLocalizations.placeholder_back_button,
+                      child: const Icon(Icons.arrow_back),
+                    ),
+                  ),
+                  LoadingOverlay(
+                    isLoading: isLoading,
+                    child: Positioned(
+                      top: kIsWeb ? null : 50,
+                      right: kIsWeb ? null : 16,
+                      bottom: kIsWeb ? 80 : null,
+                      left: kIsWeb ? 16 : null,
+                      child: Column(
+                        children: [
+                          MenuElevatedButton(
+                            colorChangeOnPress: true,
+                            onPressed: () {
                               setState(() {
-                                zoomMap = cameraPosition.zoom;
-                              });
-                            },
-                            circles: circles,
-                            polylines: polylines,
-                            onMapCreated: (GoogleMapController controller) {
-                              if (location != null &&
-                                  _mapController.isCompleted &&
-                                  !(false)) {
-                                controller.moveCamera(
-                                    CameraUpdate.newLatLngZoom(
-                                        location!, zoomMap));
-                              }
-                              if (!_mapController.isCompleted) {
-                                _mapController.complete(controller);
-                              }
-                            },
-                            onTap: (LatLng latLng) {},
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 16.0,
-                        top: 50,
-                        bottom: null,
-                        right: null,
-                        child: FloatingActionButton(
-                          foregroundColor: primarySwatch,
-                          backgroundColor: lightBackground,
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          tooltip: appLocalizations.placeholder_back_button,
-                          child: const Icon(Icons.arrow_back),
-                        ),
-                      ),
-                      LoadingOverlay(
-                        isLoading: isLoading,
-                        child: Positioned(
-                          top: kIsWeb ? null : 50,
-                          right: kIsWeb ? null : 16,
-                          bottom: kIsWeb ? 80 : null,
-                          left: kIsWeb ? 16 : null,
-                          child: Column(
-                            children: [
-                              MenuElevatedButton(
-                                colorChangeOnPress: true,
-                                onPressed: () {
-                                  setState(() {
-                                    _currentMapType =
+                                _currentMapType =
                                     _currentMapType == MapType.normal
                                         ? MapType.satellite
                                         : MapType.normal;
-                                  });
-                                },
-                                tooltipMessage: appLocalizations
-                                    .map_component_map_view_tooltip,
-                                icon: _currentMapType == MapType.normal
-                                    ? Icons.map
-                                    : Icons.satellite,
-                              ),
-                              if (kIsWeb) const SizedBox(height: 6),
-                              MenuElevatedButton(
-                                  onPressed: () {},
-                                  icon: Icons.my_location,
-                                  tooltipMessage: appLocalizations
-                                      .map_component_get_location),
-                              if (kIsWeb) const SizedBox(height: 6),
-                              MultiSelectPopupMenuButton(
-                                texts: [
-                                  appLocalizations.sections,
-                                  appLocalizations.registers,
-                                  appLocalizations.catchments
-                                ],
-                                onClose: () {
-                                  updateElementsOnMapOnFilter();
-                                },
-                                selectedIndices: selectedIndices,
-                                onIconsSelected: handleIconsSelected,
+                              });
+                            },
+                            tooltipMessage:
+                                appLocalizations.map_component_map_view_tooltip,
+                            icon: _currentMapType == MapType.normal
+                                ? Icons.map
+                                : Icons.satellite,
+                          ),
+                          if (kIsWeb) const SizedBox(height: 6),
+                          MenuElevatedButton(
+                              onPressed: () async {
+                                setState(() {
+                                  markers.clear();
+                                });
+                                await getCurrentLocation();
+                              },
+                              icon: Icons.my_location,
+                              tooltipMessage:
+                                  appLocalizations.map_component_get_location),
+                          if (kIsWeb) const SizedBox(height: 6),
+                          MultiSelectPopupMenuButton(
+                            texts: [
+                              appLocalizations.sections,
+                              appLocalizations.registers,
+                              appLocalizations.catchments
+                            ],
+                            onClose: () {
+                              updateElementsOnMapOnFilter();
+                            },
+                            selectedIndices: selectedIndices,
+                            onIconsSelected: handleIconsSelected,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Visibility(
+              visible: kIsWeb && viewDetailElementInfo,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 0),
+                  onEnd: () {},
+                  curve: Curves.easeIn,
+                  width: viewDetailElementInfo ? modalWidth : 0,
+                  child: Container(
+                    width: viewDetailElementInfo ? modalWidth : 0,
+                    color: const Color.fromRGBO(253, 255, 252, 1),
+                    child: Column(
+                      children: [
+                        Container(
+                          color: primarySwatch,
+                          height: 50,
+                          child: Row(
+                            children: [
+                              ButtonCircle(
+                                  icon: Icons.close,
+                                  size: 50,
+                                  onPressed: () {
+                                    openFormElementWeb(false);
+                                    resetSelectionsOnMap();
+                                  }),
+                              Container(
+                                width: 250,
+                                padding: const EdgeInsetsDirectional.symmetric(
+                                    horizontal: 20),
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                    appLocalizations.component_detail_title,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: titleColor,
+                                        letterSpacing: 1,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18)),
                               ),
                             ],
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                ),
-                Visibility(
-                  visible: kIsWeb && viewDetailElementInfo,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 0),
-                      onEnd: () {},
-                      curve: Curves.easeIn,
-                      width: viewDetailElementInfo ? modalWidth : 0,
-                      child: Container(
-                        width: viewDetailElementInfo ? modalWidth : 0,
-                        color: const Color.fromRGBO(253, 255, 252, 1),
-                        child: Column(
-                          children: [
-                            Container(
-                              color: primarySwatch,
-                              height: 50,
-                              child: Row(
-                                children: [
-                                  ButtonCircle(
-                                      icon: Icons.close,
-                                      size: 50,
-                                      onPressed: () {
-                                        openFormElementWeb(false);
-                                        resetSelectionsOnMap();
-                                      }),
-                                  Container(
-                                    width: 250,
-                                    padding: const EdgeInsetsDirectional
-                                        .symmetric(
-                                        horizontal: 20),
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                        appLocalizations.component_detail_title,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: titleColor,
-                                            letterSpacing: 1,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 4),
-                                  child: ScheduledFormWidget(
-                                      key: _scheduledFormWidgetKey,
-                                      onAccept: () async {
-                                        openFormElementWeb(false);
-                                        resetSelectionsOnMap();
-                                        await _initializeSheduledElements();
-                                      },
-                                      onCancel: () {
-                                        openFormElementWeb(false);
-                                        resetSelectionsOnMap();
-                                      },
-                                      elementType: elementType,
-                                      elementId: elementId,
-                                      scheduledid: widget.idSheduled)),
-                            ),
-                          ],
+                        Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 4),
+                              child: ScheduledFormWidget(
+                                  key: _scheduledFormWidgetKey,
+                                  onAccept: () async {
+                                    openFormElementWeb(false);
+                                    resetSelectionsOnMap();
+                                    await _initializeSheduledElements();
+                                  },
+                                  onCancel: () {
+                                    openFormElementWeb(false);
+                                    resetSelectionsOnMap();
+                                  },
+                                  elementType: elementType,
+                                  elementId: elementId,
+                                  scheduledid: widget.idSheduled)),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
-          );
-        });
+          ],
+        ),
+      );
+    });
   }
 }
