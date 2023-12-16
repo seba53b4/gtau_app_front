@@ -56,11 +56,14 @@ class SelectedItemsProvider with ChangeNotifier {
   }
 
   void toggleCircleSelected(CircleId circleId, ElementType type) {
+
     var circleList = getCircleList(type);
     if (circleList.contains(circleId)) {
       circleList.remove(circleId);
     } else {
+      print('lista vacia ${circleList.isEmpty}');
       if (circleList.isEmpty || _letMultipleItemsSelected) {
+        print('agrega $circleId ${type.name}');
         circleList.add(circleId);
       }
     }
@@ -146,6 +149,7 @@ class SelectedItemsProvider with ChangeNotifier {
 
   bool isCircleSelected(CircleId circleId, ElementType type) {
     var circleList = getCircleList(type);
+    print(circleList.toList().toString());
     return circleList.contains(circleId);
   }
 

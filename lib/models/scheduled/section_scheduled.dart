@@ -1,5 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../constants/theme_constants.dart';
 import '../enums/section_color_enum.dart';
 
 class SectionScheduled {
@@ -83,12 +84,12 @@ class SectionScheduled {
           }
         }
 
-        SectionColor byName = getPolylineColor(tipoTra);
+        //SectionColor byName = getPolylineColor(tipoTra);
         if (multiLineCoordinates.isNotEmpty) {
           return Polyline(
             polylineId: PolylineId('${json['ogcFid'].toString()}'),
             points: latLngList,
-            color: byName.color,
+            color: scheduledNotInspectionedElement,
             width: 5,
             consumeTapEvents: true,
           );

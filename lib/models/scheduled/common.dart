@@ -21,7 +21,8 @@ Circle? buildCircle(Map<String, dynamic> json, PointType type) {
           radius: 1.3,
           strokeWidth: 7,
           consumeTapEvents: true,
-          strokeColor: registerDefaultColor,
+          strokeColor: scheduledNotInspectionedElement,
+          // registerDefaultColor,
           fillColor: Colors.grey);
     } else {
       circle = Circle(
@@ -30,7 +31,8 @@ Circle? buildCircle(Map<String, dynamic> json, PointType type) {
           radius: 2,
           strokeWidth: 2,
           consumeTapEvents: true,
-          strokeColor: catchmentDefaultColor,
+          strokeColor: scheduledNotInspectionedElement,
+          //catchmentDefaultColor,
           fillColor: Colors.black);
     }
 

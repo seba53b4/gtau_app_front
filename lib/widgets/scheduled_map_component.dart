@@ -57,6 +57,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   bool viewDetailElementInfo = false;
   int elementId = -1;
   ElementType elementType = ElementType.section;
+  Key _scheduledFormWidgetKey = UniqueKey();
 
   // Indices { S, R, C };
   Set<int> selectedIndices = {0, 1, 2};
@@ -76,7 +77,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     selectedItemsProvider = context.read<SelectedItemsProvider>();
     scheduledViewModel = context.read<ScheduledViewModel>();
     token = context.read<UserProvider>().getToken!;
-    _initializeSheduledElements().then((value) => null);
+    _initializeSheduledElements(isNewLocation: true).then((value) => null);
     mapInit = MediaQuery.of(context).size.width;
     setState(() {
       mapWidth = mapInit;
@@ -89,57 +90,106 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     selectedItemsProvider.reset();
   }
 
-  Future<void> _initializeSheduledElements() async {
+  Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
     ScheduledElements? entities = await scheduledViewModel
         .fetchScheduledElements(token, widget.idSheduled);
     if (entities != null) {
-      updateElementsOnMap(isCache: false, scheduledElements: entities);
+      updateElementsOnMap(
+          isCache: false,
+          isNewLocation: isNewLocation,
+          scheduledElements: entities);
     }
   }
 
   Color _onColorParamBehaviorSection(SectionScheduled section) {
-    return selectedItemsProvider.isPolylineSelected(
-            section.line!.polylineId, ElementType.section)
-        ? selectedColor
-        : section.line!.color;
+    if (selectedItemsProvider.isPolylineSelected(
+        section.line!.polylineId, ElementType.section)) {
+      return selectedColor;
+    }
+    return section.inspectioned
+        ? scheduledInspectionedElement
+        : scheduledNotInspectionedElement;
   }
 
   Color _onColorParamBehaviorCatchment(CatchmentScheduled catchment) {
-    return selectedItemsProvider.isCircleSelected(
-            catchment.point!.circleId, ElementType.catchment)
-        ? selectedColor
-        : catchment.point!.strokeColor;
+    return _commonColorBehaviorOnCircle(catchment.point!.circleId,
+        catchment.inspectioned, ElementType.catchment);
   }
 
   Color _onColorParamBehaviorRegister(RegisterScheduled register) {
-    return selectedItemsProvider.isCircleSelected(
-            register.point!.circleId, ElementType.register)
-        ? selectedColor
-        : register.point!.strokeColor;
+    return _commonColorBehaviorOnCircle(
+        register.point!.circleId, register.inspectioned, ElementType.register);
+  }
+
+  Color _commonColorBehaviorOnCircle(
+      CircleId circleId, bool inspectioned, ElementType type) {
+    if (selectedItemsProvider.isCircleSelected(circleId, type)) {
+      print('selected $circleId');
+      return selectedColor;
+    }
+    return inspectioned
+        ? scheduledInspectionedElement
+        : scheduledNotInspectionedElement;
   }
 
   void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) {
-    if (kIsWeb) {
-      setState(() {
-        elementId = ogcFid;
-        elementType = ElementType.section;
-        viewDetailElementInfo = true;
-      });
+    ElementType elementType = ElementType.section;
+    if (selectedItemsProvider.isPolylineSelected(
+        line!.polylineId, elementType)) {
+      selectedItemsProvider.togglePolylineSelected(
+          line.polylineId, elementType);
+      openFormElementWeb(false);
+      updateElementsOnMap();
     } else {
-      _showModalElement(context, ogcFid, ElementType.section);
+      if (selectedItemsProvider.isSomeElementSelected()) {
+        selectedItemsProvider.clearAllElements();
+        updateElementsOnMap();
+      } else {
+        selectedItemsProvider.clearAllElements();
+      }
+      selectedItemsProvider.togglePolylineSelected(
+          line.polylineId, elementType);
+      openFormElementWeb(false);
+      showDetailElement(ogcFid, elementType);
     }
   }
 
-  Future<void> _onTapParamBehaviorCircle(
-      int ogcFid, Circle? point, ElementType type) async {
+  void _onTapParamBehaviorCircle(int ogcFid, Circle? point, ElementType type) {
+    if (selectedItemsProvider.isCircleSelected(point!.circleId, type)) {
+      selectedItemsProvider.toggleCircleSelected(point.circleId, type);
+      openFormElementWeb(false);
+      updateElementsOnMap();
+    } else {
+      if (selectedItemsProvider.isSomeElementSelected()) {
+        selectedItemsProvider.clearAllElements();
+        updateElementsOnMap();
+      } else {
+        selectedItemsProvider.clearAllElements();
+      }
+      selectedItemsProvider.toggleCircleSelected(point.circleId, type);
+      openFormElementWeb(false);
+      showDetailElement(ogcFid, type);
+    }
+  }
+
+  void openFormElementWeb(bool newStatus) {
+    if (kIsWeb && viewDetailElementInfo != newStatus) {
+      setState(() {
+        _scheduledFormWidgetKey = UniqueKey();
+        viewDetailElementInfo = newStatus;
+      });
+    }
+  }
+
+  void showDetailElement(int id, ElementType type) {
     if (kIsWeb) {
       setState(() {
-        elementId = ogcFid;
+        elementId = id;
         elementType = type;
-        viewDetailElementInfo = true;
+        openFormElementWeb(true);
       });
     } else {
-      _showModalElement(context, ogcFid, type);
+      _showModalElement(context, id, type);
     }
   }
 
@@ -148,7 +198,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   Future<void> updateElementsOnMap(
-      {bool isCache = false, ScheduledElements? scheduledElements}) async {
+      {bool isCache = true,
+      bool isNewLocation = false,
+      ScheduledElements? scheduledElements}) async {
     List<SectionScheduled>? sections;
     List<RegisterScheduled>? registers;
     List<CatchmentScheduled>? catchments;
@@ -166,22 +218,30 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       polylines = getPolylines(sections);
       circles = getCircles(catchments, registers);
     });
+    if (isNewLocation) {
+      scheduledViewModel.setInitPosition(
+          getRandomPointOfMap(polylines, circles) ?? initLocation);
 
-    scheduledViewModel.setInitPosition(
-        getRandomPointOfMap(polylines, circles) ?? initLocation);
-
-    setState(() {
-      location = scheduledViewModel.initPosition;
-    });
-    final GoogleMapController controller = await _mapController.future;
-    controller.moveCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(location!.latitude, location!.longitude),
-          zoom: zoomMap,
+      setState(() {
+        location = scheduledViewModel.initPosition;
+      });
+      final GoogleMapController controller = await _mapController.future;
+      controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(location!.latitude, location!.longitude),
+            zoom: zoomMap,
+          ),
         ),
-      ),
-    );
+      );
+    }
+  }
+
+  void resetSelectionsOnMap() {
+    if (selectedItemsProvider.isSomeElementSelected()) {
+      selectedItemsProvider.clearAllElements();
+      updateElementsOnMap();
+    }
   }
 
   Set<Polyline> getPolylines(List<SectionScheduled>? sections) {
@@ -194,7 +254,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           colorParam: _onColorParamBehaviorSection(section),
           onTapParam: () {
             _onTapParamBehaviorPolyline(section.ogcFid!, section.line);
-            //updateElementsOnMap();
+            updateElementsOnMap();
           },
         );
         setPol.add(pol);
@@ -216,10 +276,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           radiusParam: catchment.point!.radius,
           strokeWidthParam: catchment.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
-          onTapParam: () async {
-            await _onTapParamBehaviorCircle(
+          onTapParam: () {
+            _onTapParamBehaviorCircle(
                 catchment.ogcFid!, catchment.point, ElementType.catchment);
-            //updateElementsOnMap();
+            updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -233,10 +293,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           radiusParam: register.point!.radius,
           strokeWidthParam: register.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorRegister(register),
-          onTapParam: () async {
-            await _onTapParamBehaviorCircle(
+          onTapParam: () {
+            _onTapParamBehaviorCircle(
                 register.ogcFid!, register.point, ElementType.register);
-            //updateElementsOnMap();
+            updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -381,9 +441,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                                   icon: Icons.close,
                                   size: 50,
                                   onPressed: () {
-                                    setState(() {
-                                      viewDetailElementInfo = false;
-                                    });
+                                    openFormElementWeb(false);
+                                    resetSelectionsOnMap();
                                   }),
                               Container(
                                 width: 250,
@@ -408,15 +467,15 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 6, vertical: 4),
                               child: ScheduledFormWidget(
-                                  onAccept: () {
-                                    setState(() {
-                                      viewDetailElementInfo = false;
-                                    });
+                                  key: _scheduledFormWidgetKey,
+                                  onAccept: () async {
+                                    openFormElementWeb(false);
+                                    resetSelectionsOnMap();
+                                    await _initializeSheduledElements();
                                   },
                                   onCancel: () {
-                                    setState(() {
-                                      viewDetailElementInfo = false;
-                                    });
+                                    openFormElementWeb(false);
+                                    resetSelectionsOnMap();
                                   },
                                   elementType: elementType,
                                   elementId: elementId,
