@@ -34,6 +34,7 @@ MaterialColor primarySwatch = const MaterialColor(
 );
 
 ThemeData defaultTheme = ThemeData(
+  useMaterial3: false,
   primaryColor: baseColor,
   primarySwatch: primarySwatch,
   textTheme: TextTheme(
