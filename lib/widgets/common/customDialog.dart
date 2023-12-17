@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../constants/theme_constants.dart';
+import 'custom_text_button.dart';
+
 Future<void> showCustomDialog({
   required BuildContext context,
   required String title,
@@ -19,7 +22,10 @@ Future<void> showCustomDialog({
           curve: Curves.easeInOut,
         ),
         child: AlertDialog(
+          surfaceTintColor: lightBackground,
+          backgroundColor: lightBackground,
           title: Container(
+            color: lightBackground,
             alignment: Alignment.center,
             child: Text(
               title,
@@ -40,7 +46,8 @@ Future<void> showCustomDialog({
                 color: Colors.grey.shade100,
               ),
               const SizedBox(height: 8),
-              SizedBox(
+              Container(
+                color: lightBackground,
                 height: 80,
                 child: Center(
                   child: Text(
@@ -58,19 +65,13 @@ Future<void> showCustomDialog({
             ],
           ),
           actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
+            CustomTextButton(
               onPressed: onDisablePressed,
-              child: Text(cancelbuttonLabel),
+              text: cancelbuttonLabel,
             ),
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
+            CustomTextButton(
               onPressed: onEnablePressed,
-              child: Text(acceptButtonLabel),
+              text: acceptButtonLabel,
             ),
           ],
         ),

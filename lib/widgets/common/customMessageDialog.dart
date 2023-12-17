@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 
+import 'custom_text_button.dart';
+
 enum DialogMessageType {
   success,
   error,
@@ -126,15 +128,12 @@ class _MessageDialogState extends State<MessageDialog>
           color: Colors.grey.shade100,
         ),
         const SizedBox(height: 8),
-        TextButton(
-          style: TextButton.styleFrom(
-            textStyle: Theme.of(context).textTheme.labelLarge,
-          ),
+        CustomTextButton(
           onPressed: () {
             Navigator.of(context).pop();
             widget.onAcceptPressed();
           },
-          child: Text(AppLocalizations.of(context)!.dialogCloseButton),
+          text: AppLocalizations.of(context)!.dialogCloseButton,
         ),
       ],
     );
@@ -151,6 +150,8 @@ Future<void> showCustomMessageDialog({
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
+        surfaceTintColor: lightBackground,
+        backgroundColor: lightBackground,
         title: Center(
             child: Text(
           messageType.value,
