@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/scheduled/register_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
+import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/services/scheduled_service.dart';
 
 import '../models/scheduled/catchment_scheduled.dart';
@@ -11,6 +12,13 @@ class ScheduledViewModel extends ChangeNotifier {
   final ScheduledService _scheduledService = ScheduledService();
 
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
+
+  final Map<String, List<TaskScheduled>> _tasks = {
+    "DOING": [],
+    "DONE": [],
+    "PENDING": [],
+    "BLOCKED": []
+  };
 
   List<CatchmentScheduled> _catchments = [];
 
@@ -35,6 +43,9 @@ class ScheduledViewModel extends ChangeNotifier {
   LatLng _initPosition = LatLng(-34.88773, -56.13955);
 
   LatLng get initPosition => _initPosition;
+
+  int _page = 0;
+  int _size = kIsWeb ? 12 : 10;
 
   void setInitPosition(LatLng? pos) {
     if (pos != null && initLocation.longitude != pos.longitude ||
@@ -257,6 +268,29 @@ class ScheduledViewModel extends ChangeNotifier {
       }
       rethrow;
     } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<List<TaskScheduled>?> fetchScheduledTasks(
+      String token, String status) async {
+    try {
+      _error = false;
+      _isLoading = true;
+
+      notifyListeners();
+      final responseListTask = await _scheduledService.getScheduledTasks(
+          token, _page, _size, status);
+
+      _tasks[status] = responseListTask!;
+      _page++;
+      return responseListTask;
+    } catch (error) {
+      _error = true;
+      print(error);
+      throw Exception('Error al obtener los datos fetchScheduledTasks');
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }

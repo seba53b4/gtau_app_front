@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gtau_app_front/models/scheduled/catchment_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/register_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
+import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:http/http.dart' as http;
 
 class ScheduledElements {
@@ -205,6 +206,32 @@ class ScheduledService {
     } catch (error) {
       if (kDebugMode) {
         print('Error in updateCatchmentScheduled: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<TaskScheduled>?> getScheduledTasks(
+      String token, int page, int size, String status) async {
+    try {
+      String userByType = dotenv.get('BY_STATUS_URL', fallback: 'NOT_FOUND');
+      final url = Uri.parse(
+          '$baseUrl/$userByType?page=$page&size=$size&status=$status');
+      final response = await http.get(url, headers: _getHeaders(token));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final content = data['content'];
+        return content.map<TaskScheduled>((taskScheduledData) {
+          return TaskScheduled.fromJson(json: taskScheduledData);
+        }).toList();
+      } else {
+        print('Error getScheduledTasks re null');
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in getScheduledTasks: $error');
       }
       rethrow;
     }
