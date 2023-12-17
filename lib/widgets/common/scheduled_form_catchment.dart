@@ -15,6 +15,7 @@ import '../../providers/user_provider.dart';
 import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
 import '../../viewmodels/scheduled_viewmodel.dart';
+import '../loading_overlay.dart';
 import 'chip_registered_element.dart';
 import 'container_divider.dart';
 import 'container_scheduled_info.dart';
@@ -250,311 +251,323 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Flexible(
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: const Offset(0, 2),
+    return Consumer<ScheduledViewModel>(
+        builder: (context, scheduledViewModel, child) {
+      return LoadingOverlay(
+        isLoading: scheduledViewModel.isLoading,
+        child: Column(
+          children: [
+            Flexible(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 1,
+                                    blurRadius: 3,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Text(AppLocalizations.of(context)!
-                                  .form_scheduled_id),
-                              const SizedBox(width: 8),
-                              Text(idCatchment),
-                            ],
-                          ),
+                              child: Row(
+                                children: [
+                                  Text(AppLocalizations.of(context)!
+                                      .form_scheduled_id),
+                                  const SizedBox(width: 8),
+                                  Text(idCatchment),
+                                ],
+                              ),
+                            ),
+                            RegistrationChip(
+                                isRegistered: catchmentScheduled.inspectioned),
+                          ],
                         ),
-                        RegistrationChip(
-                            isRegistered: catchmentScheduled.inspectioned),
-                      ],
-                    ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsetsDirectional.only(
+                            bottom: 8, start: 4, end: 4),
+                        child: Divider(color: Colors.grey, thickness: 1),
+                      ),
+                      Visibility(
+                        visible: catchmentScheduled.inspectioned,
+                        child: ScheduledInspectionDetails(
+                          username: catchmentScheduled.username ?? '',
+                          inspectionedDate:
+                              catchmentScheduled.inspectionedDate ??
+                                  DateTime.now(),
+                        ),
+                      ),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_cadastre),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: cadastre ??
+                                AppLocalizations.of(context)!
+                                    .form_scheduled_cadastre_type_empty,
+                            items: [
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_cadastre_type_new,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_cadastre_type_adjust,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_cadastre_type_empty
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                cadastre = str;
+                              });
+                            }),
+                        const SizedBox(height: 8)
+                      ]),
+                      const SizedBox(height: 12),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_type),
+                        CustomTextField(
+                          controller: _typeController,
+                          width: 98,
+                          keyboardType: TextInputType.number,
+                          focusNode: _typeDropdownFocusNode,
+                          hasError: false,
+                        ),
+                      ]),
+                      const SizedBox(height: 12),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_conn),
+                        const SizedBox(height: 8),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: catchmentConn ??
+                                AppLocalizations.of(context)!
+                                    .form_scheduled_no_data,
+                            items: [
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_1,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_2,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_3,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_no_data
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                catchmentConn = str;
+                              });
+                            }),
+                        const SizedBox(height: 8),
+                      ]),
+                      const SizedBox(height: 12),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_call_status),
+                        const SizedBox(height: 8),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: catchmentCallStatus ??
+                                AppLocalizations.of(context)!
+                                    .form_scheduled_no_data,
+                            items: [
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_1,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_2,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_3,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_no_data
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                catchmentCallStatus = str;
+                              });
+                            }),
+                        const SizedBox(height: 8),
+                      ]),
+                      const SizedBox(height: 12),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_slab),
+                        const SizedBox(height: 8),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: catchmentSlab ??
+                                AppLocalizations.of(context)!
+                                    .form_scheduled_no_data,
+                            items: [
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_1,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_2,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_3,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_no_data
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                catchmentSlab = str;
+                              });
+                            }),
+                        const SizedBox(height: 8),
+                      ]),
+                      const SizedBox(height: 12),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_partition),
+                        const SizedBox(height: 8),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: catchmentPartition ??
+                                AppLocalizations.of(context)!
+                                    .form_scheduled_no_data,
+                            items: [
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_1,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_2,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_3,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_no_data
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                catchmentPartition = str;
+                              });
+                            }),
+                        const SizedBox(height: 8),
+                      ]),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_deposit),
+                        const SizedBox(height: 8),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: catchmentDeposit ??
+                                AppLocalizations.of(context)!
+                                    .form_scheduled_no_data,
+                            items: [
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_1,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_2,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_register_status_3,
+                              AppLocalizations.of(context)!
+                                  .form_scheduled_no_data
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                catchmentDeposit = str;
+                              });
+                            }),
+                        const SizedBox(height: 8),
+                      ]),
+                      const SizedBox(height: 12),
+                      ContainerBottomDivider(children: [
+                        // Estado de la tapa
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_top_status_1),
+                        TopStatusOptions(
+                          initialCheckboxStates: topStatusChecks_1,
+                          onChanged: (Map<String, bool> checks) {
+                            setState(() {
+                              topStatusChecks_1 = checks;
+                            });
+                          },
+                        ),
+                      ]),
+                      // Estado de la tapa - END
+                      const SizedBox(height: 10.0),
+                      ContainerBottomDivider(children: [
+                        // Estado de la tapa
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_catchm_top_status_2),
+                        TopStatusOptions(
+                          initialCheckboxStates: topStatusChecks_2,
+                          onChanged: (Map<String, bool> checks) {
+                            setState(() {
+                              topStatusChecks_2 = checks;
+                            });
+                          },
+                        ),
+                      ]),
+                      // Estado de la tapa - END
+                      const SizedBox(height: 10.0),
+                      ScheduledFormTitle(
+                          titleText: AppLocalizations.of(context)!
+                              .createTaskPage_observationsTitle),
+                      SizedBox(
+                        width: double.infinity,
+                        child: CustomTextFormField(
+                          focusNode: _observationsFocusNode,
+                          useValidation: false,
+                          isTextBox: true,
+                          maxLines: 10,
+                          hintText: AppLocalizations.of(context)!
+                              .default_observationsPlaceholder,
+                          controller: observationsController,
+                        ),
+                      ),
+                    ],
                   ),
-                  const Padding(
-                    padding:
-                        EdgeInsetsDirectional.only(bottom: 8, start: 4, end: 4),
-                    child: Divider(color: Colors.grey, thickness: 1),
-                  ),
-                  Visibility(
-                    visible: catchmentScheduled.inspectioned,
-                    child: ScheduledInspectionDetails(
-                      username: catchmentScheduled.username ?? '',
-                      inspectionedDate:
-                          catchmentScheduled.inspectionedDate ?? DateTime.now(),
-                    ),
-                  ),
-                  ContainerBottomDivider(children: [
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_cadastre),
-                    CustomDropdown(
-                        fontSize: 12,
-                        value: cadastre ??
-                            AppLocalizations.of(context)!
-                                .form_scheduled_cadastre_type_empty,
-                        items: [
-                          AppLocalizations.of(context)!
-                              .form_scheduled_cadastre_type_new,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_cadastre_type_adjust,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_cadastre_type_empty
-                        ],
-                        onChanged: (str) {
-                          setState(() {
-                            cadastre = str;
-                          });
-                        }),
-                    const SizedBox(height: 8)
-                  ]),
-                  const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_type),
-                    CustomTextField(
-                      controller: _typeController,
-                      width: 98,
-                      keyboardType: TextInputType.number,
-                      focusNode: _typeDropdownFocusNode,
-                      hasError: false,
-                    ),
-                  ]),
-                  const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_conn),
-                    const SizedBox(height: 8),
-                    CustomDropdown(
-                        fontSize: 12,
-                        value: catchmentConn ??
-                            AppLocalizations.of(context)!
-                                .form_scheduled_no_data,
-                        items: [
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_1,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_2,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_3,
-                          AppLocalizations.of(context)!.form_scheduled_no_data
-                        ],
-                        onChanged: (str) {
-                          setState(() {
-                            catchmentConn = str;
-                          });
-                        }),
-                    const SizedBox(height: 8),
-                  ]),
-                  const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_call_status),
-                    const SizedBox(height: 8),
-                    CustomDropdown(
-                        fontSize: 12,
-                        value: catchmentCallStatus ??
-                            AppLocalizations.of(context)!
-                                .form_scheduled_no_data,
-                        items: [
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_1,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_2,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_3,
-                          AppLocalizations.of(context)!.form_scheduled_no_data
-                        ],
-                        onChanged: (str) {
-                          setState(() {
-                            catchmentCallStatus = str;
-                          });
-                        }),
-                    const SizedBox(height: 8),
-                  ]),
-                  const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_slab),
-                    const SizedBox(height: 8),
-                    CustomDropdown(
-                        fontSize: 12,
-                        value: catchmentSlab ??
-                            AppLocalizations.of(context)!
-                                .form_scheduled_no_data,
-                        items: [
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_1,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_2,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_3,
-                          AppLocalizations.of(context)!.form_scheduled_no_data
-                        ],
-                        onChanged: (str) {
-                          setState(() {
-                            catchmentSlab = str;
-                          });
-                        }),
-                    const SizedBox(height: 8),
-                  ]),
-                  const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_partition),
-                    const SizedBox(height: 8),
-                    CustomDropdown(
-                        fontSize: 12,
-                        value: catchmentPartition ??
-                            AppLocalizations.of(context)!
-                                .form_scheduled_no_data,
-                        items: [
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_1,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_2,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_3,
-                          AppLocalizations.of(context)!.form_scheduled_no_data
-                        ],
-                        onChanged: (str) {
-                          setState(() {
-                            catchmentPartition = str;
-                          });
-                        }),
-                    const SizedBox(height: 8),
-                  ]),
-                  ContainerBottomDivider(children: [
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_deposit),
-                    const SizedBox(height: 8),
-                    CustomDropdown(
-                        fontSize: 12,
-                        value: catchmentDeposit ??
-                            AppLocalizations.of(context)!
-                                .form_scheduled_no_data,
-                        items: [
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_1,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_2,
-                          AppLocalizations.of(context)!
-                              .form_scheduled_register_status_3,
-                          AppLocalizations.of(context)!.form_scheduled_no_data
-                        ],
-                        onChanged: (str) {
-                          setState(() {
-                            catchmentDeposit = str;
-                          });
-                        }),
-                    const SizedBox(height: 8),
-                  ]),
-                  const SizedBox(height: 12),
-                  ContainerBottomDivider(children: [
-                    // Estado de la tapa
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_top_status_1),
-                    TopStatusOptions(
-                      initialCheckboxStates: topStatusChecks_1,
-                      onChanged: (Map<String, bool> checks) {
-                        setState(() {
-                          topStatusChecks_1 = checks;
-                        });
-                      },
-                    ),
-                  ]),
-                  // Estado de la tapa - END
-                  const SizedBox(height: 10.0),
-                  ContainerBottomDivider(children: [
-                    // Estado de la tapa
-                    ScheduledFormTitle(
-                        titleText: AppLocalizations.of(context)!
-                            .form_scheduled_catchm_top_status_2),
-                    TopStatusOptions(
-                      initialCheckboxStates: topStatusChecks_2,
-                      onChanged: (Map<String, bool> checks) {
-                        setState(() {
-                          topStatusChecks_2 = checks;
-                        });
-                      },
-                    ),
-                  ]),
-                  // Estado de la tapa - END
-                  const SizedBox(height: 10.0),
-                  ScheduledFormTitle(
-                      titleText: AppLocalizations.of(context)!
-                          .createTaskPage_observationsTitle),
-                  SizedBox(
-                    width: double.infinity,
-                    child: CustomTextFormField(
-                      focusNode: _observationsFocusNode,
-                      useValidation: false,
-                      isTextBox: true,
-                      maxLines: 10,
-                      hintText: AppLocalizations.of(context)!
-                          .default_observationsPlaceholder,
-                      controller: observationsController,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomElevatedButton(
-                onPressed: () {
-                  if (widget.onCancel != null) {
-                    widget.onCancel!();
-                  }
-                  if (!kIsWeb) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                messageType: MessageType.error,
-                text: AppLocalizations.of(context)!.buttonCancelLabel),
-            const SizedBox(width: 16),
-            CustomElevatedButton(
-                onPressed: () {
-                  showConfirmationDialog();
-                },
-                text: AppLocalizations.of(context)!.buttonAcceptLabel),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomElevatedButton(
+                    onPressed: () {
+                      if (widget.onCancel != null) {
+                        widget.onCancel!();
+                      }
+                      if (!kIsWeb) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    messageType: MessageType.error,
+                    text: AppLocalizations.of(context)!.buttonCancelLabel),
+                const SizedBox(width: 16),
+                CustomElevatedButton(
+                    onPressed: () {
+                      showConfirmationDialog();
+                    },
+                    text: AppLocalizations.of(context)!.buttonAcceptLabel),
+              ],
+            ),
           ],
         ),
-      ],
-    );
+      );
+    });
   }
 }

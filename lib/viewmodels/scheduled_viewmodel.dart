@@ -5,6 +5,7 @@ import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/services/scheduled_service.dart';
 
 import '../models/scheduled/catchment_scheduled.dart';
+import '../utils/map_functions.dart';
 
 class ScheduledViewModel extends ChangeNotifier {
   final ScheduledService _scheduledService = ScheduledService();
@@ -55,7 +56,8 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 2500));
       ScheduledElements? entities =
           await _scheduledService.fetchTaskScheduledEntities(
         token,
@@ -94,7 +96,8 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 2500));
       SectionScheduled? sectionScheduledResp = await _scheduledService
           .fetchSectionScheduledById(token, scheduledId, sectionId);
 
@@ -126,7 +129,8 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 2500));
       final response = await _scheduledService.updateSectionScheduled(
           token, scheduledId, sectionId, body);
       _isLoading = false;
@@ -146,7 +150,8 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 2500));
       RegisterScheduled? registerScheduledResp = await _scheduledService
           .fetchRegisterScheduledById(token, scheduledId, registerId);
 
@@ -178,7 +183,8 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 2500));
       final response = await _scheduledService.updateRegisterScheduled(
           token, scheduledId, registerId, body);
       _isLoading = false;
@@ -198,7 +204,8 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 2500));
       CatchmentScheduled? catchmentScheduledResp = await _scheduledService
           .fetchCatchmentScheduledById(token, scheduledId, catchmentId);
 
@@ -230,7 +237,8 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-
+      notifyListeners();
+      await Future.delayed(Duration(milliseconds: 2500));
       final response = await _scheduledService.updateCatchmentScheduled(
           token, scheduledId, catchmentId, body);
       _isLoading = false;
@@ -242,6 +250,27 @@ class ScheduledViewModel extends ChangeNotifier {
         print('Error in updateCatchmentScheduled: $error');
       }
       rethrow;
+    }
+  }
+
+  Future<LatLng?> getRandomPosition(
+      Set<Polyline> polylines, Set<Circle> circles) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+      LatLng? pos = getRandomPointOfMap(polylines, circles);
+      _isLoading = false;
+      return pos;
+    } catch (error) {
+      _isLoading = false;
+      _error = true;
+      if (kDebugMode) {
+        print('Error in getRandomPosition: $error');
+      }
+      rethrow;
+    } finally {
+      notifyListeners();
     }
   }
 }

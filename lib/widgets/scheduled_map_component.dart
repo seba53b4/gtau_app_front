@@ -282,8 +282,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       circles = getCircles(catchments, registers);
     });
     if (isNewLocation) {
-      scheduledViewModel.setInitPosition(
-          getRandomPointOfMap(polylines, circles) ?? initLocation);
+      LatLng? pos =
+          await scheduledViewModel.getRandomPosition(polylines, circles);
+      scheduledViewModel.setInitPosition(pos ?? initLocation);
 
       setState(() {
         location = scheduledViewModel.initPosition;
