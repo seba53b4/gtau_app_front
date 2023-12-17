@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/app_constants.dart';
 
+import '../../constants/theme_constants.dart';
+
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
@@ -60,6 +62,7 @@ class CustomTextFormField extends StatelessWidget {
       width: width,
       height: height,
       child: TextFormField(
+        cursorColor: primarySwatch,
         onTap: onTap,
         focusNode: focusNode,
         keyboardType: keyboardType,
@@ -69,6 +72,14 @@ class CustomTextFormField extends StatelessWidget {
           hintText: hintText,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(isTextBox ? 24 : 48),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Color.fromRGBO(96, 166, 27, 1)),
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.red),
+            borderRadius: BorderRadius.circular(24.0),
           ),
           contentPadding: isTextBox
               ? const EdgeInsets.symmetric(vertical: 16, horizontal: 16)
