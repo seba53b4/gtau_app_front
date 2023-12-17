@@ -63,7 +63,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   final scheduledNumberController = TextEditingController();
   final contactController = TextEditingController();
   final applicantController = TextEditingController();
-  final userAssignedController = TextEditingController();
   final lengthController = TextEditingController();
   final materialController = TextEditingController();
   final observationsController = TextEditingController();
@@ -82,7 +81,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     scheduledNumberController.text = '';
     contactController.text = '';
     applicantController.text = '';
-    userAssignedController.text = '';
     lengthController.text = '';
     materialController.text = '';
     observationsController.text = '';
@@ -108,7 +106,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     scheduledNumberController.dispose();
     contactController.dispose();
     applicantController.dispose();
-    userAssignedController.dispose();
     lengthController.dispose();
     materialController.dispose();
     observationsController.dispose();
@@ -163,7 +160,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
       locationController.text = task.location!;
-      userAssignedController.text = task.user!;
+      setState(() {
+        userAssigned = task.user!;
+      });
       lengthController.text = task.length ?? '';
       materialController.text = task.material ?? '';
       conclusionsController.text = task.conclusions ?? '';
