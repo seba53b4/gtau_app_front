@@ -56,8 +56,6 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 2500));
       ScheduledElements? entities =
           await _scheduledService.fetchTaskScheduledEntities(
         token,
@@ -96,8 +94,6 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 2500));
       SectionScheduled? sectionScheduledResp = await _scheduledService
           .fetchSectionScheduledById(token, scheduledId, sectionId);
 
@@ -129,8 +125,6 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 2500));
       final response = await _scheduledService.updateSectionScheduled(
           token, scheduledId, sectionId, body);
       _isLoading = false;
@@ -150,8 +144,7 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 2500));
+
       RegisterScheduled? registerScheduledResp = await _scheduledService
           .fetchRegisterScheduledById(token, scheduledId, registerId);
 
@@ -183,8 +176,6 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 2500));
       final response = await _scheduledService.updateRegisterScheduled(
           token, scheduledId, registerId, body);
       _isLoading = false;
@@ -204,8 +195,6 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 2500));
       CatchmentScheduled? catchmentScheduledResp = await _scheduledService
           .fetchCatchmentScheduledById(token, scheduledId, catchmentId);
 
@@ -237,8 +226,6 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      notifyListeners();
-      await Future.delayed(Duration(milliseconds: 2500));
       final response = await _scheduledService.updateCatchmentScheduled(
           token, scheduledId, catchmentId, body);
       _isLoading = false;
