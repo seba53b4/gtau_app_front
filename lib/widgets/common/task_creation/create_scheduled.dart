@@ -150,12 +150,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                     (states) => Colors.transparent),
                                 onTap: () async {
                                   final DateTime? pickedDate =
-                                      await showDatePicker(
-                                    context: context,
-                                    initialDate: startDate!,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2100),
-                                  );
+                                      await showCustomDatePicker(
+                                          context, startDate!);
                                   if (pickedDate != null) {
                                     _handleEndDateChange(pickedDate);
                                   }
@@ -190,12 +186,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                     (states) => Colors.transparent),
                                 onTap: () async {
                                   final DateTime? pickedDate =
-                                      await showDatePicker(
-                                    context: context,
-                                    initialDate: startDate!,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2100),
-                                  );
+                                      await showCustomDatePicker(
+                                          context, startDate!);
                                   if (pickedDate != null) {
                                     _handleStartDateChange(pickedDate);
                                   }
