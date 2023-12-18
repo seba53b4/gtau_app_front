@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -36,6 +37,7 @@ class CustomTextField extends StatelessWidget {
       width: width ?? inputWidth,
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextField(
+        cursorColor: primarySwatch,
         focusNode: focusNode,
         decoration: InputDecoration(
             border: OutlineInputBorder(
