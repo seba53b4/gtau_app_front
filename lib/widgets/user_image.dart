@@ -4,8 +4,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/dto/image_data.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -32,100 +35,121 @@ class _UserImageState extends State<UserImage> {
 
   _UserImageState(this.onFileChanged, this.idTask);
 
+  final double heightImageCarousel = 150;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 12),
         if (imagesFiles == null)
-          const Icon(
-            Icons.image,
-            size: 60,
-            color: Colors.white10,
-            semanticLabel: 'No image have been uploaded',
-          ),
-        if (imagesFiles != null)
-          CarouselSlider.builder(
-              options: CarouselOptions(
-                height: 200,
-                onPageChanged: (index, reason) =>
-                    setState(() => activeIndex = index),
+          Container(
+            width: heightImageCarousel,
+            height: heightImageCarousel,
+            decoration: BoxDecoration(
+              color: softGrey,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Icon(
+                Icons.image,
+                size: 60,
+                color: primarySwatch[100],
+                semanticLabel: 'No image have been uploaded',
               ),
-              itemCount: imagesFiles!.length,
-              itemBuilder: (context, index, realIndex) {
-                final actualImage = imagesFiles![index].getImage;
-                return Stack(children: [
-                  InkWell(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onTap: () => _selectPhoto(),
-                    child: Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: actualImage!.image, fit: BoxFit.fill),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                      right: 10,
-                      top: -9,
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.cancel,
-                            color: Colors.red.withOpacity(1),
-                            size: 40,
-                          ),
-                          onPressed: () => setState(() {
-                                if (imagesFiles!.length == 1) {
-                                  imagesFiles = null;
-                                } else {
-                                  imagesFiles!.removeAt(activeIndex);
-                                }
-                                /*images.removeAt(index);*/
-                              })))
-                ]);
-              }),
-        InkWell(
-          onTap: () => _selectPhoto(),
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              imagesFiles != null ? 'Add Photo' : 'Select Photo',
-              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-        )
+        if (imagesFiles != null)
+          Container(
+            height: heightImageCarousel,
+            child: CarouselSlider.builder(
+                options: CarouselOptions(
+                  //aspectRatio: 0.25,
+                  viewportFraction: 0.75,
+                  height: heightImageCarousel,
+                  onPageChanged: (index, reason) =>
+                      setState(() => activeIndex = index),
+                ),
+                itemCount: imagesFiles!.length,
+                itemBuilder: (context, index, realIndex) {
+                  final actualImage = imagesFiles![index].getImage;
+                  return Center(
+                      heightFactor: 0.5,
+                      child: Stack(children: [
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () => _selectPhoto(),
+                          child: Container(
+                            width: 150,
+                            height: heightImageCarousel,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: actualImage.image, fit: BoxFit.fill),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                            right: 10,
+                            top: -9,
+                            child: IconButton(
+                                icon: Icon(
+                                  Icons.cancel,
+                                  color: Colors.red.withOpacity(1),
+                                  size: 40,
+                                ),
+                                onPressed: () => setState(() {
+                                      if (imagesFiles!.length == 1) {
+                                        imagesFiles = null;
+                                      } else {
+                                        imagesFiles!.removeAt(activeIndex);
+                                      }
+                                      /*images.removeAt(index);*/
+                                    }))),
+                      ]));
+                }),
+          ),
+        const SizedBox(height: 12),
+        CustomElevatedButton(
+          onPressed: () => _selectPhoto(),
+          text: 'Agregar imagen',
+          //style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12)
       ],
     );
   }
 
   void _selectPhoto() async {
-    await showModalBottomSheet(
-        context: context,
-        builder: (context) => BottomSheet(
-              builder: (context) => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                      leading: Icon(Icons.camera),
-                      title: Text('Camera'),
-                      onTap: () async {
-                        Navigator.of(context).pop();
-                        await _pickImage(ImageSource.camera);
-                      }),
-                  ListTile(
-                      leading: Icon(Icons.filter),
-                      title: Text('Pick a File'),
-                      onTap: () async {
-                        Navigator.of(context).pop();
-                        await _pickImage(ImageSource.gallery);
-                      }),
-                ],
-              ),
-              onClosing: () {},
-            ));
+    if (kIsWeb) {
+      await _pickImage(ImageSource.gallery);
+    } else {
+      await showModalBottomSheet(
+          context: context,
+          builder: (context) => BottomSheet(
+                builder: (context) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                        leading: const Icon(Icons.camera),
+                        title: Text(AppLocalizations.of(context)!.from_camera),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await _pickImage(ImageSource.camera);
+                        }),
+                    ListTile(
+                        leading: const Icon(Icons.filter),
+                        title: Text(AppLocalizations.of(context)!.pick_a_file),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await _pickImage(ImageSource.gallery);
+                        }),
+                  ],
+                ),
+                onClosing: () {},
+              ));
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {

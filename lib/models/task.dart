@@ -18,10 +18,20 @@ class Task {
   late Set<PolylineId>? sections;
   late Set<CircleId>? catchments;
   late Set<CircleId>? registers;
+  late Set<PolylineId>? lots;
+  late LatLng? position;
+
+  LatLng? get Position => position;
+
+  set setPosition(LatLng? value) => position = value;
 
   Set<PolylineId>? get getSections => sections;
 
   set setSections(Set<PolylineId>? value) => sections = value;
+
+  Set<PolylineId>? get getLots => lots;
+
+  set setLots(Set<PolylineId>? value) => lots = value;
 
   Set<CircleId>? get getCatchments => catchments;
 
@@ -104,5 +114,7 @@ class Task {
       required this.conclusions,
       required this.sections,
       required this.catchments,
-      required this.registers});
+      required this.registers,
+      required this.lots,
+      required this.position});
 }

@@ -21,40 +21,17 @@ class TaskService {
     };
   }
 
-  Future<List<Task>?> getTasks(
-      String token, String user, int page, int size, String status) async {
+  Future<List<Task>?> getTasks(String token, String user, int page, int size,
+      String status) async {
     try {
       String userByType =
-          dotenv.get('BY_USER_N_TYPE_URL', fallback: 'NOT_FOUND');
+      dotenv.get('BY_USER_N_TYPE_URL', fallback: 'NOT_FOUND');
       final url = Uri.parse(
           '$baseUrl/$userByType?page=$page&size=$size&user=$user&status=$status');
       final response = await http.get(url, headers: _getHeaders(token));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final content = data['content'];
-        return content.map<Task>((taskData) {
-          return Task(
-              id: taskData['id'],
-              status: taskData['status'],
-              inspectionType: taskData['inspectionType'],
-              workNumber: taskData['workNumber'],
-              addDate: DateTime.parse(taskData['addDate']),
-              applicant: taskData['applicant'],
-              location: taskData['location'],
-              description: taskData['description'],
-              releasedDate: taskData['releasedDate'] != null
-                  ? DateTime.parse(taskData['releasedDate'])
-                  : null,
-              user: taskData['user'],
-              length: taskData['length'],
-              material: taskData['material'],
-              observations: taskData['observations'],
-              conclusions: taskData['conclusions'],
-              sections: _parseIntListToPolylineIdList(taskData['tramos']),
-              catchments: _parseIntListToCircleIdList(taskData['captaciones']),
-              registers: _parseIntListToCircleIdList(taskData['registros']));
-        }).toList();
+        return parseTaskListResponse(response);
       } else {
         print('Error getTasks re null');
         return null;
@@ -110,7 +87,7 @@ class TaskService {
       final response = await http.get(url, headers: _getHeaders(token));
       if (response.statusCode == 200) {
         final taskData = json.decode(response.body);
-
+        var position = taskData['position'];
         return Task(
             id: taskData['id'],
             status: taskData['status'],
@@ -130,7 +107,11 @@ class TaskService {
             conclusions: taskData['conclusions'],
             sections: _parseIntListToPolylineIdList(taskData['tramos']),
             catchments: _parseIntListToCircleIdList(taskData['captaciones']),
-            registers: _parseIntListToCircleIdList(taskData['registros']));
+            registers: _parseIntListToCircleIdList(taskData['registros']),
+            lots: _parseIntListToPolylineIdList(taskData['parcelas']),
+            position: position != null && position['latitud'] != null
+                ? LatLng(position['latitud'], position['longitud'])
+                : const LatLng(0, 0));
       } else {
         if (kDebugMode) {
           print('No se pudieron traer datos');
@@ -151,7 +132,11 @@ class TaskService {
       final response = await http.get(url, headers: _getHeaders(token));
       if (response.statusCode == 200) {
         List<dynamic> decode = json.decode(response.body) as List<dynamic>;
-        return decode.map((e) => e["image"].toString()).toList();
+        List<String> newList = await decode.map((e) => e["image"].toString())
+            .toList();
+        await new Future.delayed(
+            Duration(seconds: 1)); /*Simulamos el delay de una lenta conexion*/
+        return await newList;
       } else {
         if (kDebugMode) {
           print('No se pudieron traer datos');
@@ -166,13 +151,39 @@ class TaskService {
     }
   }
 
-  Future<bool> updateTask(
-      String token, int idTask, Map<String, dynamic> body) async {
+  Future<List<String>> fetchTaskImagesWithDelay(token, int idTask,
+      int delaysec) async {
+    try {
+      final url = Uri.parse('$baseUrl/$idTask/images');
+      final response = await http.get(url, headers: _getHeaders(token));
+      if (response.statusCode == 200) {
+        List<dynamic> decode = json.decode(response.body) as List<dynamic>;
+        List<String> newList = await decode.map((e) => e["image"].toString())
+            .toList();
+        await new Future.delayed(Duration(
+            seconds: delaysec)); /*Simulamos el delay de una lenta conexion*/
+        return await newList;
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return [];
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in fetchTaskImages: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> updateTask(String token, int idTask,
+      Map<String, dynamic> body) async {
     try {
       final url = Uri.parse('$baseUrl/$idTask');
       final String jsonBody = jsonEncode(body);
       final response =
-          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
         print('Tarea ha sido actualizada correctamente');
         return true;
@@ -193,7 +204,7 @@ class TaskService {
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse(baseUrl);
       final response =
-          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 201) {
         print('Tarea ha sido creada correctamente');
@@ -210,8 +221,8 @@ class TaskService {
     }
   }
 
-  Future<List<String>?> putBase64Images(
-      String token, int id, String path) async {
+  Future<List<String>?> putBase64Images(String token, int id,
+      String path) async {
     try {
       Uri uri = Uri.parse(path);
       String basename = p.basename(uri.path);
@@ -228,7 +239,7 @@ class TaskService {
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse('$baseUrl/$id/image/v2');
       final response =
-          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -237,7 +248,8 @@ class TaskService {
         var id = jsonResponse['inspectionTaskId'];
 
         return jsonResponse.entries.map<String>((entry) {
-          return "${entry.key}: ${entry.value}"; //Agrego esto por aca solo para que no salte error
+          return "${entry.key}: ${entry
+              .value}"; //Agrego esto por aca solo para que no salte error
         }).toList();
       } else {
         return null;
@@ -254,7 +266,9 @@ class TaskService {
     final response = await http.get(Uri.parse(imageUrl));
     if (response.statusCode == 200) {
       String content = response.headers['content-type'].toString();
-      String ext = content.split('/').last;
+      String ext = content
+          .split('/')
+          .last;
       final List<int> imageBytes = response.bodyBytes;
       final String base64String = base64Encode(imageBytes);
       return {
@@ -276,6 +290,7 @@ class TaskService {
           contentType: MediaType('image', 'jpg')));
       var response = await request.send();
 
+
       return response.statusCode == 200;
     } catch (error) {
       if (kDebugMode) {
@@ -287,13 +302,15 @@ class TaskService {
 
   Future<bool> deleteTaskImage(String token, int id, String path) async {
     try {
-      var fileName = path.split("/").last;
+      var fileName = path
+          .split("/")
+          .last;
       final Map<String, dynamic> body = {"name": fileName};
 
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse('$baseUrl/$id/image');
       final response =
-          await http.delete(url, headers: _getHeaders(token), body: jsonBody);
+      await http.delete(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 200) {
         final bool jsonResponse = json.decode(response.body);
@@ -308,5 +325,59 @@ class TaskService {
       }
       rethrow;
     }
+  }
+
+  Future<List<Task>?> searchTasks(String token, Map<String, dynamic> body,
+      int page, int size) async {
+    try {
+      final url = Uri.parse('$baseUrl/search?page=$page&size=$size');
+      final String jsonBody = jsonEncode(body);
+      final response =
+      await http.post(url, headers: _getHeaders(token), body: jsonBody);
+
+      if (response.statusCode == 200) {
+        return parseTaskListResponse(response);
+      } else {
+        print('No se pudieron traer datos');
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in createTask: $error');
+      }
+      rethrow;
+    }
+  }
+
+  parseTaskListResponse(http.Response response) {
+    final data = json.decode(response.body);
+    final content = data['content'];
+    return content.map<Task>((taskData) {
+      var position = taskData['position'];
+      return Task(
+          id: taskData['id'],
+          status: taskData['status'],
+          inspectionType: taskData['inspectionType'],
+          workNumber: taskData['workNumber'],
+          addDate: DateTime.parse(taskData['addDate']),
+          applicant: taskData['applicant'],
+          location: taskData['location'],
+          description: taskData['description'],
+          releasedDate: taskData['releasedDate'] != null
+              ? DateTime.parse(taskData['releasedDate'])
+              : null,
+          user: taskData['user'],
+          length: taskData['length'],
+          material: taskData['material'],
+          observations: taskData['observations'],
+          conclusions: taskData['conclusions'],
+          sections: _parseIntListToPolylineIdList(taskData['tramos']),
+          catchments: _parseIntListToCircleIdList(taskData['captaciones']),
+          registers: _parseIntListToCircleIdList(taskData['registros']),
+          lots: _parseIntListToPolylineIdList(taskData['parcelas']),
+          position: position != null && position['latitud'] != null
+              ? LatLng(position['latitud'], position['longitud'])
+              : const LatLng(0, 0));
+    }).toList();
   }
 }

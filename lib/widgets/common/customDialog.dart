@@ -1,4 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../../constants/theme_constants.dart';
+import 'custom_text_button.dart';
 
 Future<void> showCustomDialog({
   required BuildContext context,
@@ -12,25 +16,65 @@ Future<void> showCustomDialog({
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: <Widget>[
-          TextButton(
-            style: TextButton.styleFrom(
-              textStyle: Theme.of(context).textTheme.labelLarge,
+      return ScaleTransition(
+        scale: CurvedAnimation(
+          parent: ModalRoute.of(context)!.animation!,
+          curve: Curves.easeInOut,
+        ),
+        child: AlertDialog(
+          surfaceTintColor: lightBackground,
+          backgroundColor: lightBackground,
+          title: Container(
+            color: lightBackground,
+            alignment: Alignment.center,
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: kIsWeb ? 28 : 22,
+              ),
             ),
-            child: Text(cancelbuttonLabel),
-            onPressed: onDisablePressed,
           ),
-          TextButton(
-            style: TextButton.styleFrom(
-              textStyle: Theme.of(context).textTheme.labelLarge,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Divider(
+                height: 8,
+                thickness: 2,
+                color: Colors.grey.shade100,
+              ),
+              const SizedBox(height: 8),
+              Container(
+                color: lightBackground,
+                height: 80,
+                child: Center(
+                  child: Text(
+                    content,
+                    style: const TextStyle(fontSize: kIsWeb ? 16 : 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Divider(
+                height: 8,
+                thickness: 2,
+                color: Colors.grey.shade100,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            CustomTextButton(
+              onPressed: onDisablePressed,
+              text: cancelbuttonLabel,
             ),
-            child: Text(acceptButtonLabel),
-            onPressed: onEnablePressed,
-          ),
-        ],
+            CustomTextButton(
+              onPressed: onEnablePressed,
+              text: acceptButtonLabel,
+            ),
+          ],
+        ),
       );
     },
   );
