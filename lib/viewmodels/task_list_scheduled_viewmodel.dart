@@ -134,6 +134,34 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     }
   }
 
+  Future<TaskScheduled?> fetchTaskScheduled(token, int scheduledId) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+      final responseTask =
+          await _scheduledService.fetchTaskScheduled(token, scheduledId);
+      if (responseTask != null) {
+        return responseTask;
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        _error = true;
+        return null;
+      }
+    } catch (error) {
+      _error = true;
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   //
   // Future<List<Task>?> initializeTasks(
   //     BuildContext context, String status, String? user) async {

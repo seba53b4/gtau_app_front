@@ -260,6 +260,27 @@ class ScheduledService {
     }
   }
 
+  Future<TaskScheduled?> fetchTaskScheduled(token, int scheduledId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId');
+      final response = await http.get(url, headers: _getHeaders(token));
+      if (response.statusCode == 200) {
+        final taskData = json.decode(response.body);
+        return TaskScheduled.fromJson(json: taskData);
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in fetchTaskScheduled: $error');
+      }
+      rethrow;
+    }
+  }
+
 // Future<bool> createSheduledTask(
 //     String token, Map<String, dynamic> body) async {
 //   try {

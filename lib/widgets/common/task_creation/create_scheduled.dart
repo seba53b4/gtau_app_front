@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:provider/provider.dart';
@@ -31,14 +32,14 @@ class ScheduledComponent extends StatefulWidget {
 class _CreateScheduledState extends State<ScheduledComponent> {
   final scheduledNumberController = TextEditingController();
   final addDateController = TextEditingController();
-  final endDateController = TextEditingController();
+  final releasedDateController = TextEditingController();
   final numWorkController = TextEditingController();
-  final observationsController = TextEditingController();
+  final descriptionController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late List<Map<String, dynamic>> geometriesFromFile = [];
   late String taskStatus = 'PENDING';
   late DateTime? startDate;
-  late DateTime? endDate;
+  late DateTime? releasedDate;
   late bool isAdmin;
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late String token;
@@ -46,7 +47,14 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   @override
   void initState() {
     super.initState();
-    startDate = DateTime.now();
+    if (widget.isEdit) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
+        await initializeScheduledTask();
+      });
+    } else {
+      startDate = DateTime.now();
+    }
   }
 
   @override
@@ -63,9 +71,41 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     scheduledNumberController.dispose();
     addDateController.dispose();
     numWorkController.dispose();
-    endDateController.dispose();
-    observationsController.dispose();
+    releasedDateController.dispose();
+    descriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> initializeScheduledTask() async {
+    TaskScheduled? taskScheduled = await taskListScheduledViewModel
+        .fetchTaskScheduled(token, widget.scheduledId!)
+        .catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {
+          Navigator.of(context).pop();
+        },
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+      return null;
+    });
+    loadInfoFromTaskScheduledResponse(taskScheduled);
+  }
+
+  void loadInfoFromTaskScheduledResponse(TaskScheduled? taskScheduled) {
+    if (taskScheduled != null) {
+      startDate = taskScheduled.addDate!;
+      taskStatus = taskScheduled.status!;
+      descriptionController.text = taskScheduled.description!;
+      if (taskScheduled.releasedDate != null) {
+        releasedDate = taskScheduled.releasedDate!;
+        releasedDateController.text =
+            parseDateTimeOnFormat(taskScheduled.releasedDate!);
+      }
+      addDateController.text = parseDateTimeOnFormat(taskScheduled.addDate!);
+    }
   }
 
   void _handleStartDateChange(DateTime date) {
@@ -75,11 +115,11 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     addDateController.text = parseDateTimeOnFormat(date);
   }
 
-  void _handleEndDateChange(DateTime date) {
+  void _handleReleasedDateChange(DateTime date) {
     setState(() {
-      endDate = date;
+      releasedDate = date;
     });
-    endDateController.text = parseDateTimeOnFormat(date);
+    releasedDateController.text = parseDateTimeOnFormat(date);
   }
 
   void _showMapElement(BuildContext context) {
@@ -95,12 +135,13 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   Future handleAcceptOnShowDialogCreateTask() async {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
-    late String endDateUpdated = formattedDateToUpdate(endDateController.text);
+    late String endDateUpdated =
+        formattedDateToUpdate(releasedDateController.text);
 
     Map<String, dynamic> body = {
       // Falta el titulo
       "status": taskStatus,
-      "description": observationsController.text,
+      "description": descriptionController.text,
       "releasedDate": endDateUpdated,
       "addDate": addDateUpdated,
     };
@@ -232,7 +273,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                       await showCustomDatePicker(
                                           context, startDate!);
                                   if (pickedDate != null) {
-                                    _handleEndDateChange(pickedDate);
+                                    _handleReleasedDateChange(pickedDate);
                                   }
                                 },
                                 child: IgnorePointer(
@@ -241,7 +282,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                     width: AppConstants.taskRowSpace,
                                     hintText: AppLocalizations.of(context)!
                                         .scheduled_end_date_title,
-                                    controller: endDateController,
+                                    controller: releasedDateController,
                                   ),
                                 ),
                               ),
@@ -277,8 +318,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                     ),
                   ),
                   Text(
-                    AppLocalizations.of(context)!
-                        .createTaskPage_observationsTitle,
+                    AppLocalizations.of(context)!.default_descriptionTitle,
                     style: const TextStyle(fontSize: 16.0),
                   ),
                   const SizedBox(height: 10.0),
@@ -289,8 +329,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                     width: widthRow,
                     //height: heightRow,
                     hintText: AppLocalizations.of(context)!
-                        .default_observationsPlaceholder,
-                    controller: observationsController,
+                        .default_descriptionPlaceholder,
+                    controller: descriptionController,
                   ),
                   const SizedBox(height: 24.0),
                   Column(

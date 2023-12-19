@@ -137,7 +137,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       releasedDate = DateTime.now();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-        await initializeTask();
+        if (!widget.scheduledEdit) {
+          await initializeTask();
+        }
       });
     } else {
       startDate = DateTime.now();
@@ -994,7 +996,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   Visibility(
                       visible: selectedIndex == 0,
                       child: ScheduledComponent(
-                        isEdit: false,
+                        isEdit: widget.detail,
                         scheduledId: widget.idTask!,
                       )),
                   Visibility(
