@@ -29,6 +29,7 @@ class TaskListItemScheduled extends StatelessWidget {
         builder: (context) => TaskCreationScreen(
           detail: true,
           idTask: taskScheduled!.id,
+          scheduledEdit: true,
           type: 'scheduled',
         ),
       ),

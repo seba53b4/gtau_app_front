@@ -120,7 +120,6 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
 
   Future updateTaskListState(BuildContext context) async {
     final status = taskFilterProvider?.lastStatus;
-    print('entro a bsucar scheduled');
     await taskListScheduledViewModel?.fetchNextPageTasksScheduled(
         token, status!);
   }

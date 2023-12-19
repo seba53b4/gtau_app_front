@@ -15,8 +15,11 @@ import '../file_upload_component.dart';
 
 class ScheduledComponent extends StatefulWidget {
   final bool isEdit;
+  final int? scheduledId;
 
-  const ScheduledComponent({Key? key, required this.isEdit}) : super(key: key);
+  const ScheduledComponent(
+      {Key? key, required this.isEdit, required this.scheduledId})
+      : super(key: key);
 
   @override
   State<ScheduledComponent> createState() => _CreateScheduledState();
@@ -77,23 +80,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => const ScheduledMapComponent(idSheduled: 1)),
+          builder: (context) =>
+              ScheduledMapComponent(idSheduled: widget.scheduledId)),
     );
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return Dialog(
-    //       shape: const RoundedRectangleBorder(
-    //           borderRadius: BorderRadius.all(Radius.circular(50.0))),
-    //       child: SizedBox(
-    //         width: kIsWeb ? widthWindow * 0.85 : widthWindow,
-    //         child: const Center(
-    //             widthFactor: kIsWeb ? 0.6 : 0.5,
-    //             child: ScheduledMapComponent(idSheduled: 3)),
-    //       ),
-    //     );
-    //   },
-    // );
   }
 
   @override
@@ -101,7 +90,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     double widthRow = 640;
     double heightRow = 128;
 
-    return Column(children: [
+    return Center(
+        child: Column(children: [
       BoxContainer(
         width: widthRow * 1.15,
         padding: const EdgeInsets.all(24),
@@ -282,9 +272,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
               Visibility(
                 visible: widget.isEdit,
                 child: Column(children: [
-                  Text(
+                  const Text(
                     'Inspeccionar Zona',
-                    style: const TextStyle(fontSize: 16.0),
+                    style: TextStyle(fontSize: 16.0),
                   ),
                   const SizedBox(height: 12),
                   CustomElevatedButton(
@@ -304,11 +294,13 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         visible: !widget.isEdit,
         child: CustomElevatedButton(
           onPressed: () async {
-            if (_formKey.currentState!.validate()) {}
+            if (_formKey.currentState!.validate()) {
+              print('');
+            }
           },
           text: AppLocalizations.of(context)!.buttonAcceptLabel,
         ),
       ),
-    ]);
+    ]));
   }
 }

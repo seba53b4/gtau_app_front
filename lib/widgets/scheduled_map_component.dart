@@ -26,7 +26,7 @@ import 'common/scheduled_form_widget.dart';
 import 'element_scheduled_modal.dart';
 
 class ScheduledMapComponent extends StatefulWidget {
-  final int idSheduled;
+  final int? idSheduled;
 
   const ScheduledMapComponent({super.key, required this.idSheduled});
 
@@ -130,7 +130,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
     await scheduledViewModel
-        .fetchScheduledElements(token, widget.idSheduled)
+        .fetchScheduledElements(token, widget.idSheduled!)
         .then((entities) {
       if (entities != null) {
         updateElementsOnMap(
@@ -245,7 +245,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   void _showModalElement(BuildContext context, int ogcFid, ElementType type) {
     showScheduledElementModal(
       context: context,
-      scheduledId: widget.idSheduled,
+      scheduledId: widget.idSheduled!,
       elementType: type,
       elementId: ogcFid,
       onAccept: () async {
@@ -578,7 +578,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                                   },
                                   elementType: elementType,
                                   elementId: elementId,
-                                  scheduledid: widget.idSheduled)),
+                                  scheduledid: widget.idSheduled!)),
                         ),
                       ],
                     ),

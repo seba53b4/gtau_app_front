@@ -108,6 +108,32 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> createScheduledTask(
+      String token, Map<String, dynamic> body) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+      final response = await _scheduledService.createScheduledTask(token, body);
+      if (response) {
+        print('Tarea Programada ha sido creada correctamente');
+        notifyListeners();
+        return true;
+      } else {
+        _error = true;
+        print('No se pudieron traer datos');
+        return false;
+      }
+    } catch (error) {
+      _error = true;
+      print(error);
+      throw Exception('Error createScheduledTask');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   //
   // Future<List<Task>?> initializeTasks(
   //     BuildContext context, String status, String? user) async {

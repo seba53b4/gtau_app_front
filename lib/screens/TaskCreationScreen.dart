@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
-import '../constants/theme_constants.dart';
 import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../navigation/navigation.dart';
@@ -41,9 +40,14 @@ class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
   bool detail = false;
   int? idTask = 0;
+  final bool scheduledEdit;
 
   TaskCreationScreen(
-      {super.key, required this.type, this.detail = false, this.idTask = 0});
+      {super.key,
+      required this.type,
+      this.detail = false,
+      this.idTask = 0,
+      this.scheduledEdit = false});
 
   @override
   _TaskCreationScreenState createState() => _TaskCreationScreenState();
@@ -989,11 +993,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   ),
                   Visibility(
                       visible: selectedIndex == 0,
-                      child: const ScheduledComponent(
+                      child: ScheduledComponent(
                         isEdit: true,
+                        scheduledId: widget.idTask!,
                       )),
                   Visibility(
-                    visible: widget.detail,
+                    visible: widget.detail && selectedIndex == 1,
                     child: Container(
                       width: widthRow * 1.15,
                       padding: const EdgeInsets.all(24),

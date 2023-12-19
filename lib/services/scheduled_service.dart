@@ -237,6 +237,29 @@ class ScheduledService {
     }
   }
 
+  Future<bool> createScheduledTask(
+      String token, Map<String, dynamic> body) async {
+    try {
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse(baseUrl);
+      final response =
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+
+      if (response.statusCode == 201) {
+        print('Tarea ha sido creada correctamente');
+        return true;
+      } else {
+        print('No se pudieron traer datos');
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in createTask: $error');
+      }
+      rethrow;
+    }
+  }
+
 // Future<bool> createSheduledTask(
 //     String token, Map<String, dynamic> body) async {
 //   try {

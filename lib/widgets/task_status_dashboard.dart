@@ -33,13 +33,12 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late TaskFilterProvider taskFilterProvider;
   late String token;
-  late bool _isScheduled = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      updateTaskListState(TaskStatus.Pending.value, true);
+      updateTaskListState(TaskStatus.Pending.value, false);
     });
     _tabController = TabController(vsync: this, length: 4);
     taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
@@ -67,7 +66,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         _currentIndex = newIndex;
         _tabController.animateTo(_currentIndex);
       }
-      print('${taskFilterProvider.inspectionTypeFilter.toString()}');
+      bool isScheduled =
+          taskFilterProvider.inspectionTypeFilter?.allMatches('SCHEDULED') !=
+              null;
 
       return SizedBox(
         width: 120,
@@ -110,8 +111,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                     _clearPref();
                     String status = getTaskStatusSelected(index);
                     taskFilterProvider.setLastStatus(status);
-                    updateTaskListState(status,
-                        true); //taskFilterProvider.inspectionTypeFilter?.allMatches('Programada') != null);
+                    updateTaskListState(status, isScheduled);
                   }
                 },
               ),
@@ -120,7 +120,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                 builder: (context, taskListViewModel, child) {
               return LoadingOverlay(
                   isLoading: taskListViewModel.isLoading,
-                  child: _buildTabContent(scaffoldKeyDashboard, true));
+                  child: _buildTabContent(scaffoldKeyDashboard, isScheduled));
               // taskFilterProvider.inspectionTypeFilter
               //         ?.allMatches('Programada') !=
               //     null));
