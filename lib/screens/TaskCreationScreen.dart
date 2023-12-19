@@ -994,7 +994,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   Visibility(
                       visible: selectedIndex == 0,
                       child: ScheduledComponent(
-                        isEdit: true,
+                        isEdit: false,
                         scheduledId: widget.idTask!,
                       )),
                   Visibility(

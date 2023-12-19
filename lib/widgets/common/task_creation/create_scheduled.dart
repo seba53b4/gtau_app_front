@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:provider/provider.dart';
 
@@ -8,6 +9,8 @@ import '../../../models/task_status.dart';
 import '../../../providers/user_provider.dart';
 import '../../../utils/date_utils.dart';
 import '../../scheduled_map_component.dart';
+import '../customDialog.dart';
+import '../customMessageDialog.dart';
 import '../custom_dropdown.dart';
 import '../custom_elevated_button.dart';
 import '../custom_text_form_field.dart';
@@ -18,7 +21,7 @@ class ScheduledComponent extends StatefulWidget {
   final int? scheduledId;
 
   const ScheduledComponent(
-      {Key? key, required this.isEdit, required this.scheduledId})
+      {Key? key, this.isEdit = false, required this.scheduledId})
       : super(key: key);
 
   @override
@@ -37,6 +40,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   late DateTime? startDate;
   late DateTime? endDate;
   late bool isAdmin;
+  late TaskListScheduledViewModel taskListScheduledViewModel;
+  late String token;
 
   @override
   void initState() {
@@ -48,6 +53,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     isAdmin = context.read<UserProvider>().isAdmin!;
+    taskListScheduledViewModel =
+        Provider.of<TaskListScheduledViewModel>(context, listen: false);
+    token = Provider.of<UserProvider>(context, listen: false).getToken!;
   }
 
   @override
@@ -71,7 +79,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     setState(() {
       endDate = date;
     });
-    addDateController.text = parseDateTimeOnFormat(date);
+    endDateController.text = parseDateTimeOnFormat(date);
   }
 
   void _showMapElement(BuildContext context) {
@@ -83,6 +91,51 @@ class _CreateScheduledState extends State<ScheduledComponent> {
           builder: (context) =>
               ScheduledMapComponent(idSheduled: widget.scheduledId)),
     );
+  }
+
+  Future handleAcceptOnShowDialogCreateTask() async {
+    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String endDateUpdated = formattedDateToUpdate(endDateController.text);
+
+    Map<String, dynamic> body = {
+      // Falta el titulo
+      "status": taskStatus,
+      "description": observationsController.text,
+      "releasedDate": endDateUpdated,
+      "addDate": addDateUpdated,
+    };
+
+    bool isUpdated =
+        await taskListScheduledViewModel.createScheduledTask(token, body);
+    if (isUpdated) {
+      await showMessageDialog(DialogMessageType.success);
+      return true;
+    } else {
+      await showMessageDialog(DialogMessageType.error);
+      return false;
+    }
+  }
+
+  void handleSubmit() {
+    showCustomDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.dialogWarning,
+      content: AppLocalizations.of(context)!.dialogContent,
+      onDisablePressed: () {
+        Navigator.of(context).pop();
+      },
+      onEnablePressed: () async {
+        Navigator.of(context).pop();
+        await handleAcceptOnShowDialogCreateTask();
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
+  }
+
+  Future<void> showMessageDialog(DialogMessageType type) async {
+    await showCustomMessageDialog(
+        context: context, messageType: type, onAcceptPressed: () {});
   }
 
   @override
@@ -143,7 +196,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                       await showCustomDatePicker(
                                           context, startDate!);
                                   if (pickedDate != null) {
-                                    _handleEndDateChange(pickedDate);
+                                    _handleStartDateChange(pickedDate);
                                   }
                                 },
                                 child: IgnorePointer(
@@ -179,7 +232,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                       await showCustomDatePicker(
                                           context, startDate!);
                                   if (pickedDate != null) {
-                                    _handleStartDateChange(pickedDate);
+                                    _handleEndDateChange(pickedDate);
                                   }
                                 },
                                 child: IgnorePointer(
@@ -295,7 +348,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         child: CustomElevatedButton(
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
-              print('');
+              handleSubmit();
             }
           },
           text: AppLocalizations.of(context)!.buttonAcceptLabel,
