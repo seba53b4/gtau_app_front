@@ -40,18 +40,27 @@ class ScheduledViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
-  LatLng _initPosition = LatLng(-34.88773, -56.13955);
+  LatLng? _initPosition;
 
-  LatLng get initPosition => _initPosition;
+  LatLng? get initPosition => _initPosition;
 
   int _page = 0;
   int _size = kIsWeb ? 12 : 10;
 
-  void setInitPosition(LatLng? pos) {
-    if (pos != null && initLocation.longitude != pos.longitude ||
-        initLocation.latitude != pos!.latitude) {
-      _initPosition = pos;
-    }
+  // void setInitPosition(LatLng? pos) {
+  //   if (pos != null && initLocation.longitude != pos.longitude ||
+  //       initLocation.latitude != pos!.latitude) {
+  //     _initPosition = pos;
+  //   }
+  // }
+
+  LatLng getPosition() {
+    return _initPosition ?? initLocation;
+  }
+
+  bool positionToBeLoaded() {
+    print('pisition is loaded:' + (_initPosition != null).toString());
+    return _initPosition == null;
   }
 
   reset() {
@@ -259,6 +268,8 @@ class ScheduledViewModel extends ChangeNotifier {
       notifyListeners();
       LatLng? pos = getRandomPointOfMap(polylines, circles);
       _isLoading = false;
+      print(pos.toString());
+      _initPosition = pos;
       return pos;
     } catch (error) {
       _isLoading = false;

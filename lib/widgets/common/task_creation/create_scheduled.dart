@@ -49,7 +49,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     super.initState();
     if (widget.isEdit) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
         await initializeScheduledTask();
       });
     } else {
@@ -133,19 +132,43 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     );
   }
 
-  Future handleAcceptOnShowDialogCreateTask() async {
+  Map<String, dynamic> bodyScheduledTask() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
     late String endDateUpdated =
         formattedDateToUpdate(releasedDateController.text);
 
-    Map<String, dynamic> body = {
-      // Falta el titulo
+    return {
+      // Falta el título
       "status": taskStatus,
       "description": descriptionController.text,
       "releasedDate": endDateUpdated,
       "addDate": addDateUpdated,
     };
+  }
 
+  void _showConfirmationDialog(
+      {Function? cancelPressed, Function? acceptPressed}) async {
+    await showCustomDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.dialogWarning,
+      content: AppLocalizations.of(context)!.dialogContent,
+      onDisablePressed: () {
+        if (cancelPressed != null) {
+          cancelPressed();
+        }
+      },
+      onEnablePressed: () {
+        if (acceptPressed != null) {
+          acceptPressed();
+        }
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
+  }
+
+  Future<bool> handleAcceptOnShowDialogCreateTask() async {
+    Map<String, dynamic> body = bodyScheduledTask();
     bool isUpdated =
         await taskListScheduledViewModel.createScheduledTask(token, body);
     if (isUpdated) {
@@ -158,20 +181,35 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   }
 
   void handleSubmit() {
-    showCustomDialog(
-      context: context,
-      title: AppLocalizations.of(context)!.dialogWarning,
-      content: AppLocalizations.of(context)!.dialogContent,
-      onDisablePressed: () {
-        Navigator.of(context).pop();
-      },
-      onEnablePressed: () async {
-        Navigator.of(context).pop();
-        await handleAcceptOnShowDialogCreateTask();
-      },
-      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
-      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
-    );
+    _showConfirmationDialog(cancelPressed: () {
+      Navigator.of(context).pop();
+    }, acceptPressed: () async {
+      Navigator.of(context).pop();
+      await handleAcceptOnShowDialogCreateTask();
+    });
+  }
+
+  Future<bool> handleAcceptOnShowDialogEditTask() async {
+    Map<String, dynamic> body = bodyScheduledTask();
+    bool isUpdated = await taskListScheduledViewModel.updateTaskScheduled(
+        token, widget.scheduledId!, body);
+    if (isUpdated) {
+      await showMessageDialog(DialogMessageType.success);
+      return true;
+    } else {
+      await showMessageDialog(DialogMessageType.error);
+      return false;
+    }
+  }
+
+  void handleEdit() {
+    _showConfirmationDialog(cancelPressed: () {
+      Navigator.of(context).pop();
+    }, acceptPressed: () async {
+      Navigator.of(context).pop();
+      await handleAcceptOnShowDialogEditTask();
+      Navigator.of(context).pop();
+    });
   }
 
   Future<void> showMessageDialog(DialogMessageType type) async {
@@ -365,16 +403,16 @@ class _CreateScheduledState extends State<ScheduledComponent> {
               Visibility(
                 visible: widget.isEdit,
                 child: Column(children: [
-                  const Text(
-                    'Inspeccionar Zona',
-                    style: TextStyle(fontSize: 16.0),
+                  Text(
+                    AppLocalizations.of(context)!.inspect_map_title,
+                    style: const TextStyle(fontSize: 16.0),
                   ),
                   const SizedBox(height: 12),
                   CustomElevatedButton(
                     onPressed: () async {
                       _showMapElement(context);
                     },
-                    text: 'Ver mapa',
+                    text: AppLocalizations.of(context)!.see_map_button,
                   )
                 ]),
               )
@@ -383,16 +421,15 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         ),
       ),
       const SizedBox(height: AppConstants.taskColumnSpace),
-      Visibility(
-        visible: !widget.isEdit,
-        child: CustomElevatedButton(
-          onPressed: () async {
-            if (_formKey.currentState!.validate()) {
-              handleSubmit();
-            }
-          },
-          text: AppLocalizations.of(context)!.buttonAcceptLabel,
-        ),
+      CustomElevatedButton(
+        onPressed: () async {
+          if (_formKey.currentState!.validate()) {
+            widget.isEdit ? handleEdit() : handleSubmit();
+          }
+        },
+        text: widget.isEdit
+            ? AppLocalizations.of(context)!.buttonAcceptLabel
+            : AppLocalizations.of(context)!.createTaskPage_submitButton,
       ),
     ]));
   }

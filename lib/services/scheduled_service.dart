@@ -281,6 +281,41 @@ class ScheduledService {
     }
   }
 
+  Future<bool> updateTaskScheduled(
+      String token, int scheduledId, Map<String, dynamic> body) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId');
+      final String jsonBody = jsonEncode(body);
+      final response =
+          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      if (response.statusCode == 200) {
+        print('Tarea ha sido actualizada correctamente');
+        return true;
+      } else {
+        print('Error en update de tarea');
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in updateTaskScheduled: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteTaskScheduled(String token, int scheduledId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId');
+      final response = await http.delete(url, headers: _getHeaders(token));
+      return response.statusCode == 204;
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in deleteTaskScheduled: $error');
+      }
+      rethrow;
+    }
+  }
+
 // Future<bool> createSheduledTask(
 //     String token, Map<String, dynamic> body) async {
 //   try {

@@ -83,7 +83,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     setState(() {
       mapWidth = mapInit;
     });
-    _initializeSheduledElements(isNewLocation: true).then((value) => null);
+    bool isNewLocation = scheduledViewModel.positionToBeLoaded();
+    _initializeSheduledElements(isNewLocation: isNewLocation)
+        .then((value) => null);
   }
 
   @override
@@ -281,24 +283,23 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       polylines = getPolylines(sections);
       circles = getCircles(catchments, registers);
     });
-    if (isNewLocation) {
-      LatLng? pos =
-          await scheduledViewModel.getRandomPosition(polylines, circles);
-      scheduledViewModel.setInitPosition(pos ?? initLocation);
 
-      setState(() {
-        location = scheduledViewModel.initPosition;
-      });
-      final GoogleMapController controller = await _mapController.future;
-      controller.moveCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(location!.latitude, location!.longitude),
-            zoom: zoomMap,
-          ),
-        ),
-      );
+    if (isNewLocation) {
+      await scheduledViewModel.getRandomPosition(polylines, circles);
     }
+    setState(() {
+      location = scheduledViewModel.getPosition();
+    });
+
+    final GoogleMapController controller = await _mapController.future;
+    controller.moveCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(location!.latitude, location!.longitude),
+          zoom: zoomMap,
+        ),
+      ),
+    );
   }
 
   void updateElementsOnMapOnFilter() {

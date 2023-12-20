@@ -164,5 +164,7 @@
     "scheduled_end_date_title" : "Fecha de Fin",
     "dialogContent_deleteImage" : "¿Desea eliminar esta(s) imagen(es)?",
     "file_upload_btn": "Seleccionar",
-    "placeholder_back_button": "Retroceder"
+    "placeholder_back_button": "Retroceder",
+    "inspect_map_title": "Inspeccionar Zona",
+    "see_map_button": "Ver mapa"
 }
