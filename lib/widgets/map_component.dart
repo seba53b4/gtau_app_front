@@ -58,7 +58,7 @@ class _MapComponentState extends State<MapComponent> {
   double zoomMap = 16;
   late Completer<GoogleMapController> _mapController;
   bool viewDetailElementInfo = false;
-  double modalWidth = 300.0;
+  double modalWidth = 320.0;
   late double mapWidth;
   late double mapInit;
   late SelectedItemsProvider selectedItemsProvider;
