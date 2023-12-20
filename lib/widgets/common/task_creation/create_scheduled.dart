@@ -140,14 +140,16 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   Map<String, dynamic> bodyScheduledTask() {
     late String addDateUpdated = formattedDateToUpdate(addDateController.text);
-    late String endDateUpdated =
-        formattedDateToUpdate(releasedDateController.text);
+
+    late String? releasedDateUpdated = releasedDateController.text.isNotEmpty
+        ? formattedDateToUpdate(releasedDateController.text)
+        : null;
 
     return {
       // Falta el título
       "status": taskStatus,
       "description": descriptionController.text,
-      "releasedDate": endDateUpdated,
+      "releasedDate": releasedDateUpdated,
       "addDate": addDateUpdated,
     };
   }

@@ -21,7 +21,9 @@ class TaskScheduled {
       status: json['status'] as String,
       addDate: DateTime.parse(json['addDate'] as String),
       description: json['description'] as String,
-      releasedDate: DateTime.parse(json['releasedDate'] as String),
+      releasedDate: json['releasedDate'] != null
+          ? DateTime.parse(json['releasedDate'])
+          : null,
     );
   }
 }

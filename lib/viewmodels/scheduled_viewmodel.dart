@@ -292,13 +292,13 @@ class ScheduledViewModel extends ChangeNotifier {
       notifyListeners();
       final responseListTask = await _scheduledService.getScheduledTasks(
           token, _page, _size, status);
-
-      _tasks[status] = responseListTask!;
+      print(responseListTask.toString());
+      _tasks[status] = responseListTask ?? [];
       _page++;
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      print('Error en fetchScheduledTasks: $error');
       throw Exception('Error al obtener los datos fetchScheduledTasks');
     } finally {
       _isLoading = false;

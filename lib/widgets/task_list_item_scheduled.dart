@@ -5,12 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
 import '../utils/date_utils.dart';
-import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
 
@@ -182,14 +182,12 @@ class TaskListItemScheduled extends StatelessWidget {
         bool result = await _deleteTask(context, taskScheduled!.id!);
 
         if (result) {
-          print('Tarea ha sido eliminada correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          print('No se pudo eliminar la tarea');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,
@@ -204,19 +202,21 @@ class TaskListItemScheduled extends StatelessWidget {
   }
 
   Future updateTaskListState(BuildContext context) async {
+    final token = context.read<UserProvider>().getToken!;
     final status =
         Provider.of<TaskFilterProvider>(context, listen: false).statusFilter;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    taskListViewModel.clearListByStatus(status!);
-    await taskListViewModel.initializeTasks(context, status, "");
+    final taskListScheduledViewModel =
+        Provider.of<TaskListScheduledViewModel>(context, listen: false);
+    taskListScheduledViewModel.clearListByStatus(status!);
+    await taskListScheduledViewModel.fetchScheduledTasks(token, status);
   }
 
   Future<bool> _deleteTask(BuildContext context, int id) async {
     final token = context.read<UserProvider>().getToken;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    bool result = await taskListViewModel.deleteTask(token!, id);
+    final taskListScheduledViewModel =
+        Provider.of<TaskListScheduledViewModel>(context, listen: false);
+    bool result =
+        await taskListScheduledViewModel.deleteTaskScheduled(token!, id);
     return result;
   }
 }
