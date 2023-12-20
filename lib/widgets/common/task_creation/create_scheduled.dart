@@ -6,9 +6,11 @@ import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants/app_constants.dart';
+import '../../../constants/theme_constants.dart';
 import '../../../models/task_status.dart';
 import '../../../providers/user_provider.dart';
 import '../../../utils/date_utils.dart';
+import '../../../viewmodels/scheduled_viewmodel.dart';
 import '../../scheduled_map_component.dart';
 import '../customDialog.dart';
 import '../customMessageDialog.dart';
@@ -42,6 +44,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   late DateTime? releasedDate;
   late bool isAdmin;
   late TaskListScheduledViewModel taskListScheduledViewModel;
+  late ScheduledViewModel scheduledViewModel;
   late String token;
 
   @override
@@ -63,6 +66,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     taskListScheduledViewModel =
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
     token = Provider.of<UserProvider>(context, listen: false).getToken!;
+    scheduledViewModel =
+        Provider.of<ScheduledViewModel>(context, listen: false);
   }
 
   @override
@@ -72,6 +77,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     numWorkController.dispose();
     releasedDateController.dispose();
     descriptionController.dispose();
+    scheduledViewModel.reset();
     super.dispose();
   }
 
@@ -222,215 +228,236 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     double widthRow = 640;
     double heightRow = 128;
 
-    return Center(
-        child: Column(children: [
-      BoxContainer(
-        width: widthRow * 1.15,
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Text(
-                AppLocalizations.of(context)!.scheduled_main_title,
-                style: const TextStyle(fontSize: 32.0),
-              ),
-              Column(
-                children: [
-                  const SizedBox(height: 24.0),
-                  Text(
-                    AppLocalizations.of(context)!.scheduled_title_input,
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                  const SizedBox(height: 12.0),
-                  CustomTextFormField(
-                    width: widthRow,
-                    hintText: AppLocalizations.of(context)!
-                        .default_placeHolderInputText,
-                    controller: scheduledNumberController,
-                  ),
-                  SizedBox(
-                    width: widthRow,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          children: [
-                            const SizedBox(
-                                height: AppConstants.taskColumnSpace),
-                            Text(
-                              AppLocalizations.of(context)!
-                                  .createTaskPage_startDateTitle,
-                              style: const TextStyle(fontSize: 16.0),
-                            ),
-                            const SizedBox(height: 12.0),
-                            SizedBox(
-                              width: AppConstants.textFieldWidth,
-                              child: InkWell(
-                                overlayColor: MaterialStateColor.resolveWith(
-                                    (states) => Colors.transparent),
-                                onTap: () async {
-                                  final DateTime? pickedDate =
-                                      await showCustomDatePicker(
-                                          context, startDate!);
-                                  if (pickedDate != null) {
-                                    _handleStartDateChange(pickedDate);
-                                  }
-                                },
-                                child: IgnorePointer(
-                                  child: CustomTextFormField(
-                                    width: AppConstants.taskRowSpace,
-                                    hintText: AppLocalizations.of(context)!
-                                        .createTaskPage_startDateTitle,
-                                    controller: addDateController,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Column(
-                          children: [
-                            const SizedBox(
-                                height: AppConstants.taskColumnSpace),
-                            Text(
-                              AppLocalizations.of(context)!
-                                  .scheduled_end_date_title,
-                              style: const TextStyle(fontSize: 16.0),
-                            ),
-                            const SizedBox(height: 12.0),
-                            SizedBox(
-                              width: AppConstants.textFieldWidth,
-                              child: InkWell(
-                                overlayColor: MaterialStateColor.resolveWith(
-                                    (states) => Colors.transparent),
-                                onTap: () async {
-                                  final DateTime? pickedDate =
-                                      await showCustomDatePicker(
-                                          context, startDate!);
-                                  if (pickedDate != null) {
-                                    _handleReleasedDateChange(pickedDate);
-                                  }
-                                },
-                                child: IgnorePointer(
-                                  child: CustomTextFormField(
-                                    useValidation: false,
-                                    width: AppConstants.taskRowSpace,
-                                    hintText: AppLocalizations.of(context)!
-                                        .scheduled_end_date_title,
-                                    controller: releasedDateController,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppConstants.taskRowSpace),
-                        Column(
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)!
-                                  .editTaskPage_statusTitle,
-                              style: const TextStyle(fontSize: 16.0),
-                            ),
-                            const SizedBox(
-                                height: AppConstants.taskColumnSpace),
-                            CustomDropdown(
-                              isStatus: true,
-                              value: taskStatus,
-                              onChanged: (String? value) {
-                                setState(() {
-                                  taskStatus = value!;
-                                });
-                              },
-                              items: TaskStatus.values
-                                  .map((status) => status.value)
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 28),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    AppLocalizations.of(context)!.default_descriptionTitle,
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                  const SizedBox(height: 10.0),
-                  CustomTextFormField(
-                    useValidation: false,
-                    isTextBox: true,
-                    maxLines: 10,
-                    width: widthRow,
-                    //height: heightRow,
-                    hintText: AppLocalizations.of(context)!
-                        .default_descriptionPlaceholder,
-                    controller: descriptionController,
-                  ),
-                  const SizedBox(height: 24.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.scheduled_file_title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Visibility(
-                        visible: isAdmin,
-                        child: SizedBox(
-                          width: widthRow,
-                          child: FileUploadComponent(
-                            onFileAdded:
-                                (List<Map<String, dynamic>> geometries) {
-                              setState(() {
-                                geometriesFromFile = geometries;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                ],
-              ),
-              Visibility(
-                visible: widget.isEdit,
-                child: Column(children: [
-                  Text(
-                    AppLocalizations.of(context)!.inspect_map_title,
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                  const SizedBox(height: 12),
-                  CustomElevatedButton(
-                    onPressed: () async {
-                      _showMapElement(context);
-                    },
-                    text: AppLocalizations.of(context)!.see_map_button,
-                  )
-                ]),
-              )
-            ],
+    return Column(children: [
+      Visibility(
+        visible: widget.isEdit,
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+            child: FloatingActionButton(
+              foregroundColor: primarySwatch,
+              backgroundColor: lightBackground,
+              onPressed: () {
+                scheduledViewModel.reset();
+                Navigator.of(context).pop();
+              },
+              tooltip: AppLocalizations.of(context)!.placeholder_back_button,
+              child: const Icon(Icons.arrow_back),
+            ),
           ),
         ),
       ),
-      const SizedBox(height: AppConstants.taskColumnSpace),
-      CustomElevatedButton(
-        onPressed: () async {
-          if (_formKey.currentState!.validate()) {
-            widget.isEdit ? handleEdit() : handleSubmit();
-          }
-        },
-        text: widget.isEdit
-            ? AppLocalizations.of(context)!.buttonAcceptLabel
-            : AppLocalizations.of(context)!.createTaskPage_submitButton,
-      ),
-    ]));
+      Center(
+          child: Column(children: [
+        BoxContainer(
+          width: widthRow * 1.15,
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.scheduled_main_title,
+                  style: const TextStyle(fontSize: 32.0),
+                ),
+                Column(
+                  children: [
+                    const SizedBox(height: 24.0),
+                    Text(
+                      AppLocalizations.of(context)!.scheduled_title_input,
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(height: 12.0),
+                    CustomTextFormField(
+                      width: widthRow,
+                      hintText: AppLocalizations.of(context)!
+                          .default_placeHolderInputText,
+                      controller: scheduledNumberController,
+                    ),
+                    SizedBox(
+                      width: widthRow,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            children: [
+                              const SizedBox(
+                                  height: AppConstants.taskColumnSpace),
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .createTaskPage_startDateTitle,
+                                style: const TextStyle(fontSize: 16.0),
+                              ),
+                              const SizedBox(height: 12.0),
+                              SizedBox(
+                                width: AppConstants.textFieldWidth,
+                                child: InkWell(
+                                  overlayColor: MaterialStateColor.resolveWith(
+                                      (states) => Colors.transparent),
+                                  onTap: () async {
+                                    final DateTime? pickedDate =
+                                        await showCustomDatePicker(
+                                            context, startDate!);
+                                    if (pickedDate != null) {
+                                      _handleStartDateChange(pickedDate);
+                                    }
+                                  },
+                                  child: IgnorePointer(
+                                    child: CustomTextFormField(
+                                      width: AppConstants.taskRowSpace,
+                                      hintText: AppLocalizations.of(context)!
+                                          .createTaskPage_startDateTitle,
+                                      controller: addDateController,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Column(
+                            children: [
+                              const SizedBox(
+                                  height: AppConstants.taskColumnSpace),
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .scheduled_end_date_title,
+                                style: const TextStyle(fontSize: 16.0),
+                              ),
+                              const SizedBox(height: 12.0),
+                              SizedBox(
+                                width: AppConstants.textFieldWidth,
+                                child: InkWell(
+                                  overlayColor: MaterialStateColor.resolveWith(
+                                      (states) => Colors.transparent),
+                                  onTap: () async {
+                                    final DateTime? pickedDate =
+                                        await showCustomDatePicker(
+                                            context, startDate!);
+                                    if (pickedDate != null) {
+                                      _handleReleasedDateChange(pickedDate);
+                                    }
+                                  },
+                                  child: IgnorePointer(
+                                    child: CustomTextFormField(
+                                      useValidation: false,
+                                      width: AppConstants.taskRowSpace,
+                                      hintText: AppLocalizations.of(context)!
+                                          .scheduled_end_date_title,
+                                      controller: releasedDateController,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppConstants.taskRowSpace),
+                          Column(
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .editTaskPage_statusTitle,
+                                style: const TextStyle(fontSize: 16.0),
+                              ),
+                              const SizedBox(
+                                  height: AppConstants.taskColumnSpace),
+                              CustomDropdown(
+                                isStatus: true,
+                                value: taskStatus,
+                                onChanged: (String? value) {
+                                  setState(() {
+                                    taskStatus = value!;
+                                  });
+                                },
+                                items: TaskStatus.values
+                                    .map((status) => status.value)
+                                    .toList(),
+                              ),
+                              const SizedBox(height: 28),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      AppLocalizations.of(context)!.default_descriptionTitle,
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(height: 10.0),
+                    CustomTextFormField(
+                      useValidation: false,
+                      isTextBox: true,
+                      maxLines: 10,
+                      width: widthRow,
+                      //height: heightRow,
+                      hintText: AppLocalizations.of(context)!
+                          .default_descriptionPlaceholder,
+                      controller: descriptionController,
+                    ),
+                    const SizedBox(height: 24.0),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.scheduled_file_title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Visibility(
+                          visible: isAdmin,
+                          child: SizedBox(
+                            width: widthRow,
+                            child: FileUploadComponent(
+                              onFileAdded:
+                                  (List<Map<String, dynamic>> geometries) {
+                                setState(() {
+                                  geometriesFromFile = geometries;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  ],
+                ),
+                Visibility(
+                  visible: widget.isEdit,
+                  child: Column(children: [
+                    Text(
+                      AppLocalizations.of(context)!.inspect_map_title,
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                    const SizedBox(height: 12),
+                    CustomElevatedButton(
+                      onPressed: () async {
+                        _showMapElement(context);
+                      },
+                      text: AppLocalizations.of(context)!.see_map_button,
+                    )
+                  ]),
+                )
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppConstants.taskColumnSpace),
+        CustomElevatedButton(
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+              widget.isEdit ? handleEdit() : handleSubmit();
+            }
+          },
+          text: widget.isEdit
+              ? AppLocalizations.of(context)!.buttonAcceptLabel
+              : AppLocalizations.of(context)!.createTaskPage_submitButton,
+        ),
+      ]))
+    ]);
   }
 }

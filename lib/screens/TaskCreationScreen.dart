@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
+import '../constants/theme_constants.dart';
 import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../navigation/navigation.dart';
@@ -522,6 +523,25 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
               child: Column(
                 children: [
+                  Visibility(
+                    visible: widget.detail && selectedIndex == 1,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+                        child: FloatingActionButton(
+                          foregroundColor: primarySwatch,
+                          backgroundColor: lightBackground,
+                          onPressed: () {
+                            handleCancel();
+                          },
+                          tooltip: AppLocalizations.of(context)!
+                              .placeholder_back_button,
+                          child: const Icon(Icons.arrow_back),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 12.0),
                   Visibility(
                     visible: !widget.detail,
