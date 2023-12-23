@@ -130,6 +130,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     context.read<CatchmentViewModel>().reset();
   }
 
+  void _SoftClearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("is_loading", false);
+    prefs.setInt("actual_page", 1);
+  }
+
   @override
   void initState() {
     super.initState();

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -87,6 +89,35 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       _isLoading = true;
       _error = false;
 
+      final responseListTask =
+          await _scheduledService.getScheduledTasks(token, page, size, status);
+
+      _tasks[status]?.addAll(responseListTask!);
+      final size_list = responseListTask?.length ?? 0;
+      if (size_list > 0) {
+        page++;
+      }
+      _SetActualPage(page);
+
+      return responseListTask;
+    } catch (error) {
+      _error = true;
+      print(error);
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<List<TaskScheduled>?> fetchNextPageTasksFilteredScheduled(
+      String token, String status, String encodedBody) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      /*Map<String,dynamic> body = json.decode(encodedBody);*/
+
+      //Se esta esperando que se implemente el search scheduled en el backend
       final responseListTask =
           await _scheduledService.getScheduledTasks(token, page, size, status);
 

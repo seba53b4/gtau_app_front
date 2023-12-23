@@ -60,15 +60,21 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
     int actualPage = prefs.getInt("actual_page") ?? 0;
-    if (newTasksLength == (value * actualPage) - 1) {
-      nextPage = false;
+    /*print('actual page size = $newTasksLength');
+    final shitte  = (value * actualPage) - actualPage;
+    print('actual page size to succ = $shitte');*/
+    
+    if (newTasksLength == (value * actualPage) - actualPage) {
+      nextPage = true;
     }
   }
 
   Future<bool> _checkExistNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
-    if (newTasksLength == value - 1) {
+    int actualPage = prefs.getInt("actual_page") ?? 0;
+    
+    if (newTasksLength == (value * actualPage) - actualPage) {
       return false;
     }
     return true;
@@ -124,13 +130,13 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
         token, status!);
   }
 
-  // Future updateTaskListFilteredState(BuildContext context,
-  //     String encodedBody) async {
-  //   final userName = taskFilterProvider?.userNameFilter;
-  //   final status = taskFilterProvider?.lastStatus;
-  //   await taskListScheduledViewModel?.nextPageFilteredListByStatus(
-  //       context, status!, userName, encodedBody);
-  // }
+   Future updateTaskListFilteredState(BuildContext context,
+       String encodedBody) async {
+     final userName = taskFilterProvider?.userNameFilter;
+     final status = taskFilterProvider?.lastStatus;
+     await taskListScheduledViewModel?.fetchNextPageTasksFilteredScheduled(
+         token, status!, encodedBody);
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -166,17 +172,25 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                           ScrollController(initialScrollOffset: position);
                       controller.addListener(_ScrollPosition);
                       controller.addListener(() {
+                        /*final lengthbool = tasks!.length % taskListSize! == 0;
+                        
+                        if((controller.position.maxScrollExtent ==
+                                controller.offset) ){
+                          print('scroll llegado, cumple largo: $lengthbool');
+                          print('scroll llegado, cumple nextPage: $nextPage');
+                          print('scroll llegado, cumple tasksLength: $tasksLength');
+                        }*/
                         if ((controller.position.maxScrollExtent ==
                                 controller.offset) &&
                             tasks!.length % taskListSize! == 0 &&
                             nextPage) {
                           if (isFiltered == true) {
-                            // setState(() {
-                            //   final encodedBodyFiltered =
-                            //       snapshot.data?[2] as String;
-                            //   updateTaskListFilteredState(
-                            //       context, encodedBodyFiltered);
-                            // });
+                            setState(() {
+                               final encodedBodyFiltered =
+                                   snapshot.data?[2] as String;
+                               updateTaskListFilteredState(
+                                   context, encodedBodyFiltered);
+                            });
                           } else {
                             setState(() {
                               updateTaskListState(context);
@@ -186,7 +200,6 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                           _SetActualTasksLength(tasksLength);
                         }
                       });
-
                       return Column(
                         children: [
                           Expanded(
@@ -239,8 +252,6 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                                         fontSize: 15)),
                                           ]))),
                                     );
-
-                                    ;
                                   } else {
                                     if (tasks.length % taskListSize! == 0 &&
                                         nextPage) {
@@ -254,6 +265,10 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                               var existNextPage =
                                                   snapshot.data?[0] ?? true;
                                               if (existNextPage == true) {
+                                                /*final tasksize = tasks.length;
+                                                print('existe pag: $existNextPage');
+                                                print('existe pag sieze: $tasksLength');
+                                                print('existe pag sieze: $nextPage');*/
                                                 return Padding(
                                                     padding: const EdgeInsets
                                                         .symmetric(vertical: 5),
@@ -277,28 +292,32 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                     } else {
                                       if (actualPage > 1) {
                                         return Padding(
-                                            padding: const EdgeInsets.symmetric(
+                                            padding: 
+                                            const EdgeInsets.symmetric(
                                                 vertical: 5),
                                             child: Center(
-                                                child:
-                                                    Column(children: <Widget>[
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 10),
-                                                child: SvgPicture.asset(
-                                                    'lib/assets/taskslist_empty.svg',
-                                                    width: 50,
-                                                    height: 50),
-                                              ),
-                                              Text(
-                                                  AppLocalizations.of(context)!
-                                                      .no_more_tasks_found,
-                                                  style: TextStyle(
-                                                      color: Colors.black
-                                                          .withOpacity(0.6),
-                                                      fontSize: 15)),
-                                            ])));
+                                                child: Column(
+                                                  children: <Widget>[
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                            vertical: 10),
+                                                    child: SvgPicture.asset(
+                                                        'lib/assets/taskslist_empty.svg',
+                                                        width: 50,
+                                                        height: 50),
+                                                  ),
+                                                  Text(
+                                                      AppLocalizations.of(context)!
+                                                          .no_more_tasks_found,
+                                                      style: TextStyle(
+                                                          color: Colors.black
+                                                              .withOpacity(0.6),
+                                                          fontSize: 15)),
+                                                ]
+                                              )
+                                            )
+                                          );
                                       } else {
                                         return const Padding(
                                           padding:

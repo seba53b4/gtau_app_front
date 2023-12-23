@@ -64,7 +64,9 @@ class _TaskListComponentState extends State<TaskList> {
   Future<bool> _checkExistNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
-    if (newTasksLength == value - 1) {
+    int actualPage = prefs.getInt("actual_page") ?? 0;
+    
+    if (newTasksLength == (value * actualPage) - actualPage) {
       return false;
     }
     return true;
@@ -161,6 +163,14 @@ class _TaskListComponentState extends State<TaskList> {
                           ScrollController(initialScrollOffset: position);
                       controller.addListener(_ScrollPosition);
                       controller.addListener(() {
+                        /*final lengthbool = tasks!.length % taskListSize! == 0;
+                        
+                        if((controller.position.maxScrollExtent ==
+                                controller.offset) ){
+                          print('scroll llegado, cumple largo: $lengthbool');
+                          print('scroll llegado, cumple nextPage: $nextPage');
+                          print('scroll llegado, cumple tasksLength: $tasksLength');
+                        }*/
                         if ((controller.position.maxScrollExtent ==
                             controller.offset) &&
                             tasks!.length % taskListSize! == 0 &&
@@ -241,8 +251,6 @@ class _TaskListComponentState extends State<TaskList> {
                                           )
                                       ),
                                     );
-
-                                    ;
                                   } else {
                                     if (tasks.length % taskListSize! == 0 &&
                                         nextPage) {
