@@ -56,19 +56,18 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
     prefs.setInt("tasks_length", length);
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, change the nextPage flag to false */
   void _checkNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
     int actualPage = prefs.getInt("actual_page") ?? 0;
-    /*print('actual page size = $newTasksLength');
-    final shitte  = (value * actualPage) - actualPage;
-    print('actual page size to succ = $shitte');*/
     
     if (newTasksLength == (value * actualPage) - actualPage) {
       nextPage = true;
     }
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, returns false. Otherwise, it returns true */
   Future<bool> _checkExistNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
@@ -132,7 +131,6 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
 
    Future updateTaskListFilteredState(BuildContext context,
        String encodedBody) async {
-     final userName = taskFilterProvider?.userNameFilter;
      final status = taskFilterProvider?.lastStatus;
      await taskListScheduledViewModel?.fetchNextPageTasksFilteredScheduled(
          token, status!, encodedBody);
@@ -172,14 +170,6 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                           ScrollController(initialScrollOffset: position);
                       controller.addListener(_ScrollPosition);
                       controller.addListener(() {
-                        /*final lengthbool = tasks!.length % taskListSize! == 0;
-                        
-                        if((controller.position.maxScrollExtent ==
-                                controller.offset) ){
-                          print('scroll llegado, cumple largo: $lengthbool');
-                          print('scroll llegado, cumple nextPage: $nextPage');
-                          print('scroll llegado, cumple tasksLength: $tasksLength');
-                        }*/
                         if ((controller.position.maxScrollExtent ==
                                 controller.offset) &&
                             tasks!.length % taskListSize! == 0 &&
@@ -265,10 +255,6 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                               var existNextPage =
                                                   snapshot.data?[0] ?? true;
                                               if (existNextPage == true) {
-                                                /*final tasksize = tasks.length;
-                                                print('existe pag: $existNextPage');
-                                                print('existe pag sieze: $tasksLength');
-                                                print('existe pag sieze: $nextPage');*/
                                                 return Padding(
                                                     padding: const EdgeInsets
                                                         .symmetric(vertical: 5),
@@ -327,7 +313,6 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                     }
                                   }
                                 }
-                                return null;
                               },
                             ),
                           ),

@@ -52,6 +52,7 @@ class _TaskListComponentState extends State<TaskList> {
     prefs.setInt("tasks_length", length);
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, change the nextPage flag to false. */
   void _checkNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
@@ -61,6 +62,7 @@ class _TaskListComponentState extends State<TaskList> {
     }
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, returns false. Otherwise, it returns true. */
   Future<bool> _checkExistNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
@@ -163,14 +165,6 @@ class _TaskListComponentState extends State<TaskList> {
                           ScrollController(initialScrollOffset: position);
                       controller.addListener(_ScrollPosition);
                       controller.addListener(() {
-                        /*final lengthbool = tasks!.length % taskListSize! == 0;
-                        
-                        if((controller.position.maxScrollExtent ==
-                                controller.offset) ){
-                          print('scroll llegado, cumple largo: $lengthbool');
-                          print('scroll llegado, cumple nextPage: $nextPage');
-                          print('scroll llegado, cumple tasksLength: $tasksLength');
-                        }*/
                         if ((controller.position.maxScrollExtent ==
                             controller.offset) &&
                             tasks!.length % taskListSize! == 0 &&
@@ -325,7 +319,6 @@ class _TaskListComponentState extends State<TaskList> {
                                     }
                                   }
                                 }
-                                return null;
                               },
                             ),
                           ),
