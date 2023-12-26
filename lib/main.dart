@@ -11,7 +11,9 @@ import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/images_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:provider/provider.dart';
 import "package:universal_html/html.dart" as html;
@@ -42,6 +44,9 @@ Future<void> main() async {
         ChangeNotifierProvider<TaskListViewModel>(
           create: (context) => TaskListViewModel(),
         ),
+        ChangeNotifierProvider<TaskListScheduledViewModel>(
+          create: (context) => TaskListScheduledViewModel(),
+        ),
         ChangeNotifierProvider<ImagesViewModel>(
           create: (context) => ImagesViewModel(),
         ),
@@ -59,6 +64,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<LotViewModel>(
           create: (context) => LotViewModel(),
+        ),
+        ChangeNotifierProvider<ScheduledViewModel>(
+          create: (context) => ScheduledViewModel(),
         ),
       ],
       child: MyApp(),

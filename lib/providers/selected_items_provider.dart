@@ -56,6 +56,7 @@ class SelectedItemsProvider with ChangeNotifier {
   }
 
   void toggleCircleSelected(CircleId circleId, ElementType type) {
+
     var circleList = getCircleList(type);
     if (circleList.contains(circleId)) {
       circleList.remove(circleId);

@@ -113,7 +113,8 @@
     "form_scheduled_no_data": "Sin Datos",
     "form_scheduled_cota": "Cota de tapa",
     "form_scheduled_depth": "Profundidad (m)",
-    "form_scheduled_diam": "Diámetro (m)",
+    "form_scheduled_diam1": "Diámetro 1 (m)",
+    "form_scheduled_diam2": "Diámetro 2 (m)",
     "form_scheduled_longitude": "Longitud (m)",
     "form_scheduled_sediment_level": "Niveles de sedimentación",
     "form_scheduled_sediment_level_1": "0 - 15 %",
@@ -162,5 +163,8 @@
     "scheduled_title_input": "Título",
     "scheduled_end_date_title" : "Fecha de Fin",
     "dialogContent_deleteImage" : "¿Desea eliminar esta(s) imagen(es)?",
-    "file_upload_btn": "Seleccionar"
+    "file_upload_btn": "Seleccionar",
+    "placeholder_back_button": "Retroceder",
+    "inspect_map_title": "Inspeccionar Zona",
+    "see_map_button": "Ver mapa"
 }

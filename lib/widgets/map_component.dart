@@ -58,7 +58,7 @@ class _MapComponentState extends State<MapComponent> {
   double zoomMap = 16;
   late Completer<GoogleMapController> _mapController;
   bool viewDetailElementInfo = false;
-  double modalWidth = 300.0;
+  double modalWidth = 320.0;
   late double mapWidth;
   late double mapInit;
   late SelectedItemsProvider selectedItemsProvider;
@@ -637,7 +637,7 @@ class _MapComponentState extends State<MapComponent> {
                         LoadingOverlay(
                           isLoading: isMapLoading && !viewDetailElementInfo,
                           child: Positioned(
-                            top: kIsWeb ? null : 80,
+                            top: kIsWeb ? null : 50,
                             right: kIsWeb ? null : 16,
                             bottom: kIsWeb ? 80 : null,
                             left: kIsWeb ? 16 : null,
