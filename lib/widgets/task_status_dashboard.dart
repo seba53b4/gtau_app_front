@@ -54,6 +54,12 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
     return prefs.clear();
   }
 
+  void _SoftClearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("is_loading", false);
+    prefs.setInt("actual_page", 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     taskFilterProvider.setUserNameFilter(widget.userName);

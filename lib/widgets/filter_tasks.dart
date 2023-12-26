@@ -62,6 +62,13 @@ class _FilterTasksState extends State<FilterTasks> {
     return prefs.clear();
   }
 
+  void _SoftClearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    //prefs.setBool("is_loading", false);
+    prefs.setInt("actual_page", 1);
+    prefs.setInt("tasks_length", 0);
+  }
+
   Future resetTaskList() async {
     final userName =
         Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
@@ -202,9 +209,11 @@ class _FilterTasksState extends State<FilterTasks> {
                                 const SizedBox(width: 10.0),
                                 CustomElevatedButton(
                                   onPressed: () {
+                                    resetTaskList();
                                     _ResetScrollPosition();
                                     _SetFilteredValue(true);
                                     context.read<TaskFilterProvider>().search();
+                                    _SoftClearPref();
                                     updateTaskList();
                                     Navigator.of(context).pop();
                                   },

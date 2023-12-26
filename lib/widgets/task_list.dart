@@ -52,6 +52,7 @@ class _TaskListComponentState extends State<TaskList> {
     prefs.setInt("tasks_length", length);
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, change the nextPage flag to false. */
   void _checkNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
@@ -61,10 +62,13 @@ class _TaskListComponentState extends State<TaskList> {
     }
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, returns false. Otherwise, it returns true. */
   Future<bool> _checkExistNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
-    if (newTasksLength == value - 1) {
+    int actualPage = prefs.getInt("actual_page") ?? 0;
+    
+    if (newTasksLength == (value * actualPage) - actualPage) {
       return false;
     }
     return true;
@@ -241,8 +245,6 @@ class _TaskListComponentState extends State<TaskList> {
                                           )
                                       ),
                                     );
-
-                                    ;
                                   } else {
                                     if (tasks.length % taskListSize! == 0 &&
                                         nextPage) {
@@ -317,7 +319,6 @@ class _TaskListComponentState extends State<TaskList> {
                                     }
                                   }
                                 }
-                                return null;
                               },
                             ),
                           ),
