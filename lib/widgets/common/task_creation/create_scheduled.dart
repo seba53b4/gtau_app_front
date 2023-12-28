@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../constants/app_constants.dart';
 import '../../../constants/theme_constants.dart';
+import '../../../models/scheduled/zone.dart';
 import '../../../models/task_status.dart';
 import '../../../providers/user_provider.dart';
 import '../../../utils/date_utils.dart';
@@ -46,6 +47,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late ScheduledViewModel scheduledViewModel;
   late String token;
+  late bool isZoneLoaded = false;
 
   @override
   void initState() {
@@ -97,6 +99,13 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       return null;
     });
     loadInfoFromTaskScheduledResponse(taskScheduled);
+
+    ScheduledZone? scheduledZone = await scheduledViewModel
+        .fetchZoneFromScheduled(token, widget.scheduledId!);
+
+    setState(() {
+      isZoneLoaded = scheduledZone != null;
+    });
   }
 
   void loadInfoFromTaskScheduledResponse(TaskScheduled? taskScheduled) {
@@ -430,7 +439,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                   ],
                 ),
                 Visibility(
-                  visible: widget.isEdit,
+                  visible: widget.isEdit && isZoneLoaded,
                   child: Column(children: [
                     Text(
                       AppLocalizations.of(context)!.inspect_map_title,

@@ -8,6 +8,8 @@ import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/scheduled/zone.dart';
+
 class ScheduledElements {
   List<RegisterScheduled> registers;
   List<SectionScheduled> sections;
@@ -316,26 +318,46 @@ class ScheduledService {
     }
   }
 
-// Future<bool> createSheduledTask(
-//     String token, Map<String, dynamic> body) async {
-//   try {
-//     final String jsonBody = jsonEncode(body);
-//     final url = Uri.parse(baseUrl);
-//     final response =
-//         await http.post(url, headers: _getHeaders(token), body: jsonBody);
-//
-//     if (response.statusCode == 201) {
-//       print('Tarea ha sido creada correctamente');
-//       return true;
-//     } else {
-//       print('No se pudieron traer datos');
-//       return false;
-//     }
-//   } catch (error) {
-//     if (kDebugMode) {
-//       print('Error in createTask: $error');
-//     }
-//     rethrow;
-//   }
-// }
+  Future<bool> createScheduledZone(
+      String token, int scheduledId, Map<String, dynamic> body) async {
+    try {
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse('$baseUrl/$scheduledId/zona');
+      final response =
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in createTask: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<ScheduledZone?> fetchZoneFromScheduled(
+      String token, int scheduledId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/zona');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return ScheduledZone.fromJson(json: jsonResponse);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener zone: $error');
+      }
+      rethrow;
+    }
+  }
 }
