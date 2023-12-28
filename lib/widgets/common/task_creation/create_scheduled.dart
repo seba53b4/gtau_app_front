@@ -32,7 +32,7 @@ class ScheduledComponent extends StatefulWidget {
 }
 
 class _CreateScheduledState extends State<ScheduledComponent> {
-  final scheduledNumberController = TextEditingController();
+  final titleController = TextEditingController();
   final addDateController = TextEditingController();
   final releasedDateController = TextEditingController();
   final numWorkController = TextEditingController();
@@ -72,7 +72,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   @override
   void dispose() {
-    scheduledNumberController.dispose();
+    titleController.dispose();
     addDateController.dispose();
     numWorkController.dispose();
     releasedDateController.dispose();
@@ -101,6 +101,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   void loadInfoFromTaskScheduledResponse(TaskScheduled? taskScheduled) {
     if (taskScheduled != null) {
+      titleController.text = taskScheduled.title ?? '';
       startDate = taskScheduled.addDate!;
       taskStatus = taskScheduled.status!;
       descriptionController.text = taskScheduled.description!;
@@ -146,7 +147,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         : null;
 
     return {
-      // Falta el título
+      "title": titleController.text,
       "status": taskStatus,
       "description": descriptionController.text,
       "releasedDate": releasedDateUpdated,
@@ -275,7 +276,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       width: widthRow,
                       hintText: AppLocalizations.of(context)!
                           .default_placeHolderInputText,
-                      controller: scheduledNumberController,
+                      controller: titleController,
                     ),
                     SizedBox(
                       width: widthRow,

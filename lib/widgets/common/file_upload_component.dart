@@ -56,6 +56,7 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
           geoJsonSrc.addAll(geometries);
           fileName = result.files.first.name;
         });
+        widget.onFileAdded(geometries);
       } else {
         print('El GeoJSON no contiene la clave "features" o no es una lista.');
       }
