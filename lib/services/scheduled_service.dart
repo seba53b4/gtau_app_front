@@ -239,7 +239,7 @@ class ScheduledService {
     }
   }
 
-  Future<bool> createScheduledTask(
+  Future<TaskScheduled?> createScheduledTask(
       String token, Map<String, dynamic> body) async {
     try {
       final String jsonBody = jsonEncode(body);
@@ -249,10 +249,11 @@ class ScheduledService {
 
       if (response.statusCode == 201) {
         print('Tarea ha sido creada correctamente');
-        return true;
+        final data = json.decode(response.body);
+        return TaskScheduled.fromJson(json: data);
       } else {
         print('No se pudieron traer datos');
-        return false;
+        return null;
       }
     } catch (error) {
       if (kDebugMode) {
@@ -325,9 +326,9 @@ class ScheduledService {
       final url = Uri.parse('$baseUrl/$scheduledId/zona');
       final response =
           await http.post(url, headers: _getHeaders(token), body: jsonBody);
-
+      String resultText = response.body;
       if (response.statusCode == 200) {
-        return true;
+        return resultText.trim().toLowerCase() == 'true';
       } else {
         return false;
       }

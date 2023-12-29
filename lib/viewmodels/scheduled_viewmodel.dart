@@ -41,9 +41,6 @@ class ScheduledViewModel extends ChangeNotifier {
 
   ScheduledZone? get scheduledZone => _scheduledZone;
 
-  int _page = 0;
-  int _size = kIsWeb ? 12 : 10;
-
   LatLng getPosition() {
     return _initPosition ?? initLocation;
   }
@@ -279,7 +276,7 @@ class ScheduledViewModel extends ChangeNotifier {
       _isLoading = true;
 
       notifyListeners();
-      final response =
+      bool response =
           await _scheduledService.createScheduledZone(token, scheduledId, body);
       return response;
     } catch (error) {

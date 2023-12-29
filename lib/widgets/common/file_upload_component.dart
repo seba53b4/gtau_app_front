@@ -7,7 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'custom_elevated_button.dart';
 
 class FileUploadComponent extends StatefulWidget {
-  final Function(List<Map<String, dynamic>>) onFileAdded;
+  final Function(Map<String, dynamic>) onFileAdded;
 
   const FileUploadComponent({Key? key, required this.onFileAdded})
       : super(key: key);
@@ -17,13 +17,13 @@ class FileUploadComponent extends StatefulWidget {
 }
 
 class _FileUploadComponentState extends State<FileUploadComponent> {
-  late List<Map<String, dynamic>> geoJsonSrc;
+  late Map<String, dynamic> geoJsonSrc;
   late String fileName = 'No agregado';
 
   @override
   void initState() {
     super.initState();
-    geoJsonSrc = [];
+    geoJsonSrc = {};
   }
 
   _pickAFile() async {
@@ -37,29 +37,26 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
 
       Map<String, dynamic> geoJsonMap = json.decode(fileContent);
 
-      if (geoJsonMap.containsKey('features') &&
-          geoJsonMap['features'] is List) {
-        List<dynamic> features = geoJsonMap['features'];
+      // if (geoJsonMap.containsKey('features') &&
+      //     geoJsonMap['features'] is List) {
+      //   List<dynamic> features = geoJsonMap['features'];
+      //
+      //   Map<String, dynamic> geometries = [];
+      //
+      //   for (var feature in features) {
+      //     if (feature is Map<String, dynamic> &&
+      //         feature.containsKey('geometry') &&
+      //         feature['geometry'] is Map<String, dynamic>) {
+      //       Map<String, dynamic> geometry = feature['geometry'];
+      //       geometries.add(geometry);
+      //     }
+      //   }
 
-        List<Map<String, dynamic>> geometries = [];
-
-        for (var feature in features) {
-          if (feature is Map<String, dynamic> &&
-              feature.containsKey('geometry') &&
-              feature['geometry'] is Map<String, dynamic>) {
-            Map<String, dynamic> geometry = feature['geometry'];
-            geometries.add(geometry);
-          }
-        }
-
-        setState(() {
-          geoJsonSrc.addAll(geometries);
-          fileName = result.files.first.name;
-        });
-        widget.onFileAdded(geometries);
-      } else {
-        print('El GeoJSON no contiene la clave "features" o no es una lista.');
-      }
+      setState(() {
+        geoJsonSrc.addAll(geoJsonMap);
+        fileName = result.files.first.name;
+      });
+      widget.onFileAdded(geoJsonMap);
     } else {
       print('Selección de archivo cancelada.');
     }

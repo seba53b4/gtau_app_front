@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -139,21 +137,22 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> createScheduledTask(
+  Future<TaskScheduled?> createScheduledTask(
       String token, Map<String, dynamic> body) async {
     try {
       _isLoading = true;
       _error = false;
       notifyListeners();
-      final response = await _scheduledService.createScheduledTask(token, body);
-      if (response) {
+      TaskScheduled? response =
+          await _scheduledService.createScheduledTask(token, body);
+      if (response != null) {
         print('Tarea Programada ha sido creada correctamente');
         notifyListeners();
-        return true;
+        return response;
       } else {
         _error = true;
         print('No se pudieron traer datos');
-        return false;
+        return null;
       }
     } catch (error) {
       _error = true;

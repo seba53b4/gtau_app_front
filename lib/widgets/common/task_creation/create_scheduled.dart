@@ -12,6 +12,7 @@ import '../../../models/task_status.dart';
 import '../../../providers/user_provider.dart';
 import '../../../utils/date_utils.dart';
 import '../../../viewmodels/scheduled_viewmodel.dart';
+import '../../../viewmodels/zone_load_viewmodel.dart';
 import '../../scheduled_map_component.dart';
 import '../customDialog.dart';
 import '../customMessageDialog.dart';
@@ -39,13 +40,14 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   final numWorkController = TextEditingController();
   final descriptionController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late List<Map<String, dynamic>> geometriesFromFile = [];
+  late Map<String, dynamic> geojsonFromFile = {};
   late String taskStatus = 'PENDING';
   late DateTime? startDate;
   late DateTime? releasedDate;
   late bool isAdmin;
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late ScheduledViewModel scheduledViewModel;
+  late ZoneLoadViewModel zoneLoadViewModel;
   late String token;
   late bool isZoneLoaded = false;
 
@@ -70,6 +72,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     token = Provider.of<UserProvider>(context, listen: false).getToken!;
     scheduledViewModel =
         Provider.of<ScheduledViewModel>(context, listen: false);
+    zoneLoadViewModel = ZoneLoadViewModel();
   }
 
   @override
@@ -185,17 +188,10 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     );
   }
 
-  Future<bool> handleAcceptOnShowDialogCreateTask() async {
+  Future<TaskScheduled?> handleAcceptOnShowDialogCreateTask() async {
     Map<String, dynamic> body = bodyScheduledTask();
-    bool isUpdated =
-        await taskListScheduledViewModel.createScheduledTask(token, body);
-    if (isUpdated) {
-      await showMessageDialog(DialogMessageType.success);
-      return true;
-    } else {
-      await showMessageDialog(DialogMessageType.error);
-      return false;
-    }
+
+    return await taskListScheduledViewModel.createScheduledTask(token, body);
   }
 
   void handleSubmit() {
@@ -203,7 +199,26 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       Navigator.of(context).pop();
     }, acceptPressed: () async {
       Navigator.of(context).pop();
-      await handleAcceptOnShowDialogCreateTask();
+      TaskScheduled? taskScheduledResponse =
+          await handleAcceptOnShowDialogCreateTask();
+      print('taskCreated succesfully: $taskScheduledResponse');
+      print(geojsonFromFile.toString());
+      var zoneCreated = false;
+      if (taskScheduledResponse != null) {
+        zoneCreated = await scheduledViewModel.createScheduledZone(
+            token, taskScheduledResponse.id!, geojsonFromFile);
+        print('zoneCreated succesfully: $zoneCreated');
+        // zoneLoadViewModel.sendMessage(
+        //     'SCHEDULED_CHARGE', 'start', widget.scheduledId!);
+      }
+
+      if (taskScheduledResponse != null && zoneCreated) {
+        await showMessageDialog(DialogMessageType.success);
+        return true;
+      } else {
+        await showMessageDialog(DialogMessageType.error);
+        return false;
+      }
     });
   }
 
@@ -403,38 +418,36 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       isTextBox: true,
                       maxLines: 10,
                       width: widthRow,
-                      //height: heightRow,
                       hintText: AppLocalizations.of(context)!
                           .default_descriptionPlaceholder,
                       controller: descriptionController,
                     ),
                     const SizedBox(height: 24.0),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.scheduled_file_title,
-                          style: const TextStyle(
-                            fontSize: 16,
+                    Visibility(
+                      visible: isAdmin && !isZoneLoaded,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.scheduled_file_title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Visibility(
-                          visible: isAdmin,
-                          child: SizedBox(
+                          const SizedBox(height: 12),
+                          SizedBox(
                             width: widthRow,
                             child: FileUploadComponent(
-                              onFileAdded:
-                                  (List<Map<String, dynamic>> geometries) {
+                              onFileAdded: (Map<String, dynamic> fileContent) {
                                 setState(() {
-                                  geometriesFromFile = geometries;
+                                  geojsonFromFile = fileContent;
                                 });
                               },
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
+                          const SizedBox(height: 12),
+                        ],
+                      ),
                     ),
                   ],
                 ),
