@@ -72,7 +72,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     token = Provider.of<UserProvider>(context, listen: false).getToken!;
     scheduledViewModel =
         Provider.of<ScheduledViewModel>(context, listen: false);
-    zoneLoadViewModel = ZoneLoadViewModel();
   }
 
   @override
@@ -202,14 +201,19 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       TaskScheduled? taskScheduledResponse =
           await handleAcceptOnShowDialogCreateTask();
       print('taskCreated succesfully: $taskScheduledResponse');
-      print(geojsonFromFile.toString());
       var zoneCreated = false;
       if (taskScheduledResponse != null) {
         zoneCreated = await scheduledViewModel.createScheduledZone(
             token, taskScheduledResponse.id!, geojsonFromFile);
         print('zoneCreated succesfully: $zoneCreated');
-        // zoneLoadViewModel.sendMessage(
-        //     'SCHEDULED_CHARGE', 'start', widget.scheduledId!);
+        zoneLoadViewModel = ZoneLoadViewModel();
+        await zoneLoadViewModel.waitForWebSocketConnection();
+        zoneLoadViewModel.sendMessage(
+            token: token,
+            operation: 'start',
+            type: 'SCHEDULED_CHARGE',
+            id: widget.scheduledId!);
+        //zoneLoadViewModel.closeWebSocket();
       }
 
       if (taskScheduledResponse != null && zoneCreated) {
