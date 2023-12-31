@@ -212,7 +212,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
             token: token,
             operation: 'start',
             type: 'SCHEDULED_CHARGE',
-            id: widget.scheduledId!);
+            id: taskScheduledResponse.id!);
         //zoneLoadViewModel.closeWebSocket();
       }
 
