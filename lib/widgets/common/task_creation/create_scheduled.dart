@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants/app_constants.dart';
@@ -50,6 +51,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   late ZoneLoadViewModel zoneLoadViewModel;
   late String token;
   late bool isZoneLoaded = false;
+  late bool creatingScheduled = false;
+  late TaskScheduled? taskScheduledResponse = null;
+  late bool? zoneCreated = null;
 
   @override
   void initState() {
@@ -198,32 +202,44 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       Navigator.of(context).pop();
     }, acceptPressed: () async {
       Navigator.of(context).pop();
-      TaskScheduled? taskScheduledResponse =
-          await handleAcceptOnShowDialogCreateTask();
-      print('taskCreated succesfully: $taskScheduledResponse');
-      var zoneCreated = false;
+      setState(() {
+        creatingScheduled = true;
+      });
+      TaskScheduled? taskCreated = await handleAcceptOnShowDialogCreateTask();
+      setState(() {
+        taskScheduledResponse = taskCreated;
+      });
+
       if (taskScheduledResponse != null) {
-        zoneCreated = await scheduledViewModel.createScheduledZone(
-            token, taskScheduledResponse.id!, geojsonFromFile);
-        print('zoneCreated succesfully: $zoneCreated');
-        zoneLoadViewModel = ZoneLoadViewModel();
-        await zoneLoadViewModel.waitForWebSocketConnection();
-        zoneLoadViewModel.sendMessage(
-            token: token,
-            operation: 'start',
-            type: 'SCHEDULED_CHARGE',
-            id: taskScheduledResponse.id!);
-        //zoneLoadViewModel.closeWebSocket();
+        bool created = await scheduledViewModel.createScheduledZone(
+            token, taskScheduledResponse!.id!, geojsonFromFile);
+        setState(() {
+          zoneCreated = created;
+        });
+        await manageLoadZoneProcess(taskScheduledResponse!);
       }
 
-      if (taskScheduledResponse != null && zoneCreated) {
-        await showMessageDialog(DialogMessageType.success);
-        return true;
-      } else {
-        await showMessageDialog(DialogMessageType.error);
-        return false;
-      }
+      // if (taskScheduledResponse != null &&
+      //     zoneCreated != null &&
+      //     zoneCreated!) {
+      //   await showMessageDialog(DialogMessageType.success);
+      //   return true;
+      // } else {
+      //   await showMessageDialog(DialogMessageType.error);
+      //   return false;
+      // }
     });
+  }
+
+  Future<void> manageLoadZoneProcess(
+      TaskScheduled taskScheduledResponse) async {
+    zoneLoadViewModel = Provider.of<ZoneLoadViewModel>(context, listen: false);
+    await zoneLoadViewModel.waitForWebSocketConnection();
+    zoneLoadViewModel.sendMessage(
+        token: token,
+        operation: 'start',
+        type: 'SCHEDULED_CHARGE',
+        id: taskScheduledResponse.id!);
   }
 
   Future<bool> handleAcceptOnShowDialogEditTask() async {
@@ -428,7 +444,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                     ),
                     const SizedBox(height: 24.0),
                     Visibility(
-                      visible: isAdmin && !isZoneLoaded,
+                      visible: isAdmin && !isZoneLoaded && !creatingScheduled,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -470,7 +486,209 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       text: AppLocalizations.of(context)!.see_map_button,
                     )
                   ]),
-                )
+                ),
+                Visibility(
+                  visible: creatingScheduled,
+                  child: SizedBox(
+                    height: 150,
+                    child: Center(child: Consumer<ScheduledViewModel>(
+                      builder: (context, scheduledViewModel, child) {
+                        return Consumer<TaskListScheduledViewModel>(
+                          builder:
+                              (context, taskListScheduledViewModel, child) {
+                            return Consumer<ZoneLoadViewModel>(
+                              builder: (context, zoneLoadViewModel, child) {
+                                return Visibility(
+                                  visible: true,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          zoneLoadViewModel.warning
+                                              ? Text(zoneLoadViewModel.message!)
+                                              : const Text(
+                                                  'Se esta procesando. Este proceso puede demorar unos minutos.'),
+                                          const SizedBox(height: 4),
+                                          Visibility(
+                                            visible:
+                                                zoneLoadViewModel.isLoading ||
+                                                    zoneLoadViewModel
+                                                            .connectionStatus ==
+                                                        SocketConnectionStatus
+                                                            .connecting,
+                                            child: const Center(
+                                              child: CircularProgressIndicator(
+                                                color: Color.fromRGBO(
+                                                    96, 166, 27, 1),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text(
+                                              'Creación de Programada: '),
+                                          Visibility(
+                                            visible: taskListScheduledViewModel
+                                                .isLoading,
+                                            child:
+                                                LoadingAnimationWidget.waveDots(
+                                              color: primarySwatch[400]!,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          Visibility(
+                                              visible:
+                                                  !taskListScheduledViewModel
+                                                      .isLoading,
+                                              child: taskScheduledResponse !=
+                                                      null
+                                                  ? Icon(Icons.check_circle,
+                                                      color:
+                                                          primarySwatch[400]!,
+                                                      size: 20)
+                                                  : const Icon(Icons.error,
+                                                      color: Colors.red,
+                                                      size: 20)),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text('Creando Zonas: '),
+                                          Visibility(
+                                            visible:
+                                                scheduledViewModel.isLoading,
+                                            child:
+                                                LoadingAnimationWidget.waveDots(
+                                              color: primarySwatch[400]!,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          Visibility(
+                                              visible:
+                                                  !scheduledViewModel.isLoading,
+                                              child: zoneCreated != null &&
+                                                      zoneCreated!
+                                                  ? Icon(Icons.check_circle,
+                                                      color:
+                                                          primarySwatch[400]!,
+                                                      size: 20)
+                                                  : const Icon(Icons.error,
+                                                      color: Colors.red,
+                                                      size: 20)),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text('Tramos: '),
+                                          Visibility(
+                                            visible: zoneLoadViewModel
+                                                .isLoadingSections,
+                                            child:
+                                                LoadingAnimationWidget.waveDots(
+                                              color: primarySwatch[400]!,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          Visibility(
+                                              visible: !zoneLoadViewModel
+                                                      .isLoadingSections &&
+                                                  zoneLoadViewModel
+                                                          .connectionStatus ==
+                                                      SocketConnectionStatus
+                                                          .connected,
+                                              child: zoneLoadViewModel
+                                                      .sectionsResult
+                                                  ? Icon(Icons.check_circle,
+                                                      color:
+                                                          primarySwatch[400]!,
+                                                      size: 20)
+                                                  : const Icon(Icons.error,
+                                                      color: Colors.red,
+                                                      size: 20)),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text('Captacion: '),
+                                          Visibility(
+                                            visible: zoneLoadViewModel
+                                                    .isLoadingCatchments &&
+                                                zoneLoadViewModel
+                                                        .connectionStatus ==
+                                                    SocketConnectionStatus
+                                                        .connected,
+                                            child:
+                                                LoadingAnimationWidget.waveDots(
+                                              color: primarySwatch[400]!,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          Visibility(
+                                              visible: !zoneLoadViewModel
+                                                  .isLoadingCatchments,
+                                              child: zoneLoadViewModel
+                                                      .catchmentsResult
+                                                  ? Icon(Icons.check_circle,
+                                                      color:
+                                                          primarySwatch[400]!,
+                                                      size: 20)
+                                                  : const Icon(Icons.error,
+                                                      color: Colors.red,
+                                                      size: 20)),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text('Registros: '),
+                                          Visibility(
+                                            visible: zoneLoadViewModel
+                                                .isLoadingRegisters,
+                                            child:
+                                                LoadingAnimationWidget.waveDots(
+                                              color: primarySwatch[400]!,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          Visibility(
+                                              visible: !zoneLoadViewModel
+                                                      .isLoadingRegisters &&
+                                                  zoneLoadViewModel
+                                                          .connectionStatus ==
+                                                      SocketConnectionStatus
+                                                          .connected,
+                                              child: zoneLoadViewModel
+                                                      .registersResult
+                                                  ? Icon(Icons.check_circle,
+                                                      color:
+                                                          primarySwatch[400]!,
+                                                      size: 20)
+                                                  : const Icon(Icons.error,
+                                                      color: Colors.red,
+                                                      size: 20)),
+                                        ],
+                                      ),
+                                      if (zoneLoadViewModel.error)
+                                        Text(
+                                            'Error: ${zoneLoadViewModel.message}'),
+                                      if (zoneLoadViewModel.result != null)
+                                        Text(
+                                            'Result: ${zoneLoadViewModel.result! ? "Success" : "Error"}'),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    )),
+                  ),
+                ),
               ],
             ),
           ),
