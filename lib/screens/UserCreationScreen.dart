@@ -227,10 +227,10 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     final Map<String, dynamic> requestBody = {
       "email": emailController.text,
       "firstName": firstnameController.text,
-      "id": '0',
       "lastName": lastnameController.text,
-      "username": usernameController.text,
-      "role": roleController.text
+      "userName": usernameController.text,
+      "password": passwordController.text,
+      "rol": roleController.text
     };
     return requestBody;
   }
@@ -240,10 +240,10 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     final Map<String, dynamic> requestBody = {
       "email": emailController.text,
       "firstName": firstnameController.text,
-      "id": '0',
       "lastName": lastnameController.text,
-      "username": usernameController.text,
-      "role": roleController.text
+      "userName": usernameController.text,
+      "password": passwordController.text,
+      "rol": roleController.text
     };
     return requestBody;
   }
@@ -367,8 +367,8 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                                 value: userRole,
                                                 items: const [
                                                   notAssigned,
-                                                  'USER',
-                                                  'ADMIN'
+                                                  'OPERADOR',
+                                                  'ADMINISTRADOR'
                                                 ],
                                                 onChanged: (String? value) {
                                                   setState(() {
