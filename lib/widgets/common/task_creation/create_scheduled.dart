@@ -298,6 +298,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       Center(
           child: Column(children: [
         BoxContainer(
+          height: 800,
           width: widthRow * 1.15,
           padding: const EdgeInsets.all(24),
           child: Form(
@@ -490,7 +491,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                 Visibility(
                   visible: creatingScheduled,
                   child: SizedBox(
-                    height: 150,
                     child: Center(child: Consumer<ScheduledViewModel>(
                       builder: (context, scheduledViewModel, child) {
                         return Consumer<TaskListScheduledViewModel>(
@@ -510,7 +510,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                           zoneLoadViewModel.warning
                                               ? Text(zoneLoadViewModel.message!)
                                               : const Text(
-                                                  'Se esta procesando. Este proceso puede demorar unos minutos.'),
+                                                  'El proceso ha iniciado. Este proceso puede demorar unos minutos.'),
                                           const SizedBox(height: 4),
                                           Visibility(
                                             visible:
@@ -582,95 +582,103 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                       size: 20)),
                                         ],
                                       ),
-                                      Row(
-                                        children: [
-                                          const Text('Tramos: '),
-                                          Visibility(
-                                            visible: zoneLoadViewModel
-                                                .isLoadingSections,
-                                            child:
-                                                LoadingAnimationWidget.waveDots(
-                                              color: primarySwatch[400]!,
-                                              size: 20,
+                                      Visibility(
+                                        visible: zoneLoadViewModel
+                                                    .connectionStatus ==
+                                                SocketConnectionStatus
+                                                    .connected ||
+                                            zoneLoadViewModel.result != null,
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                const Text('Tramos: '),
+                                                Visibility(
+                                                  visible: zoneLoadViewModel
+                                                      .isLoadingSections,
+                                                  child: LoadingAnimationWidget
+                                                      .waveDots(
+                                                    color: primarySwatch[400]!,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                    visible: !zoneLoadViewModel
+                                                        .isLoadingSections,
+                                                    child: zoneLoadViewModel
+                                                            .sectionsResult
+                                                        ? Icon(
+                                                            Icons.check_circle,
+                                                            color:
+                                                                primarySwatch[
+                                                                    400]!,
+                                                            size: 20)
+                                                        : const Icon(
+                                                            Icons.error,
+                                                            color: Colors.red,
+                                                            size: 20)),
+                                              ],
                                             ),
-                                          ),
-                                          Visibility(
-                                              visible: !zoneLoadViewModel
-                                                      .isLoadingSections &&
-                                                  zoneLoadViewModel
-                                                          .connectionStatus ==
-                                                      SocketConnectionStatus
-                                                          .connected,
-                                              child: zoneLoadViewModel
-                                                      .sectionsResult
-                                                  ? Icon(Icons.check_circle,
-                                                      color:
-                                                          primarySwatch[400]!,
-                                                      size: 20)
-                                                  : const Icon(Icons.error,
-                                                      color: Colors.red,
-                                                      size: 20)),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          const Text('Captacion: '),
-                                          Visibility(
-                                            visible: zoneLoadViewModel
-                                                    .isLoadingCatchments &&
-                                                zoneLoadViewModel
-                                                        .connectionStatus ==
-                                                    SocketConnectionStatus
-                                                        .connected,
-                                            child:
-                                                LoadingAnimationWidget.waveDots(
-                                              color: primarySwatch[400]!,
-                                              size: 20,
+                                            Row(
+                                              children: [
+                                                const Text('Captacion: '),
+                                                Visibility(
+                                                  visible: zoneLoadViewModel
+                                                      .isLoadingCatchments,
+                                                  child: LoadingAnimationWidget
+                                                      .waveDots(
+                                                    color: primarySwatch[400]!,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                    visible: !zoneLoadViewModel
+                                                        .isLoadingCatchments,
+                                                    child: zoneLoadViewModel
+                                                            .catchmentsResult
+                                                        ? Icon(
+                                                            Icons.check_circle,
+                                                            color:
+                                                                primarySwatch[
+                                                                    400]!,
+                                                            size: 20)
+                                                        : const Icon(
+                                                            Icons.error,
+                                                            color: Colors.red,
+                                                            size: 20)),
+                                              ],
                                             ),
-                                          ),
-                                          Visibility(
-                                              visible: !zoneLoadViewModel
-                                                  .isLoadingCatchments,
-                                              child: zoneLoadViewModel
-                                                      .catchmentsResult
-                                                  ? Icon(Icons.check_circle,
-                                                      color:
-                                                          primarySwatch[400]!,
-                                                      size: 20)
-                                                  : const Icon(Icons.error,
-                                                      color: Colors.red,
-                                                      size: 20)),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          const Text('Registros: '),
-                                          Visibility(
-                                            visible: zoneLoadViewModel
-                                                .isLoadingRegisters,
-                                            child:
-                                                LoadingAnimationWidget.waveDots(
-                                              color: primarySwatch[400]!,
-                                              size: 20,
+                                            Row(
+                                              children: [
+                                                const Text('Registros: '),
+                                                Visibility(
+                                                  visible: zoneLoadViewModel
+                                                      .isLoadingRegisters,
+                                                  child: LoadingAnimationWidget
+                                                      .waveDots(
+                                                    color: primarySwatch[400]!,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                    visible: !zoneLoadViewModel
+                                                        .isLoadingRegisters,
+                                                    child: zoneLoadViewModel
+                                                            .registersResult
+                                                        ? Icon(
+                                                            Icons.check_circle,
+                                                            color:
+                                                                primarySwatch[
+                                                                    400]!,
+                                                            size: 20)
+                                                        : const Icon(
+                                                            Icons.error,
+                                                            color: Colors.red,
+                                                            size: 20)),
+                                              ],
                                             ),
-                                          ),
-                                          Visibility(
-                                              visible: !zoneLoadViewModel
-                                                      .isLoadingRegisters &&
-                                                  zoneLoadViewModel
-                                                          .connectionStatus ==
-                                                      SocketConnectionStatus
-                                                          .connected,
-                                              child: zoneLoadViewModel
-                                                      .registersResult
-                                                  ? Icon(Icons.check_circle,
-                                                      color:
-                                                          primarySwatch[400]!,
-                                                      size: 20)
-                                                  : const Icon(Icons.error,
-                                                      color: Colors.red,
-                                                      size: 20)),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                       if (zoneLoadViewModel.error)
                                         Text(
