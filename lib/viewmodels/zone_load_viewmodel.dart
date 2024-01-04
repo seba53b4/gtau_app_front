@@ -59,7 +59,11 @@ class ZoneLoadViewModel extends ChangeNotifier {
 
   bool get warning => _warning;
 
-  ZoneLoadViewModel() {
+  bool _connected = false;
+
+  bool get connected => _connected;
+
+  void initWS() {
     _socketService = ZoneWebSocketService(
       onMessage: (message) {
         _handleWebSocketMessage(message);
@@ -93,8 +97,11 @@ class ZoneLoadViewModel extends ChangeNotifier {
   }
 
   Future<void> waitForWebSocketConnection() async {
+    _connected = false;
+    notifyListeners();
     await _socketService.waitForWebSocketConnection();
     _connectionStatus = SocketConnectionStatus.connected;
+    _connected = true;
     notifyListeners();
   }
 
@@ -113,7 +120,6 @@ class ZoneLoadViewModel extends ChangeNotifier {
         _message = webSocketResponse.message;
         _isLoading = false;
         _error = true;
-        notifyListeners();
         break;
       case StatusProcess.INFO:
         if (webSocketResponse.tramosStatus != null && !_sectionsResult) {
@@ -128,14 +134,12 @@ class ZoneLoadViewModel extends ChangeNotifier {
           _registersResult = webSocketResponse.registrosStatus!.result;
           _isLoadingRegisters = false;
         }
-        notifyListeners();
         break;
       case StatusProcess.RUNNING:
         _message =
             'Existe un proceso ejecutándose. Espere unos minutos y vuelva a intentar.';
         _warning = true;
         _isLoading = false;
-        notifyListeners();
         break;
       case StatusProcess.STOPPED:
         _message =
@@ -143,7 +147,6 @@ class ZoneLoadViewModel extends ChangeNotifier {
         _warning = true;
         _isLoading = false;
         print('Process stopped');
-        notifyListeners();
         break;
       case StatusProcess.FINISHED:
         if (webSocketResponse.result) {
@@ -155,11 +158,11 @@ class ZoneLoadViewModel extends ChangeNotifier {
         }
         _isLoading = false;
         closeWebSocket();
-        notifyListeners();
         break;
       default:
         break;
     }
+    notifyListeners();
   }
 
   void closeWebSocket() {
@@ -172,14 +175,15 @@ class ZoneLoadViewModel extends ChangeNotifier {
     _catchmentsResult = false;
     _sectionsResult = false;
     _isLoading = false;
-    _result = false;
+    _result = null;
     _message = null;
     _error = false;
     _token = null;
+    _connected = false;
     _warning = false;
     _isLoadingCatchments = false;
     _isLoadingRegisters = false;
     _isLoadingSections = false;
-    super.dispose();
+    _connectionStatus = SocketConnectionStatus.disconnected;
   }
 }
