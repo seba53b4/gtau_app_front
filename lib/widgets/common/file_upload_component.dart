@@ -3,13 +3,22 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 
 import 'custom_elevated_button.dart';
 
 class FileUploadComponent extends StatefulWidget {
   final Function(Map<String, dynamic>) onFileAdded;
+  final Function? onDeleteSelection;
+  final bool? errorVisible;
+  final String? errorMessage;
 
-  const FileUploadComponent({Key? key, required this.onFileAdded})
+  const FileUploadComponent(
+      {Key? key,
+      required this.onFileAdded,
+      required this.errorVisible,
+      this.errorMessage,
+      this.onDeleteSelection})
       : super(key: key);
 
   @override
@@ -36,21 +45,6 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
       String fileContent = utf8.decode(result.files.first.bytes!);
 
       Map<String, dynamic> geoJsonMap = json.decode(fileContent);
-
-      // if (geoJsonMap.containsKey('features') &&
-      //     geoJsonMap['features'] is List) {
-      //   List<dynamic> features = geoJsonMap['features'];
-      //
-      //   Map<String, dynamic> geometries = [];
-      //
-      //   for (var feature in features) {
-      //     if (feature is Map<String, dynamic> &&
-      //         feature.containsKey('geometry') &&
-      //         feature['geometry'] is Map<String, dynamic>) {
-      //       Map<String, dynamic> geometry = feature['geometry'];
-      //       geometries.add(geometry);
-      //     }
-      //   }
 
       setState(() {
         geoJsonSrc.addAll(geoJsonMap);
@@ -87,35 +81,49 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CustomElevatedButton(
-                onPressed: _pickAFile,
-                text: AppLocalizations.of(context)!.file_upload_btn,
-              ),
-              const SizedBox(height: 8),
-              Visibility(
-                visible: geoJsonSrc.isNotEmpty,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          Visibility(
+            visible: geoJsonSrc.isNotEmpty,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
                   children: [
-                    const SizedBox(width: 24),
-                    Wrap(
-                      spacing: 8.0,
-                      runSpacing: 4.0,
-                      children: [
-                        InputChip(
-                          label: Text(fileName),
-                          onDeleted: () => _removeGeometry(),
-                        ),
-                      ],
+                    InputChip(
+                      label: Text(fileName),
+                      onDeleted: () {
+                        if (widget.onDeleteSelection != null) {
+                          widget.onDeleteSelection!();
+                        }
+                        _removeGeometry();
+                      },
                     ),
                   ],
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          CustomElevatedButton(
+            onPressed: _pickAFile,
+            text: geoJsonSrc.isEmpty
+                ? AppLocalizations.of(context)!.file_upload_btn
+                : AppLocalizations.of(context)!.file_upload_btn_change,
+          ),
+          if (widget.errorVisible != null && !(widget.errorVisible!))
+            const SizedBox(height: 8),
+          Visibility(
+            visible: widget.errorVisible ?? false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Center(
+                child: Text(
+                  widget.errorMessage ?? 'Se ha producido un error',
+                  style: TextStyle(color: redColor, fontSize: 14),
+                ),
               ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ],
       ),

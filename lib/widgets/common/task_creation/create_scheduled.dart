@@ -21,6 +21,7 @@ import '../custom_dropdown.dart';
 import '../custom_elevated_button.dart';
 import '../custom_text_form_field.dart';
 import '../file_upload_component.dart';
+import '../info_icon.dart';
 
 class ScheduledComponent extends StatefulWidget {
   final bool isEdit;
@@ -48,12 +49,13 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   late bool isAdmin;
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late ScheduledViewModel scheduledViewModel;
-  late ZoneLoadViewModel zoneLoadViewModel;
+  late ZoneLoadViewModel? zoneLoadViewModel;
   late String token;
   late bool isZoneLoaded = false;
   late bool creatingScheduled = false;
   late TaskScheduled? taskScheduledResponse = null;
   late bool? zoneCreated = null;
+  bool errorFileUpload = false;
 
   @override
   void initState() {
@@ -76,6 +78,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     token = Provider.of<UserProvider>(context, listen: false).getToken!;
     scheduledViewModel =
         Provider.of<ScheduledViewModel>(context, listen: false);
+    zoneLoadViewModel = null;
   }
 
   @override
@@ -86,7 +89,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     releasedDateController.dispose();
     descriptionController.dispose();
     scheduledViewModel.reset();
-    zoneLoadViewModel.reset();
+    zoneLoadViewModel?.reset();
     super.dispose();
   }
 
@@ -211,7 +214,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         taskScheduledResponse = taskCreated;
       });
 
-      if (taskScheduledResponse != null && geojsonFromFile.isNotEmpty) {
+      if (taskScheduledResponse != null) {
         bool created = await scheduledViewModel.createScheduledZone(
             token, taskScheduledResponse!.id!, geojsonFromFile);
         setState(() {
@@ -228,9 +231,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       zoneLoadViewModel =
           Provider.of<ZoneLoadViewModel>(context, listen: false);
     });
-    zoneLoadViewModel.initWS();
-    await zoneLoadViewModel.waitForWebSocketConnection();
-    zoneLoadViewModel.sendMessage(
+    zoneLoadViewModel!.initWS();
+    await zoneLoadViewModel!.waitForWebSocketConnection();
+    zoneLoadViewModel!.sendMessage(
         token: token,
         operation: 'start',
         type: 'SCHEDULED_CHARGE',
@@ -269,6 +272,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   Widget build(BuildContext context) {
     double widthRow = 640;
     double fontCreateTask = 16.0;
+    final appLocalizations = AppLocalizations.of(context)!;
 
     return Column(children: [
       Visibility(
@@ -284,7 +288,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                 scheduledViewModel.reset();
                 Navigator.of(context).pop();
               },
-              tooltip: AppLocalizations.of(context)!.placeholder_back_button,
+              tooltip: appLocalizations.placeholder_back_button,
               child: const Icon(Icons.arrow_back),
             ),
           ),
@@ -293,7 +297,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       Center(
           child: Column(children: [
         BoxContainer(
-          height: creatingScheduled ? 890 : 700,
+          height: creatingScheduled ? 890 : 724,
           width: widthRow * 1.15,
           padding: const EdgeInsets.all(24),
           child: Form(
@@ -301,21 +305,20 @@ class _CreateScheduledState extends State<ScheduledComponent> {
             child: Column(
               children: [
                 Text(
-                  AppLocalizations.of(context)!.scheduled_main_title,
+                  appLocalizations.scheduled_main_title,
                   style: const TextStyle(fontSize: 32.0),
                 ),
                 Column(
                   children: [
                     const SizedBox(height: 24.0),
                     Text(
-                      AppLocalizations.of(context)!.scheduled_title_input,
+                      appLocalizations.scheduled_title_input,
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     const SizedBox(height: 12.0),
                     CustomTextFormField(
                       width: widthRow,
-                      hintText: AppLocalizations.of(context)!
-                          .default_placeHolderInputText,
+                      hintText: appLocalizations.default_placeHolderInputText,
                       controller: titleController,
                     ),
                     SizedBox(
@@ -329,8 +332,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                               const SizedBox(
                                   height: AppConstants.taskColumnSpace),
                               Text(
-                                AppLocalizations.of(context)!
-                                    .createTaskPage_startDateTitle,
+                                appLocalizations.createTaskPage_startDateTitle,
                                 style: const TextStyle(fontSize: 16.0),
                               ),
                               const SizedBox(height: 12.0),
@@ -350,7 +352,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                   child: IgnorePointer(
                                     child: CustomTextFormField(
                                       width: AppConstants.taskRowSpace,
-                                      hintText: AppLocalizations.of(context)!
+                                      hintText: appLocalizations
                                           .createTaskPage_startDateTitle,
                                       controller: addDateController,
                                     ),
@@ -365,8 +367,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                               const SizedBox(
                                   height: AppConstants.taskColumnSpace),
                               Text(
-                                AppLocalizations.of(context)!
-                                    .scheduled_end_date_title,
+                                appLocalizations.scheduled_end_date_title,
                                 style: const TextStyle(fontSize: 16.0),
                               ),
                               const SizedBox(height: 12.0),
@@ -387,7 +388,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                     child: CustomTextFormField(
                                       useValidation: false,
                                       width: AppConstants.taskRowSpace,
-                                      hintText: AppLocalizations.of(context)!
+                                      hintText: appLocalizations
                                           .scheduled_end_date_title,
                                       controller: releasedDateController,
                                     ),
@@ -400,8 +401,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                           Column(
                             children: [
                               Text(
-                                AppLocalizations.of(context)!
-                                    .editTaskPage_statusTitle,
+                                appLocalizations.editTaskPage_statusTitle,
                                 style: const TextStyle(fontSize: 16.0),
                               ),
                               const SizedBox(
@@ -425,7 +425,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       ),
                     ),
                     Text(
-                      AppLocalizations.of(context)!.default_descriptionTitle,
+                      appLocalizations.default_descriptionTitle,
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     const SizedBox(height: 10.0),
@@ -434,8 +434,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       isTextBox: true,
                       maxLines: 10,
                       width: widthRow,
-                      hintText: AppLocalizations.of(context)!
-                          .default_descriptionPlaceholder,
+                      hintText: appLocalizations.default_descriptionPlaceholder,
                       controller: descriptionController,
                     ),
                     const SizedBox(height: 24.0),
@@ -444,19 +443,37 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            AppLocalizations.of(context)!.scheduled_file_title,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                appLocalizations.scheduled_file_title,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              InfoIcon(
+                                  message: appLocalizations
+                                      .info_icon_msg_file_upload),
+                            ],
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: errorFileUpload ? 4 : 12),
                           SizedBox(
                             width: widthRow,
                             child: FileUploadComponent(
+                              errorVisible: errorFileUpload,
+                              errorMessage: appLocalizations
+                                  .info_icon_msg_file_upload_error,
+                              onDeleteSelection: () {
+                                setState(() {
+                                  errorFileUpload = false;
+                                  geojsonFromFile = {};
+                                });
+                              },
                               onFileAdded: (Map<String, dynamic> fileContent) {
                                 setState(() {
                                   geojsonFromFile = fileContent;
+                                  errorFileUpload = false;
                                 });
                               },
                             ),
@@ -471,7 +488,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                   visible: widget.isEdit && isZoneLoaded,
                   child: Column(children: [
                     Text(
-                      AppLocalizations.of(context)!.inspect_map_title,
+                      appLocalizations.inspect_map_title,
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     const SizedBox(height: 12),
@@ -479,7 +496,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       onPressed: () async {
                         _showMapElement(context);
                       },
-                      text: AppLocalizations.of(context)!.see_map_button,
+                      text: appLocalizations.see_map_button,
                     )
                   ]),
                 ),
@@ -531,8 +548,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                               zoneLoadViewModel.warning
                                                   ? Text(zoneLoadViewModel
                                                       .message!)
-                                                  : const Text(
-                                                      'El proceso ha iniciado. Este proceso puede demorar unos minutos.'),
+                                                  : Text(appLocalizations
+                                                      .file_upload_message_information),
                                               const SizedBox(height: 4),
                                               Visibility(
                                                 visible: (geojsonFromFile
@@ -556,7 +573,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                           ),
                                         ),
                                         TaskCreationStatusRow(
-                                            title: 'Creación de Programada ',
+                                            title: appLocalizations
+                                                .file_upload_creating_scheduled,
                                             isLoading:
                                                 taskListScheduledViewModel
                                                     .isLoading,
@@ -565,7 +583,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                         Visibility(
                                             visible: geojsonFromFile.isNotEmpty,
                                             child: TaskCreationStatusRow(
-                                              title: 'Creando Zonas ',
+                                              title: appLocalizations
+                                                  .file_upload_creating_zone,
                                               isLoading:
                                                   scheduledViewModel.isLoading,
                                               iconCheck: zoneCreated != null &&
@@ -575,8 +594,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                           visible: zoneCreated != null &&
                                               zoneCreated!,
                                           child: TaskCreationStatusRow(
-                                            title:
-                                                'Iniciando carga de elementos',
+                                            title: appLocalizations
+                                                .file_upload_starting_elements_load,
                                             isLoading:
                                                 !zoneLoadViewModel.connected,
                                             iconCheck:
@@ -590,21 +609,24 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                           child: Column(
                                             children: [
                                               TaskCreationStatusRow(
-                                                title: 'Agregando tramos ',
+                                                title: appLocalizations
+                                                    .file_upload_adding_sections,
                                                 isLoading: zoneLoadViewModel
                                                     .isLoadingSections,
                                                 iconCheck: zoneLoadViewModel
                                                     .sectionsResult,
                                               ),
                                               TaskCreationStatusRow(
-                                                title: 'Agregando captaciones ',
+                                                title: appLocalizations
+                                                    .file_upload_adding_catchments,
                                                 isLoading: zoneLoadViewModel
                                                     .isLoadingCatchments,
                                                 iconCheck: zoneLoadViewModel
                                                     .catchmentsResult,
                                               ),
                                               TaskCreationStatusRow(
-                                                title: 'Agregando registros ',
+                                                title: appLocalizations
+                                                    .file_upload_adding_registers,
                                                 isLoading: zoneLoadViewModel
                                                     .isLoadingRegisters,
                                                 iconCheck: zoneLoadViewModel
@@ -623,12 +645,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                               'Result: ${zoneLoadViewModel.result! ? "Success" : "Error"}',
                                               style: TextStyle(
                                                   fontSize: fontCreateTask)),
-                                        if (geojsonFromFile.isEmpty &&
-                                            taskScheduledResponse != null)
-                                          Text(
-                                              'Success: Recuerde que aún debe agregar a la programada la zona',
-                                              style: TextStyle(
-                                                  fontSize: fontCreateTask))
                                       ],
                                     ),
                                   );
@@ -648,13 +664,19 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         const SizedBox(height: AppConstants.taskColumnSpace),
         CustomElevatedButton(
           onPressed: () async {
-            if (_formKey.currentState!.validate()) {
+            if (_formKey.currentState!.validate() &&
+                geojsonFromFile.isNotEmpty) {
               widget.isEdit ? handleEdit() : handleSubmit();
+            }
+            if (geojsonFromFile.isEmpty) {
+              setState(() {
+                errorFileUpload = true;
+              });
             }
           },
           text: widget.isEdit
-              ? AppLocalizations.of(context)!.buttonAcceptLabel
-              : AppLocalizations.of(context)!.createTaskPage_submitButton,
+              ? appLocalizations.buttonAcceptLabel
+              : appLocalizations.createTaskPage_submitButton,
         ),
       ]))
     ]);
