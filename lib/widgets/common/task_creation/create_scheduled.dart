@@ -56,6 +56,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   late TaskScheduled? taskScheduledResponse = null;
   late bool? zoneCreated = null;
   bool errorFileUpload = false;
+  double heightToAddOnCreate = 100;
 
   @override
   void initState() {
@@ -295,390 +296,454 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         ),
       ),
       Center(
-          child: Column(children: [
-        BoxContainer(
-          height: creatingScheduled ? 890 : 724,
-          width: widthRow * 1.15,
-          padding: const EdgeInsets.all(24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Text(
-                  appLocalizations.scheduled_main_title,
-                  style: const TextStyle(fontSize: 32.0),
-                ),
-                Column(
+        child: Column(
+          children: [
+            BoxContainer(
+              height: creatingScheduled ? 724 + heightToAddOnCreate : 724,
+              width: widthRow * 1.15,
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: Column(
                   children: [
-                    const SizedBox(height: 24.0),
                     Text(
-                      appLocalizations.scheduled_title_input,
-                      style: const TextStyle(fontSize: 16.0),
+                      appLocalizations.scheduled_main_title,
+                      style: const TextStyle(fontSize: 32.0),
                     ),
-                    const SizedBox(height: 12.0),
-                    CustomTextFormField(
-                      width: widthRow,
-                      hintText: appLocalizations.default_placeHolderInputText,
-                      controller: titleController,
-                    ),
-                    SizedBox(
-                      width: widthRow,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
+                    Column(
+                      children: [
+                        const SizedBox(height: 24.0),
+                        Text(
+                          appLocalizations.scheduled_title_input,
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                        const SizedBox(height: 12.0),
+                        CustomTextFormField(
+                          width: widthRow,
+                          hintText:
+                              appLocalizations.default_placeHolderInputText,
+                          controller: titleController,
+                        ),
+                        SizedBox(
+                          width: widthRow,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const SizedBox(
-                                  height: AppConstants.taskColumnSpace),
-                              Text(
-                                appLocalizations.createTaskPage_startDateTitle,
-                                style: const TextStyle(fontSize: 16.0),
-                              ),
-                              const SizedBox(height: 12.0),
-                              SizedBox(
-                                width: AppConstants.textFieldWidth,
-                                child: InkWell(
-                                  overlayColor: MaterialStateColor.resolveWith(
-                                      (states) => Colors.transparent),
-                                  onTap: () async {
-                                    final DateTime? pickedDate =
-                                        await showCustomDatePicker(
-                                            context, startDate!);
-                                    if (pickedDate != null) {
-                                      _handleStartDateChange(pickedDate);
-                                    }
-                                  },
-                                  child: IgnorePointer(
-                                    child: CustomTextFormField(
-                                      width: AppConstants.taskRowSpace,
-                                      hintText: appLocalizations
-                                          .createTaskPage_startDateTitle,
-                                      controller: addDateController,
+                              Column(
+                                children: [
+                                  const SizedBox(
+                                      height: AppConstants.taskColumnSpace),
+                                  Text(
+                                    appLocalizations
+                                        .createTaskPage_startDateTitle,
+                                    style: const TextStyle(fontSize: 16.0),
+                                  ),
+                                  const SizedBox(height: 12.0),
+                                  SizedBox(
+                                    width: AppConstants.textFieldWidth,
+                                    child: InkWell(
+                                      overlayColor:
+                                          MaterialStateColor.resolveWith(
+                                              (states) => Colors.transparent),
+                                      onTap: () async {
+                                        final DateTime? pickedDate =
+                                            await showCustomDatePicker(
+                                                context, startDate!);
+                                        if (pickedDate != null) {
+                                          _handleStartDateChange(pickedDate);
+                                        }
+                                      },
+                                      child: IgnorePointer(
+                                        child: CustomTextFormField(
+                                          width: AppConstants.taskRowSpace,
+                                          hintText: appLocalizations
+                                              .createTaskPage_startDateTitle,
+                                          controller: addDateController,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Column(
-                            children: [
-                              const SizedBox(
-                                  height: AppConstants.taskColumnSpace),
-                              Text(
-                                appLocalizations.scheduled_end_date_title,
-                                style: const TextStyle(fontSize: 16.0),
-                              ),
-                              const SizedBox(height: 12.0),
-                              SizedBox(
-                                width: AppConstants.textFieldWidth,
-                                child: InkWell(
-                                  overlayColor: MaterialStateColor.resolveWith(
-                                      (states) => Colors.transparent),
-                                  onTap: () async {
-                                    final DateTime? pickedDate =
-                                        await showCustomDatePicker(
-                                            context, startDate!);
-                                    if (pickedDate != null) {
-                                      _handleReleasedDateChange(pickedDate);
-                                    }
-                                  },
-                                  child: IgnorePointer(
-                                    child: CustomTextFormField(
-                                      useValidation: false,
-                                      width: AppConstants.taskRowSpace,
-                                      hintText: appLocalizations
-                                          .scheduled_end_date_title,
-                                      controller: releasedDateController,
+                              const SizedBox(height: 8),
+                              Column(
+                                children: [
+                                  const SizedBox(
+                                      height: AppConstants.taskColumnSpace),
+                                  Text(
+                                    appLocalizations.scheduled_end_date_title,
+                                    style: const TextStyle(fontSize: 16.0),
+                                  ),
+                                  const SizedBox(height: 12.0),
+                                  SizedBox(
+                                    width: AppConstants.textFieldWidth,
+                                    child: InkWell(
+                                      overlayColor:
+                                          MaterialStateColor.resolveWith(
+                                              (states) => Colors.transparent),
+                                      onTap: () async {
+                                        final DateTime? pickedDate =
+                                            await showCustomDatePicker(
+                                                context, startDate!);
+                                        if (pickedDate != null) {
+                                          _handleReleasedDateChange(pickedDate);
+                                        }
+                                      },
+                                      child: IgnorePointer(
+                                        child: CustomTextFormField(
+                                          useValidation: false,
+                                          width: AppConstants.taskRowSpace,
+                                          hintText: appLocalizations
+                                              .scheduled_end_date_title,
+                                          controller: releasedDateController,
+                                        ),
+                                      ),
                                     ),
                                   ),
+                                ],
+                              ),
+                              const SizedBox(height: AppConstants.taskRowSpace),
+                              Column(
+                                children: [
+                                  Text(
+                                    appLocalizations.editTaskPage_statusTitle,
+                                    style: const TextStyle(fontSize: 16.0),
+                                  ),
+                                  const SizedBox(
+                                      height: AppConstants.taskColumnSpace),
+                                  CustomDropdown(
+                                    isStatus: true,
+                                    value: taskStatus,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        taskStatus = value!;
+                                      });
+                                    },
+                                    items: TaskStatus.values
+                                        .map((status) => status.value)
+                                        .toList(),
+                                  ),
+                                  const SizedBox(height: 28),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          appLocalizations.default_descriptionTitle,
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                        const SizedBox(height: 10.0),
+                        CustomTextFormField(
+                          useValidation: false,
+                          isTextBox: true,
+                          maxLines: 10,
+                          width: widthRow,
+                          hintText:
+                              appLocalizations.default_descriptionPlaceholder,
+                          controller: descriptionController,
+                        ),
+                        const SizedBox(height: 24.0),
+                        Visibility(
+                          visible:
+                              isAdmin && !isZoneLoaded && !creatingScheduled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    appLocalizations.scheduled_file_title,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  InfoIcon(
+                                      message: appLocalizations
+                                          .info_icon_msg_file_upload),
+                                ],
+                              ),
+                              SizedBox(height: errorFileUpload ? 4 : 12),
+                              SizedBox(
+                                width: widthRow * 0.6,
+                                child: FileUploadComponent(
+                                  errorVisible: errorFileUpload,
+                                  errorMessage: appLocalizations
+                                      .info_icon_msg_file_upload_error,
+                                  onDeleteSelection: () {
+                                    setState(() {
+                                      errorFileUpload = false;
+                                      geojsonFromFile = {};
+                                    });
+                                  },
+                                  onFileAdded:
+                                      (Map<String, dynamic> fileContent) {
+                                    setState(() {
+                                      geojsonFromFile = fileContent;
+                                      errorFileUpload = false;
+                                    });
+                                  },
                                 ),
                               ),
+                              const SizedBox(height: 12),
                             ],
                           ),
-                          const SizedBox(height: AppConstants.taskRowSpace),
-                          Column(
-                            children: [
-                              Text(
-                                appLocalizations.editTaskPage_statusTitle,
-                                style: const TextStyle(fontSize: 16.0),
-                              ),
-                              const SizedBox(
-                                  height: AppConstants.taskColumnSpace),
-                              CustomDropdown(
-                                isStatus: true,
-                                value: taskStatus,
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    taskStatus = value!;
-                                  });
-                                },
-                                items: TaskStatus.values
-                                    .map((status) => status.value)
-                                    .toList(),
-                              ),
-                              const SizedBox(height: 28),
-                            ],
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      appLocalizations.default_descriptionTitle,
-                      style: const TextStyle(fontSize: 16.0),
-                    ),
-                    const SizedBox(height: 10.0),
-                    CustomTextFormField(
-                      useValidation: false,
-                      isTextBox: true,
-                      maxLines: 10,
-                      width: widthRow,
-                      hintText: appLocalizations.default_descriptionPlaceholder,
-                      controller: descriptionController,
-                    ),
-                    const SizedBox(height: 24.0),
                     Visibility(
-                      visible: isAdmin && !isZoneLoaded && !creatingScheduled,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                appLocalizations.scheduled_file_title,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                ),
-                              ),
-                              InfoIcon(
-                                  message: appLocalizations
-                                      .info_icon_msg_file_upload),
-                            ],
-                          ),
-                          SizedBox(height: errorFileUpload ? 4 : 12),
-                          SizedBox(
-                            width: widthRow,
-                            child: FileUploadComponent(
-                              errorVisible: errorFileUpload,
-                              errorMessage: appLocalizations
-                                  .info_icon_msg_file_upload_error,
-                              onDeleteSelection: () {
-                                setState(() {
-                                  errorFileUpload = false;
-                                  geojsonFromFile = {};
-                                });
-                              },
-                              onFileAdded: (Map<String, dynamic> fileContent) {
-                                setState(() {
-                                  geojsonFromFile = fileContent;
-                                  errorFileUpload = false;
-                                });
+                      visible: widget.isEdit && isZoneLoaded,
+                      child: Column(children: [
+                        Text(
+                          appLocalizations.inspect_map_title,
+                          style: const TextStyle(fontSize: 16.0),
+                        ),
+                        const SizedBox(height: 12),
+                        CustomElevatedButton(
+                          onPressed: () async {
+                            _showMapElement(context);
+                          },
+                          text: appLocalizations.see_map_button,
+                        )
+                      ]),
+                    ),
+                    Visibility(
+                      visible: creatingScheduled,
+                      child: Container(
+                        width: widthRow * 0.6,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: SizedBox(
+                          child: Center(
+                            child: Consumer<ScheduledViewModel>(
+                              builder: (context, scheduledViewModel, child) {
+                                return Consumer<TaskListScheduledViewModel>(
+                                  builder: (context, taskListScheduledViewModel,
+                                      child) {
+                                    return Consumer<ZoneLoadViewModel>(
+                                      builder:
+                                          (context, zoneLoadViewModel, child) {
+                                        return Visibility(
+                                          key: UniqueKey(),
+                                          visible: true,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Visibility(
+                                                visible: (geojsonFromFile
+                                                            .isNotEmpty &&
+                                                        (!zoneLoadViewModel
+                                                                .error &&
+                                                            zoneLoadViewModel
+                                                                    .result ==
+                                                                null)) ||
+                                                    (geojsonFromFile.isEmpty &&
+                                                        taskListScheduledViewModel
+                                                            .isLoading),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    zoneLoadViewModel.warning
+                                                        ? Text(
+                                                            zoneLoadViewModel
+                                                                .message!,
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          )
+                                                        : Text(
+                                                            appLocalizations
+                                                                .file_upload_message_information,
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: const TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                    const SizedBox(height: 4),
+                                                    Visibility(
+                                                      visible: (geojsonFromFile
+                                                                  .isNotEmpty &&
+                                                              (zoneLoadViewModel
+                                                                      .isLoading ||
+                                                                  !zoneLoadViewModel
+                                                                      .connected)) ||
+                                                          (geojsonFromFile
+                                                                  .isEmpty &&
+                                                              taskListScheduledViewModel
+                                                                  .isLoading),
+                                                      child: Center(
+                                                        child:
+                                                            LoadingAnimationWidget
+                                                                .waveDots(
+                                                          color: primarySwatch[
+                                                              400]!,
+                                                          size: 42,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              TaskCreationStatusRow(
+                                                title: appLocalizations
+                                                    .file_upload_creating_scheduled,
+                                                isLoading:
+                                                    taskListScheduledViewModel
+                                                        .isLoading,
+                                                iconCheck:
+                                                    taskScheduledResponse !=
+                                                        null,
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    geojsonFromFile.isNotEmpty,
+                                                child: TaskCreationStatusRow(
+                                                  title: appLocalizations
+                                                      .file_upload_creating_zone,
+                                                  isLoading: scheduledViewModel
+                                                      .isLoading,
+                                                  iconCheck:
+                                                      zoneCreated != null &&
+                                                          zoneCreated!,
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible: zoneCreated != null &&
+                                                    zoneCreated!,
+                                                child: TaskCreationStatusRow(
+                                                  title: appLocalizations
+                                                      .file_upload_starting_elements_load,
+                                                  isLoading: !zoneLoadViewModel
+                                                      .connected,
+                                                  iconCheck: zoneLoadViewModel
+                                                      .connected,
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible: zoneLoadViewModel
+                                                        .connected ||
+                                                    zoneLoadViewModel.result !=
+                                                        null,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    TaskCreationStatusRow(
+                                                      title: appLocalizations
+                                                          .file_upload_adding_sections,
+                                                      isLoading:
+                                                          zoneLoadViewModel
+                                                              .isLoadingSections,
+                                                      iconCheck:
+                                                          zoneLoadViewModel
+                                                              .sectionsResult,
+                                                    ),
+                                                    TaskCreationStatusRow(
+                                                      title: appLocalizations
+                                                          .file_upload_adding_catchments,
+                                                      isLoading: zoneLoadViewModel
+                                                          .isLoadingCatchments,
+                                                      iconCheck:
+                                                          zoneLoadViewModel
+                                                              .catchmentsResult,
+                                                    ),
+                                                    TaskCreationStatusRow(
+                                                      title: appLocalizations
+                                                          .file_upload_adding_registers,
+                                                      isLoading: zoneLoadViewModel
+                                                          .isLoadingRegisters,
+                                                      iconCheck:
+                                                          zoneLoadViewModel
+                                                              .registersResult,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              if (zoneLoadViewModel.error)
+                                                Text(
+                                                  'Error: ${zoneLoadViewModel.message}',
+                                                  style: TextStyle(
+                                                      fontSize: fontCreateTask),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              const SizedBox(height: 24),
+                                              if (zoneLoadViewModel.result !=
+                                                  null)
+                                                Text(
+                                                  'Programada ${zoneLoadViewModel.result! ? "Creada !" : "con error"}',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: zoneLoadViewModel
+                                                              .result!
+                                                          ? primarySwatch[600]
+                                                          : redColor,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
                               },
                             ),
                           ),
-                          const SizedBox(height: 12),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                Visibility(
-                  visible: widget.isEdit && isZoneLoaded,
-                  child: Column(children: [
-                    Text(
-                      appLocalizations.inspect_map_title,
-                      style: const TextStyle(fontSize: 16.0),
-                    ),
-                    const SizedBox(height: 12),
-                    CustomElevatedButton(
-                      onPressed: () async {
-                        _showMapElement(context);
-                      },
-                      text: appLocalizations.see_map_button,
-                    )
-                  ]),
-                ),
-                Visibility(
-                  visible: creatingScheduled,
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: SizedBox(
-                      child: Center(child: Consumer<ScheduledViewModel>(
-                        builder: (context, scheduledViewModel, child) {
-                          return Consumer<TaskListScheduledViewModel>(
-                            builder:
-                                (context, taskListScheduledViewModel, child) {
-                              return Consumer<ZoneLoadViewModel>(
-                                builder: (context, zoneLoadViewModel, child) {
-                                  return Visibility(
-                                    key: UniqueKey(),
-                                    visible: true,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Visibility(
-                                          visible: (geojsonFromFile
-                                                      .isNotEmpty &&
-                                                  (!zoneLoadViewModel.error &&
-                                                      zoneLoadViewModel
-                                                              .result ==
-                                                          null)) ||
-                                              (geojsonFromFile.isEmpty &&
-                                                  taskListScheduledViewModel
-                                                      .isLoading),
-                                          child: Column(
-                                            children: [
-                                              zoneLoadViewModel.warning
-                                                  ? Text(zoneLoadViewModel
-                                                      .message!)
-                                                  : Text(appLocalizations
-                                                      .file_upload_message_information),
-                                              const SizedBox(height: 4),
-                                              Visibility(
-                                                visible: (geojsonFromFile
-                                                            .isNotEmpty &&
-                                                        (zoneLoadViewModel
-                                                                .isLoading ||
-                                                            !zoneLoadViewModel
-                                                                .connected)) ||
-                                                    (geojsonFromFile.isEmpty &&
-                                                        taskListScheduledViewModel
-                                                            .isLoading),
-                                                child: const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    color: Color.fromRGBO(
-                                                        96, 166, 27, 1),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        TaskCreationStatusRow(
-                                            title: appLocalizations
-                                                .file_upload_creating_scheduled,
-                                            isLoading:
-                                                taskListScheduledViewModel
-                                                    .isLoading,
-                                            iconCheck:
-                                                taskScheduledResponse != null),
-                                        Visibility(
-                                            visible: geojsonFromFile.isNotEmpty,
-                                            child: TaskCreationStatusRow(
-                                              title: appLocalizations
-                                                  .file_upload_creating_zone,
-                                              isLoading:
-                                                  scheduledViewModel.isLoading,
-                                              iconCheck: zoneCreated != null &&
-                                                  zoneCreated!,
-                                            )),
-                                        Visibility(
-                                          visible: zoneCreated != null &&
-                                              zoneCreated!,
-                                          child: TaskCreationStatusRow(
-                                            title: appLocalizations
-                                                .file_upload_starting_elements_load,
-                                            isLoading:
-                                                !zoneLoadViewModel.connected,
-                                            iconCheck:
-                                                zoneLoadViewModel.connected,
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: zoneLoadViewModel
-                                                  .connected ||
-                                              zoneLoadViewModel.result != null,
-                                          child: Column(
-                                            children: [
-                                              TaskCreationStatusRow(
-                                                title: appLocalizations
-                                                    .file_upload_adding_sections,
-                                                isLoading: zoneLoadViewModel
-                                                    .isLoadingSections,
-                                                iconCheck: zoneLoadViewModel
-                                                    .sectionsResult,
-                                              ),
-                                              TaskCreationStatusRow(
-                                                title: appLocalizations
-                                                    .file_upload_adding_catchments,
-                                                isLoading: zoneLoadViewModel
-                                                    .isLoadingCatchments,
-                                                iconCheck: zoneLoadViewModel
-                                                    .catchmentsResult,
-                                              ),
-                                              TaskCreationStatusRow(
-                                                title: appLocalizations
-                                                    .file_upload_adding_registers,
-                                                isLoading: zoneLoadViewModel
-                                                    .isLoadingRegisters,
-                                                iconCheck: zoneLoadViewModel
-                                                    .registersResult,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        if (zoneLoadViewModel.error)
-                                          Text(
-                                              'Error: ${zoneLoadViewModel.message}',
-                                              style: TextStyle(
-                                                  fontSize: fontCreateTask)),
-                                        if (zoneLoadViewModel.result != null)
-                                          Text(
-                                              'Result: ${zoneLoadViewModel.result! ? "Success" : "Error"}',
-                                              style: TextStyle(
-                                                  fontSize: fontCreateTask)),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
-                      )),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: AppConstants.taskColumnSpace),
+            Visibility(
+              visible: !creatingScheduled,
+              child: CustomElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate() &&
+                      geojsonFromFile.isNotEmpty) {
+                    widget.isEdit ? handleEdit() : handleSubmit();
+                  }
+                  if (geojsonFromFile.isEmpty) {
+                    setState(() {
+                      errorFileUpload = true;
+                    });
+                  }
+                },
+                text: widget.isEdit
+                    ? appLocalizations.buttonAcceptLabel
+                    : appLocalizations.createTaskPage_submitButton,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: AppConstants.taskColumnSpace),
-        CustomElevatedButton(
-          onPressed: () async {
-            if (_formKey.currentState!.validate() &&
-                geojsonFromFile.isNotEmpty) {
-              widget.isEdit ? handleEdit() : handleSubmit();
-            }
-            if (geojsonFromFile.isEmpty) {
-              setState(() {
-                errorFileUpload = true;
-              });
-            }
-          },
-          text: widget.isEdit
-              ? appLocalizations.buttonAcceptLabel
-              : appLocalizations.createTaskPage_submitButton,
-        ),
-      ]))
+      ),
     ]);
   }
 }
@@ -698,10 +763,11 @@ class TaskCreationStatusRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double fontCreateTask = 16.0;
-    double iconCreateResult = 20;
-    double sizeWaveDots = 38;
+    double iconCreateResult = 18;
+    double sizeWaveDots = 30;
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Visibility(
           visible: !isLoading,
@@ -722,12 +788,14 @@ class TaskCreationStatusRow extends StatelessWidget {
           title,
           style: TextStyle(fontSize: fontCreateTask),
         ),
-        const SizedBox(width: 4),
         Visibility(
           visible: isLoading,
-          child: LoadingAnimationWidget.horizontalRotatingDots(
-            color: primarySwatch[400]!,
-            size: sizeWaveDots,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 4.0, bottom: 0, top: 0),
+            child: LoadingAnimationWidget.horizontalRotatingDots(
+              color: primarySwatch[400]!,
+              size: sizeWaveDots,
+            ),
           ),
         ),
       ],

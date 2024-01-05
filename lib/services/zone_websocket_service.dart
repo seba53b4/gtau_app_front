@@ -5,21 +5,23 @@ class ZoneWebSocketService {
   late WebSocketChannel _webSocketChannel;
   bool _isConnected = false;
 
-  ZoneWebSocketService({required Function(dynamic) onMessage,
-    required Function() onDone,
-    required Function(dynamic) onError}) {
+  ZoneWebSocketService(
+      {required Function(dynamic) onMessage,
+      required Function() onDone,
+      required Function(dynamic) onError}) {
     final String socketUrl =
-    dotenv.get('ZONE_WEBSOCKET_URL', fallback: 'NOT_FOUND');
+        dotenv.get('ZONE_WEBSOCKET_URL', fallback: 'NOT_FOUND');
     _webSocketChannel = WebSocketChannel.connect(Uri.parse(socketUrl));
     openConn(onDone: onDone, onMessage: onMessage, onError: onError);
   }
 
-  void openConn({required Function(dynamic) onMessage,
-    required Function() onDone,
-    required Function(dynamic) onError}) async {
+  void openConn(
+      {required Function(dynamic) onMessage,
+      required Function() onDone,
+      required Function(dynamic) onError}) async {
     await _webSocketChannel.ready;
     _webSocketChannel.stream.listen(
-          (event) {
+      (event) {
         if (!_isConnected) {
           _isConnected = true;
           print('WebSocket Connected!');
@@ -38,11 +40,8 @@ class ZoneWebSocketService {
 
     await Future.delayed(const Duration(seconds: 5));
     if (_webSocketChannel.closeCode == null) {
-      print('WebSocket connection is open!');
       _isConnected = true;
-    } else {
-      print('WebSocket connection is closed!');
-    }
+    } else {}
   }
 
   Future<void> waitForWebSocketConnection() async {
@@ -53,22 +52,22 @@ class ZoneWebSocketService {
     }
   }
 
-  void initWebSocket({required Function(dynamic) onMessage,
-    required Function() onDone,
-    required Function(dynamic) onError}) {
+  void initWebSocket(
+      {required Function(dynamic) onMessage,
+      required Function() onDone,
+      required Function(dynamic) onError}) {
     if (!_isConnected) {
       print('WebSocket connection is not fully open yet.');
       return;
     }
 
     _webSocketChannel.stream.listen(
-          (event) {
+      (event) {
         onMessage(event);
       },
       onDone: () {
         print(
-            'WebSocket connection closed with code: ${_webSocketChannel
-                .closeCode}');
+            'WebSocket connection closed with code: ${_webSocketChannel.closeCode}');
         onDone();
       },
       onError: (error) {

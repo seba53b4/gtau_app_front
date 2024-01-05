@@ -170,7 +170,7 @@
     "see_map_button": "Ver mapa",
     "info_icon_msg_file_upload": "Se debe adjuntar un archivo de zona en formato .geojson",
     "info_icon_msg_file_upload_error": "Debe ingresar un archivo .geojson de zona",
-    "file_upload_message_information": "El proceso ha iniciado. Este proceso puede demorar unos minutos.",
+    "file_upload_message_information": "Este proceso puede demorar unos minutos.",
     "file_upload_creating_scheduled" : "Creación de Programada",
     "file_upload_creating_zone": "Creando Zona/as",
     "file_upload_starting_elements_load" : "Iniciando carga de elementos",

@@ -151,10 +151,8 @@ class ZoneLoadViewModel extends ChangeNotifier {
       case StatusProcess.FINISHED:
         if (webSocketResponse.result) {
           _result = true;
-          print('Task finished successfully.');
         } else {
           _result = false;
-          print('Task finished with an error: ${webSocketResponse.message}');
         }
         _isLoading = false;
         closeWebSocket();

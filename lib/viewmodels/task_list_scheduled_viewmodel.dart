@@ -146,7 +146,6 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       TaskScheduled? response =
           await _scheduledService.createScheduledTask(token, body);
       if (response != null) {
-        print('Tarea Programada ha sido creada correctamente');
         notifyListeners();
         return response;
       } else {
