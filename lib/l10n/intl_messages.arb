@@ -176,5 +176,7 @@
     "file_upload_starting_elements_load" : "Iniciando carga de elementos",
     "file_upload_adding_sections" : "Agregando tramos",
     "file_upload_adding_catchments" : "Agregando captaciones",
-    "file_upload_adding_registers" : "Agregando registros"
+    "file_upload_adding_registers" : "Agregando registros",
+    "file_upload_success": "Programada creada!",
+    "file_upload_error": "Error en creación"
 }
