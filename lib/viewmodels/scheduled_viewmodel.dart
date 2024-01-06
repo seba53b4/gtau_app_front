@@ -254,7 +254,6 @@ class ScheduledViewModel extends ChangeNotifier {
       notifyListeners();
       LatLng? pos = getRandomPointOfMap(polylines, circles);
       _isLoading = false;
-      print(pos.toString());
       _initPosition = pos;
       return pos;
     } catch (error) {

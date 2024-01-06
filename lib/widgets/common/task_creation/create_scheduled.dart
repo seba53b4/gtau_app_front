@@ -299,7 +299,11 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         child: Column(
           children: [
             BoxContainer(
-              height: creatingScheduled ? 730 + heightToAddOnCreate : 724,
+              height: creatingScheduled
+                  ? 730 + heightToAddOnCreate
+                  : widget.isEdit
+                      ? 620
+                      : 700,
               width: widthRow * 1.15,
               padding: const EdgeInsets.all(24),
               child: Form(

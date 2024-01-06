@@ -19,10 +19,10 @@ class AuthViewModel extends ChangeNotifier {
       _error = false;
       notifyListeners();
 
-      final authResult = await _authService.fetchAuth(username, password);
+      final authData = await _authService.fetchAuth(username, password);
 
-      if (authResult.authData != null) {
-        return authResult;
+      if (authData != null) {
+        return authData;
       }
       _error = true;
       return null;
