@@ -10,10 +10,12 @@ import 'package:gtau_app_front/models/scheduled/catchment_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/radio_dropdown.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/element_type.dart';
 import '../models/scheduled/register_scheduled.dart';
+import '../models/scheduled/zone.dart';
 import '../providers/user_provider.dart';
 import '../services/scheduled_service.dart';
 import '../utils/map_functions.dart';
@@ -27,8 +29,10 @@ import 'element_scheduled_modal.dart';
 
 class ScheduledMapComponent extends StatefulWidget {
   final int? idSheduled;
+  final ScheduledZone? scheduledZone;
 
-  const ScheduledMapComponent({super.key, required this.idSheduled});
+  const ScheduledMapComponent(
+      {super.key, required this.idSheduled, this.scheduledZone});
 
   @override
   _ScheduledMapComponentState createState() => _ScheduledMapComponentState();
@@ -63,6 +67,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
   // Indices { S, R, C };
   Set<int> selectedIndices = {0, 1, 2};
+  int selectedZone = 0;
 
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
@@ -84,8 +89,12 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       mapWidth = mapInit;
     });
     bool isNewLocation = scheduledViewModel.positionToBeLoaded();
-    _initializeSheduledElements(isNewLocation: isNewLocation)
-        .then((value) => null);
+    // _initializeSheduledElements(isNewLocation: isNewLocation)
+    //     .then((value) => null);
+
+    // for (int i = 0; i < widget.scheduledZone!.subZones!.length; i++) {
+    //   selectedZoneIndices.add(i);
+    // }
   }
 
   @override
@@ -399,6 +408,12 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     });
   }
 
+  void handleZoneIconSelected(int value) {
+    setState(() {
+      selectedZone = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
@@ -511,6 +526,16 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                             },
                             selectedIndices: selectedIndices,
                             onIconsSelected: handleIconsSelected,
+                          ),
+                          if (kIsWeb) const SizedBox(height: 6),
+                          SingleSelectDropdown(
+                            onChanged: (int value) {
+                              handleZoneIconSelected(value);
+                            },
+                            items: widget.scheduledZone!.subZones!.map((e) {
+                              return e.cuenca!;
+                            }).toList(),
+                            selectedItemIndex: selectedZone,
                           ),
                         ],
                       ),
