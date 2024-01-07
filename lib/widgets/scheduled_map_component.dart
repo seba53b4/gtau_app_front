@@ -193,18 +193,18 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
         : scheduledNotInspectionedElement;
   }
 
-  void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) {
+  void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) async {
     ElementType elementType = ElementType.section;
     if (selectedItemsProvider.isPolylineSelected(
         line!.polylineId, elementType)) {
       selectedItemsProvider.togglePolylineSelected(
           line.polylineId, elementType);
       openFormElementWeb(false);
-      updateElementsOnMap();
+      await updateElementsOnMap();
     } else {
       if (selectedItemsProvider.isSomeElementSelected()) {
         selectedItemsProvider.clearAllElements();
-        updateElementsOnMap();
+        await updateElementsOnMap();
       } else {
         selectedItemsProvider.clearAllElements();
       }
@@ -215,15 +215,16 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     }
   }
 
-  void _onTapParamBehaviorCircle(int ogcFid, Circle? point, ElementType type) {
+  void _onTapParamBehaviorCircle(
+      int ogcFid, Circle? point, ElementType type) async {
     if (selectedItemsProvider.isCircleSelected(point!.circleId, type)) {
       selectedItemsProvider.toggleCircleSelected(point.circleId, type);
       openFormElementWeb(false);
-      updateElementsOnMap();
+      await updateElementsOnMap();
     } else {
       if (selectedItemsProvider.isSomeElementSelected()) {
         selectedItemsProvider.clearAllElements();
-        updateElementsOnMap();
+        await updateElementsOnMap();
       } else {
         selectedItemsProvider.clearAllElements();
       }
@@ -302,15 +303,17 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       location = scheduledViewModel.getPosition();
     });
 
-    final GoogleMapController controller = await _mapController.future;
-    controller.moveCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(location!.latitude, location!.longitude),
-          zoom: zoomMap,
+    if (isNewLocation) {
+      final GoogleMapController controller = await _mapController.future;
+      controller.moveCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(location!.latitude, location!.longitude),
+            zoom: zoomMap,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   void updateElementsOnMapOnFilter() {
@@ -562,7 +565,6 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                               handleZoneIconSelected(value);
                             },
                             onClose: () async {
-                              Future.delayed(const Duration(milliseconds: 400));
                               await _initializeSheduledElements(
                                   isNewLocation: true);
                             },
