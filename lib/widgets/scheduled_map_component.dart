@@ -475,14 +475,13 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                     top: 50,
                     bottom: null,
                     right: null,
-                    child: FloatingActionButton(
-                      foregroundColor: primarySwatch,
-                      backgroundColor: lightBackground,
+                    child: MenuElevatedButton(
+                      colorChangeOnPress: false,
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      tooltip: appLocalizations.placeholder_back_button,
-                      child: const Icon(Icons.arrow_back),
+                      tooltipMessage: appLocalizations.placeholder_back_button,
+                      icon: Icons.arrow_back,
                     ),
                   ),
                   LoadingOverlay(

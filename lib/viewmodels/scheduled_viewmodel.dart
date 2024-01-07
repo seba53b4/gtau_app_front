@@ -58,15 +58,18 @@ class ScheduledViewModel extends ChangeNotifier {
   }
 
   Future<ScheduledElements?> fetchScheduledElements(
-      String token, int scheduledId) async {
+      {required String token,
+      required int scheduledId,
+      double? originLongitude,
+      double? originLatitude,
+      int? radiusMeters,
+      int? subzone}) async {
     try {
       _isLoading = true;
       _error = false;
       ScheduledElements? entities =
-          await _scheduledService.fetchTaskScheduledEntities(
-        token,
-        scheduledId,
-      );
+          await _scheduledService.fetchTaskScheduledEntities(token, scheduledId,
+              originLongitude, originLatitude, radiusMeters, subzone);
 
       if (entities != null) {
         _catchments = entities.catchments;

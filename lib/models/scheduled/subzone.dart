@@ -51,12 +51,11 @@ class ScheduledSubZone {
       }
 
       polylines.add(Polyline(
-        points: latLngList,
-        color: zoneColor,
-        width: 5,
-        polylineId: PolylineId(Random().nextInt(10001).toString()),
-        consumeTapEvents: true,
-      ));
+          points: latLngList,
+          zIndex: -1,
+          color: zoneColor,
+          width: 5,
+          polylineId: PolylineId(Random().nextInt(10001).toString())));
     }
 
     return polylines;
