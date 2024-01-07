@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -467,6 +468,28 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                           }
                         },
                         onTap: (LatLng latLng) {},
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: MediaQuery.of(context).size.width / 2 - 180,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.8),
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(24.0),
+                            bottomRight: Radius.circular(24.0),
+                          ),
+                        ),
+                        child: Text(
+                          '${widget.scheduledZone!.name} - ${widget.scheduledZone!.subZones!.elementAt(selectedSubZone).cuenca}',
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 26),
+                        ),
                       ),
                     ),
                   ),
