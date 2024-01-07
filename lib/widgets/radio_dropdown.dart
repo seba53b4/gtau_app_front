@@ -7,11 +7,15 @@ class SingleSelectDropdown extends StatefulWidget {
   final List<String> items;
   final int selectedItemIndex;
   final Function(int) onChanged;
+  final Function()? onClose;
+  final IconData? icon;
 
   SingleSelectDropdown({
     required this.items,
     required this.selectedItemIndex,
     required this.onChanged,
+    required this.icon,
+    this.onClose,
   });
 
   @override
@@ -25,6 +29,11 @@ class _SingleSelectDropdownState extends State<SingleSelectDropdown> {
     double sizeIcon = kIsWeb ? 24 : 22;
 
     return PopupMenuButton<int>(
+      onCanceled: () {
+        if (widget.onClose != null) {
+          widget.onClose!();
+        }
+      },
       onSelected: (int newIndex) {
         setState(() {
           widget.onChanged(newIndex);
@@ -42,8 +51,7 @@ class _SingleSelectDropdownState extends State<SingleSelectDropdown> {
             minimumSize: Size(circleSize, circleSize),
             shape: const OvalBorder(),
           ),
-          child: Icon(Icons.map_outlined,
-              size: sizeIcon, color: primarySwatch[500]!),
+          child: Icon(widget.icon, size: sizeIcon, color: primarySwatch[500]!),
         ),
       ),
       itemBuilder: (BuildContext context) {
@@ -64,7 +72,7 @@ class _SingleSelectDropdownState extends State<SingleSelectDropdown> {
                       groupValue: widget.selectedItemIndex,
                       onChanged: (int? newValue) {
                         if (newValue != null) {
-                          widget.onChanged(newValue);
+                          widget.onChanged(newValue + 1);
                           Navigator.pop(context);
                         }
                       },

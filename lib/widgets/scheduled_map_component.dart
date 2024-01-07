@@ -67,8 +67,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
   // Indices { S, R, C };
   Set<int> selectedIndices = {0, 1, 2};
-  int selectedZone = 0;
-
+  int selectedSubZone = 0;
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
 
@@ -89,12 +88,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       mapWidth = mapInit;
     });
     bool isNewLocation = scheduledViewModel.positionToBeLoaded();
-    // _initializeSheduledElements(isNewLocation: isNewLocation)
-    //     .then((value) => null);
-
-    // for (int i = 0; i < widget.scheduledZone!.subZones!.length; i++) {
-    //   selectedZoneIndices.add(i);
-    // }
+    _initializeSheduledElements(isNewLocation: isNewLocation)
+        .then((value) => null);
   }
 
   @override
@@ -140,26 +135,31 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
-    await scheduledViewModel
-        .fetchScheduledElements(token, widget.idSheduled!)
-        .then((entities) {
+    if (kIsWeb) {
+      ScheduledElements? entities = await scheduledViewModel
+          .fetchScheduledElements(
+              token: token,
+              scheduledId: widget.idSheduled!,
+              subzone: widget.scheduledZone!.subZones!
+                  .elementAt(selectedSubZone)
+                  .id!)
+          .catchError((error) async {
+        // Manejo de error
+        await showCustomMessageDialog(
+          context: context,
+          onAcceptPressed: () {},
+          customText: AppLocalizations.of(context)!.error_service_not_available,
+          messageType: DialogMessageType.error,
+        );
+        return null;
+      });
       if (entities != null) {
-        updateElementsOnMap(
+        await updateElementsOnMap(
             isCache: false,
             isNewLocation: isNewLocation,
             scheduledElements: entities);
       }
-      return entities;
-    }).catchError((error) async {
-      // Manejo de error
-      await showCustomMessageDialog(
-        context: context,
-        onAcceptPressed: () {},
-        customText: AppLocalizations.of(context)!.error_service_not_available,
-        messageType: DialogMessageType.error,
-      );
-      return null;
-    });
+    }
   }
 
   Color _onColorParamBehaviorSection(SectionScheduled section) {
@@ -290,6 +290,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     }
     setState(() {
       polylines = getPolylines(sections);
+      polylines.addAll(getPolylinesSubZone());
       circles = getCircles(catchments, registers);
     });
 
@@ -330,14 +331,15 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
     setState(() {
       polylines = getPolylines(sectionsFilter);
+      polylines.addAll(getPolylinesSubZone());
       circles = getCircles(catchmentsFilter, registersFilter);
     });
   }
 
-  void resetSelectionsOnMap() {
+  void resetSelectionsOnMap() async {
     if (selectedItemsProvider.isSomeElementSelected()) {
       selectedItemsProvider.clearAllElements();
-      updateElementsOnMap();
+      await updateElementsOnMap();
     }
   }
 
@@ -349,9 +351,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
         Polyline pol = section.line!.copyWith(
           zIndexParam: 0,
           colorParam: _onColorParamBehaviorSection(section),
-          onTapParam: () {
+          onTapParam: () async {
             _onTapParamBehaviorPolyline(section.ogcFid!, section.line);
-            updateElementsOnMap();
+            await updateElementsOnMap();
           },
         );
         setPol.add(pol);
@@ -360,6 +362,11 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       }
     }
     return setPol;
+  }
+
+  Set<Polyline> getPolylinesSubZone() {
+    return Set<Polyline>.from(
+        widget.scheduledZone!.subZones!.elementAt(selectedSubZone).polylines);
   }
 
   Set<Circle> getCircles(List<CatchmentScheduled>? catchments,
@@ -373,10 +380,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           radiusParam: catchment.point!.radius,
           strokeWidthParam: catchment.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
-          onTapParam: () {
+          onTapParam: () async {
             _onTapParamBehaviorCircle(
                 catchment.ogcFid!, catchment.point, ElementType.catchment);
-            updateElementsOnMap();
+            await updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -390,10 +397,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           radiusParam: register.point!.radius,
           strokeWidthParam: register.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorRegister(register),
-          onTapParam: () {
+          onTapParam: () async {
             _onTapParamBehaviorCircle(
                 register.ogcFid!, register.point, ElementType.register);
-            updateElementsOnMap();
+            await updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -410,7 +417,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
   void handleZoneIconSelected(int value) {
     setState(() {
-      selectedZone = value;
+      selectedSubZone = value;
     });
   }
 
@@ -532,10 +539,16 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                             onChanged: (int value) {
                               handleZoneIconSelected(value);
                             },
+                            onClose: () async {
+                              Future.delayed(const Duration(milliseconds: 400));
+                              await _initializeSheduledElements(
+                                  isNewLocation: true);
+                            },
+                            icon: Icons.map_outlined,
                             items: widget.scheduledZone!.subZones!.map((e) {
                               return e.cuenca!;
                             }).toList(),
-                            selectedItemIndex: selectedZone,
+                            selectedItemIndex: selectedSubZone,
                           ),
                         ],
                       ),
