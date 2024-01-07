@@ -67,6 +67,9 @@ class ScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
+      if (kDebugMode) {
+        await Future.delayed(const Duration(milliseconds: 250));
+      }
       ScheduledElements? entities =
           await _scheduledService.fetchTaskScheduledEntities(token, scheduledId,
               originLongitude, originLatitude, radiusMeters, subzone);

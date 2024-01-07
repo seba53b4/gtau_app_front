@@ -74,14 +74,10 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    isAdmin = context
-        .read<UserProvider>()
-        .isAdmin!;
+    isAdmin = context.read<UserProvider>().isAdmin!;
     taskListScheduledViewModel =
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
-    token = Provider
-        .of<UserProvider>(context, listen: false)
-        .getToken!;
+    token = Provider.of<UserProvider>(context, listen: false).getToken!;
     scheduledViewModel =
         Provider.of<ScheduledViewModel>(context, listen: false);
     zoneLoadViewModel = null;
@@ -160,11 +156,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              ScheduledMapComponent(
-                  idSheduled: widget.scheduledId,
-                  scheduledZone: scheduledZone)
-      ),
+          builder: (context) => ScheduledMapComponent(
+              idSheduled: widget.scheduledId, scheduledZone: scheduledZone)),
     );
   }
 
@@ -313,8 +306,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
               height: creatingScheduled
                   ? 730 + heightToAddOnCreate
                   : widget.isEdit
-                  ? 620
-                  : 700,
+                      ? 600
+                      : 680,
               width: widthRow * 1.15,
               padding: const EdgeInsets.all(24),
               child: Form(
@@ -336,7 +329,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                         CustomTextFormField(
                           width: widthRow,
                           hintText:
-                          appLocalizations.default_placeHolderInputText,
+                              appLocalizations.default_placeHolderInputText,
                           controller: titleController,
                         ),
                         SizedBox(
@@ -359,12 +352,12 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                     width: AppConstants.textFieldWidth,
                                     child: InkWell(
                                       overlayColor:
-                                      MaterialStateColor.resolveWith(
+                                          MaterialStateColor.resolveWith(
                                               (states) => Colors.transparent),
                                       onTap: () async {
                                         final DateTime? pickedDate =
-                                        await showCustomDatePicker(
-                                            context, startDate!);
+                                            await showCustomDatePicker(
+                                                context, startDate!);
                                         if (pickedDate != null) {
                                           _handleStartDateChange(pickedDate);
                                         }
@@ -395,12 +388,12 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                     width: AppConstants.textFieldWidth,
                                     child: InkWell(
                                       overlayColor:
-                                      MaterialStateColor.resolveWith(
+                                          MaterialStateColor.resolveWith(
                                               (states) => Colors.transparent),
                                       onTap: () async {
                                         final DateTime? pickedDate =
-                                        await showCustomDatePicker(
-                                            context, startDate!);
+                                            await showCustomDatePicker(
+                                                context, startDate!);
                                         if (pickedDate != null) {
                                           _handleReleasedDateChange(pickedDate);
                                         }
@@ -456,7 +449,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                           maxLines: 10,
                           width: widthRow,
                           hintText:
-                          appLocalizations.default_descriptionPlaceholder,
+                              appLocalizations.default_descriptionPlaceholder,
                           controller: descriptionController,
                         ),
                         const SizedBox(height: 24.0),
@@ -560,12 +553,12 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                           children: [
                                             Visibility(
                                               visible: (geojsonFromFile
-                                                  .isNotEmpty &&
-                                                  (!zoneLoadViewModel
-                                                      .error &&
-                                                      zoneLoadViewModel
-                                                          .result ==
-                                                          null)) ||
+                                                          .isNotEmpty &&
+                                                      (!zoneLoadViewModel
+                                                              .error &&
+                                                          zoneLoadViewModel
+                                                                  .result ==
+                                                              null)) ||
                                                   (geojsonFromFile.isEmpty &&
                                                       taskListScheduledViewModel
                                                           .isLoading),
@@ -573,40 +566,40 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                 children: [
                                                   zoneLoadViewModel.warning
                                                       ? Text(
-                                                    zoneLoadViewModel
-                                                        .message!,
-                                                    textAlign:
-                                                    TextAlign.center,
-                                                  )
+                                                          zoneLoadViewModel
+                                                              .message!,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        )
                                                       : Text(
-                                                    appLocalizations
-                                                        .file_upload_message_information,
-                                                    textAlign:
-                                                    TextAlign.center,
-                                                    style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                        FontWeight
-                                                            .w400),
-                                                  ),
+                                                          appLocalizations
+                                                              .file_upload_message_information,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        ),
                                                   const SizedBox(height: 4),
                                                   Visibility(
                                                     visible: (geojsonFromFile
-                                                        .isNotEmpty &&
-                                                        (zoneLoadViewModel
-                                                            .isLoading ||
-                                                            !zoneLoadViewModel
-                                                                .connected)) ||
+                                                                .isNotEmpty &&
+                                                            (zoneLoadViewModel
+                                                                    .isLoading ||
+                                                                !zoneLoadViewModel
+                                                                    .connected)) ||
                                                         (geojsonFromFile
-                                                            .isEmpty &&
+                                                                .isEmpty &&
                                                             taskListScheduledViewModel
                                                                 .isLoading),
                                                     child: Center(
                                                       child:
-                                                      LoadingAnimationWidget
-                                                          .waveDots(
+                                                          LoadingAnimationWidget
+                                                              .waveDots(
                                                         color:
-                                                        primarySwatch[400]!,
+                                                            primarySwatch[400]!,
                                                         size: 36,
                                                       ),
                                                     ),
@@ -618,22 +611,22 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                               title: appLocalizations
                                                   .file_upload_creating_scheduled,
                                               isLoading:
-                                              taskListScheduledViewModel
-                                                  .isLoading,
+                                                  taskListScheduledViewModel
+                                                      .isLoading,
                                               iconCheck:
-                                              taskScheduledResponse != null,
+                                                  taskScheduledResponse != null,
                                             ),
                                             Visibility(
                                               visible:
-                                              geojsonFromFile.isNotEmpty,
+                                                  geojsonFromFile.isNotEmpty,
                                               child: TaskCreationStatusRow(
                                                 title: appLocalizations
                                                     .file_upload_creating_zone,
                                                 isLoading: scheduledViewModel
                                                     .isLoading,
                                                 iconCheck:
-                                                zoneCreated != null &&
-                                                    zoneCreated!,
+                                                    zoneCreated != null &&
+                                                        zoneCreated!,
                                               ),
                                             ),
                                             Visibility(
@@ -645,19 +638,19 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                 isLoading: !zoneLoadViewModel
                                                     .connected,
                                                 iconCheck:
-                                                zoneLoadViewModel.connected,
+                                                    zoneLoadViewModel.connected,
                                               ),
                                             ),
                                             Visibility(
                                               visible: zoneLoadViewModel
-                                                  .connected ||
+                                                      .connected ||
                                                   zoneLoadViewModel.result !=
                                                       null,
                                               child: Column(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                    MainAxisAlignment.center,
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                                    CrossAxisAlignment.center,
                                                 children: [
                                                   TaskCreationStatusRow(
                                                     title: appLocalizations
@@ -688,8 +681,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                             ),
                                             if (zoneLoadViewModel.error)
                                               Text(
-                                                'Error: ${zoneLoadViewModel
-                                                    .message}',
+                                                'Error: ${zoneLoadViewModel.message}',
                                                 style: TextStyle(
                                                     fontSize: fontCreateTask),
                                                 textAlign: TextAlign.center,
@@ -700,17 +692,17 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                               Text(
                                                 zoneLoadViewModel.result!
                                                     ? appLocalizations
-                                                    .file_upload_success
+                                                        .file_upload_success
                                                     : appLocalizations
-                                                    .file_upload_error,
+                                                        .file_upload_error,
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     color: zoneLoadViewModel
-                                                        .result!
+                                                            .result!
                                                         ? primarySwatch[600]
                                                         : redColor,
                                                     fontWeight:
-                                                    FontWeight.w400),
+                                                        FontWeight.w400),
                                                 textAlign: TextAlign.center,
                                               ),
                                           ],
@@ -780,15 +772,15 @@ class TaskCreationStatusRow extends StatelessWidget {
           visible: !isLoading,
           child: iconCheck
               ? Icon(
-            Icons.check_circle,
-            color: primarySwatch[400]!,
-            size: iconCreateResult,
-          )
+                  Icons.check_circle,
+                  color: primarySwatch[400]!,
+                  size: iconCreateResult,
+                )
               : Icon(
-            Icons.error,
-            color: !isLoading ? Colors.transparent : Colors.red,
-            size: iconCreateResult,
-          ),
+                  Icons.error,
+                  color: !isLoading ? Colors.transparent : Colors.red,
+                  size: iconCreateResult,
+                ),
         ),
         const SizedBox(width: 4),
         Text(

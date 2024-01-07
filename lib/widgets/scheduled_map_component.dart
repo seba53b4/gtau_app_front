@@ -10,7 +10,6 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/scheduled/catchment_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
-import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:gtau_app_front/widgets/radio_dropdown.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +26,7 @@ import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
 import 'common/scheduled_form_widget.dart';
 import 'element_scheduled_modal.dart';
+import 'loading_overlay.dart';
 
 class ScheduledMapComponent extends StatefulWidget {
   final int? idSheduled;
@@ -39,7 +39,8 @@ class ScheduledMapComponent extends StatefulWidget {
   _ScheduledMapComponentState createState() => _ScheduledMapComponentState();
 }
 
-class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
+class _ScheduledMapComponentState extends State<ScheduledMapComponent>
+    with TickerProviderStateMixin {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
   MapType _currentMapType = MapType.satellite;
@@ -71,6 +72,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   int selectedSubZone = 0;
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
+  late AnimationController _animationController;
 
   @override
   void initState() {
@@ -79,6 +81,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     selectedItemsProvider = context.read<SelectedItemsProvider>();
     scheduledViewModel = context.read<ScheduledViewModel>();
     token = context.read<UserProvider>().getToken!;
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 5),
+    );
   }
 
   @override
@@ -88,9 +94,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     setState(() {
       mapWidth = mapInit;
     });
-    bool isNewLocation = scheduledViewModel.positionToBeLoaded();
-    _initializeSheduledElements(isNewLocation: isNewLocation)
-        .then((value) => null);
+
+    _initializeSheduledElements(isNewLocation: true).then((value) => null);
   }
 
   @override
@@ -239,6 +244,11 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       setState(() {
         _scheduledFormWidgetKey = UniqueKey();
         viewDetailElementInfo = newStatus;
+        if (viewDetailElementInfo) {
+          _animationController.forward(); // Inicia la animación de apertura
+        } else {
+          _animationController.reverse(); // Inicia la animación de cierre
+        }
       });
     }
   }
@@ -425,6 +435,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     });
   }
 
+  void onCloseSingleDropDown() async {
+    await _initializeSheduledElements(isNewLocation: true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
@@ -439,7 +453,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
               child: Stack(
                 children: [
                   AnimatedContainer(
-                    duration: const Duration(milliseconds: 0),
+                    duration: _animationController.duration ??
+                        const Duration(milliseconds: 100),
                     width: viewDetailElementInfo
                         ? mapWidth - modalWidth
                         : mapWidth,
@@ -564,9 +579,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                             onChanged: (int value) {
                               handleZoneIconSelected(value);
                             },
-                            onClose: () async {
-                              await _initializeSheduledElements(
-                                  isNewLocation: true);
+                            onClose: () {
+                              onCloseSingleDropDown();
                             },
                             icon: Icons.map_outlined,
                             items: widget.scheduledZone!.subZones!.map((e) {
@@ -586,7 +600,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 0),
+                  duration: _animationController?.duration ??
+                      const Duration(milliseconds: 100),
                   onEnd: () {},
                   curve: Curves.easeIn,
                   width: viewDetailElementInfo ? modalWidth : 0,
