@@ -310,7 +310,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       ? kIsWeb
                           ? 600
                           : 835
-                      : 680,
+                      : 706,
               width: widthRow * 1.15,
               padding: const EdgeInsets.all(24),
               child: Form(
