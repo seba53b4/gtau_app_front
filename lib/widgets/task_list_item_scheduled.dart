@@ -13,6 +13,7 @@ import '../providers/user_provider.dart';
 import '../utils/date_utils.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
+import 'loading_overlay.dart';
 
 class TaskListItemScheduled extends StatelessWidget {
   final TaskScheduled? taskScheduled;
@@ -170,6 +171,7 @@ class TaskListItemScheduled extends StatelessWidget {
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     final showDialogContext = scaffoldKey.currentContext!;
 
+    // Mostrar el diálogo de confirmación
     await showCustomDialog(
       context: showDialogContext,
       title: AppLocalizations.of(showDialogContext)!.dialogWarning,
@@ -179,7 +181,19 @@ class TaskListItemScheduled extends StatelessWidget {
       },
       onEnablePressed: () async {
         Navigator.of(showDialogContext).pop();
+        LoadingOverlay loadingOverlay = LoadingOverlay(
+          isLoading: true,
+          child: Container(),
+        );
+        showDialog(
+          context: showDialogContext,
+          builder: (BuildContext context) => loadingOverlay,
+          barrierDismissible: false,
+        );
+
         bool result = await _deleteTask(context, taskScheduled!.id!);
+
+        Navigator.of(showDialogContext).pop();
 
         if (result) {
           await showCustomMessageDialog(

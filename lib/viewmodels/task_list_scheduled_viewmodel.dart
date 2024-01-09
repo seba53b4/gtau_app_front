@@ -226,15 +226,12 @@ class TaskListScheduledViewModel extends ChangeNotifier {
           await _scheduledService.deleteTaskScheduled(token, scheduledId);
 
       if (response) {
-        print('Tarea ha sido eliminada correctamente');
         return true;
       } else {
-        print('No se pudo eliminar la tarea');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
       throw Exception('Error al eliminar la tarea');
     } finally {
       _isLoading = false;
