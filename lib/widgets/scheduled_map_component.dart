@@ -85,6 +85,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
       vsync: this,
       duration: const Duration(milliseconds: 5),
     );
+    if (!kIsWeb) {
+      getCurrentLocation();
+    }
   }
 
   @override
@@ -115,12 +118,11 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
       Position currentPosition = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.best);
       setState(() {
-        final locationGPS =
-            LatLng(currentPosition.latitude, currentPosition.longitude);
+        location = LatLng(currentPosition.latitude, currentPosition.longitude);
 
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
-          position: locationGPS,
+          position: location!,
         );
         markers.add(newMarker);
       });
@@ -141,30 +143,36 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
   }
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
-    if (kIsWeb) {
-      ScheduledElements? entities = await scheduledViewModel
-          .fetchScheduledElements(
-              token: token,
-              scheduledId: widget.idSheduled!,
-              subzone: widget.scheduledZone!.subZones!
-                  .elementAt(selectedSubZone)
-                  .id!)
-          .catchError((error) async {
-        // Manejo de error
-        await showCustomMessageDialog(
-          context: context,
-          onAcceptPressed: () {},
-          customText: AppLocalizations.of(context)!.error_service_not_available,
-          messageType: DialogMessageType.error,
-        );
-        return null;
-      });
-      if (entities != null) {
-        await updateElementsOnMap(
-            isCache: false,
-            isNewLocation: isNewLocation,
-            scheduledElements: entities);
-      }
+    double? latitude, longitude;
+    int radio = 200;
+    if (!kIsWeb) {
+      latitude = location?.latitude;
+      longitude = location?.longitude;
+    }
+    ScheduledElements? entities = await scheduledViewModel
+        .fetchScheduledElements(
+            token: token,
+            scheduledId: widget.idSheduled!,
+            originLatitude: latitude,
+            originLongitude: longitude,
+            radiusMeters: radio,
+            subzone:
+                widget.scheduledZone!.subZones!.elementAt(selectedSubZone).id!)
+        .catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_service_not_available,
+        messageType: DialogMessageType.error,
+      );
+      return null;
+    });
+    if (entities != null) {
+      await updateElementsOnMap(
+          isCache: false,
+          isNewLocation: isNewLocation,
+          scheduledElements: entities);
     }
   }
 
@@ -305,24 +313,25 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
       polylines.addAll(getPolylinesSubZone());
       circles = getCircles(catchments, registers);
     });
+    if (kIsWeb) {
+      if (isNewLocation) {
+        await scheduledViewModel.getRandomPosition(polylines, circles);
+      }
+      setState(() {
+        location = scheduledViewModel.getPosition();
+      });
 
-    if (isNewLocation) {
-      await scheduledViewModel.getRandomPosition(polylines, circles);
-    }
-    setState(() {
-      location = scheduledViewModel.getPosition();
-    });
-
-    if (isNewLocation) {
-      final GoogleMapController controller = await _mapController.future;
-      controller.moveCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: LatLng(location!.latitude, location!.longitude),
-            zoom: zoomMap,
+      if (isNewLocation) {
+        final GoogleMapController controller = await _mapController.future;
+        controller.moveCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(location!.latitude, location!.longitude),
+              zoom: zoomMap,
+            ),
           ),
-        ),
-      );
+        );
+      }
     }
   }
 
@@ -490,8 +499,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                     ),
                   ),
                   Positioned(
-                    top: 0,
-                    left: MediaQuery.of(context).size.width / 2 - 180,
+                    top: kIsWeb ? 0 : null,
+                    left: MediaQuery.of(context).size.width / 2 -
+                        (kIsWeb ? 180 : 100),
+                    bottom: kIsWeb ? null : 0,
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                       child: Container(
@@ -499,14 +510,15 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.8),
                           borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(24.0),
-                            bottomRight: Radius.circular(24.0),
-                          ),
+                              bottomLeft: Radius.circular(kIsWeb ? 24.0 : 0.0),
+                              bottomRight: Radius.circular(kIsWeb ? 24.0 : 0.0),
+                              topLeft: Radius.circular(!kIsWeb ? 24.0 : 0.0),
+                              topRight: Radius.circular(!kIsWeb ? 24.0 : 0.0)),
                         ),
                         child: Text(
                           '${widget.scheduledZone!.name} - ${widget.scheduledZone!.subZones!.elementAt(selectedSubZone).cuenca}',
                           style: const TextStyle(
-                              color: Colors.white, fontSize: 26),
+                              color: Colors.white, fontSize: kIsWeb ? 26 : 18),
                         ),
                       ),
                     ),

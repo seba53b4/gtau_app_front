@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
@@ -281,7 +282,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
     return Column(children: [
       Visibility(
-        visible: widget.isEdit,
+        visible: widget.isEdit && kIsWeb,
         child: Align(
           alignment: Alignment.topLeft,
           child: Padding(
@@ -306,7 +307,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
               height: creatingScheduled
                   ? 730 + heightToAddOnCreate
                   : widget.isEdit
-                      ? 600
+                      ? kIsWeb
+                          ? 600
+                          : 835
                       : 680,
               width: widthRow * 1.15,
               padding: const EdgeInsets.all(24),
@@ -316,7 +319,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                   children: [
                     Text(
                       appLocalizations.scheduled_main_title,
-                      style: const TextStyle(fontSize: 32.0),
+                      style: const TextStyle(fontSize: kIsWeb ? 32.0 : 22),
                     ),
                     Column(
                       children: [
@@ -334,109 +337,250 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                         ),
                         SizedBox(
                           width: widthRow,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                children: [
-                                  const SizedBox(
-                                      height: AppConstants.taskColumnSpace),
-                                  Text(
-                                    appLocalizations
-                                        .createTaskPage_startDateTitle,
-                                    style: const TextStyle(fontSize: 16.0),
-                                  ),
-                                  const SizedBox(height: 12.0),
-                                  SizedBox(
-                                    width: AppConstants.textFieldWidth,
-                                    child: InkWell(
-                                      overlayColor:
-                                          MaterialStateColor.resolveWith(
-                                              (states) => Colors.transparent),
-                                      onTap: () async {
-                                        final DateTime? pickedDate =
-                                            await showCustomDatePicker(
-                                                context, startDate!);
-                                        if (pickedDate != null) {
-                                          _handleStartDateChange(pickedDate);
-                                        }
-                                      },
-                                      child: IgnorePointer(
-                                        child: CustomTextFormField(
-                                          width: AppConstants.taskRowSpace,
-                                          hintText: appLocalizations
+                          child: kIsWeb
+                              ? Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
+                                        Text(
+                                          appLocalizations
                                               .createTaskPage_startDateTitle,
-                                          controller: addDateController,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
                                         ),
-                                      ),
+                                        const SizedBox(height: 12.0),
+                                        SizedBox(
+                                          width: AppConstants.textFieldWidth,
+                                          child: InkWell(
+                                            overlayColor:
+                                                MaterialStateColor.resolveWith(
+                                                    (states) =>
+                                                        Colors.transparent),
+                                            onTap: () async {
+                                              final DateTime? pickedDate =
+                                                  await showCustomDatePicker(
+                                                      context, startDate!);
+                                              if (pickedDate != null) {
+                                                _handleStartDateChange(
+                                                    pickedDate);
+                                              }
+                                            },
+                                            child: IgnorePointer(
+                                              child: CustomTextFormField(
+                                                width:
+                                                    AppConstants.taskRowSpace,
+                                                hintText: appLocalizations
+                                                    .createTaskPage_startDateTitle,
+                                                controller: addDateController,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Column(
-                                children: [
-                                  const SizedBox(
-                                      height: AppConstants.taskColumnSpace),
-                                  Text(
-                                    appLocalizations.scheduled_end_date_title,
-                                    style: const TextStyle(fontSize: 16.0),
-                                  ),
-                                  const SizedBox(height: 12.0),
-                                  SizedBox(
-                                    width: AppConstants.textFieldWidth,
-                                    child: InkWell(
-                                      overlayColor:
-                                          MaterialStateColor.resolveWith(
-                                              (states) => Colors.transparent),
-                                      onTap: () async {
-                                        final DateTime? pickedDate =
-                                            await showCustomDatePicker(
-                                                context, startDate!);
-                                        if (pickedDate != null) {
-                                          _handleReleasedDateChange(pickedDate);
-                                        }
-                                      },
-                                      child: IgnorePointer(
-                                        child: CustomTextFormField(
-                                          useValidation: false,
-                                          width: AppConstants.taskRowSpace,
-                                          hintText: appLocalizations
+                                    const SizedBox(height: 8),
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
+                                        Text(
+                                          appLocalizations
                                               .scheduled_end_date_title,
-                                          controller: releasedDateController,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
                                         ),
-                                      ),
+                                        const SizedBox(height: 12.0),
+                                        SizedBox(
+                                          width: AppConstants.textFieldWidth,
+                                          child: InkWell(
+                                            overlayColor:
+                                                MaterialStateColor.resolveWith(
+                                                    (states) =>
+                                                        Colors.transparent),
+                                            onTap: () async {
+                                              final DateTime? pickedDate =
+                                                  await showCustomDatePicker(
+                                                      context, startDate!);
+                                              if (pickedDate != null) {
+                                                _handleReleasedDateChange(
+                                                    pickedDate);
+                                              }
+                                            },
+                                            child: IgnorePointer(
+                                              child: CustomTextFormField(
+                                                useValidation: false,
+                                                width:
+                                                    AppConstants.taskRowSpace,
+                                                hintText: appLocalizations
+                                                    .scheduled_end_date_title,
+                                                controller:
+                                                    releasedDateController,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: AppConstants.taskRowSpace),
-                              Column(
-                                children: [
-                                  Text(
-                                    appLocalizations.editTaskPage_statusTitle,
-                                    style: const TextStyle(fontSize: 16.0),
-                                  ),
-                                  const SizedBox(
-                                      height: AppConstants.taskColumnSpace),
-                                  CustomDropdown(
-                                    isStatus: true,
-                                    value: taskStatus,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        taskStatus = value!;
-                                      });
-                                    },
-                                    items: TaskStatus.values
-                                        .map((status) => status.value)
-                                        .toList(),
-                                  ),
-                                  const SizedBox(height: 28),
-                                ],
-                              ),
-                            ],
-                          ),
+                                    const SizedBox(
+                                        height: AppConstants.taskRowSpace),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          appLocalizations
+                                              .editTaskPage_statusTitle,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
+                                        CustomDropdown(
+                                          isStatus: true,
+                                          value: taskStatus,
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              taskStatus = value!;
+                                            });
+                                          },
+                                          items: TaskStatus.values
+                                              .map((status) => status.value)
+                                              .toList(),
+                                        ),
+                                        const SizedBox(height: 28),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        // const SizedBox(
+                                        //     height:
+                                        //         AppConstants.taskColumnSpace),
+                                        Text(
+                                          appLocalizations
+                                              .createTaskPage_startDateTitle,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        SizedBox(
+                                          width: AppConstants.textFieldWidth,
+                                          child: InkWell(
+                                            overlayColor:
+                                                MaterialStateColor.resolveWith(
+                                                    (states) =>
+                                                        Colors.transparent),
+                                            onTap: () async {
+                                              final DateTime? pickedDate =
+                                                  await showCustomDatePicker(
+                                                      context, startDate!);
+                                              if (pickedDate != null) {
+                                                _handleStartDateChange(
+                                                    pickedDate);
+                                              }
+                                            },
+                                            child: IgnorePointer(
+                                              child: CustomTextFormField(
+                                                width:
+                                                    AppConstants.taskRowSpace,
+                                                fontSize: 14,
+                                                hintText: appLocalizations
+                                                    .createTaskPage_startDateTitle,
+                                                controller: addDateController,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // const SizedBox(height: 8),
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
+                                        Text(
+                                          appLocalizations
+                                              .scheduled_end_date_title,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        SizedBox(
+                                          width: AppConstants.textFieldWidth,
+                                          child: InkWell(
+                                            overlayColor:
+                                                MaterialStateColor.resolveWith(
+                                                    (states) =>
+                                                        Colors.transparent),
+                                            onTap: () async {
+                                              final DateTime? pickedDate =
+                                                  await showCustomDatePicker(
+                                                      context, startDate!);
+                                              if (pickedDate != null) {
+                                                _handleReleasedDateChange(
+                                                    pickedDate);
+                                              }
+                                            },
+                                            child: IgnorePointer(
+                                              child: CustomTextFormField(
+                                                useValidation: false,
+                                                fontSize: 14,
+                                                width:
+                                                    AppConstants.taskRowSpace,
+                                                hintText: appLocalizations
+                                                    .scheduled_end_date_title,
+                                                controller:
+                                                    releasedDateController,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    // const SizedBox(
+                                    //     height: AppConstants.taskRowSpace),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          appLocalizations
+                                              .editTaskPage_statusTitle,
+                                          style:
+                                              const TextStyle(fontSize: 18.0),
+                                        ),
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
+                                        CustomDropdown(
+                                          isStatus: true,
+                                          value: taskStatus,
+                                          fontSize: 14,
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              taskStatus = value!;
+                                            });
+                                          },
+                                          items: TaskStatus.values
+                                              .map((status) => status.value)
+                                              .toList(),
+                                        ),
+                                        const SizedBox(height: 26),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                         ),
                         Text(
                           appLocalizations.default_descriptionTitle,
@@ -723,7 +867,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
             ),
             const SizedBox(height: AppConstants.taskColumnSpace),
             Visibility(
-              visible: !creatingScheduled,
+              visible: !creatingScheduled && isAdmin,
               child: CustomElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
