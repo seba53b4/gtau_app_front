@@ -7,6 +7,7 @@ import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:gtau_app_front/widgets/common/informe_upload_component.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -1264,7 +1265,20 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                       this.imagesFiles = imagesFiles;
                                     },
                                     idTask: widget.idTask),
-                                ImageGalleryModal(idTask: widget.idTask!),
+                                    ImageGalleryModal(idTask: widget.idTask!),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            AppLocalizations.of(context)!.informe_title,
+                              style: const TextStyle(fontSize: 16.0),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            width: widthRow,
+                            child: Column(
+                              children: [                                   
+                                InformeUploadComponent(idTask: widget.idTask!)
                               ],
                             ),
                           ),

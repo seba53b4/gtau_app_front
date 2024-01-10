@@ -366,59 +366,35 @@ class TaskService {
     }
   }
 
-  Future<List<String>?> putBase64Informes(
-      String token, int id, String path) async {
+  Future<String> putBase64Informes(String token, int id, Map<String, dynamic> informe) async {
     try {
-      Uri uri = Uri.parse(path);
-      String basename = p.basename(uri.path);
+      // Uri uri = Uri.parse(path);
+      // String basename = p.basename(uri.path);
 
-      Map<String, String> imageEncode = await imageToBase64(path);
-      var extension = imageEncode['ext'];
-      var content = imageEncode['content'];
-      var base64 = imageEncode['base64'];
+      // Map<String, String> informeEncode = await informeToBase64(path);
+      var content = 'application/pdf';
+      var extension = 'pdf';
+      var base64 = informe['base64'];
+      var fileName = informe['fileName'];
       final Map<String, dynamic> body = {
         "informe": "$content,$base64",
-        "name": "$basename.$extension"
+        "name": "$fileName.$extension"
       };
 
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse('$baseUrl/$id/informe/v2');
-      final response =
-          await http.post(url, headers: _getHeaders(token), body: jsonBody);
-
+      final response = await http.post(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         //Cuando ingresa a la galeria la imagen se renderiza de todas formas, no es necesario hacer nada aca.
         var informe = jsonResponse['informe'];
-        var id = jsonResponse['inspectionTaskId'];
-
-        return jsonResponse.entries.map<String>((entry) {
-          return "${entry.key}: ${entry.value}"; //Agrego esto por aca solo para que no salte error
-        }).toList();
+        return informe;
       } else {
-        return null;
+        return '';
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error in putBase64Informes: $error');
-      }
-      rethrow;
-    }
-  }
-
-  Future<bool> putMultipartInforme(String token, int id, String path) async {
-    try {
-      final url = Uri.parse('$baseUrl/$id/informe');
-      var request = http.MultipartRequest("POST", url);
-      request.headers.addAll(_getHeaders(token));
-      request.files.add(await http.MultipartFile.fromPath('informe', path,
-          contentType: MediaType('informe', 'pdf')));
-      var response = await request.send();
-
-      return response.statusCode == 200;
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error in putMultipartInforme: $error');
+        print('Error al guardar informes: $error');
       }
       rethrow;
     }
@@ -433,7 +409,6 @@ class TaskService {
       final url = Uri.parse('$baseUrl/$id/informe');
       final response =
           await http.delete(url, headers: _getHeaders(token), body: jsonBody);
-
       if (response.statusCode == 200) {
         final bool jsonResponse = json.decode(response.body);
 
@@ -443,7 +418,7 @@ class TaskService {
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error in deleteTaskInforme: $error');
+        print('Error al borrar informe: $error');
       }
       rethrow;
     }
