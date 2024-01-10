@@ -71,7 +71,7 @@ class TaskListItemScheduled extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               child: CircleAvatar(
-                backgroundColor: primarySwatch[900],
+                backgroundColor: Colors.deepPurple,
                 radius: 20,
                 child: Text(
                   'P',

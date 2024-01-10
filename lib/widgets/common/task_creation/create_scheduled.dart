@@ -239,11 +239,15 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     });
     zoneLoadViewModel!.initWS();
     await zoneLoadViewModel!.waitForWebSocketConnection();
-    zoneLoadViewModel!.sendMessage(
+    initializeProcess();
+  }
+
+  void initializeProcess() {
+    zoneLoadViewModel!.initializeProcess(
         token: token,
         operation: 'start',
         type: 'SCHEDULED_CHARGE',
-        id: taskScheduledResponse.id!);
+        id: taskScheduledResponse!.id!);
   }
 
   Future<bool> handleAcceptOnShowDialogEditTask() async {
@@ -641,7 +645,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                   },
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 8),
                             ],
                           ),
                         ),
@@ -665,57 +669,79 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                     ),
                     Visibility(
                       visible: creatingScheduled,
-                      child: Container(
-                        width: widthRow * 0.6,
-                        height: 258,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: SizedBox(
-                          child: Consumer<ScheduledViewModel>(
-                            builder: (context, scheduledViewModel, child) {
-                              return Consumer<TaskListScheduledViewModel>(
-                                builder: (context, taskListScheduledViewModel,
-                                    child) {
-                                  return Consumer<ZoneLoadViewModel>(
-                                    builder:
-                                        (context, zoneLoadViewModel, child) {
-                                      return Visibility(
-                                        key: UniqueKey(),
-                                        visible: true,
-                                        child: Column(
-                                          children: [
-                                            Visibility(
-                                              visible: (geojsonFromFile
-                                                          .isNotEmpty &&
-                                                      (!zoneLoadViewModel
-                                                              .error &&
-                                                          zoneLoadViewModel
-                                                                  .result ==
-                                                              null)) ||
-                                                  (geojsonFromFile.isEmpty &&
-                                                      taskListScheduledViewModel
-                                                          .isLoading),
+                      child: Consumer<ScheduledViewModel>(
+                        builder: (context, scheduledViewModel, child) {
+                          return Consumer<TaskListScheduledViewModel>(
+                            builder:
+                                (context, taskListScheduledViewModel, child) {
+                              return Consumer<ZoneLoadViewModel>(
+                                builder: (context, zoneLoadViewModel, child) {
+                                  return Container(
+                                    width: widthRow * 0.6,
+                                    height: zoneLoadViewModel
+                                                .processAlreadyRunning ||
+                                            zoneLoadViewModel.warning
+                                        ? 150
+                                        : 258,
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: SizedBox(
+                                      child: zoneLoadViewModel
+                                                  .processAlreadyRunning ||
+                                              zoneLoadViewModel.warning
+                                          ? Column(children: [
+                                              const Text(
+                                                'Existe un proceso ejecutándose, espere unos minutos y vuelva a intentar.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 24),
+                                              CustomElevatedButton(
+                                                  showLoading: zoneLoadViewModel
+                                                      .isRetrying,
+                                                  loadingDuration: 1000,
+                                                  onPressed: () async {
+                                                    await zoneLoadViewModel.retryProcess(
+                                                        token: token,
+                                                        operation: 'start',
+                                                        type:
+                                                            'SCHEDULED_CHARGE',
+                                                        id: taskScheduledResponse!
+                                                            .id!);
+                                                  },
+                                                  text: 'Reintentar')
+                                            ])
+                                          : Visibility(
+                                              key: UniqueKey(),
+                                              visible: true,
                                               child: Column(
                                                 children: [
-                                                  zoneLoadViewModel.warning
-                                                      ? Text(
-                                                          zoneLoadViewModel
-                                                              .message!,
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        )
-                                                      : Text(
+                                                  Visibility(
+                                                    visible: (geojsonFromFile
+                                                                .isNotEmpty &&
+                                                            (!zoneLoadViewModel
+                                                                    .error &&
+                                                                zoneLoadViewModel
+                                                                        .result ==
+                                                                    null)) ||
+                                                        (geojsonFromFile
+                                                                .isEmpty &&
+                                                            taskListScheduledViewModel
+                                                                .isLoading),
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
                                                           appLocalizations
                                                               .file_upload_message_information,
                                                           textAlign:
@@ -726,139 +752,162 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                                   FontWeight
                                                                       .w400),
                                                         ),
-                                                  const SizedBox(height: 4),
-                                                  Visibility(
-                                                    visible: (geojsonFromFile
-                                                                .isNotEmpty &&
-                                                            (zoneLoadViewModel
-                                                                    .isLoading ||
-                                                                !zoneLoadViewModel
-                                                                    .connected)) ||
-                                                        (geojsonFromFile
-                                                                .isEmpty &&
-                                                            taskListScheduledViewModel
-                                                                .isLoading),
-                                                    child: Center(
-                                                      child:
-                                                          LoadingAnimationWidget
-                                                              .waveDots(
-                                                        color:
-                                                            primarySwatch[400]!,
-                                                        size: 36,
-                                                      ),
+                                                        const SizedBox(
+                                                            height: 4),
+                                                        Visibility(
+                                                          visible: (geojsonFromFile
+                                                                      .isNotEmpty &&
+                                                                  (zoneLoadViewModel
+                                                                          .isLoading ||
+                                                                      !zoneLoadViewModel
+                                                                          .connected)) ||
+                                                              (geojsonFromFile
+                                                                      .isEmpty &&
+                                                                  taskListScheduledViewModel
+                                                                      .isLoading),
+                                                          child: Center(
+                                                            child:
+                                                                LoadingAnimationWidget
+                                                                    .waveDots(
+                                                              color:
+                                                                  primarySwatch[
+                                                                      400]!,
+                                                              size: 36,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
+                                                  TaskCreationStatusRow(
+                                                    title: appLocalizations
+                                                        .file_upload_creating_scheduled,
+                                                    isLoading:
+                                                        taskListScheduledViewModel
+                                                            .isLoading,
+                                                    iconCheck:
+                                                        taskScheduledResponse !=
+                                                            null,
+                                                  ),
+                                                  Visibility(
+                                                    visible: geojsonFromFile
+                                                        .isNotEmpty,
+                                                    child:
+                                                        TaskCreationStatusRow(
+                                                      title: appLocalizations
+                                                          .file_upload_creating_zone,
+                                                      isLoading:
+                                                          scheduledViewModel
+                                                              .isLoading,
+                                                      iconCheck:
+                                                          zoneCreated != null &&
+                                                              zoneCreated!,
+                                                    ),
+                                                  ),
+                                                  Visibility(
+                                                    visible:
+                                                        zoneCreated != null &&
+                                                            zoneCreated!,
+                                                    child:
+                                                        TaskCreationStatusRow(
+                                                      title: appLocalizations
+                                                          .file_upload_starting_elements_load,
+                                                      isLoading:
+                                                          !zoneLoadViewModel
+                                                              .connected,
+                                                      iconCheck:
+                                                          zoneLoadViewModel
+                                                              .connected,
+                                                    ),
+                                                  ),
+                                                  Visibility(
+                                                    visible: zoneLoadViewModel
+                                                            .connected ||
+                                                        zoneLoadViewModel
+                                                                .result !=
+                                                            null,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        TaskCreationStatusRow(
+                                                          title: appLocalizations
+                                                              .file_upload_adding_sections,
+                                                          isLoading:
+                                                              zoneLoadViewModel
+                                                                  .isLoadingSections,
+                                                          iconCheck:
+                                                              zoneLoadViewModel
+                                                                  .sectionsResult,
+                                                        ),
+                                                        TaskCreationStatusRow(
+                                                          title: appLocalizations
+                                                              .file_upload_adding_catchments,
+                                                          isLoading:
+                                                              zoneLoadViewModel
+                                                                  .isLoadingCatchments,
+                                                          iconCheck:
+                                                              zoneLoadViewModel
+                                                                  .catchmentsResult,
+                                                        ),
+                                                        TaskCreationStatusRow(
+                                                          title: appLocalizations
+                                                              .file_upload_adding_registers,
+                                                          isLoading:
+                                                              zoneLoadViewModel
+                                                                  .isLoadingRegisters,
+                                                          iconCheck:
+                                                              zoneLoadViewModel
+                                                                  .registersResult,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  if (zoneLoadViewModel.error)
+                                                    Text(
+                                                      'Error: ${zoneLoadViewModel.message}',
+                                                      style: TextStyle(
+                                                          fontSize:
+                                                              fontCreateTask),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  const SizedBox(height: 24),
+                                                  if (zoneLoadViewModel
+                                                          .result !=
+                                                      null)
+                                                    Text(
+                                                      zoneLoadViewModel.result!
+                                                          ? appLocalizations
+                                                              .file_upload_success
+                                                          : appLocalizations
+                                                              .file_upload_error,
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          color: zoneLoadViewModel
+                                                                  .result!
+                                                              ? primarySwatch[
+                                                                  600]
+                                                              : redColor,
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
                                                 ],
                                               ),
                                             ),
-                                            TaskCreationStatusRow(
-                                              title: appLocalizations
-                                                  .file_upload_creating_scheduled,
-                                              isLoading:
-                                                  taskListScheduledViewModel
-                                                      .isLoading,
-                                              iconCheck:
-                                                  taskScheduledResponse != null,
-                                            ),
-                                            Visibility(
-                                              visible:
-                                                  geojsonFromFile.isNotEmpty,
-                                              child: TaskCreationStatusRow(
-                                                title: appLocalizations
-                                                    .file_upload_creating_zone,
-                                                isLoading: scheduledViewModel
-                                                    .isLoading,
-                                                iconCheck:
-                                                    zoneCreated != null &&
-                                                        zoneCreated!,
-                                              ),
-                                            ),
-                                            Visibility(
-                                              visible: zoneCreated != null &&
-                                                  zoneCreated!,
-                                              child: TaskCreationStatusRow(
-                                                title: appLocalizations
-                                                    .file_upload_starting_elements_load,
-                                                isLoading: !zoneLoadViewModel
-                                                    .connected,
-                                                iconCheck:
-                                                    zoneLoadViewModel.connected,
-                                              ),
-                                            ),
-                                            Visibility(
-                                              visible: zoneLoadViewModel
-                                                      .connected ||
-                                                  zoneLoadViewModel.result !=
-                                                      null,
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  TaskCreationStatusRow(
-                                                    title: appLocalizations
-                                                        .file_upload_adding_sections,
-                                                    isLoading: zoneLoadViewModel
-                                                        .isLoadingSections,
-                                                    iconCheck: zoneLoadViewModel
-                                                        .sectionsResult,
-                                                  ),
-                                                  TaskCreationStatusRow(
-                                                    title: appLocalizations
-                                                        .file_upload_adding_catchments,
-                                                    isLoading: zoneLoadViewModel
-                                                        .isLoadingCatchments,
-                                                    iconCheck: zoneLoadViewModel
-                                                        .catchmentsResult,
-                                                  ),
-                                                  TaskCreationStatusRow(
-                                                    title: appLocalizations
-                                                        .file_upload_adding_registers,
-                                                    isLoading: zoneLoadViewModel
-                                                        .isLoadingRegisters,
-                                                    iconCheck: zoneLoadViewModel
-                                                        .registersResult,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            if (zoneLoadViewModel.error)
-                                              Text(
-                                                'Error: ${zoneLoadViewModel.message}',
-                                                style: TextStyle(
-                                                    fontSize: fontCreateTask),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            const SizedBox(height: 24),
-                                            if (zoneLoadViewModel.result !=
-                                                null)
-                                              Text(
-                                                zoneLoadViewModel.result!
-                                                    ? appLocalizations
-                                                        .file_upload_success
-                                                    : appLocalizations
-                                                        .file_upload_error,
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: zoneLoadViewModel
-                                                            .result!
-                                                        ? primarySwatch[600]
-                                                        : redColor,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                          ],
-                                        ),
-                                      );
-                                    },
+                                    ),
                                   );
                                 },
                               );
                             },
-                          ),
-                        ),
+                          );
+                        },
                       ),
                     ),
                   ],
