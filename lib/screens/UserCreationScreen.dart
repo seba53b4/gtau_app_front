@@ -5,6 +5,7 @@ import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
@@ -114,14 +115,14 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   
 
-  Future<bool> _createTask(Map<String, dynamic> body) async {
+  Future<bool> _createUser(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
+    final userListViewModel =
+        Provider.of<UserListViewModel>(context, listen: false);
     try {
-      final response = await taskListViewModel.createTask(token!, body);
+      final response = await userListViewModel.createUser(token!, body);
       if (response) {
-        print('Tarea ha sido creada correctamente');
+        print('Usuario ha sido creada correctamente');
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
@@ -214,7 +215,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         },
         onEnablePressed: () async {
           Navigator.of(context).pop();
-          /*await handleAcceptOnShowDialogCreateUser();*/
+          await handleAcceptOnShowDialogCreateUser();
           print('user created');
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
@@ -228,8 +229,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       "email": emailController.text,
       "firstName": firstnameController.text,
       "lastName": lastnameController.text,
-      "userName": usernameController.text,
-      "password": passwordController.text,
+      "username": usernameController.text,
       "rol": roleController.text
     };
     return requestBody;
@@ -241,8 +241,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       "email": emailController.text,
       "firstName": firstnameController.text,
       "lastName": lastnameController.text,
-      "userName": usernameController.text,
-      "password": passwordController.text,
+      "username": usernameController.text,
       "rol": roleController.text
     };
     return requestBody;
@@ -259,7 +258,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   Future handleAcceptOnShowDialogCreateUser() async {
     Map<String, dynamic> requestBody = createBodyToCreate();
-    bool isUpdated = await _createTask(requestBody);
+    bool isUpdated = await _createUser(requestBody);
     if (isUpdated) {
       reset();
     }
