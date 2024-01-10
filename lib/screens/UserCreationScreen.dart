@@ -216,7 +216,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         onEnablePressed: () async {
           Navigator.of(context).pop();
           await handleAcceptOnShowDialogCreateUser();
-          print('user created');
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
