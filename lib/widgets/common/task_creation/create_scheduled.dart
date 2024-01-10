@@ -697,30 +697,64 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                       ],
                                     ),
                                     child: SizedBox(
-                                      child: zoneLoadViewModel
-                                                  .processAlreadyRunning ||
-                                              zoneLoadViewModel.warning
+                                      child: zoneLoadViewModel.warning
                                           ? Column(children: [
-                                              const Text(
-                                                'Existe un proceso ejecutándose, espere unos minutos y vuelva a intentar.',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 16),
+                                              Visibility(
+                                                visible: zoneLoadViewModel
+                                                    .processAlreadyRunning,
+                                                child: Column(children: [
+                                                  const Text(
+                                                    'Existe un proceso ejecutándose, espere unos minutos y vuelva a intentar.',
+                                                    textAlign: TextAlign.center,
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  CustomElevatedButton(
+                                                      showLoading:
+                                                          zoneLoadViewModel
+                                                              .isRetrying,
+                                                      loadingDuration: 1000,
+                                                      onPressed: () async {
+                                                        await zoneLoadViewModel.retryProcess(
+                                                            token: token,
+                                                            operation: 'start',
+                                                            type:
+                                                                'SCHEDULED_CHARGE',
+                                                            id: taskScheduledResponse!
+                                                                .id!);
+                                                      },
+                                                      text: 'Reintentar')
+                                                ]),
                                               ),
-                                              const SizedBox(height: 24),
-                                              CustomElevatedButton(
-                                                  showLoading: zoneLoadViewModel
-                                                      .isRetrying,
-                                                  loadingDuration: 1000,
-                                                  onPressed: () async {
-                                                    await zoneLoadViewModel.retryProcess(
-                                                        token: token,
-                                                        operation: 'start',
-                                                        type:
-                                                            'SCHEDULED_CHARGE',
-                                                        id: taskScheduledResponse!
-                                                            .id!);
-                                                  },
-                                                  text: 'Reintentar')
+                                              Visibility(
+                                                visible:
+                                                    zoneLoadViewModel.error,
+                                                child: Column(children: [
+                                                  const Text(
+                                                    'Hubo un error, espere unos minutos y vuelva a intentar.',
+                                                    textAlign: TextAlign.center,
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  CustomElevatedButton(
+                                                      showLoading:
+                                                          zoneLoadViewModel
+                                                              .isRetrying,
+                                                      loadingDuration: 1000,
+                                                      onPressed: () async {
+                                                        await zoneLoadViewModel.retryProcess(
+                                                            token: token,
+                                                            operation: 'start',
+                                                            type:
+                                                                'SCHEDULED_CHARGE',
+                                                            id: taskScheduledResponse!
+                                                                .id!);
+                                                      },
+                                                      text: 'Reintentar')
+                                                ]),
+                                              ),
                                             ])
                                           : Visibility(
                                               key: UniqueKey(),

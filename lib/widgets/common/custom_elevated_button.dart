@@ -101,16 +101,22 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
   }
 
   void _handleButtonPress() async {
-    setState(() {
-      _isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
     widget.onPressed();
+
     if (widget.loadingDuration > 0) {
       await Future.delayed(Duration(milliseconds: widget.loadingDuration));
     }
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }

@@ -9,7 +9,7 @@ enum SocketConnectionStatus { connecting, connected, disconnected }
 
 class ZoneLoadViewModel extends ChangeNotifier {
   late ZoneWebSocketService _socketService;
-
+  static const String proccesIsAlreadyRunning = "Process is already running";
   SocketConnectionStatus _connectionStatus = SocketConnectionStatus.connecting;
 
   SocketConnectionStatus get connectionStatus => _connectionStatus;
@@ -63,6 +63,14 @@ class ZoneLoadViewModel extends ChangeNotifier {
 
   bool get connected => _connected;
 
+  bool _processAlreadyRunning = false;
+
+  bool get processAlreadyRunning => _processAlreadyRunning;
+
+  bool _isRetrying = false;
+
+  bool get isRetrying => _isRetrying;
+
   void initWS() {
     _socketService = ZoneWebSocketService(
       onMessage: (message) {
@@ -92,8 +100,33 @@ class ZoneLoadViewModel extends ChangeNotifier {
       'id': id,
       'token': _token
     };
-
     _socketService.sendMessage(jsonEncode(message));
+  }
+
+  void initializeProcess(
+      {String? token,
+      required String type,
+      required String operation,
+      required int id}) {
+    _token = token ?? _token;
+
+    sendMessage(type: type, operation: operation, id: id);
+  }
+
+  Future<void> retryProcess(
+      {String? token,
+      required String type,
+      required String operation,
+      required int id}) async {
+    _token = token ?? _token;
+    {
+      _isRetrying = true;
+      notifyListeners();
+      await Future.delayed(const Duration(seconds: 1));
+      sendMessage(type: type, operation: operation, id: id);
+      _isRetrying = false;
+      notifyListeners();
+    }
   }
 
   Future<void> waitForWebSocketConnection() async {
@@ -112,6 +145,8 @@ class ZoneLoadViewModel extends ChangeNotifier {
     switch (webSocketResponse.status) {
       case StatusProcess.STARTING:
         _isLoading = true;
+        _warning = false;
+        _processAlreadyRunning = false;
         _isLoadingCatchments = true;
         _isLoadingRegisters = true;
         _isLoadingSections = true;
@@ -136,17 +171,13 @@ class ZoneLoadViewModel extends ChangeNotifier {
         }
         break;
       case StatusProcess.RUNNING:
-        _message =
-            'Existe un proceso ejecutándose. Espere unos minutos y vuelva a intentar.';
+        _processAlreadyRunning = true;
         _warning = true;
         _isLoading = false;
         break;
       case StatusProcess.STOPPED:
-        _message =
-            'Se está cancelando el proceso. Espere unos minutos y vuelva a intentar.';
         _warning = true;
         _isLoading = false;
-        print('Process stopped');
         break;
       case StatusProcess.FINISHED:
         if (webSocketResponse.result) {
