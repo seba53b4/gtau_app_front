@@ -26,6 +26,8 @@ class _TaskListComponentState extends State<TaskList> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   TaskFilterProvider? taskFilterProvider;
   TaskListViewModel? taskListViewModel;
+  bool nextPage = true;
+  bool isLoadingNow = false;
 
   _ScrollPosition() async {
     final prefs = await SharedPreferences.getInstance();
@@ -67,7 +69,7 @@ class _TaskListComponentState extends State<TaskList> {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
     int actualPage = prefs.getInt("actual_page") ?? 0;
-    
+
     if (newTasksLength == (value * actualPage) - actualPage) {
       return false;
     }
@@ -88,7 +90,6 @@ class _TaskListComponentState extends State<TaskList> {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getBool("is_loading") ?? false);
   }
-
 
   Future<double> initScroll() async {
     final SharedPreferences prefs = await _prefs;
@@ -114,17 +115,14 @@ class _TaskListComponentState extends State<TaskList> {
     super.dispose();
   }
 
-  bool nextPage = true;
-  bool isLoadingNow = false;
-
   Future updateTaskListState(BuildContext context) async {
     final userName = taskFilterProvider?.userNameFilter;
     final status = taskFilterProvider?.lastStatus;
     await taskListViewModel?.nextPageListByStatus(context, status!, userName);
   }
 
-  Future updateTaskListFilteredState(BuildContext context,
-      String encodedBody) async {
+  Future updateTaskListFilteredState(
+      BuildContext context, String encodedBody) async {
     final userName = taskFilterProvider?.userNameFilter;
     final status = taskFilterProvider?.lastStatus;
     await taskListViewModel?.nextPageFilteredListByStatus(
@@ -140,14 +138,13 @@ class _TaskListComponentState extends State<TaskList> {
         child: Center(
             widthFactor: 0.5,
             child: FutureBuilder(
-              future: Future.wait(
-                  [
-                    initScroll(),
-                    _GetFilteredValue(),
-                    _GetBodyPrefValue(),
-                    _GetActualPage(),
-                    _GetIsLoadingValue()
-                  ]),
+              future: Future.wait([
+                initScroll(),
+                _GetFilteredValue(),
+                _GetBodyPrefValue(),
+                _GetActualPage(),
+                _GetIsLoadingValue()
+              ]),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var position = snapshot.data?[0] as double;
@@ -166,13 +163,13 @@ class _TaskListComponentState extends State<TaskList> {
                       controller.addListener(_ScrollPosition);
                       controller.addListener(() {
                         if ((controller.position.maxScrollExtent ==
-                            controller.offset) &&
+                                controller.offset) &&
                             tasks!.length % taskListSize! == 0 &&
                             nextPage) {
                           if (isFiltered == true) {
                             setState(() {
                               final encodedBodyFiltered =
-                              snapshot.data?[2] as String;
+                                  snapshot.data?[2] as String;
                               updateTaskListFilteredState(
                                   context, encodedBodyFiltered);
                             });
@@ -204,46 +201,39 @@ class _TaskListComponentState extends State<TaskList> {
                                     return Visibility(
                                       visible: !isLoading,
                                       child: Padding(
-                                          padding:
-                                          const EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 15),
                                           child: Center(
-                                              child: Column(
-                                                  children: <Widget>[
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          vertical: 10,
-                                                          horizontal: 15),
-                                                      child: SvgPicture.asset(
-                                                          'lib/assets/taskslists_notfound_small.svg',
-                                                          width: 50,
-                                                          height: 50),
-                                                    ),
-                                                    isFiltered == true ? Text(
-                                                        AppLocalizations.of(
+                                              child: Column(children: <Widget>[
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 15),
+                                              child: SvgPicture.asset(
+                                                  'lib/assets/taskslists_notfound_small.svg',
+                                                  width: 50,
+                                                  height: 50),
+                                            ),
+                                            isFiltered == true
+                                                ? Text(
+                                                    AppLocalizations.of(
                                                             context)!
-                                                            .no_tasks_found_filter,
-                                                        textAlign: TextAlign
-                                                            .center,
-                                                        style: TextStyle(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                0.6),
-                                                            fontSize: 15)) :
-                                                    Text(AppLocalizations.of(
-                                                        context)!
+                                                        .no_tasks_found_filter,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: Colors.black
+                                                            .withOpacity(0.6),
+                                                        fontSize: 15))
+                                                : Text(
+                                                    AppLocalizations.of(
+                                                            context)!
                                                         .emptyTaskList,
-                                                        style: TextStyle(
-                                                            color: Colors.black
-                                                                .withOpacity(
-                                                                0.6),
-                                                            fontSize: 15))
-                                                    ,
-                                                  ]
-                                              )
-                                          )
-                                      ),
+                                                    style: TextStyle(
+                                                        color: Colors.black
+                                                            .withOpacity(0.6),
+                                                        fontSize: 15)),
+                                          ]))),
                                     );
                                   } else {
                                     if (tasks.length % taskListSize! == 0 &&
@@ -259,21 +249,20 @@ class _TaskListComponentState extends State<TaskList> {
                                                   snapshot.data?[0] ?? true;
                                               if (existNextPage == true) {
                                                 return Padding(
-                                                    padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 5),
                                                     child: Center(
-                                                        child:
-                                                        Lottie.asset(
-                                                          'lib/assets/three_dots_loading_fast.json',
-                                                          width: 64,
-                                                          height: 64,)));
+                                                        child: Lottie.asset(
+                                                      'lib/assets/three_dots_loading_fast.json',
+                                                      width: 64,
+                                                      height: 64,
+                                                    )));
                                               } else {
                                                 _SetFilteredValue(false);
                                                 return const Padding(
                                                     padding:
-                                                    EdgeInsets.symmetric(
-                                                        vertical: 0));
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 0));
                                               }
                                             } else {
                                               return const LoadingWidget();
@@ -282,39 +271,33 @@ class _TaskListComponentState extends State<TaskList> {
                                     } else {
                                       if (actualPage > 1) {
                                         return Padding(
-                                            padding:
-                                            const EdgeInsets.symmetric(
+                                            padding: const EdgeInsets.symmetric(
                                                 vertical: 5),
                                             child: Center(
-                                                child: Column(
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                            vertical: 10),
-                                                        child: SvgPicture.asset(
-                                                            'lib/assets/taskslist_empty.svg',
-                                                            width: 50,
-                                                            height: 50),
-                                                      ),
-                                                      Text(AppLocalizations.of(
-                                                          context)!
-                                                          .no_more_tasks_found,
-                                                          style: TextStyle(
-                                                              color: Colors
-                                                                  .black
-                                                                  .withOpacity(
-                                                                  0.6),
-                                                              fontSize: 15)),
-                                                    ]
-                                                )
-                                            )
-                                        );
+                                                child:
+                                                    Column(children: <Widget>[
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 10),
+                                                child: SvgPicture.asset(
+                                                    'lib/assets/taskslist_empty.svg',
+                                                    width: 50,
+                                                    height: 50),
+                                              ),
+                                              Text(
+                                                  AppLocalizations.of(context)!
+                                                      .no_more_tasks_found,
+                                                  style: TextStyle(
+                                                      color: Colors.black
+                                                          .withOpacity(0.6),
+                                                      fontSize: 15)),
+                                            ])));
                                       } else {
                                         return const Padding(
                                           padding:
-                                          EdgeInsets.symmetric(
-                                              vertical: 0),);
+                                              EdgeInsets.symmetric(vertical: 0),
+                                        );
                                       }
                                     }
                                   }
