@@ -60,8 +60,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   final emailController = TextEditingController();
   final firstnameController = TextEditingController();
   final lastnameController = TextEditingController();
-  final passwordController = TextEditingController();
-  final passconfirmController = TextEditingController();
 
   SelectedItemsProvider? selectedItemsProvider;
 
@@ -73,8 +71,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     emailController.text = '';
     firstnameController.text = '';
     lastnameController.text = '';
-    passwordController.text = '';
-    passconfirmController.text = '';
     /*setState(() {
       userAssigned = notAssigned;
     });*/
@@ -93,8 +89,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     emailController.dispose();
     firstnameController.dispose();
     lastnameController.dispose();
-    passwordController.dispose();
-    passconfirmController.dispose();
     _scrollController.dispose();
     selectedItemsProvider?.reset();
 
@@ -109,8 +103,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     emailController.text = '';
     firstnameController.text = '';
     lastnameController.text = '';
-    passwordController.text = '';
-    passconfirmController.text = '';
   }
 
   
@@ -192,12 +184,10 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     final bool emailValid = 
     RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
     .hasMatch(emailController.text);
-    final bool isPassValid = passwordController.text == passconfirmController.text;
     final bool isRoleValid = roleController.text != notAssigned;
     if(emailValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_emailWarning + '\n';
-    if(isPassValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_passwordWarning + '\n';
     if(isRoleValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_roleWarning;
-    if(emailValid == false || isPassValid == false || isRoleValid == false){
+    if(emailValid == false || isRoleValid == false){
       showCustomMessageDialog(
         context: context,
         customText: bodyMsg,
@@ -472,53 +462,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                     ]),
                               ),
                               // Tercera fila
-                              SizedBox(
-                                height: heightRow,
-                                width: widthRow,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                      .createUserPage_passwordTitle,
-                                          style: const TextStyle(fontSize: 16.0),
-                                        ),
-                                        const SizedBox(height: 12.0),
-                                        CustomTextFormField(
-                                          width: (widthRow / 2) - (AppConstants.taskRowSpace / 2),
-                                          hintText: AppLocalizations.of(context)!
-                                              .createUserPage_passwordPlaceholder,
-                                          controller: passwordController,
-                                          obscureText: true
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                        width: AppConstants.taskRowSpace),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                      .createUserPage_passconfirmTitle,
-                                          style: const TextStyle(fontSize: 16.0),
-                                        ),
-                                        const SizedBox(height: 12.0),
-                                        CustomTextFormField(
-                                          width: (widthRow / 2) - (AppConstants.taskRowSpace / 2),
-                                          hintText: AppLocalizations.of(context)!
-                                              .createUserPage_passconfirmPlaceholder,
-                                          controller: passconfirmController,
-                                          obscureText: true,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ],
                           ),
                         ),

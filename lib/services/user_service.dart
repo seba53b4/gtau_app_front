@@ -41,10 +41,6 @@ class UserService {
       final response =
           await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
-      print('$url');
-      final response_code = response.statusCode;
-      print('codigo error: $response_code');
-
       if (response.statusCode == 201) {
         print('Usuario ha sido creado correctamente');
         return true;
