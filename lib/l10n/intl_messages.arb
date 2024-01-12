@@ -177,6 +177,10 @@
     "file_upload_adding_sections" : "Agregando tramos",
     "file_upload_adding_catchments" : "Agregando captaciones",
     "file_upload_adding_registers" : "Agregando registros",
-    "file_upload_success": "Programada creada!",
-    "file_upload_error": "Error en creación"
+    "file_upload_success": "Programada creada",
+    "file_upload_error": "Error en creación",
+    "scheduled_process_ejecuting": "Existe un proceso ejecutándose, espere unos minutos y vuelva a intentar.",
+    "scheduled_process_error": "Hubo un error, espere unos minutos y vuelva a intentar.",
+    "scheduled_process_creating_error": "Se ha producido un error al crear programada",
+    "retry_button" : "Reintentar"
 }

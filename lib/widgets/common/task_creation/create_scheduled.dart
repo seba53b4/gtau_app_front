@@ -59,6 +59,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   bool errorFileUpload = false;
   double heightToAddOnCreate = 80;
   late ScheduledZone? scheduledZone;
+  late bool creatingScheduledError = false;
 
   @override
   void initState() {
@@ -201,33 +202,43 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   void handleSubmit() {
     _showConfirmationDialog(cancelPressed: () {
       Navigator.of(context).pop();
-    }, acceptPressed: () async {
-      if (geojsonFromFile.isNotEmpty) {
-        setState(() {
-          creatingScheduled = true;
-        });
-        TaskScheduled? taskCreated = await handleAcceptOnShowDialogCreateTask()
-            .catchError((error) async {
-          showGenericModalError(onAcceptPressed: () {
-            Navigator.of(context).pop();
-          });
-          return null;
-        });
-        setState(() {
-          taskScheduledResponse = taskCreated;
-        });
-
-        if (taskScheduledResponse != null) {
-          Navigator.of(context).pop();
-          bool created = await scheduledViewModel.createScheduledZone(
-              token, taskScheduledResponse!.id!, geojsonFromFile);
-          setState(() {
-            zoneCreated = created;
-          });
-          await manageLoadZoneProcess(taskScheduledResponse!);
-        }
-      }
+    }, acceptPressed: () {
+      setState(() {
+        creatingScheduledError = false;
+      });
+      startCreationProcess();
     });
+  }
+
+  void startCreationProcess() async {
+    if (geojsonFromFile.isNotEmpty) {
+      setState(() {
+        creatingScheduled = true;
+      });
+      TaskScheduled? taskCreated =
+          await handleAcceptOnShowDialogCreateTask().catchError((error) async {
+        setState(() {
+          creatingScheduledError = true;
+        });
+        showGenericModalError(onAcceptPressed: () {
+          Navigator.of(context).pop();
+        });
+        return null;
+      });
+      setState(() {
+        taskScheduledResponse = taskCreated;
+      });
+
+      if (taskScheduledResponse != null) {
+        Navigator.of(context).pop();
+        bool created = await scheduledViewModel.createScheduledZone(
+            token, taskScheduledResponse!.id!, geojsonFromFile);
+        setState(() {
+          zoneCreated = created;
+        });
+        await manageLoadZoneProcess(taskScheduledResponse!);
+      }
+    }
   }
 
   void showGenericModalError({Function? onAcceptPressed}) async {
@@ -481,9 +492,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                   children: [
                                     Column(
                                       children: [
-                                        // const SizedBox(
-                                        //     height:
-                                        //         AppConstants.taskColumnSpace),
                                         Text(
                                           appLocalizations
                                               .createTaskPage_startDateTitle,
@@ -680,7 +688,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       ]),
                     ),
                     Visibility(
-                      visible: creatingScheduled,
+                      visible: creatingScheduled && !creatingScheduledError,
                       child: Consumer<ScheduledViewModel>(
                         builder: (context, scheduledViewModel, child) {
                           return Consumer<TaskListScheduledViewModel>(
@@ -715,11 +723,12 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                 visible: zoneLoadViewModel
                                                     .processAlreadyRunning,
                                                 child: Column(children: [
-                                                  const Text(
-                                                    'Existe un proceso ejecutándose, espere unos minutos y vuelva a intentar.',
+                                                  Text(
+                                                    appLocalizations
+                                                        .scheduled_process_ejecuting,
                                                     textAlign: TextAlign.center,
-                                                    style:
-                                                        TextStyle(fontSize: 16),
+                                                    style: const TextStyle(
+                                                        fontSize: 16),
                                                   ),
                                                   const SizedBox(height: 24),
                                                   CustomElevatedButton(
@@ -736,18 +745,20 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                             id: taskScheduledResponse!
                                                                 .id!);
                                                       },
-                                                      text: 'Reintentar')
+                                                      text: appLocalizations
+                                                          .retry_button)
                                                 ]),
                                               ),
                                               Visibility(
                                                 visible:
                                                     zoneLoadViewModel.error,
                                                 child: Column(children: [
-                                                  const Text(
-                                                    'Hubo un error, espere unos minutos y vuelva a intentar.',
+                                                  Text(
+                                                    appLocalizations
+                                                        .scheduled_process_error,
                                                     textAlign: TextAlign.center,
-                                                    style:
-                                                        TextStyle(fontSize: 16),
+                                                    style: const TextStyle(
+                                                        fontSize: 16),
                                                   ),
                                                   const SizedBox(height: 24),
                                                   CustomElevatedButton(
@@ -764,7 +775,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                             id: taskScheduledResponse!
                                                                 .id!);
                                                       },
-                                                      text: 'Reintentar')
+                                                      text: appLocalizations
+                                                          .retry_button)
                                                 ]),
                                               ),
                                             ])
@@ -954,6 +966,48 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                             },
                           );
                         },
+                      ),
+                    ),
+                    Visibility(
+                      visible: creatingScheduledError,
+                      child: Container(
+                        width: widthRow * 0.6,
+                        height: 172,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                                appLocalizations
+                                    .scheduled_process_creating_error,
+                                style: TextStyle(fontSize: fontCreateTask),
+                                textAlign: TextAlign.center),
+                            const SizedBox(height: 8),
+                            const Icon(
+                              Icons.error,
+                              color: Colors.red,
+                              size: 42,
+                            ),
+                            const SizedBox(height: 8),
+                            CustomElevatedButton(
+                                onPressed: () {
+                                  handleSubmit();
+                                },
+                                text: appLocalizations.retry_button),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
                       ),
                     ),
                   ],
