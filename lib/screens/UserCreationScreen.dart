@@ -214,24 +214,35 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToCreate() {
+    var roleFinal = '';
+    if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueOperator){
+      roleFinal = 'OPERADOR';
+    }else if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueAdmin){
+      roleFinal = 'ADMINISTRADOR';
+    }
     final Map<String, dynamic> requestBody = {
       "email": emailController.text,
       "firstName": firstnameController.text,
       "lastName": lastnameController.text,
       "username": usernameController.text,
-      "rol": roleController.text
+      "rol": roleFinal
     };
     return requestBody;
   }
 
   Map<String, dynamic> createBodyToUpdate() {
-    
+    var roleFinal = '';
+    if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueOperator){
+      roleFinal = 'OPERADOR';
+    }else if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueAdmin){
+      roleFinal = 'ADMINISTRADOR';
+    }
     final Map<String, dynamic> requestBody = {
       "email": emailController.text,
       "firstName": firstnameController.text,
       "lastName": lastnameController.text,
       "username": usernameController.text,
-      "rol": roleController.text
+      "rol": roleFinal
     };
     return requestBody;
   }
@@ -329,7 +340,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                               ),
                               const SizedBox(height: 24.0),
                               // Primera fila
-                              // Segunda fila
                               SizedBox(
                                 height: heightRow,
                                 width: widthRow,
@@ -353,10 +363,10 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                               const SizedBox(height: 12.0),
                                               CustomDropdown(
                                                 value: userRole,
-                                                items: const [
+                                                items: [
                                                   notAssigned,
-                                                  'OPERADOR',
-                                                  'ADMINISTRADOR'
+                                                  AppLocalizations.of(context)!.createUserPage_roleValueOperator,
+                                                  AppLocalizations.of(context)!.createUserPage_roleValueAdmin
                                                 ],
                                                 onChanged: (String? value) {
                                                   setState(() {
@@ -393,7 +403,8 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                   ],
                                 ),
                               ),
-                              //const SizedBox(height: 20.0),
+                              const SizedBox(height: 20.0),
+                              // Segunda fila
                               SizedBox(
                                 height: heightRow,
                                 width: widthRow,

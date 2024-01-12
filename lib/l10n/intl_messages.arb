@@ -178,5 +178,7 @@
     "createUserPage_passconfirmPlaceholder": "Confirmar Contraseña",
     "createUserPage_passwordWarning": "Las contraseñas no coinciden entre si",
     "createUserPage_emailWarning": "El correo electronico ingresado no es valido",
-    "createUserPage_roleWarning": "El rol seleccionado no es valido"
+    "createUserPage_roleWarning": "El rol seleccionado no es valido",
+    "createUserPage_roleValueOperator": "Operador",
+    "createUserPage_roleValueAdmin": "Administrador"
 }
