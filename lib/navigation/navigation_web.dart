@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/MapScreen.dart';
@@ -49,15 +50,15 @@ class _NavigationWeb extends State<NavigationWeb> {
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
     NavigationRailDestination navAddUser = _buildCircularDestination(
-        icon: Icon(Icons.add_alarm, size: iconSize),
-        label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
+        icon: Icon(GtauIcons.addUser, size: iconSize),
+        label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
     NavigationRailDestination navMap = _buildCircularDestination(
         icon: Icon(Icons.map, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_map));
 
     NavigationRailDestination navProfile = _buildCircularDestination(
-        icon: Icon(Icons.person, size: iconSize),
+        icon: Icon(GtauIcons.profileUser, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
     if (userStateProvider.isAdmin!) {

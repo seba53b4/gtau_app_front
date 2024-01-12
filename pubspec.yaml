@@ -86,6 +86,12 @@ flutter:
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
+
+  fonts:
+  - family: gtauicons
+    fonts:
+      - asset: lib/assets/font/gtauicons.ttf
+
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
