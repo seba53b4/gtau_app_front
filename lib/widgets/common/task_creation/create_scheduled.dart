@@ -101,14 +101,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         .fetchTaskScheduled(token, widget.scheduledId!)
         .catchError((error) async {
       // Manejo de error
-      await showCustomMessageDialog(
-        context: context,
-        onAcceptPressed: () {
-          Navigator.of(context).pop();
-        },
-        customText: AppLocalizations.of(context)!.error_generic_text,
-        messageType: DialogMessageType.error,
-      );
+      showGenericModalError();
       return null;
     });
     loadInfoFromTaskScheduledResponse(taskScheduled);
@@ -210,16 +203,22 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       Navigator.of(context).pop();
     }, acceptPressed: () async {
       if (geojsonFromFile.isNotEmpty) {
-        Navigator.of(context).pop();
         setState(() {
           creatingScheduled = true;
         });
-        TaskScheduled? taskCreated = await handleAcceptOnShowDialogCreateTask();
+        TaskScheduled? taskCreated = await handleAcceptOnShowDialogCreateTask()
+            .catchError((error) async {
+          showGenericModalError(onAcceptPressed: () {
+            Navigator.of(context).pop();
+          });
+          return null;
+        });
         setState(() {
           taskScheduledResponse = taskCreated;
         });
 
         if (taskScheduledResponse != null) {
+          Navigator.of(context).pop();
           bool created = await scheduledViewModel.createScheduledZone(
               token, taskScheduledResponse!.id!, geojsonFromFile);
           setState(() {
@@ -229,6 +228,19 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         }
       }
     });
+  }
+
+  void showGenericModalError({Function? onAcceptPressed}) async {
+    await showCustomMessageDialog(
+      context: context,
+      onAcceptPressed: () {
+        if (onAcceptPressed != null) {
+          onAcceptPressed();
+        }
+      },
+      customText: AppLocalizations.of(context)!.error_generic_text,
+      messageType: DialogMessageType.error,
+    );
   }
 
   Future<void> manageLoadZoneProcess(
