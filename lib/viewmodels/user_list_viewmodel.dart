@@ -129,7 +129,6 @@ class UserListViewModel extends ChangeNotifier {
       notifyListeners();
       final response = await _userService.createUser(token, body);
       if (response) {
-        print('Usuario ha sido creada correctamente');
         notifyListeners();
         return true;
       } else {

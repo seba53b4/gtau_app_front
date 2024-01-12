@@ -114,7 +114,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     try {
       final response = await userListViewModel.createUser(token!, body);
       if (response) {
-        print('Usuario ha sido creada correctamente');
+        print('Usuario ha sido creado correctamente');
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {

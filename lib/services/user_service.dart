@@ -42,7 +42,6 @@ class UserService {
           await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 201) {
-        print('Usuario ha sido creado correctamente');
         return true;
       } else {
         print('No se pudieron traer datos');
