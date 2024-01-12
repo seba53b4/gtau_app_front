@@ -46,7 +46,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         label: Text(AppLocalizations.of(context)!.navigation_label_home));
 
     NavigationRailDestination navAddTask = _buildCircularDestination(
-        icon: Icon(Icons.add, size: iconSize),
+        icon: Icon(GtauIcons.addTask, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
     NavigationRailDestination navAddUser = _buildCircularDestination(

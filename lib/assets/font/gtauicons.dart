@@ -8,5 +8,6 @@ class GtauIcons{
 
   static const IconData addUser = IconData(0xe000, fontFamily: _gtauIcons);
   static const IconData profileUser = IconData(0xe001, fontFamily: _gtauIcons);
+  static const IconData addTask = IconData(0xe002, fontFamily: _gtauIcons);
 
 }
