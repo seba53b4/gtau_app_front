@@ -702,7 +702,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                                 .processAlreadyRunning ||
                                             zoneLoadViewModel.warning
                                         ? 150
-                                        : 258,
+                                        : zoneLoadViewModel.result != null
+                                            ? 202
+                                            : 258,
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
