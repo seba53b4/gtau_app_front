@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 Color baseColor = const Color.fromRGBO(200, 217, 184, 0.25);
 Color softGrey = const Color.fromRGBO(88, 87, 89, 0.15);
+Color scheduledNotInspectionedElement = const Color.fromRGBO(203, 35, 30, 1);
+Color scheduledInspectionedElement = const Color.fromRGBO(19, 215, 105, 1);
+Color arrowColor = const Color.fromRGBO(247, 247, 247, 1);
 Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
 Color navColor = const Color.fromRGBO(200, 217, 184, 1);
 Color lightBackground = const Color.fromRGBO(253, 255, 252, 1);
@@ -34,6 +37,7 @@ MaterialColor primarySwatch = const MaterialColor(
 );
 
 ThemeData defaultTheme = ThemeData(
+  useMaterial3: false,
   primaryColor: baseColor,
   primarySwatch: primarySwatch,
   textTheme: TextTheme(

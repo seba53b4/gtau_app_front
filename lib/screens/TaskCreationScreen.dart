@@ -5,6 +5,9 @@ import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
@@ -13,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
+import '../constants/theme_constants.dart';
 import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../navigation/navigation.dart';
@@ -21,6 +25,7 @@ import '../providers/task_filters_provider.dart';
 import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
 import '../viewmodels/images_viewmodel.dart';
+import '../viewmodels/section_viewmodel.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/common/custom_dropdown.dart';
@@ -31,15 +36,19 @@ import '../widgets/common/inspection_location_select.dart';
 import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/image_gallery_modal.dart';
-import '../widgets/user_image.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
   bool detail = false;
   int? idTask = 0;
+  final bool scheduledEdit;
 
   TaskCreationScreen(
-      {super.key, required this.type, this.detail = false, this.idTask = 0});
+      {super.key,
+      required this.type,
+      this.detail = false,
+      this.idTask = 0,
+      this.scheduledEdit = false});
 
   @override
   _TaskCreationScreenState createState() => _TaskCreationScreenState();
@@ -60,7 +69,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   final scheduledNumberController = TextEditingController();
   final contactController = TextEditingController();
   final applicantController = TextEditingController();
-  final userAssignedController = TextEditingController();
   final lengthController = TextEditingController();
   final materialController = TextEditingController();
   final observationsController = TextEditingController();
@@ -79,7 +87,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     scheduledNumberController.text = '';
     contactController.text = '';
     applicantController.text = '';
-    userAssignedController.text = '';
     lengthController.text = '';
     materialController.text = '';
     observationsController.text = '';
@@ -105,7 +112,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     scheduledNumberController.dispose();
     contactController.dispose();
     applicantController.dispose();
-    userAssignedController.dispose();
     lengthController.dispose();
     materialController.dispose();
     observationsController.dispose();
@@ -114,8 +120,20 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     releasedDateController.dispose();
     _scrollController.dispose();
     selectedItemsProvider?.reset();
-
     super.dispose();
+  }
+
+  void clearElementsFetched() {
+    context.read<RegisterViewModel>().reset();
+    context.read<SectionViewModel>().reset();
+    context.read<LotViewModel>().reset();
+    context.read<CatchmentViewModel>().reset();
+  }
+
+  void _SoftClearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("is_loading", false);
+    prefs.setInt("actual_page", 1);
   }
 
   @override
@@ -126,9 +144,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       releasedDate = DateTime.now();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
-        await initializeTask();
+        if (!widget.scheduledEdit) {
+          await initializeTask();
+        }
       });
-      Hive.initFlutter().then((value) => null);
     } else {
       startDate = DateTime.now();
     }
@@ -155,7 +174,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       descriptionController.text = task.description!;
       applicantController.text = task.applicant!;
       locationController.text = task.location!;
-      userAssignedController.text = task.user!;
+      setState(() {
+        userAssigned = task.user!;
+      });
       lengthController.text = task.length ?? '';
       materialController.text = task.material ?? '';
       conclusionsController.text = task.conclusions ?? '';
@@ -375,7 +396,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "location": locationController.text,
       "description": descriptionController.text,
       "releasedDate": releasedDateSelected,
-      "user": userAssignedController.text,
+      "user": userAssigned,
       "length": lengthController.text,
       "material": materialController.text,
       "observations": observationsController.text,
@@ -396,6 +417,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    clearElementsFetched();
     _ResetPrefs();
     await updateTaskList();
   }
@@ -423,6 +445,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     if (isUpdated) {
       reset();
     }
+    clearElementsFetched();
     _ResetPrefs();
   }
 
@@ -473,6 +496,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
   void handleCancel() {
     resetSelectionOnMap();
+    clearElementsFetched();
     Navigator.of(context).pop();
   }
 
@@ -505,6 +529,25 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
               child: Column(
                 children: [
+                  Visibility(
+                    visible: widget.detail && selectedIndex == 1,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+                        child: FloatingActionButton(
+                          foregroundColor: primarySwatch,
+                          backgroundColor: lightBackground,
+                          onPressed: () {
+                            handleCancel();
+                          },
+                          tooltip: AppLocalizations.of(context)!
+                              .placeholder_back_button,
+                          child: const Icon(Icons.arrow_back),
+                        ),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 12.0),
                   Visibility(
                     visible: !widget.detail,
@@ -654,12 +697,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                                       Colors.transparent),
                                           onTap: () async {
                                             final DateTime? pickedDate =
-                                                await showDatePicker(
-                                              context: context,
-                                              initialDate: startDate!,
-                                              firstDate: DateTime(2000),
-                                              lastDate: DateTime(2100),
-                                            );
+                                                await showCustomDatePicker(
+                                                    context, startDate!);
                                             if (pickedDate != null) {
                                               handleStartDateChange(pickedDate);
                                             }
@@ -848,12 +887,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                                         Colors.transparent),
                                             onTap: () async {
                                               final DateTime? pickedDate =
-                                                  await showDatePicker(
-                                                context: context,
-                                                initialDate: startDate!,
-                                                firstDate: DateTime(2000),
-                                                lastDate: DateTime(2100),
-                                              );
+                                                  await showCustomDatePicker(
+                                                      context, startDate!);
                                               if (pickedDate != null) {
                                                 handleStartDateChange(
                                                     pickedDate);
@@ -987,9 +1022,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                   ),
                   Visibility(
                       visible: selectedIndex == 0,
-                      child: const CreateScheduled()),
+                      child: ScheduledComponent(
+                        isEdit: widget.detail,
+                        scheduledId: widget.idTask!,
+                      )),
                   Visibility(
-                    visible: widget.detail,
+                    visible: widget.detail && selectedIndex == 1,
                     child: Container(
                       width: widthRow * 1.15,
                       padding: const EdgeInsets.all(24),
@@ -1030,12 +1068,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                                       Colors.transparent),
                                               onTap: () async {
                                                 final DateTime? pickedDate =
-                                                    await showDatePicker(
-                                                  context: context,
-                                                  initialDate: releasedDate!,
-                                                  firstDate: DateTime(2000),
-                                                  lastDate: DateTime(2100),
-                                                );
+                                                    await showCustomDatePicker(
+                                                        context, startDate!);
                                                 if (pickedDate != null) {
                                                   handleReleasedDateChange(
                                                       pickedDate);
@@ -1124,12 +1158,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                                       Colors.transparent),
                                               onTap: () async {
                                                 final DateTime? pickedDate =
-                                                    await showDatePicker(
-                                                  context: context,
-                                                  initialDate: releasedDate!,
-                                                  firstDate: DateTime(2000),
-                                                  lastDate: DateTime(2100),
-                                                );
+                                                    await showCustomDatePicker(
+                                                        context, startDate!);
                                                 if (pickedDate != null) {
                                                   handleReleasedDateChange(
                                                       pickedDate);
@@ -1259,11 +1289,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             width: widthRow,
                             child: Column(
                               children: [
-                                UserImage(
+                                /*UserImage(
                                     onFileChanged: (imagesFiles) {
                                       this.imagesFiles = imagesFiles;
                                     },
-                                    idTask: widget.idTask),
+                                    idTask: widget.idTask),*/
                                 ImageGalleryModal(idTask: widget.idTask!),
                               ],
                             ),

@@ -18,8 +18,8 @@ class SelectedItemsProvider with ChangeNotifier {
   Set<PolylineId> _initialSelectedLots = {};
   Set<PolylineId> _currentSelectedLots = {};
 
-  LatLng _initialInspectionPosition = LatLng(0, 0);
-  LatLng _currentInspectionPosition = LatLng(0, 0);
+  LatLng _initialInspectionPosition = const LatLng(0, 0);
+  LatLng _currentInspectionPosition = const LatLng(0, 0);
 
   bool get letMultipleItemsSelected => _letMultipleItemsSelected;
 
@@ -32,6 +32,7 @@ class SelectedItemsProvider with ChangeNotifier {
   Set<PolylineId> get selectedLots => _currentSelectedLots;
 
   LatLng get inspectionPosition => _currentInspectionPosition;
+
 
   void setInspectionPosition(LatLng position) {
     _currentInspectionPosition = position;
@@ -55,6 +56,7 @@ class SelectedItemsProvider with ChangeNotifier {
   }
 
   void toggleCircleSelected(CircleId circleId, ElementType type) {
+
     var circleList = getCircleList(type);
     if (circleList.contains(circleId)) {
       circleList.remove(circleId);
@@ -176,7 +178,7 @@ class SelectedItemsProvider with ChangeNotifier {
     };
   }
 
-  void clearAll() {
+  void clearAllElements() {
     _currentSelectedCatchments.clear();
     _currentSelectedSections.clear();
     _currentSelectedRegisters.clear();
@@ -185,11 +187,11 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters.clear();
     _initialSelectedCatchments.clear();
     _initialSelectedLots.clear();
-    notifyListeners();
   }
 
   void reset() {
-    clearAll();
+    clearAllElements();
     _letMultipleItemsSelected = false;
+    _currentInspectionPosition = const LatLng(0, 0);
   }
 }

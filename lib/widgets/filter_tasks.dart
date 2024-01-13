@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/text_field_filter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +27,20 @@ class FilterTasks extends StatefulWidget {
 class _FilterTasksState extends State<FilterTasks> {
   double widthRow = 640;
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  late TaskFilterProvider filterProvider;
+  late TaskListViewModel taskListViewModel;
+  late TaskListScheduledViewModel taskListScheduledViewModel;
+  late String token;
+
+  @override
+  void initState() {
+    super.initState();
+    filterProvider = Provider.of<TaskFilterProvider>(context, listen: false);
+    taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+    taskListScheduledViewModel =
+        Provider.of<TaskListScheduledViewModel>(context, listen: false);
+    token = Provider.of<UserProvider>(context, listen: false).getToken!;
+  }
 
   _ResetScrollPosition() async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,6 +60,13 @@ class _FilterTasksState extends State<FilterTasks> {
   Future<bool> _ResetPrefs() async {
     final SharedPreferences prefs = await _prefs;
     return prefs.clear();
+  }
+
+  void _SoftClearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    //prefs.setBool("is_loading", false);
+    prefs.setInt("actual_page", 1);
+    prefs.setInt("tasks_length", 0);
   }
 
   Future resetTaskList() async {
@@ -93,7 +115,7 @@ class _FilterTasksState extends State<FilterTasks> {
                     dropdownValue: filterProvider.inspectionTypeFilter ??
                         filterProvider.inspectionType.first.value,
                     label: appLocalizations.inspection_type,
-                    enabled: false,
+                    enabled: true,
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFilter(
@@ -187,9 +209,11 @@ class _FilterTasksState extends State<FilterTasks> {
                                 const SizedBox(width: 10.0),
                                 CustomElevatedButton(
                                   onPressed: () {
+                                    resetTaskList();
                                     _ResetScrollPosition();
                                     _SetFilteredValue(true);
                                     context.read<TaskFilterProvider>().search();
+                                    _SoftClearPref();
                                     updateTaskList();
                                     Navigator.of(context).pop();
                                   },
@@ -210,12 +234,15 @@ class _FilterTasksState extends State<FilterTasks> {
   }
 
   void updateTaskList() async {
-    final filterProvider =
-        Provider.of<TaskFilterProvider>(context, listen: false);
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    taskListViewModel.clearListByStatus(filterProvider.statusFilter!);
-    await taskListViewModel.fetchTasksFromFilters(context,
-        filterProvider.statusFilter!, filterProvider.buildSearchBody());
+    if (filterProvider.inspectionTypeFilter?.allMatches('SCHEDULED') == null) {
+      taskListViewModel.clearListByStatus(filterProvider.statusFilter!);
+      await taskListViewModel.fetchTasksFromFilters(context,
+          filterProvider.statusFilter!, filterProvider.buildSearchBody());
+    } else {
+      taskListScheduledViewModel
+          .clearListByStatus(filterProvider.statusFilter!);
+      await taskListScheduledViewModel.fetchScheduledTasks(
+          token, filterProvider.statusFilter!);
+    }
   }
 }

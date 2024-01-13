@@ -42,6 +42,8 @@ class _MapComponentState extends State<MapComponent> {
   String? errorMsg;
   List<String> distances = ["100", "200", "300", "500"];
   int distanceSelected = 0;
+  int lastDistanceSelected = 8;
+  LatLng? lastLocation;
   MapType _currentMapType = MapType.satellite;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
@@ -52,10 +54,11 @@ class _MapComponentState extends State<MapComponent> {
   Color defaultPolylineColor = Colors.redAccent;
   Color selectedButtonColor = Colors.green;
   bool locationManual = false;
+  bool locationManualSelected = false;
   double zoomMap = 16;
   late Completer<GoogleMapController> _mapController;
   bool viewDetailElementInfo = false;
-  double modalWidth = 300.0;
+  double modalWidth = 320.0;
   late double mapWidth;
   late double mapInit;
   late SelectedItemsProvider selectedItemsProvider;
@@ -75,7 +78,6 @@ class _MapComponentState extends State<MapComponent> {
   @override
   void initState() {
     super.initState();
-    _initializeLocation();
     _mapController = Completer<GoogleMapController>();
   }
 
@@ -93,20 +95,75 @@ class _MapComponentState extends State<MapComponent> {
         Provider.of<CatchmentViewModel>(context, listen: false);
     registerViewModel = Provider.of<RegisterViewModel>(context, listen: false);
     token = context.read<UserProvider>().getToken!;
+    _initializeLocation();
+    if (widget.isModal) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (sectionViewModel.hasSections() ||
+            lotViewModel.hasLots() ||
+            registerViewModel.hasRegisters() ||
+            catchmentViewModel.hasCatchment()) {
+          updateElementsOnMap();
+        } else {
+          LatLng? loc = getFinalLocation();
+          if (loc != initLocation) {
+            fetchAndUpdateData().then((value) => null);
+          }
+        }
+      });
+      setState(() {
+        lastDistanceSelected = 0;
+      });
+    }
   }
 
   @override
   void dispose() {
-    super.dispose();
-
     if (!widget.isModal) {
       selectedItemsProvider.reset();
     }
+    if (!widget.isModal || locationManualSelected) {
+      clearElementsFetched();
+    }
+    super.dispose();
+  }
+
+  void clearElementsFetched() {
+    registerViewModel.reset();
+    sectionViewModel.reset();
+    lotViewModel.reset();
+    catchmentViewModel.reset();
   }
 
   Future<void> _initializeLocation() async {
     try {
-      await getCurrentLocation();
+      if (selectedItemsProvider.inspectionPosition.latitude == 0 &&
+          selectedItemsProvider.inspectionPosition.longitude == 0) {
+        getCurrentLocation();
+      } else {
+        setState(() {
+          final locationGPS = selectedItemsProvider.inspectionPosition;
+          lastLocation = locationGPS;
+          final Marker newMarker = Marker(
+            markerId: const MarkerId('current_position'),
+            position: locationGPS,
+          );
+          location = locationGPS;
+          markersGPS.add(newMarker);
+          _getMarkers();
+        });
+
+        // Actualiza la cámara del mapa para centrarse en la ubicación actual sin animación
+        final GoogleMapController controller = await _mapController.future;
+        controller.moveCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(selectedItemsProvider.inspectionPosition.latitude,
+                  selectedItemsProvider.inspectionPosition.longitude),
+              zoom: zoomMap,
+            ),
+          ),
+        );
+      }
     } catch (e) {
       setState(() {
         errorMsg = 'Error fetching location';
@@ -130,6 +187,7 @@ class _MapComponentState extends State<MapComponent> {
       setState(() {
         final locationGPS =
             LatLng(currentPosition.latitude, currentPosition.longitude);
+        lastLocation = locationGPS;
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
           position: locationGPS,
@@ -138,7 +196,11 @@ class _MapComponentState extends State<MapComponent> {
         markersGPS.add(newMarker);
         _getMarkers();
       });
-
+      if (currentPosition.latitude != initLocation.latitude &&
+          currentPosition.longitude != initLocation.longitude) {
+        selectedItemsProvider.setInspectionPosition(
+            LatLng(currentPosition.latitude, currentPosition.longitude));
+      }
       // Actualiza la cámara del mapa para centrarse en la ubicación actual sin animación
       final GoogleMapController controller = await _mapController.future;
       controller.moveCamera(
@@ -156,34 +218,37 @@ class _MapComponentState extends State<MapComponent> {
     }
   }
 
-  Future<List<Section>?> fetchSectionsPolylines(String token) async {
+  Future<List<Section>?> fetchSectionsPolylines() async {
     LatLng? finalLocation = getFinalLocation();
     return await sectionViewModel.fetchSectionsByRadius(
         token,
         finalLocation!.latitude,
-        finalLocation!.longitude,
+        finalLocation.longitude,
         int.parse(distances[distanceSelected]));
   }
 
-  Future<List<Lot>?> fetchLotsPolylines(String token) async {
+  Future<List<Lot>?> fetchLotsPolylines() async {
     LatLng? finalLocation = getFinalLocation();
     return await lotViewModel.fetchLotsByRadius(token, finalLocation!.latitude,
-        finalLocation!.longitude, int.parse(distances[distanceSelected]));
+        finalLocation.longitude, int.parse(distances[distanceSelected]));
   }
 
-  Future<List<Catchment>?> fetchCatchmentsCircles(String token) async {
+  Future<List<Catchment>?> fetchCatchmentsCircles() async {
     LatLng? finalLocation = getFinalLocation();
     return await catchmentViewModel.fetchCatchmentsByRadius(
         token,
         finalLocation!.latitude,
-        finalLocation!.longitude,
+        finalLocation.longitude,
         int.parse(distances[distanceSelected]));
   }
 
-  Future<List<Register>?> fetchRegistersCircles(String token) async {
+  Future<List<Register>?> fetchRegistersCircles() async {
     LatLng? finalLocation = getFinalLocation();
     return await registerViewModel.fetchRegistersByRadius(
-        token, finalLocation!.latitude, finalLocation!.longitude, 200);
+        token,
+        finalLocation!.latitude,
+        finalLocation.longitude,
+        int.parse(distances[distanceSelected]));
   }
 
   LatLng? getFinalLocation() => (location != null) ? location : initLocation;
@@ -200,8 +265,8 @@ class _MapComponentState extends State<MapComponent> {
           viewDetailElementInfo = false;
         }
       } else {
-        selectedItemsProvider.clearAll();
-        selectedItemsProvider.togglePolylineSelected(line!.polylineId, type);
+        selectedItemsProvider.clearAllElements();
+        selectedItemsProvider.togglePolylineSelected(line.polylineId, type);
         setState(() {
           elementSelectedId = ogcFid;
           elementSelectedType = type;
@@ -229,8 +294,8 @@ class _MapComponentState extends State<MapComponent> {
           viewDetailElementInfo = false;
         }
       } else {
-        selectedItemsProvider.clearAll();
-        selectedItemsProvider.toggleCircleSelected(point!.circleId, type);
+        selectedItemsProvider.clearAllElements();
+        selectedItemsProvider.toggleCircleSelected(point.circleId, type);
         setState(() {
           elementSelectedId = ogcFid;
           elementSelectedType = type;
@@ -247,10 +312,29 @@ class _MapComponentState extends State<MapComponent> {
   }
 
   void updateElementsOnMap() {
+    List<Section>? sections;
+    List<Lot>? lots;
+    List<Catchment>? catchments;
+    List<Register>? registers;
+
+    if (selectedIndices.contains(0)) {
+      sections = sectionViewModel.sections;
+    }
+
+    if (selectedIndices.contains(1)) {
+      registers = registerViewModel.registers;
+    }
+
+    if (selectedIndices.contains(2)) {
+      catchments = catchmentViewModel.catchments;
+    }
+    if (selectedIndices.contains(3)) {
+      lots = lotViewModel.lots;
+    }
+
     setState(() {
-      polylines = getPolylines(sectionViewModel.sections, lotViewModel.lots);
-      circles = getCircles(
-          catchmentViewModel.catchments, registerViewModel.registers);
+      polylines = getPolylines(sections, lots);
+      circles = getCircles(catchments, registers);
     });
   }
 
@@ -312,12 +396,6 @@ class _MapComponentState extends State<MapComponent> {
     setState(() {
       markers.clear();
       markers.addAll(markersGPS);
-    });
-  }
-
-  void _clearMarkersGPS() {
-    setState(() {
-      markersGPS.clear();
     });
   }
 
@@ -398,34 +476,49 @@ class _MapComponentState extends State<MapComponent> {
     return setCir;
   }
 
-  List<Future> getElementFutureSelected(String token) {
+  void getElements() async {
+    LatLng? finalLocation = getFinalLocation();
+    if (lastDistanceSelected != distanceSelected ||
+        finalLocation != lastLocation) {
+      selectedIndices.addAll([0, 1, 2, 3]);
+      await fetchAndUpdateData();
+      setState(() {
+        lastDistanceSelected = distanceSelected;
+        lastLocation = finalLocation;
+      });
+    } else {
+      updateElementsOnMap();
+    }
+  }
+
+  List<Future> getElementFutureSelected() {
     List<Future> futures = [];
     // Agregar tramos a búsqueda
     if (selectedIndices.contains(0)) {
-      futures.add(fetchSectionsPolylines(token));
+      futures.add(fetchSectionsPolylines());
     }
     // Agregar tramos a búsqueda
     if (selectedIndices.contains(1)) {
-      futures.add(fetchRegistersCircles(token));
+      futures.add(fetchRegistersCircles());
     }
     // Agregar tramos a búsqueda
     if (selectedIndices.contains(2)) {
-      futures.add(fetchCatchmentsCircles(token));
+      futures.add(fetchCatchmentsCircles());
     }
     if (selectedIndices.contains(3)) {
       //lo mismo pero para parcela
-      futures.add(fetchLotsPolylines(token));
+      futures.add(fetchLotsPolylines());
     }
     return futures;
   }
 
-  Future<void> fetchAndUpdateData(String token) async {
+  Future<void> fetchAndUpdateData() async {
     List<Section>? fetchedSections;
     List<Register>? fetchedRegisters;
     List<Catchment>? fetchedCatchments;
     List<Lot>? fetchedLots;
 
-    List<Future> futuresElementsSelected = getElementFutureSelected(token);
+    List<Future> futuresElementsSelected = getElementFutureSelected();
     await Future.wait(futuresElementsSelected).then((responses) {
       int iter = 0;
       if (selectedIndices.contains(0)) {
@@ -468,8 +561,6 @@ class _MapComponentState extends State<MapComponent> {
 
   @override
   Widget build(BuildContext context) {
-    final token = context.read<UserProvider>().getToken;
-
     return Consumer<SectionViewModel>(
         builder: (context, sectionViewModel, child) {
       return Consumer<RegisterViewModel>(
@@ -546,7 +637,7 @@ class _MapComponentState extends State<MapComponent> {
                         LoadingOverlay(
                           isLoading: isMapLoading && !viewDetailElementInfo,
                           child: Positioned(
-                            top: kIsWeb ? null : 80,
+                            top: kIsWeb ? null : 50,
                             right: kIsWeb ? null : 16,
                             bottom: kIsWeb ? 80 : null,
                             left: kIsWeb ? 16 : null,
@@ -571,7 +662,7 @@ class _MapComponentState extends State<MapComponent> {
                                 if (kIsWeb) const SizedBox(height: 6),
                                 MenuElevatedButton(
                                   onPressed: () async {
-                                    await fetchAndUpdateData(token!);
+                                    getElements();
                                   },
                                   tooltipMessage: AppLocalizations.of(context)!
                                       .map_component_fetch_elements,
@@ -597,7 +688,9 @@ class _MapComponentState extends State<MapComponent> {
                                   colorChangeOnPress: true,
                                   onPressed: () {
                                     setState(() {
-                                      selectedItemsProvider.clearAll();
+                                      selectedItemsProvider.clearAllElements();
+                                      locationManualSelected =
+                                          locationManualSelected || true;
                                       isDetailsButtonVisible = false;
                                       markersGPS.clear();
                                       if (kIsWeb) {
@@ -685,7 +778,7 @@ class _MapComponentState extends State<MapComponent> {
                                   elementType: elementSelectedType,
                                   onPressed: () {
                                     setState(() {
-                                      selectedItemsProvider.clearAll();
+                                      selectedItemsProvider.clearAllElements();
                                       updateElementsOnMap();
                                       viewDetailElementInfo = false;
                                     });
