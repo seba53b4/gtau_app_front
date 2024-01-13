@@ -37,16 +37,28 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      updateTaskListState(TaskStatus.Pending.value, false);
-    });
+
     _tabController = TabController(vsync: this, length: 4);
     taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
     taskListScheduledViewModel =
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
     taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
-    token = context.read<UserProvider>().getToken!;
+  }
+
+  void _loadFromStorage() {
+    token = context.read<UserProvider>().getToken ?? '';
+    if (token.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        updateTaskListState(TaskStatus.Pending.value, false);
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    //_loadFromStorage();
   }
 
   Future<bool> _clearPref() async {
@@ -63,6 +75,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   @override
   Widget build(BuildContext context) {
     taskFilterProvider.setUserNameFilter(widget.userName);
+    _loadFromStorage();
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
     return Consumer<TaskFilterProvider>(

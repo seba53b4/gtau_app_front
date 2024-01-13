@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../models/user_state.dart';
 
 class UserProvider with ChangeNotifier {
@@ -13,15 +14,16 @@ class UserProvider with ChangeNotifier {
 
   bool? get isUserDataEmpty => _userState?.isUserDataEmpty;
 
-  void logout(){
+  void logout() {
     _userState?.reset();
     notifyListeners();
   }
+
   bool? get getIsLoggedIn => _userState?.getIsLoggedIn;
 
   bool? get isAdmin => _userState?.isAdmin;
 
-  String? get getToken{
+  String? get getToken {
     return _userState?.authData?.accessToken;
   }
 
