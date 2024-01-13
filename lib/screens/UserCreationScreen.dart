@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
-import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
@@ -14,25 +13,15 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
-import '../dto/image_data.dart';
 import '../models/task.dart';
 import '../navigation/navigation.dart';
 import '../providers/selected_items_provider.dart';
-import '../providers/task_filters_provider.dart';
-import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
-import '../viewmodels/images_viewmodel.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/common/custom_dropdown.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_text_form_field.dart';
-import '../widgets/common/custom_toggle_buttons.dart';
-import '../widgets/common/inspection_location_select.dart';
-import '../widgets/common/task_creation/create_scheduled.dart';
-import '../widgets/common/task_creation/element_selected.dart';
-import '../widgets/image_gallery_modal.dart';
-import '../widgets/user_image.dart';
 
 class UserCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -60,6 +49,8 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   final emailController = TextEditingController();
   final firstnameController = TextEditingController();
   final lastnameController = TextEditingController();
+  late UserListViewModel userListViewModel;
+  late String token;
 
   SelectedItemsProvider? selectedItemsProvider;
 
@@ -71,15 +62,13 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     emailController.text = '';
     firstnameController.text = '';
     lastnameController.text = '';
-    /*setState(() {
-      userAssigned = notAssigned;
-    });*/
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    selectedItemsProvider = context.read<SelectedItemsProvider>();
+    userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
+    token = Provider.of<UserProvider>(context, listen: false).getToken!;
   }
 
   @override
@@ -105,12 +94,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     lastnameController.text = '';
   }
 
-  
-
   Future<bool> _createUser(Map<String, dynamic> body) async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final userListViewModel =
-        Provider.of<UserListViewModel>(context, listen: false);
     try {
       final response = await userListViewModel.createUser(token!, body);
       if (response) {
@@ -181,21 +165,25 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   void handleSubmit() {
     String bodyMsg = '';
-    final bool emailValid = 
-    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-    .hasMatch(emailController.text);
+    final bool emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(emailController.text);
     final bool isRoleValid = roleController.text != notAssigned;
-    if(emailValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_emailWarning + '\n';
-    if(isRoleValid == false) bodyMsg = bodyMsg + AppLocalizations.of(context)!.createUserPage_roleWarning;
-    if(emailValid == false || isRoleValid == false){
+    if (emailValid == false)
+      bodyMsg = bodyMsg +
+          AppLocalizations.of(context)!.createUserPage_emailWarning +
+          '\n';
+    if (isRoleValid == false)
+      bodyMsg =
+          bodyMsg + AppLocalizations.of(context)!.createUserPage_roleWarning;
+    if (emailValid == false || isRoleValid == false) {
       showCustomMessageDialog(
         context: context,
         customText: bodyMsg,
-        onAcceptPressed: () {
-        }, 
+        onAcceptPressed: () {},
         messageType: DialogMessageType.error,
       );
-    }else{
+    } else {
       showCustomDialog(
         context: context,
         title: AppLocalizations.of(context)!.dialogWarning,
@@ -210,14 +198,16 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
       );
-    }      
+    }
   }
 
   Map<String, dynamic> createBodyToCreate() {
     var roleFinal = '';
-    if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueOperator){
+    if (roleController.text ==
+        AppLocalizations.of(context)!.createUserPage_roleValueOperator) {
       roleFinal = 'OPERADOR';
-    }else if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueAdmin){
+    } else if (roleController.text ==
+        AppLocalizations.of(context)!.createUserPage_roleValueAdmin) {
       roleFinal = 'ADMINISTRADOR';
     }
     final Map<String, dynamic> requestBody = {
@@ -232,9 +222,11 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   Map<String, dynamic> createBodyToUpdate() {
     var roleFinal = '';
-    if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueOperator){
+    if (roleController.text ==
+        AppLocalizations.of(context)!.createUserPage_roleValueOperator) {
       roleFinal = 'OPERADOR';
-    }else if(roleController.text == AppLocalizations.of(context)!.createUserPage_roleValueAdmin){
+    } else if (roleController.text ==
+        AppLocalizations.of(context)!.createUserPage_roleValueAdmin) {
       roleFinal = 'ADMINISTRADOR';
     }
     final Map<String, dynamic> requestBody = {
@@ -275,7 +267,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       },
       onEnablePressed: () async {
         Navigator.of(context).pop();
-        /*await handleAcceptOnShowDialogEditTask();*/
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
       cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
@@ -307,10 +298,10 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     double widthRow = 640;
     double heightRow = 128;
 
-    return Consumer<TaskListViewModel>(
-        builder: (context, taskListViewModel, child) {
+    return Consumer<UserListViewModel>(
+        builder: (context, userListViewModel, child) {
       return LoadingOverlay(
-        isLoading: taskListViewModel.isLoading,
+        isLoading: userListViewModel.isLoading,
         child: Scaffold(
           body: SingleChildScrollView(
             controller: _scrollController,
@@ -321,8 +312,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                 children: [
                   const SizedBox(height: 12.0),
                   Center(
-                    child:
-                    Visibility(
+                    child: Visibility(
                       visible: true,
                       child: Form(
                         key: _formKey,
@@ -335,7 +325,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                             children: [
                               Text(
                                 AppLocalizations.of(context)!
-                                                .createuser_main_title,
+                                    .createuser_main_title,
                                 style: const TextStyle(fontSize: 32.0),
                               ),
                               const SizedBox(height: 24.0),
@@ -349,52 +339,59 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Column(
-                                        children: [
-                                          const SizedBox(
-                                              width: AppConstants.taskRowSpace),
-                                          Column(
-                                            children: [
-                                              Text(
+                                      children: [
+                                        const SizedBox(
+                                            width: AppConstants.taskRowSpace),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createUserPage_roleTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                            const SizedBox(height: 12.0),
+                                            CustomDropdown(
+                                              value: userRole,
+                                              width:
+                                                  AppConstants.textFieldWidth,
+                                              items: [
+                                                notAssigned,
                                                 AppLocalizations.of(context)!
-                                      .createUserPage_roleTitle,
-                                                style: const TextStyle(
-                                                    fontSize: 16.0),
-                                              ),
-                                              const SizedBox(height: 12.0),
-                                              CustomDropdown(
-                                                value: userRole,
-                                                items: [
-                                                  notAssigned,
-                                                  AppLocalizations.of(context)!.createUserPage_roleValueOperator,
-                                                  AppLocalizations.of(context)!.createUserPage_roleValueAdmin
-                                                ],
-                                                onChanged: (String? value) {
-                                                  setState(() {
-                                                    roleController.text = value!;
-                                                  });
-                                                },
-                                              ),
-                                              const SizedBox(
-                                                  height: AppConstants
-                                                      .taskColumnSpace),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                                    .createUserPage_roleValueOperator,
+                                                AppLocalizations.of(context)!
+                                                    .createUserPage_roleValueAdmin
+                                              ],
+                                              onChanged: (String? value) {
+                                                setState(() {
+                                                  roleController.text = value!;
+                                                });
+                                              },
+                                            ),
+                                            const SizedBox(
+                                                height: AppConstants
+                                                    .taskColumnSpace),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                     const SizedBox(
                                         width: AppConstants.taskRowSpace),
                                     Column(
                                       children: [
                                         Text(
                                           AppLocalizations.of(context)!
-                                      .createUserPage_usernameTitle,
-                                          style: const TextStyle(fontSize: 16.0),
+                                              .createUserPage_usernameTitle,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
                                         ),
                                         const SizedBox(height: 12.0),
                                         CustomTextFormField(
-                                          width: AppConstants.textFieldWidth * 2 +
-                                              AppConstants.taskRowSpace,
-                                          hintText: AppLocalizations.of(context)!
+                                          width:
+                                              AppConstants.textFieldWidth * 2 +
+                                                  AppConstants.taskRowSpace,
+                                          hintText: AppLocalizations.of(
+                                                  context)!
                                               .createUserPage_usernamePlaceholder,
                                           controller: usernameController,
                                         ),
@@ -411,13 +408,14 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                 child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Column(
                                         children: [
                                           Text(
                                             AppLocalizations.of(context)!
-                                      .createUserPage_emailTitle,
+                                                .createUserPage_emailTitle,
                                             style:
                                                 const TextStyle(fontSize: 16.0),
                                           ),
@@ -436,7 +434,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                         children: [
                                           Text(
                                             AppLocalizations.of(context)!
-                                      .createUserPage_firstnameTitle,
+                                                .createUserPage_firstnameTitle,
                                             style:
                                                 const TextStyle(fontSize: 16.0),
                                           ),
@@ -455,7 +453,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                         children: [
                                           Text(
                                             AppLocalizations.of(context)!
-                                      .createUserPage_lastnameTitle,
+                                                .createUserPage_lastnameTitle,
                                             style:
                                                 const TextStyle(fontSize: 16.0),
                                           ),
@@ -480,25 +478,25 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                     ),
                   ),
                   Container(
-                      height: 50.0,
-                      margin: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (widget.detail)
-                            CustomElevatedButton(
-                              messageType: MessageType.error,
-                              onPressed: handleCancel,
-                              text: AppLocalizations.of(context)!
-                                  .buttonCancelLabel,
-                            ),
-                          const SizedBox(width: 12.0),
+                    height: 50.0,
+                    margin: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (widget.detail)
                           CustomElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                handleSubmit();
-                                
-                                /*if (widget.detail) {
+                            messageType: MessageType.error,
+                            onPressed: handleCancel,
+                            text:
+                                AppLocalizations.of(context)!.buttonCancelLabel,
+                          ),
+                        const SizedBox(width: 12.0),
+                        CustomElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              handleSubmit();
+
+                              /*if (widget.detail) {
                                   handleEditTask();
                                 } else {
                                   // Se quita acción de creación en Programada
@@ -506,19 +504,18 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                     handleSubmit();
                                   }
                                 }*/
-                              } else {
-                                scrollToTopScrollView();
-                              }
-                            },
-                            text: widget.detail
-                                ? AppLocalizations.of(context)!
-                                    .buttonAcceptLabel
-                                : AppLocalizations.of(context)!
-                                    .createTaskPage_submitButton,
-                          ),
-                        ],
-                      ),
+                            } else {
+                              scrollToTopScrollView();
+                            }
+                          },
+                          text: widget.detail
+                              ? AppLocalizations.of(context)!.buttonAcceptLabel
+                              : AppLocalizations.of(context)!
+                                  .createTaskPage_submitButton,
+                        ),
+                      ],
                     ),
+                  ),
                 ],
               ),
             ),
