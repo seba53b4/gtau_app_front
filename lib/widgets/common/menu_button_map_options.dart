@@ -46,7 +46,7 @@ class _MultiSelectPopupMenuButtonState
           color: lightBackground,
         ),
         child: ElevatedButton(
-          onPressed: null, // Puedes ajustar esta propiedad si es necesario
+          onPressed: null,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.all(0),
             minimumSize: Size(circleSize, circleSize),

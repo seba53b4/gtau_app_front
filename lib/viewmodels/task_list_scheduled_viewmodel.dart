@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -139,21 +137,21 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> createScheduledTask(
+  Future<TaskScheduled?> createScheduledTask(
       String token, Map<String, dynamic> body) async {
     try {
       _isLoading = true;
       _error = false;
       notifyListeners();
-      final response = await _scheduledService.createScheduledTask(token, body);
-      if (response) {
-        print('Tarea Programada ha sido creada correctamente');
+      TaskScheduled? response =
+          await _scheduledService.createScheduledTask(token, body);
+      if (response != null) {
         notifyListeners();
-        return true;
+        return response;
       } else {
         _error = true;
         print('No se pudieron traer datos');
-        return false;
+        return null;
       }
     } catch (error) {
       _error = true;
@@ -228,15 +226,12 @@ class TaskListScheduledViewModel extends ChangeNotifier {
           await _scheduledService.deleteTaskScheduled(token, scheduledId);
 
       if (response) {
-        print('Tarea ha sido eliminada correctamente');
         return true;
       } else {
-        print('No se pudo eliminar la tarea');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
       throw Exception('Error al eliminar la tarea');
     } finally {
       _isLoading = false;

@@ -129,11 +129,11 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
   }
 
   void _loadInfoFromResponse(CatchmentScheduled catchmentScheduled) {
+    _typeController.text = catchmentScheduled.tipo ?? '';
     if (catchmentScheduled.inspectioned) {
       setState(() {
         cadastre = catchmentScheduled.catastro ??
             AppLocalizations.of(context)!.form_scheduled_cadastre_type_empty;
-        _typeController.text = catchmentScheduled.tipo ?? '';
         catchmentConn = catchmentScheduled.estadoConexion ??
             AppLocalizations.of(context)!.form_scheduled_no_data;
         catchmentCallStatus = catchmentScheduled.estadoLlamada ??

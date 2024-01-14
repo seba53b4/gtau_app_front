@@ -137,12 +137,12 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   }
 
   void _loadInfoFromResponse(SectionScheduled sectionScheduled) {
+    _diamController1.text = (sectionScheduled.diametro ?? '').toString();
+    _diamController2.text = (sectionScheduled.diametro2 ?? '').toString();
+    _longitudeController.text = (sectionScheduled.longitud ?? '').toString();
+    _typeController.text = sectionScheduled.tipoTra ?? '';
     if (sectionScheduled.inspectioned) {
       _userNameController.text = sectionScheduled.username!;
-      _typeController.text = sectionScheduled.tipoTra ?? '';
-      _diamController1.text = (sectionScheduled.diametro ?? '').toString();
-      _diamController2.text = (sectionScheduled.diametro2 ?? '').toString();
-      _longitudeController.text = (sectionScheduled.longitud ?? '').toString();
       _observationsController.text = sectionScheduled.observaciones ?? '';
       downStreamCheckbox = sectionScheduled.observacionAguaAbajo ?? false;
       upStreamCheckbox = sectionScheduled.observacionAguaArriba ?? false;
