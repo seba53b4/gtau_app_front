@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
+import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../models/auth_data.dart';
@@ -24,17 +26,18 @@ class _AuthCheckState extends State<AuthCheck> {
   String accessToken = '';
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   late UserProvider userStateProvider;
+  bool loading = true;
 
   @override
   void initState() {
     super.initState();
     userStateProvider = context.read<UserProvider>();
+    checkLoginStatus();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    checkLoginStatus();
   }
 
   Future<void> checkLoginStatus() async {
@@ -49,6 +52,9 @@ class _AuthCheckState extends State<AuthCheck> {
         loadUserStateFromStorage();
       }
     }
+    setState(() {
+      loading = false;
+    });
     return;
   }
 
@@ -84,10 +90,16 @@ class _AuthCheckState extends State<AuthCheck> {
 
   @override
   Widget build(BuildContext context) {
-    return !isLoggedIn
-        ? LoginScreen()
-        : kIsWeb && isLoggedIn
-            ? const NavigationWeb()
-            : const BottomNavigation();
+    return loading
+        ? LoadingOverlay(
+            isLoading: true,
+            child: Container(
+              color: lightBackground,
+            ))
+        : !isLoggedIn
+            ? LoginScreen()
+            : kIsWeb && isLoggedIn
+                ? const NavigationWeb()
+                : const BottomNavigation();
   }
 }
