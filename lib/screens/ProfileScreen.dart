@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
@@ -12,10 +13,12 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void handleLogOutPress(BuildContext context) {
+    void handleLogOutPress(BuildContext context) async {
       final userStateProvider =
           Provider.of<UserProvider>(context, listen: false);
       userStateProvider.logout();
+      const FlutterSecureStorage storage = FlutterSecureStorage();
+      await storage.deleteAll();
 
       Navigator.pushReplacement(
         context,

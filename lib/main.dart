@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
-import 'package:gtau_app_front/screens/LoginScreen.dart';
+import 'package:gtau_app_front/screens/AuthCheckScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/images_viewmodel.dart';
@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: LoginScreen(),
+        home: const AuthCheck(),
         theme: defaultTheme);
   }
 }
