@@ -33,6 +33,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late TaskFilterProvider taskFilterProvider;
   late String token;
+  late bool alreadyUpdated;
 
   @override
   void initState() {
@@ -44,11 +45,25 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
     taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
+    alreadyUpdated = false;
+    // context.read<UserProvider>().addListener(_onUserProviderChange);
+  }
+
+  void _onUserProviderChange() {
+    final newToken = context.read<UserProvider>().getToken;
+
+    if (newToken != null) {
+      setState(() {
+        token = newToken;
+      });
+
+      _loadFromStorage();
+      //   context.read<UserProvider>().removeListener(_onUserProviderChange);
+    }
   }
 
   void _loadFromStorage() {
-    token = context.read<UserProvider>().getToken ?? '';
-    if (token.isNotEmpty) {
+    if (token.isNotEmpty && !alreadyUpdated) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         updateTaskListState(TaskStatus.Pending.value, false);
       });
@@ -58,7 +73,14 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    //_loadFromStorage();
+    context.read<UserProvider>().addListener(_onUserProviderChange);
+    _onUserProviderChange();
+  }
+
+  @override
+  void dispose() {
+    context.read<UserProvider>().removeListener(_onUserProviderChange);
+    super.dispose();
   }
 
   Future<bool> _clearPref() async {
@@ -75,7 +97,6 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   @override
   Widget build(BuildContext context) {
     taskFilterProvider.setUserNameFilter(widget.userName);
-    _loadFromStorage();
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
     return Consumer<TaskFilterProvider>(
@@ -189,6 +210,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   }
 
   void updateTaskListState(String status, bool isScheduled) async {
+    setState(() {
+      alreadyUpdated = true;
+    });
     if (isScheduled) {
       taskListScheduledViewModel.clearListByStatus(status);
       await taskListScheduledViewModel
@@ -227,20 +251,25 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   Widget _buildTaskList(String status,
       GlobalKey<ScaffoldState> _scaffoldKeyDashboard, bool isScheduled) {
     return FadeTransition(
-      key: ValueKey<int>(_currentIndex),
-      opacity: const AlwaysStoppedAnimation(1.0),
-      child: Center(
-        child: isScheduled
-            ? TaskListScheduled(
-                status: status,
-                scaffoldKey: _scaffoldKeyDashboard,
-              )
-            : TaskList(
-                status: status,
-                scaffoldKey: _scaffoldKeyDashboard,
-              ),
-      ),
-    );
+        key: ValueKey<int>(_currentIndex),
+        opacity: const AlwaysStoppedAnimation(1.0),
+        child: Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            token = userProvider.getToken ?? '';
+            _loadFromStorage();
+            return Center(
+              child: isScheduled
+                  ? TaskListScheduled(
+                      status: status,
+                      scaffoldKey: _scaffoldKeyDashboard,
+                    )
+                  : TaskList(
+                      status: status,
+                      scaffoldKey: _scaffoldKeyDashboard,
+                    ),
+            );
+          },
+        ));
   }
 
   Widget _buildCustomTab({required String text, required bool isSelected}) {
