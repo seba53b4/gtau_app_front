@@ -69,18 +69,20 @@ Future<void> main() async {
           create: (context) => ScheduledViewModel(),
         ),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: AuthCheck(),
+        home: const AuthCheck(),
         theme: defaultTheme);
   }
 }
