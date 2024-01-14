@@ -15,6 +15,7 @@ import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/zone_load_viewmodel.dart';
 import 'package:provider/provider.dart';
 import "package:universal_html/html.dart" as html;
 
@@ -67,6 +68,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<ScheduledViewModel>(
           create: (context) => ScheduledViewModel(),
+        ),
+        ChangeNotifierProvider<ZoneLoadViewModel>(
+          create: (context) => ZoneLoadViewModel(),
         ),
       ],
       child: const MyApp(),

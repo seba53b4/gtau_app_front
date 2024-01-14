@@ -40,9 +40,10 @@ dependencies:
   flutter_svg: ^2.0.9
   file_picker: ^6.1.1
   flutter_secure_storage: 9.0.0
-  flutter_native_splash: ^2.3.7
+  flutter_native_splash: 2.3.7
+  web_socket_channel: 2.4.0
+  loading_animation_widget: 1.2.0+4
 dev_dependencies:
-  hive_generator:
   build_runner:
   flutter_test:
     sdk: flutter

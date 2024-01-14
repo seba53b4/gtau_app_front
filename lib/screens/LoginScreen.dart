@@ -18,7 +18,6 @@ import '../widgets/common/customMessageDialog.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_taost.dart';
 import '../widgets/common/custom_textfield.dart';
-import '../widgets/loading_overlay.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -56,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
         customText: AppLocalizations.of(context)!.error_service_not_available,
         messageType: DialogMessageType.error,
       );
+      return null;
     });
   }
 
@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if ((username.isEmpty || password.isEmpty)) {
       await _showWrongCredentialsToast(context);
-      return null;
+      return;
     }
 
     AuthResult? authResponse = await _fetchAuth(context, username, password);
@@ -141,57 +141,55 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthViewModel>(builder: (context, authViewModel, child) {
-      bool isLoading = authViewModel.isLoading;
-      return LoadingOverlay(
-        isLoading: isLoading,
-        child: Scaffold(
-          body: Container(
-            color: const Color.fromRGBO(253, 255, 252, 1),
-            child: Center(
-              child: BoxContainer(
-                width: kIsWeb ? 400 : 340,
-                height: kIsWeb ? 400 : 360,
-                padding: const EdgeInsets.all(8.0),
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(AppLocalizations.of(context)!.titleApp),
-                    const SizedBox(height: 24.0),
-                    CustomTextField(
-                      controller: usernameController,
-                      hintText: AppLocalizations.of(context)!
-                          .default_input_username_hint,
-                      keyboardType: TextInputType.text,
-                      obscureText: false,
-                      hasError: onError,
-                    ),
-                    CustomTextField(
-                      controller: passwordController,
-                      hintText: AppLocalizations.of(context)!
-                          .default_input_password_hint,
-                      keyboardType: TextInputType.text,
-                      obscureText: true,
-                      hasError: onError,
-                    ),
-                    const SizedBox(height: 16.0),
-                    CustomElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            onError = false;
-                          });
-                          onLogInPressed(context);
-                        },
-                        text:
-                            AppLocalizations.of(context)!.default_login_button),
-                    const SizedBox(height: kIsWeb ? 24 : 4),
-                    TextButton(
-                        onPressed: () => onForgotPressed(context),
-                        child: Text(AppLocalizations.of(context)!
-                            .default_forgot_password)),
-                  ],
-                ),
+    return Consumer<AuthViewModel>(builder: (context, authviewModel, child) {
+      bool isLoading = authviewModel.isLoading;
+
+      return Scaffold(
+        body: Container(
+          color: const Color.fromRGBO(253, 255, 252, 1),
+          child: Center(
+            child: BoxContainer(
+              width: kIsWeb ? 400 : 340,
+              height: kIsWeb ? 400 : 360,
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(AppLocalizations.of(context)!.titleApp),
+                  const SizedBox(height: 24.0),
+                  CustomTextField(
+                    controller: usernameController,
+                    hintText: AppLocalizations.of(context)!
+                        .default_input_username_hint,
+                    keyboardType: TextInputType.text,
+                    obscureText: false,
+                    hasError: onError,
+                  ),
+                  CustomTextField(
+                    controller: passwordController,
+                    hintText: AppLocalizations.of(context)!
+                        .default_input_password_hint,
+                    keyboardType: TextInputType.text,
+                    obscureText: true,
+                    hasError: onError,
+                  ),
+                  const SizedBox(height: 16.0),
+                  CustomElevatedButton(
+                      showLoading: isLoading,
+                      onPressed: () {
+                        setState(() {
+                          onError = false;
+                        });
+                        onLogInPressed(context);
+                      },
+                      text: AppLocalizations.of(context)!.default_login_button),
+                  const SizedBox(height: kIsWeb ? 24 : 4),
+                  TextButton(
+                      onPressed: () => onForgotPressed(context),
+                      child: Text(AppLocalizations.of(context)!
+                          .default_forgot_password)),
+                ],
               ),
             ),
           ),

@@ -8,6 +8,8 @@ import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/scheduled/zone.dart';
+
 class ScheduledElements {
   List<RegisterScheduled> registers;
   List<SectionScheduled> sections;
@@ -35,9 +37,24 @@ class ScheduledService {
   }
 
   Future<ScheduledElements?> fetchTaskScheduledEntities(
-      String token, int idSchedTask) async {
+      String token,
+      int idSchedTask,
+      double? originLongitude,
+      double? originLatitude,
+      int? radiusMeters,
+      int? subzone) async {
     try {
-      final url = Uri.parse('$baseUrl/$idSchedTask/entities');
+      final params = {
+        if (originLongitude != null) 'origin_longitude': '$originLongitude',
+        if (originLatitude != null) 'origin_latitude': '$originLatitude',
+        if (radiusMeters != null) 'radius_mtr': '$radiusMeters',
+        if (subzone != null) 'subzone': '$subzone',
+      };
+
+      final query = Uri(queryParameters: params).query;
+
+      final url = Uri.parse('$baseUrl/$idSchedTask/entities?$query');
+
       final response = await http.get(url, headers: _getHeaders(token));
       if (response.statusCode == 200) {
         final entities = json.decode(response.body);
@@ -237,7 +254,7 @@ class ScheduledService {
     }
   }
 
-  Future<bool> createScheduledTask(
+  Future<TaskScheduled?> createScheduledTask(
       String token, Map<String, dynamic> body) async {
     try {
       final String jsonBody = jsonEncode(body);
@@ -247,10 +264,11 @@ class ScheduledService {
 
       if (response.statusCode == 201) {
         print('Tarea ha sido creada correctamente');
-        return true;
+        final data = json.decode(response.body);
+        return TaskScheduled.fromJson(json: data);
       } else {
         print('No se pudieron traer datos');
-        return false;
+        return null;
       }
     } catch (error) {
       if (kDebugMode) {
@@ -316,26 +334,46 @@ class ScheduledService {
     }
   }
 
-// Future<bool> createSheduledTask(
-//     String token, Map<String, dynamic> body) async {
-//   try {
-//     final String jsonBody = jsonEncode(body);
-//     final url = Uri.parse(baseUrl);
-//     final response =
-//         await http.post(url, headers: _getHeaders(token), body: jsonBody);
-//
-//     if (response.statusCode == 201) {
-//       print('Tarea ha sido creada correctamente');
-//       return true;
-//     } else {
-//       print('No se pudieron traer datos');
-//       return false;
-//     }
-//   } catch (error) {
-//     if (kDebugMode) {
-//       print('Error in createTask: $error');
-//     }
-//     rethrow;
-//   }
-// }
+  Future<bool> createScheduledZone(
+      String token, int scheduledId, Map<String, dynamic> body) async {
+    try {
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse('$baseUrl/$scheduledId/zona');
+      final response =
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      String resultText = response.body;
+      if (response.statusCode == 200) {
+        return resultText.trim().toLowerCase() == 'true';
+      } else {
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in createTask: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<ScheduledZone?> fetchZoneFromScheduled(
+      String token, int scheduledId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/zona');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return ScheduledZone.fromJson(json: jsonResponse);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener zone: $error');
+      }
+      rethrow;
+    }
+  }
 }
