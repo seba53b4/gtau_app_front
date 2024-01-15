@@ -373,12 +373,11 @@ class TaskService {
 
       // Map<String, String> informeEncode = await informeToBase64(path);
       var content = 'application/pdf';
-      var extension = 'pdf';
       var base64 = informe['base64'];
       var fileName = informe['fileName'];
       final Map<String, dynamic> body = {
         "informe": "$content,$base64",
-        "name": "$fileName.$extension"
+        "name": "$fileName"
       };
 
       final String jsonBody = jsonEncode(body);

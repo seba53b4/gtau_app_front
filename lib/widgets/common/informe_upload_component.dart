@@ -27,6 +27,13 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
   InformeViewModel? informeViewModel;
 
   @override
+  void setState(fn) {
+    if(mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
