@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../constants/theme_constants.dart';
 import 'custom_elevated_button.dart';
@@ -8,11 +9,13 @@ class MultiSelectPopupMenuButton extends StatefulWidget {
   final List<String> texts;
   final Function(Set<int>) onIconsSelected;
   final Set<int> selectedIndices;
+  final Function()? onClose;
 
   MultiSelectPopupMenuButton({
     required this.texts,
     required this.onIconsSelected,
     required this.selectedIndices,
+    this.onClose,
   });
 
   @override
@@ -43,7 +46,7 @@ class _MultiSelectPopupMenuButtonState
           color: lightBackground,
         ),
         child: ElevatedButton(
-          onPressed: null, // Puedes ajustar esta propiedad si es necesario
+          onPressed: null,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.all(0),
             minimumSize: Size(circleSize, circleSize),
@@ -82,9 +85,12 @@ class _MultiSelectPopupMenuButtonState
                   ),
                 CustomElevatedButton(
                   onPressed: () {
+                    if (widget.onClose != null) {
+                      widget.onClose!();
+                    }
                     Navigator.of(context).pop(Set<int>.from(selectedIndices));
                   },
-                  text: "Cerrar",
+                  text: AppLocalizations.of(context)!.dialogCloseButton,
                 ),
               ],
             ),

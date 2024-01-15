@@ -31,7 +31,6 @@ class TaskListViewModel extends ChangeNotifier {
   int page = 0;
   int size = kIsWeb ? 12 : 10;
 
-
   void _SetBodyPrefValue(String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("bodyFiltered", value);
@@ -53,8 +52,8 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  void setPage(int newPage){
-    page=newPage;
+  void setPage(int newPage) {
+    page = newPage;
   }
 
   void clearListByStatus(String status) {
@@ -72,9 +71,10 @@ class TaskListViewModel extends ChangeNotifier {
     return await fetchNextPageTasksFromUser(context, status, user);
   }
 
-  Future<List<Task>?> nextPageFilteredListByStatus(
-      BuildContext context, String status, String? user, String encodedBody) async {
-    return await fetchNextPageFilteredTasksFromUser(context, status, user, encodedBody);
+  Future<List<Task>?> nextPageFilteredListByStatus(BuildContext context,
+      String status, String? user, String encodedBody) async {
+    return await fetchNextPageFilteredTasksFromUser(
+        context, status, user, encodedBody);
   }
 
   Future<List<Task>?> fetchTasksFromUser(
@@ -90,14 +90,12 @@ class TaskListViewModel extends ChangeNotifier {
       _SetIsLoadingPrefValue(true);
       _error = false;
       _isLoading = true;
-      
 
       notifyListeners();
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
 
       _tasks[status] = responseListTask!;
-      
 
       return responseListTask;
     } catch (error) {
@@ -117,7 +115,7 @@ class TaskListViewModel extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt("actual_page", page);
   }
-  
+
   Future<List<Task>?> fetchNextPageTasksFromUser(
       BuildContext context, String status, String? user) async {
     final token = context.read<UserProvider>().getToken;
@@ -152,8 +150,8 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<Task>?> fetchNextPageFilteredTasksFromUser(
-      BuildContext context, String status, String? user, String encodedBody) async {
+  Future<List<Task>?> fetchNextPageFilteredTasksFromUser(BuildContext context,
+      String status, String? user, String encodedBody) async {
     final token = context.read<UserProvider>().getToken;
     String? userName;
     if (user == null) {
@@ -164,7 +162,7 @@ class TaskListViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      Map<String,dynamic> body = json.decode(encodedBody);
+      Map<String, dynamic> body = json.decode(encodedBody);
 
       final responseListTask =
           await _taskService.searchTasks(token!, body, page, size);

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 
 import '../models/enums/element_type.dart';
+import 'common/custom_text_button.dart';
 import 'common/detail_element_widget.dart';
 
 typedef void OnCloseCallback();
@@ -38,19 +40,18 @@ void showElementModal(
             ),
           ),
           actions: <Widget>[
-            TextButton(
+            CustomTextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 onClose!();
               },
-              child: Text(
-                AppLocalizations.of(context)!.dialogCloseButton,
-                style: const TextStyle(
-                    fontSize: 18, color: Color.fromRGBO(96, 166, 27, 1)),
-              ),
+              text: AppLocalizations.of(context)!.dialogCloseButton,
+              //   style: const TextStyle(
+              //       fontSize: 18, color: Color.fromRGBO(96, 166, 27, 1)),
+              // ),
             ),
           ],
-          backgroundColor: const Color.fromRGBO(242, 242, 242, 1));
+          backgroundColor: lightBackground);
     },
   );
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gtau_app_front/widgets/task_list_item.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import '../providers/task_filters_provider.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import 'loading_component.dart';
@@ -25,6 +26,8 @@ class _TaskListComponentState extends State<TaskList> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   TaskFilterProvider? taskFilterProvider;
   TaskListViewModel? taskListViewModel;
+  bool nextPage = true;
+  bool isLoadingNow = false;
 
   _ScrollPosition() async {
     final prefs = await SharedPreferences.getInstance();
@@ -51,6 +54,7 @@ class _TaskListComponentState extends State<TaskList> {
     prefs.setInt("tasks_length", length);
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, change the nextPage flag to false. */
   void _checkNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
@@ -60,10 +64,13 @@ class _TaskListComponentState extends State<TaskList> {
     }
   }
 
+  /* checks if there's a next page based on the current page size. If its below the maximum size, returns false. Otherwise, it returns true. */
   Future<bool> _checkExistNextPage(int newTasksLength) async {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
-    if (newTasksLength == value - 1) {
+    int actualPage = prefs.getInt("actual_page") ?? 0;
+
+    if (newTasksLength == (value * actualPage) - actualPage) {
       return false;
     }
     return true;
@@ -83,7 +90,6 @@ class _TaskListComponentState extends State<TaskList> {
     final SharedPreferences prefs = await _prefs;
     return (prefs.getBool("is_loading") ?? false);
   }
-
 
   Future<double> initScroll() async {
     final SharedPreferences prefs = await _prefs;
@@ -109,9 +115,6 @@ class _TaskListComponentState extends State<TaskList> {
     super.dispose();
   }
 
-  bool nextPage = true;
-  bool isLoadingNow = false;
-
   Future updateTaskListState(BuildContext context) async {
     final userName = taskFilterProvider?.userNameFilter;
     final status = taskFilterProvider?.lastStatus;
@@ -135,14 +138,19 @@ class _TaskListComponentState extends State<TaskList> {
         child: Center(
             widthFactor: 0.5,
             child: FutureBuilder(
-              future: Future.wait(
-                  [initScroll(), _GetFilteredValue(), _GetBodyPrefValue(), _GetActualPage(), _GetIsLoadingValue()]),
+              future: Future.wait([
+                initScroll(),
+                _GetFilteredValue(),
+                _GetBodyPrefValue(),
+                _GetActualPage(),
+                _GetIsLoadingValue()
+              ]),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var position = snapshot.data?[0] as double;
                   var isFiltered = snapshot.data?[1] ?? false;
                   var actualPage = snapshot.data?[3] as int;
-                  var isLoading= snapshot.data?[4] as bool; 
+                  var isLoading = snapshot.data?[4] as bool;
                   return Consumer<TaskListViewModel>(
                     builder: (context, taskListViewModel, child) {
                       var tasks = taskListViewModel.tasks[widget.status];
@@ -193,30 +201,40 @@ class _TaskListComponentState extends State<TaskList> {
                                     return Visibility(
                                       visible: !isLoading,
                                       child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            vertical: 5, horizontal:15),
-                                                    child: Center(
-                                                        child:Column(
-                                                            children: <Widget>[
-                                                              Padding(
-                                                                padding:EdgeInsets.symmetric(vertical: 10, horizontal:15),
-                                                                child: SvgPicture.asset('lib/assets/taskslists_notfound_small.svg', width: 50, height: 50),
-                                                              ),
-                                                              isFiltered==true ? Text(AppLocalizations.of(context)!
-                                                              .no_tasks_found_filter, textAlign: TextAlign.center,
-                                                          style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15)) : 
-                                                          Text(AppLocalizations.of(context)!
-                                                              .emptyTaskList,
-                                                          style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15))
-                                                          ,
-                                                        ]
-                                                        )
-                                                      )
-                                                    ),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5, horizontal: 15),
+                                          child: Center(
+                                              child: Column(children: <Widget>[
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 15),
+                                              child: SvgPicture.asset(
+                                                  'lib/assets/taskslists_notfound_small.svg',
+                                                  width: 50,
+                                                  height: 50),
+                                            ),
+                                            isFiltered == true
+                                                ? Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .no_tasks_found_filter,
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: Colors.black
+                                                            .withOpacity(0.6),
+                                                        fontSize: 15))
+                                                : Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .emptyTaskList,
+                                                    style: TextStyle(
+                                                        color: Colors.black
+                                                            .withOpacity(0.6),
+                                                        fontSize: 15)),
+                                          ]))),
                                     );
-                                    
-                                    ;
                                   } else {
                                     if (tasks.length % taskListSize! == 0 &&
                                         nextPage) {
@@ -231,14 +249,14 @@ class _TaskListComponentState extends State<TaskList> {
                                                   snapshot.data?[0] ?? true;
                                               if (existNextPage == true) {
                                                 return Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            vertical: 5),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 5),
                                                     child: Center(
-                                                        child:
-                                                            Lottie.asset('lib/assets/three_dots_loading_fast.json',
-                                                            width: 64,
-                                                            height: 64,)));
+                                                        child: Lottie.asset(
+                                                      'lib/assets/three_dots_loading_fast.json',
+                                                      width: 64,
+                                                      height: 64,
+                                                    )));
                                               } else {
                                                 _SetFilteredValue(false);
                                                 return const Padding(
@@ -250,37 +268,40 @@ class _TaskListComponentState extends State<TaskList> {
                                               return const LoadingWidget();
                                             }
                                           });
-                                    }else{
-                                      if(actualPage > 1){
+                                    } else {
+                                      if (actualPage > 1) {
                                         return Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            vertical: 5),
-                                                    child: Center(
-                                                        child:Column(
-                                                            children: <Widget>[
-                                                              Padding(
-                                                                padding:EdgeInsets.symmetric(vertical: 10),
-                                                                child: SvgPicture.asset('lib/assets/taskslist_empty.svg', width: 50, height: 50),
-                                                              ),
-                                                              Text(AppLocalizations.of(context)!
-                                                              .no_more_tasks_found,
-                                                          style: TextStyle(color: Colors.black.withOpacity(0.6), fontSize: 15)),
-                                                        ]
-                                                        )
-                                                      )
-                                                    );
-                                      }else{
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 5),
+                                            child: Center(
+                                                child:
+                                                    Column(children: <Widget>[
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 10),
+                                                child: SvgPicture.asset(
+                                                    'lib/assets/taskslist_empty.svg',
+                                                    width: 50,
+                                                    height: 50),
+                                              ),
+                                              Text(
+                                                  AppLocalizations.of(context)!
+                                                      .no_more_tasks_found,
+                                                  style: TextStyle(
+                                                      color: Colors.black
+                                                          .withOpacity(0.6),
+                                                      fontSize: 15)),
+                                            ])));
+                                      } else {
                                         return const Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 0),);
+                                          padding:
+                                              EdgeInsets.symmetric(vertical: 0),
+                                        );
                                       }
-                                                      
                                     }
                                   }
                                 }
-                                return null;
                               },
                             ),
                           ),

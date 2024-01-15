@@ -1,8 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../constants/theme_constants.dart';
 
 double calculateDistance(LatLng point1, LatLng point2) {
   final double dx = point1.latitude - point2.latitude;
@@ -29,7 +30,6 @@ List<LatLng> getLargePolylineOnSection(List<LatLng> points) {
 
 Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
   Set<Polyline> ret = {};
-  const Color arrowColor = Colors.purpleAccent;
   const int arrowWidth = 3;
 
   try {
@@ -55,7 +55,8 @@ Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
         atan2(end.latitude - init.latitude, end.longitude - init.longitude);
 
     double angle = 20 * (pi / 180); // Ángulo de los vertices según la polylinea
-    double arrowLength = 0.00001225; // Largo de los vértices de la flecha
+    double arrowLength =
+        0.00002225; //0.00001225; // Largo de los vértices de la flecha
 
     LatLng sidePoint1 = LatLng(
       midPoint.latitude + sin(angleOfPolylineRadians + angle) * arrowLength,
@@ -86,4 +87,30 @@ Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
   }
 
   return ret;
+}
+
+LatLng getRandomPoint(List<LatLng> points) {
+  if (points.isEmpty) {
+    return const LatLng(-34.88773, -56.13955);
+  }
+
+  final randomIndex = Random().nextInt(points.length);
+  return points[randomIndex];
+}
+
+LatLng? getRandomPointOfMap(Set<Polyline> polylines, Set<Circle> circles) {
+  List<LatLng> allPoints = [];
+  int numberOfElements = 2;
+
+  // Agregan de las polilíneas
+  for (var polyline in polylines.take(numberOfElements)) {
+    allPoints.addAll(polyline.points);
+  }
+
+  // Agregan de los círculos
+  for (var circle in circles.take(numberOfElements)) {
+    allPoints.add(circle.center);
+  }
+
+  return getRandomPoint(allPoints);
 }

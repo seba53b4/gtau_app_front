@@ -6,6 +6,10 @@ import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/selected_items_provider.dart';
+import '../viewmodels/catchment_viewmodel.dart';
+import '../viewmodels/lot_viewmodel.dart';
+import '../viewmodels/register_viewmodel.dart';
+import '../viewmodels/section_viewmodel.dart';
 import 'common/custom_elevated_button.dart';
 import 'map_component_location_select.dart';
 
@@ -28,6 +32,14 @@ double _getHeightModalOnDevice(BuildContext context) {
 void _showMapModal(BuildContext context) {
   SelectedItemsProvider selectedItemsProvider =
       context.read<SelectedItemsProvider>();
+
+  void clearElementsFetched() {
+    context.read<RegisterViewModel>().reset();
+    context.read<SectionViewModel>().reset();
+    context.read<LotViewModel>().reset();
+    context.read<CatchmentViewModel>().reset();
+  }
+
   showGeneralDialog(
     context: context,
     barrierDismissible: false,
@@ -69,6 +81,8 @@ void _showMapModal(BuildContext context) {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   CustomElevatedButton(
                     onPressed: () {
+                      selectedItemsProvider.clearAllElements();
+                      clearElementsFetched();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.error,
@@ -78,6 +92,7 @@ void _showMapModal(BuildContext context) {
                   CustomElevatedButton(
                     onPressed: () {
                       selectedItemsProvider.saveCurrentPositionAsInitial();
+                      clearElementsFetched();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.success,
