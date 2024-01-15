@@ -380,4 +380,83 @@ class TaskService {
               : const LatLng(0, 0));
     }).toList();
   }
+
+  Future<List<String>> fetchTaskInformes(token, int idTask) async {
+    try {
+      final url = Uri.parse('$baseUrl/$idTask/informes');
+      final response = await http.get(url, headers: _getHeaders(token));
+      if (response.statusCode == 200) {
+        List<dynamic> decode = json.decode(response.body) as List<dynamic>;
+        return decode.map((e) => e["informe"].toString()).toList();
+      } else {
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
+        return [];
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in fetchTaskInformes: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<String> putBase64Informes(String token, int id, Map<String, dynamic> informe) async {
+    try {
+      // Uri uri = Uri.parse(path);
+      // String basename = p.basename(uri.path);
+
+      // Map<String, String> informeEncode = await informeToBase64(path);
+      var content = 'application/pdf';
+      var base64 = informe['base64'];
+      var fileName = informe['fileName'];
+      final Map<String, dynamic> body = {
+        "informe": "$content,$base64",
+        "name": "$fileName"
+      };
+
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse('$baseUrl/$id/informe/v2');
+      final response = await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        //Cuando ingresa a la galeria la imagen se renderiza de todas formas, no es necesario hacer nada aca.
+        var informe = jsonResponse['informe'];
+        return informe;
+      } else {
+        return '';
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al guardar informes: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteTaskInforme(String token, int id, String path) async {
+    try {
+      var fileName = path.split("/").last;
+      final Map<String, dynamic> body = {"name": fileName};
+
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse('$baseUrl/$id/informe');
+      final response =
+          await http.delete(url, headers: _getHeaders(token), body: jsonBody);
+      if (response.statusCode == 200) {
+        final bool jsonResponse = json.decode(response.body);
+
+        return jsonResponse;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al borrar informe: $error');
+      }
+      rethrow;
+    }
+  }
+
 }
