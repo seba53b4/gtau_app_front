@@ -10,6 +10,7 @@ import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:gtau_app_front/widgets/common/informe_upload_component.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,8 @@ import '../widgets/common/inspection_location_select.dart';
 import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/image_gallery_modal.dart';
+import '../widgets/user_image.dart';
+import '../widgets/informe_file_picker.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -1288,11 +1291,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             width: widthRow,
                             child: Column(
                               children: [
-                                /*UserImage(
-                                    onFileChanged: (imagesFiles) {
-                                      this.imagesFiles = imagesFiles;
-                                    },
-                                    idTask: widget.idTask),*/
                                 ImageGalleryModal(idTask: widget.idTask!),
                               ],
                             ),
