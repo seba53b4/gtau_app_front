@@ -1297,6 +1297,17 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               ],
                             ),
                           ),
+                          Text(
+                            AppLocalizations.of(context)!.informe_title,
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            width: widthRow,
+                            child: Column(children: [
+                              InformeUploadComponent(idTask: widget.idTask!)
+                            ]),
+                          ),
                         ],
                       ),
                     ),
