@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gtau_app_front/models/auth_data.dart';
 import 'package:gtau_app_front/models/user_state.dart';
 import 'package:gtau_app_front/navigation/navigation.dart';
@@ -30,6 +31,16 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   late AuthResult? authData;
   bool onError = false;
+  bool isLoggedIn = false;
+  String accessToken = '';
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  late UserProvider userStateProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    userStateProvider = context.read<UserProvider>();
+  }
 
   Future<AuthResult?> _fetchAuth(
       BuildContext context, String username, String password) async {
@@ -58,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void setUserData(BuildContext context, bool isLoggedIn, String username,
-      AuthData authData, bool isAdmin) {
+      AuthData authData, bool isAdmin) async {
     if (isLoggedIn) {
       final filterProvider = context.read<TaskFilterProvider>();
       filterProvider.setUserNameFilter(username);
@@ -68,17 +79,21 @@ class _LoginScreenState extends State<LoginScreen> {
           isLoggedIn: true,
           authData: authData,
           isAdmin: isAdmin));
+      await _storage.write(key: 'access_token', value: authData.accessToken);
+      await _storage.write(key: 'refresh_token', value: authData.refreshToken);
+      await _storage.write(key: 'isAdmin', value: isAdmin.toString());
+      await _storage.write(key: 'username', value: username);
     }
   }
 
-  goToNav(BuildContext context) {
+  goToNav(BuildContext context) async {
     if (kIsWeb) {
-      Navigator.pushReplacement(
+      await Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const NavigationWeb()),
       );
     } else {
-      Navigator.pushReplacement(
+      await Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const BottomNavigation()),
       );
