@@ -26,10 +26,10 @@ import '../widgets/common/custom_text_form_field.dart';
 class UserCreationScreen extends StatefulWidget {
   var type = 'inspection';
   bool detail = false;
-  int? idTask = 0;
+  String? idTask = '';
 
   UserCreationScreen(
-      {super.key, required this.type, this.detail = false, this.idTask = 0});
+      {super.key, required this.type, this.detail = false, this.idTask = ''});
 
   @override
   _UserCreationScreenState createState() => _UserCreationScreenState();
@@ -112,7 +112,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     }
   }
 
-  Future<bool> _updateTask(Map<String, dynamic> body) async {
+  /*Future<bool> _updateTask(Map<String, dynamic> body) async {
     if (Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(ImageBundleAdapter());
     }
@@ -138,7 +138,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       print(error);
       throw Exception('Error al obtener los datos');
     }
-  }
+  }*/
 
   Future<void> showMessageDialog(DialogMessageType type) async {
     await showCustomMessageDialog(
@@ -241,10 +241,10 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   Future handleAcceptOnShowDialogEditUser() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
-    bool isUpdated = await _updateTask(requestBody);
+    /*bool isUpdated = await _updateTask(requestBody);
     if (isUpdated) {
       reset();
-    }
+    }*/
     _ResetPrefs();
   }
 
