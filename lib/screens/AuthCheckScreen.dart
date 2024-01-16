@@ -33,12 +33,12 @@ class _AuthCheckState extends State<AuthCheck> {
   void initState() {
     super.initState();
     userStateProvider = context.read<UserProvider>();
+    checkLoginStatus();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    checkLoginStatus();
   }
 
   Future<void> checkLoginStatus() async {
@@ -53,7 +53,7 @@ class _AuthCheckState extends State<AuthCheck> {
           isLoggedIn = true;
           accessToken = storedAccessToken;
         });
-        loadUserStateFromStorage();
+        await loadUserStateFromStorage();
       }
     }
     setState(() {
@@ -62,17 +62,15 @@ class _AuthCheckState extends State<AuthCheck> {
     return;
   }
 
-  void loadUserStateFromStorage() async {
+  Future<void> loadUserStateFromStorage() async {
     String? accessToken = await _storage.read(key: 'access_token');
     String? refreshToken = await _storage.read(key: 'refresh_token');
     String? isAdminStore = await _storage.read(key: 'isAdmin');
     String? username = await _storage.read(key: 'username');
-    setState(() {
-      isAdmin = isAdminStore == 'true';
-    });
+
     userStateProvider.updateUserState(UserState(
         isLoggedIn: true,
-        isAdmin: isAdmin,
+        isAdmin: isAdminStore == 'true',
         username: username,
         authData:
             AuthData(accessToken: accessToken!, refreshToken: refreshToken!)));
@@ -96,16 +94,18 @@ class _AuthCheckState extends State<AuthCheck> {
 
   @override
   Widget build(BuildContext context) {
-    return loading
-        ? LoadingOverlay(
-            isLoading: true,
-            child: Container(
-              color: lightBackground,
-            ))
-        : !isLoggedIn
-            ? LoginScreen()
-            : kIsWeb && isLoggedIn
-                ? NavigationWeb(isAdmin: isAdmin)
-                : const BottomNavigation();
+    return Consumer<UserProvider>(builder: (context, userProvider, _) {
+      return loading
+          ? LoadingOverlay(
+              isLoading: true,
+              child: Container(
+                color: lightBackground,
+              ))
+          : !isLoggedIn
+              ? LoginScreen()
+              : kIsWeb && isLoggedIn
+                  ? NavigationWeb(isAdmin: userProvider.isAdmin ?? false)
+                  : const BottomNavigation();
+    });
   }
 }
