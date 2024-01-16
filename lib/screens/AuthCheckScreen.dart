@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
+import '../constants/theme_constants.dart';
 import '../models/auth_data.dart';
 import '../models/user_state.dart';
 import '../navigation/navigation.dart';
@@ -27,20 +27,24 @@ class _AuthCheckState extends State<AuthCheck> {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   late UserProvider userStateProvider;
   bool loading = true;
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     userStateProvider = context.read<UserProvider>();
-    checkLoginStatus();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    checkLoginStatus();
   }
 
   Future<void> checkLoginStatus() async {
+    setState(() {
+      loading = true;
+    });
     String? storedAccessToken = await _storage.read(key: 'access_token');
 
     if (storedAccessToken != null) {
@@ -61,12 +65,14 @@ class _AuthCheckState extends State<AuthCheck> {
   void loadUserStateFromStorage() async {
     String? accessToken = await _storage.read(key: 'access_token');
     String? refreshToken = await _storage.read(key: 'refresh_token');
-    String? isAdmin = await _storage.read(key: 'isAdmin');
+    String? isAdminStore = await _storage.read(key: 'isAdmin');
     String? username = await _storage.read(key: 'username');
-
+    setState(() {
+      isAdmin = isAdminStore == 'true';
+    });
     userStateProvider.updateUserState(UserState(
         isLoggedIn: true,
-        isAdmin: isAdmin == 'true',
+        isAdmin: isAdmin,
         username: username,
         authData:
             AuthData(accessToken: accessToken!, refreshToken: refreshToken!)));
@@ -99,7 +105,7 @@ class _AuthCheckState extends State<AuthCheck> {
         : !isLoggedIn
             ? LoginScreen()
             : kIsWeb && isLoggedIn
-                ? const NavigationWeb()
+                ? NavigationWeb(isAdmin: isAdmin)
                 : const BottomNavigation();
   }
 }
