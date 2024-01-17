@@ -37,8 +37,6 @@ import '../widgets/common/inspection_location_select.dart';
 import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/image_gallery_modal.dart';
-import '../widgets/user_image.dart';
-import '../widgets/informe_file_picker.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -533,7 +531,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               child: Column(
                 children: [
                   Visibility(
-                    visible: widget.detail && selectedIndex == 1,
+                    visible: widget.detail && selectedIndex == 1 && kIsWeb,
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: Padding(
