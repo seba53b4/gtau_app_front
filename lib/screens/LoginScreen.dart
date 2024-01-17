@@ -74,7 +74,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (isLoggedIn) {
       final filterProvider = context.read<TaskFilterProvider>();
       filterProvider.setUserNameFilter(username);
-      final userStateProvider = context.read<UserProvider>();
       userStateProvider.updateUserState(UserState(
           username: username,
           isLoggedIn: true,

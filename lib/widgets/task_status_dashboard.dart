@@ -46,20 +46,6 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
     taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
     alreadyUpdated = false;
-    // context.read<UserProvider>().addListener(_onUserProviderChange);
-  }
-
-  void _onUserProviderChange() {
-    final newToken = context.read<UserProvider>().getToken;
-
-    if (newToken != null) {
-      setState(() {
-        token = newToken;
-      });
-
-      _loadFromStorage();
-      //   context.read<UserProvider>().removeListener(_onUserProviderChange);
-    }
   }
 
   void _loadFromStorage() {
@@ -73,13 +59,10 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    context.read<UserProvider>().addListener(_onUserProviderChange);
-    _onUserProviderChange();
   }
 
   @override
   void dispose() {
-    context.read<UserProvider>().removeListener(_onUserProviderChange);
     super.dispose();
   }
 
