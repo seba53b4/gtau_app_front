@@ -32,6 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   late AuthResult? authData;
   bool onError = false;
   bool isLoggedIn = false;
+  bool isAdmin = false;
   String accessToken = '';
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   late UserProvider userStateProvider;
@@ -69,19 +70,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void setUserData(BuildContext context, bool isLoggedIn, String username,
-      AuthData authData, bool isAdmin) async {
+      AuthData authData, bool isAdminUser) async {
     if (isLoggedIn) {
       final filterProvider = context.read<TaskFilterProvider>();
       filterProvider.setUserNameFilter(username);
-      final userStateProvider = context.read<UserProvider>();
       userStateProvider.updateUserState(UserState(
           username: username,
           isLoggedIn: true,
           authData: authData,
-          isAdmin: isAdmin));
+          isAdmin: isAdminUser));
+      setState(() {
+        isAdmin = isAdminUser;
+      });
       await _storage.write(key: 'access_token', value: authData.accessToken);
       await _storage.write(key: 'refresh_token', value: authData.refreshToken);
-      await _storage.write(key: 'isAdmin', value: isAdmin.toString());
+      await _storage.write(key: 'isAdmin', value: isAdminUser.toString());
       await _storage.write(key: 'username', value: username);
     }
   }
@@ -90,7 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (kIsWeb) {
       await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const NavigationWeb()),
+        MaterialPageRoute(
+            builder: (context) => NavigationWeb(isAdmin: isAdmin)),
       );
     } else {
       await Navigator.pushReplacement(
