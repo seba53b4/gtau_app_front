@@ -127,24 +127,24 @@ class UserListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> deleteUser(String token, int id) async {
+  Future<bool> deleteUser(String token, String id) async {
     try {
       _isLoading = true;
       _error = false;
       notifyListeners();
-      final response = await _taskService.deleteTask(token, id);
+      final response = await _userService.deleteUser(token, id);
 
       if (response) {
-        print('Tarea ha sido eliminada correctamente');
+        print('Usuario ha sido eliminado correctamente');
         return true;
       } else {
-        print('No se pudo eliminar la tarea');
+        print('No se pudo eliminar el usuario');
         return false;
       }
     } catch (error) {
       _error = true;
       print(error);
-      throw Exception('Error al eliminar la tarea');
+      throw Exception('Error al eliminar el usuario');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -153,15 +153,15 @@ class UserListViewModel extends ChangeNotifier {
 
   
   Future<bool> updateUser(
-      String token, int idTask, Map<String, dynamic> body) async {
+      String token, String idUser, Map<String, dynamic> body) async {
     try {
       _SetIsLoadingPrefValue(true);
       _isLoading = true;
       _error = false;
       notifyListeners();
-      final response = await _taskService.updateTask(token, idTask, body);
+      final response = await _userService.updateUser(token, idUser, body);
       if (response) {
-        print('Tarea ha sido actualizada correctamente');
+        print('Usuario ha sido actualizada correctamente');
         notifyListeners();
         return true;
       } else {

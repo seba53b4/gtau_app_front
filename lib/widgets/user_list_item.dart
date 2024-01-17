@@ -29,17 +29,14 @@ class UserListItem extends StatelessWidget {
     final token = context.read<UserProvider>().getToken;
     var response = await userListViewModel.fetchUser(token, user!.getId!);
     var username = response!.getUsername;
-    print('username = $username');
-    /*Navigator.push(
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => UserCreationScreen(
-          detail: true,
-          idTask: user!.getId,
-          type: 'inspection',
+          idUser: user!.getId,
         ),
       ),
-    );*/
+    );
   }
 
   @override
@@ -159,7 +156,7 @@ class UserListItem extends StatelessWidget {
                     hoverColor: Colors.transparent,
                     iconSize: iconSize,
                     onPressed: () async {
-                      //await _showDeleteConfirmationDialog(context);
+                      await _showDeleteConfirmationDialog(context);
                     },
                     icon: const Icon(Icons.delete, color: Colors.red),
                   ),
@@ -184,43 +181,43 @@ class UserListItem extends StatelessWidget {
       },
       onEnablePressed: () async {
         Navigator.of(showDialogContext).pop();
-        /*bool result = await _deleteTask(context, user!.id!);
+        bool result = await _deleteUser(context, user!.id!);
 
         if (result) {
-          print('Tarea ha sido eliminada correctamente');
+          print('Usuario ha sido eliminado correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          print('No se pudo eliminar la tarea');
+          print('No se pudo eliminar el usuario');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,
             onAcceptPressed: () {},
           );
         }
-        await updateTaskListState(showDialogContext);*/
+        await updateUserListState(showDialogContext);
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
       cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
     );
   }
 
-  Future updateTaskListState(BuildContext context) async {
+  Future updateUserListState(BuildContext context) async {
     final status = 'ACTIVE';
-    final taskListViewModel =
+    final userListViewModel =
         Provider.of<UserListViewModel>(context, listen: false);
-    taskListViewModel.clearListByStatus(status!);
-    await taskListViewModel.initializeUsers(context, status, "");
+    userListViewModel.clearListByStatus(status!);
+    await userListViewModel.initializeUsers(context, "ACTIVE", "");
   }
 
-  Future<bool> _deleteTask(BuildContext context, int id) async {
+  Future<bool> _deleteUser(BuildContext context, String id) async {
     final token = context.read<UserProvider>().getToken;
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
-    bool result = await taskListViewModel.deleteTask(token!, id);
+    final userListViewModel =
+        Provider.of<UserListViewModel>(context, listen: false);
+    bool result = await userListViewModel.deleteUser(token!, id);
     return result;
   }
 }

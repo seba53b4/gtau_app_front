@@ -56,9 +56,9 @@ class UserService {
         final userData = json.decode(response.body);
         return UserData(
           id: userData['id'],
-          email: userData['email']  ??  'null',
-          firstName: userData['firstName'] ??  'null',
-          lastName: userData['lastName']  ??  'null',
+          email: userData['email'],
+          firstName: userData['firstName'],
+          lastName: userData['lastName'],
           username: userData['username'],
           rol: userData['rol']);
       } else {
@@ -73,10 +73,10 @@ class UserService {
     }
   }
 
-  Future<bool> deleteUser(String token, int id) async {
+  Future<bool> deleteUser(String token, String id) async {
     try {
       final url = Uri.parse('$baseUrl/$id');
-      final response = await http.delete(url, headers: _getHeaders(token));
+      final response = await http.delete(url, headers: _getHeadersAlt(token));
       return response.statusCode == 204;
     } catch (error) {
       if (kDebugMode) {
@@ -94,6 +94,7 @@ class UserService {
           await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 201) {
+        print('Se ha creado el usuario');
         return true;
       } else {
         print('No se pudieron traer datos');
@@ -102,6 +103,32 @@ class UserService {
     } catch (error) {
       if (kDebugMode) {
         print('Error in createUser: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> updateUser(String token, String idUser, Map<String, dynamic> body) async {
+    try {
+      final String jsonBody = jsonEncode(body);
+      final url = Uri.parse('$baseUrl/$idUser');
+      final response =
+          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      
+      var responseCode = response.statusCode;
+      print('codigo= $responseCode');
+      print('url: $url');
+
+      if (response.statusCode == 200) {
+        print('Se ha actualizado el usuario');
+        return true;
+      } else {
+        print('No se pudieron traer datos');
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in updateUser: $error');
       }
       rethrow;
     }

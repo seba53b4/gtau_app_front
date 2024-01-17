@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
+import 'package:gtau_app_front/models/user_data.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
@@ -24,26 +25,23 @@ import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_text_form_field.dart';
 
 class UserCreationScreen extends StatefulWidget {
-  var type = 'inspection';
   bool detail = false;
-  String? idTask = '';
+  String? idUser = '';
 
   UserCreationScreen(
-      {super.key, required this.type, this.detail = false, this.idTask = ''});
+      {super.key, this.idUser = ''});
 
   @override
   _UserCreationScreenState createState() => _UserCreationScreenState();
 }
 
 class _UserCreationScreenState extends State<UserCreationScreen> {
-  late Task task;
-  late DateTime? startDate;
-  late DateTime? releasedDate;
+  late UserData user;
+  
   int selectedIndex = 0;
   static const String notAssigned = "Sin asignar";
   String userRole = notAssigned;
-  late String taskStatus = 'PENDING';
-  late String initStatus = 'PENDING';
+  
   final roleController = TextEditingController();
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
@@ -54,7 +52,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   SelectedItemsProvider? selectedItemsProvider;
 
-  String numOrder = "";
 
   void reset() {
     roleController.text = notAssigned;
@@ -84,14 +81,59 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     super.dispose();
   }
 
+  Future updateUserListState(BuildContext context) async {
+    final status = 'ACTIVE';
+    final userListViewModel =
+        Provider.of<UserListViewModel>(context, listen: false);
+    userListViewModel.clearListByStatus(status!);
+    await userListViewModel.initializeUsers(context, "ACTIVE", "");
+  }
+
   @override
   void initState() {
     Hive.initFlutter().then((value) => null);
-    roleController.text = notAssigned;
-    usernameController.text = '';
-    emailController.text = '';
-    firstnameController.text = '';
-    lastnameController.text = '';
+    if(widget.idUser == ''){
+      roleController.text = notAssigned;
+      usernameController.text = '';
+      emailController.text = '';
+      firstnameController.text = '';
+      lastnameController.text = '';
+    }else{
+      _fetchUser();
+    }
+    
+  }
+
+  Future<bool> _fetchUser() async {
+    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final userListViewModel =
+        Provider.of<UserListViewModel>(context, listen: false);
+
+    try {
+      final responseUser =
+          await userListViewModel.fetchUser(token, widget.idUser!);
+      if (responseUser != null) {
+        setState(() {
+          user = responseUser;
+        });
+      }
+
+      if (user.getRol == 'OPERADOR') {
+        userRole = AppLocalizations.of(context)!.createUserPage_roleValueOperator;
+      } else if (user.getRol == 'ADMINISTRADOR') {
+        userRole = AppLocalizations.of(context)!.createUserPage_roleValueAdmin;
+      }
+
+      usernameController.text = user.getUsername!;
+      emailController.text = user.getEmail ?? '';
+      firstnameController.text = user.getFirstname ?? '';
+      lastnameController.text = user.getLastname ?? '';
+
+      return true;
+    } catch (error) {
+      print(error);
+      throw Exception('Error al obtener los datos');
+    }
   }
 
   Future<bool> _createUser(Map<String, dynamic> body) async {
@@ -112,21 +154,18 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     }
   }
 
-  /*Future<bool> _updateTask(Map<String, dynamic> body) async {
-    if (Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(ImageBundleAdapter());
-    }
+  Future<bool> _updateUser(Map<String, dynamic> body) async {
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
 
-    final taskListViewModel =
-        Provider.of<TaskListViewModel>(context, listen: false);
+    final userListViewModel =
+        Provider.of<UserListViewModel>(context, listen: false);
 
     try {
       final response =
-          await taskListViewModel.updateTask(token!, widget.idTask!, body);
+          await userListViewModel.updateUser(token!, widget.idUser!, body);
 
       if (response) {
-        print('Tarea ha sido actualizada correctamente');
+        print('Usuario ha sido actualizado correctamente');
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
@@ -138,7 +177,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       print(error);
       throw Exception('Error al obtener los datos');
     }
-  }*/
+  }
 
   Future<void> showMessageDialog(DialogMessageType type) async {
     await showCustomMessageDialog(
@@ -222,10 +261,11 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   Map<String, dynamic> createBodyToUpdate() {
     var roleFinal = '';
-    if (roleController.text ==
+    var contr = roleController.text;
+    if (userRole ==
         AppLocalizations.of(context)!.createUserPage_roleValueOperator) {
       roleFinal = 'OPERADOR';
-    } else if (roleController.text ==
+    } else if (userRole ==
         AppLocalizations.of(context)!.createUserPage_roleValueAdmin) {
       roleFinal = 'ADMINISTRADOR';
     }
@@ -236,15 +276,16 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       "username": usernameController.text,
       "rol": roleFinal
     };
+    //print('role final: $roleFinal y rol contr: $userRole');
     return requestBody;
   }
 
   Future handleAcceptOnShowDialogEditUser() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
-    /*bool isUpdated = await _updateTask(requestBody);
+    bool isUpdated = await _updateUser(requestBody);
     if (isUpdated) {
       reset();
-    }*/
+    }
     _ResetPrefs();
   }
 
@@ -266,6 +307,9 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         Navigator.of(context).pop();
       },
       onEnablePressed: () async {
+        Navigator.of(context).pop();
+        await handleAcceptOnShowDialogEditUser();
+        updateUserListState(context);
         Navigator.of(context).pop();
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
@@ -494,21 +538,17 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                         CustomElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              handleSubmit();
-
-                              /*if (widget.detail) {
-                                  handleEditTask();
-                                } else {
-                                  // Se quita acción de creación en Programada
-                                  if (selectedIndex == 1) {
-                                    handleSubmit();
-                                  }
-                                }*/
+                              if (widget.idUser == '') {
+                                handleSubmit();
+                              } else {
+                                // Se quita acción de creación en Programada
+                                handleEditTask();
+                              }
                             } else {
                               scrollToTopScrollView();
                             }
                           },
-                          text: widget.detail
+                          text: widget.idUser != ''
                               ? AppLocalizations.of(context)!.buttonAcceptLabel
                               : AppLocalizations.of(context)!
                                   .createTaskPage_submitButton,

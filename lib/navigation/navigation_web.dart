@@ -82,9 +82,7 @@ class _NavigationWeb extends State<NavigationWeb> {
           TaskCreationScreen(
             type: '',
           ),
-          UserCreationScreen(
-            type: '',
-          ),
+          UserCreationScreen(),
           UserDashboard(),
           const MapScreen(),
           const ProfileScreen(),
