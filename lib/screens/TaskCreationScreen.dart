@@ -253,8 +253,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         messageType: type,
         onAcceptPressed: () {
           if (type == DialogMessageType.success && !widget.detail) {
-            Widget nav =
-                kIsWeb ? const NavigationWeb() : const BottomNavigation();
+            final isAdmin = context.read<UserProvider>().isAdmin;
+            Widget nav = kIsWeb
+                ? NavigationWeb(isAdmin: isAdmin != null && isAdmin)
+                : const BottomNavigation();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => nav),
