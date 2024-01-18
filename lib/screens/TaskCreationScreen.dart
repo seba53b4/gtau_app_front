@@ -343,7 +343,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "longitud": selectedItemsProvider.inspectionPosition.longitude.toString()
     };
 
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String addDateUpdated = formattedDate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
       "inspectionType": "inspectionType Default",
@@ -363,9 +363,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToUpdate() {
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String addDateUpdated = formattedDate(addDateController.text);
     late String? releasedDateSelected = releasedDateController.text.isNotEmpty
-        ? formattedDateToUpdate(releasedDateController.text)
+        ? formattedDate(releasedDateController.text)
         : null;
 
     var selectedItemsProvider = context.read<SelectedItemsProvider>();
