@@ -34,15 +34,24 @@ class TaskListItem extends StatelessWidget {
     );
   }
 
+  String getParsedText(String text, int maxLength) {
+    if (text.length <= maxLength) {
+      return text;
+    } else {
+      return '${text.substring(0, maxLength - 3)}...';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
-    double fontSize = kIsWeb ? 15 : 12;
+    double fontSize = kIsWeb ? 12 : 10;
     double fontSizeInfo = kIsWeb ? 12 : 9;
     double titleSpace = kIsWeb ? 200 : 120;
     double dividerHeight = kIsWeb ? 32 : 24;
     double taskInfoSpace = kIsWeb ? 150 : 115;
     double iconSize = kIsWeb ? 26 : 24;
+    final appLocalizations = AppLocalizations.of(context)!;
 
     return InkWell(
       onTap: () {
@@ -89,7 +98,7 @@ class TaskListItem extends StatelessWidget {
                         padding: const EdgeInsetsDirectional.symmetric(
                             horizontal: 8),
                         child: Text(
-                          '${task!.getWorkNumber}',
+                          getParsedText(task!.location!, kIsWeb ? 74 : 56),
                           style: TextStyle(fontSize: fontSize),
                         ),
                       )),
@@ -114,11 +123,13 @@ class TaskListItem extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                parseDateTimeOnFormatHour(task!.getAddDate!),
+                                appLocalizations.list_item_date +
+                                    parseDateTime(task!.getAddDate!),
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                               Text(
-                                task!.getUser!,
+                                appLocalizations.list_item_user +
+                                    task!.getUser!,
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                             ],
@@ -179,14 +190,12 @@ class TaskListItem extends StatelessWidget {
         bool result = await _deleteTask(context, task!.id!);
 
         if (result) {
-          print('Tarea ha sido eliminada correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          print('No se pudo eliminar la tarea');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,

@@ -37,8 +37,6 @@ import '../widgets/common/inspection_location_select.dart';
 import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/image_gallery_modal.dart';
-import '../widgets/user_image.dart';
-import '../widgets/informe_file_picker.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -255,8 +253,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         messageType: type,
         onAcceptPressed: () {
           if (type == DialogMessageType.success && !widget.detail) {
-            Widget nav =
-                kIsWeb ? const NavigationWeb() : const BottomNavigation();
+            final isAdmin = context.read<UserProvider>().isAdmin;
+            Widget nav = kIsWeb
+                ? NavigationWeb(isAdmin: isAdmin != null && isAdmin)
+                : const BottomNavigation();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => nav),
@@ -345,7 +345,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "longitud": selectedItemsProvider.inspectionPosition.longitude.toString()
     };
 
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String addDateUpdated = formattedDate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
       "inspectionType": "inspectionType Default",
@@ -365,9 +365,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToUpdate() {
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String addDateUpdated = formattedDate(addDateController.text);
     late String? releasedDateSelected = releasedDateController.text.isNotEmpty
-        ? formattedDateToUpdate(releasedDateController.text)
+        ? formattedDate(releasedDateController.text)
         : null;
 
     var selectedItemsProvider = context.read<SelectedItemsProvider>();
@@ -533,7 +533,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               child: Column(
                 children: [
                   Visibility(
-                    visible: widget.detail && selectedIndex == 1,
+                    visible: widget.detail && selectedIndex == 1 && kIsWeb,
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: Padding(

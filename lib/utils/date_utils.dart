@@ -19,7 +19,15 @@ String parseDateTimeOnFormatHour(DateTime? dt) {
   return format.format(dt);
 }
 
-String formattedDateToUpdate(String dateString) {
+String parseDateTime(DateTime? dt) {
+  if (dt == null) {
+    return "";
+  }
+  DateFormat format = DateFormat(formatDate);
+  return format.format(dt);
+}
+
+String formattedDate(String dateString) {
   DateFormat inputFormat = DateFormat(formatDate);
   DateTime date = inputFormat.parse(dateString);
 

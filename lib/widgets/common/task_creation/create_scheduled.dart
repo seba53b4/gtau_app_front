@@ -157,10 +157,10 @@ class _CreateScheduledState extends State<ScheduledComponent> {
   }
 
   Map<String, dynamic> bodyScheduledTask() {
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String addDateUpdated = formattedDate(addDateController.text);
 
     late String? releasedDateUpdated = releasedDateController.text.isNotEmpty
-        ? formattedDateToUpdate(releasedDateController.text)
+        ? formattedDate(releasedDateController.text)
         : null;
 
     return {
