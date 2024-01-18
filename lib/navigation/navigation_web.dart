@@ -47,15 +47,15 @@ class _NavigationWeb extends State<NavigationWeb> {
         label: Text(AppLocalizations.of(context)!.navigation_label_home));
 
     NavigationRailDestination navAddTask = _buildCircularDestination(
-        icon: Icon(GtauIcons.addTask, size: iconSize),
+        icon: Icon(GtauIcons.taskAdd, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
     NavigationRailDestination navAddUser = _buildCircularDestination(
-        icon: Icon(GtauIcons.addUser, size: iconSize),
+        icon: Icon(GtauIcons.userAdd, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
     NavigationRailDestination navListUser = _buildCircularDestination(
-        icon: Icon(GtauIcons.addUser, size: iconSize),
+        icon: Icon(GtauIcons.userList, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
     NavigationRailDestination navMap = _buildCircularDestination(
@@ -63,7 +63,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         label: Text(AppLocalizations.of(context)!.navigation_label_map));
 
     NavigationRailDestination navProfile = _buildCircularDestination(
-        icon: Icon(GtauIcons.profileUser, size: iconSize),
+        icon: Icon(GtauIcons.userProfile, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
     if (userStateProvider.isAdmin!) {
