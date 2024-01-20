@@ -4,19 +4,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
+import 'package:gtau_app_front/widgets/user_dashboard.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/filter_tasks.dart';
 
 class UserDashboardScreen extends StatefulWidget {
-  const HomeScreen({Key? key});
+  const UserDashboardScreen({Key? key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _UserDashboardScreen createState() => _UserDashboardScreen();
 }
 
-class _UserDashboardScreen extends State<HomeScreenState> {
+class _UserDashboardScreen extends State<UserDashboardScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _enteredUsername = '';
   Timer? _debounce;
@@ -62,7 +63,7 @@ class _UserDashboardScreen extends State<HomeScreenState> {
                   ? MediaQuery.of(context).size.height * 0.78
                   : MediaQuery.of(context).size.height - 72,
               color: lightBackground,
-              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+              child: _constraintBoxUserDashboard(context)),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -94,7 +95,7 @@ void _showFilterModal(BuildContext context) {
   );
 }
 
-Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
+Widget _constraintBoxUserDashboard(BuildContext context) {
   double widthDashboard = 980;
   double paddingDashboard =
       (MediaQuery.of(context).size.width - widthDashboard) > 0 && kIsWeb
@@ -111,7 +112,7 @@ Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
             ? MediaQuery.of(context).size.height * 0.78
             : MediaQuery.of(context).size.height - 164,
       ),
-      child: TaskStatusDashboard(userName: userName),
+      child: UserDashboard(),
     ),
   );
 }

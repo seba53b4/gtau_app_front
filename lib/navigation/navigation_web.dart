@@ -9,6 +9,7 @@ import 'package:gtau_app_front/screens/MapScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
+import 'package:gtau_app_front/screens/UserDashboardScreen.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
 import 'package:provider/provider.dart';
 
@@ -83,7 +84,7 @@ class _NavigationWeb extends State<NavigationWeb> {
             type: '',
           ),
           UserCreationScreen(),
-          UserDashboard(),
+          UserDashboardScreen(),
           const MapScreen(),
           const ProfileScreen(),
         ];
