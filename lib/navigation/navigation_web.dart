@@ -3,15 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gtau_app_front/assets/font/gtauicons.dart';
-import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/MapScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
-import 'package:gtau_app_front/screens/UserCreationScreen.dart';
 import 'package:gtau_app_front/screens/UserDashboardScreen.dart';
-import 'package:gtau_app_front/widgets/user_dashboard.dart';
-import 'package:provider/provider.dart';
 
 import '../constants/theme_constants.dart';
 
@@ -52,10 +48,6 @@ class _NavigationWeb extends State<NavigationWeb> {
         icon: Icon(GtauIcons.taskAdd, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
-    NavigationRailDestination navAddUser = _buildCircularDestination(
-        icon: Icon(GtauIcons.userAdd, size: iconSize),
-        label: Text(AppLocalizations.of(context)!.navigation_label_profile));
-
     NavigationRailDestination navListUser = _buildCircularDestination(
         icon: Icon(GtauIcons.userList, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
@@ -72,7 +64,6 @@ class _NavigationWeb extends State<NavigationWeb> {
       optionsNav = [
         navHome,
         navAddTask,
-        navAddUser,
         navListUser,
         navMap,
         navProfile,
@@ -84,8 +75,7 @@ class _NavigationWeb extends State<NavigationWeb> {
           TaskCreationScreen(
             type: '',
           ),
-          UserCreationScreen(),
-          UserDashboardScreen(),
+          const UserDashboardScreen(),
           const MapScreen(),
           const ProfileScreen(),
         ];

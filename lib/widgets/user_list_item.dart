@@ -1,20 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
-import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/models/user_data.dart';
-import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
-import '../utils/date_utils.dart';
-import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
 
@@ -26,17 +20,32 @@ class UserListItem extends StatelessWidget {
       : super(key: key);
 
   Future<void> _goToUserCreationPage(BuildContext context) async {
-    var userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
+    var userListViewModel =
+        Provider.of<UserListViewModel>(context, listen: false);
     final token = context.read<UserProvider>().getToken;
     var response = await userListViewModel.fetchUser(token, user!.getId!);
     var username = response!.getUsername;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UserCreationScreen(
-          idUser: user!.getId,
-        ),
-      ),
+
+    _showAddUserModal(context, user!.getId);
+  }
+
+  void _showAddUserModal(BuildContext context, String? isUser) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+          child: SizedBox(
+            width: 700,
+            height: 516,
+            child: UserCreationScreen(
+              detail: true,
+              idUser: user!.getId,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -76,20 +85,20 @@ class UserListItem extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: primarySwatch[900],
                 radius: 20,
-                child:  Stack(
-                  children: [
-                    Align(
-                        alignment: Alignment.topCenter,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          radius: 18,
-                          child: (user!.getRol == 'ADMINISTRADOR') ? 
-                            const Icon(GtauIcons.roleAdmin, size: 20, color: Colors.white) : 
-                            const Icon(GtauIcons.roleOper, size: 20, color: Colors.white),
-                        ),
+                child: Stack(children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 18,
+                      child: (user!.getRol == 'ADMINISTRADOR')
+                          ? const Icon(GtauIcons.roleAdmin,
+                              size: 20, color: Colors.white)
+                          : const Icon(GtauIcons.roleOper,
+                              size: 20, color: Colors.white),
                     ),
-                  ]
-                ),
+                  ),
+                ]),
               ),
             ),
             Expanded(

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
-import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
+import 'package:gtau_app_front/screens/UserCreationScreen.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/filter_tasks.dart';
@@ -50,6 +50,23 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
     return prefs.clear();
   }
 
+  void _showAddUserModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+          child: SizedBox(
+            width: 700,
+            height: 516,
+            child: UserCreationScreen(),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _clearPref();
@@ -57,13 +74,41 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
       body: Container(
         color: lightBackground,
         child: Center(
-          child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: kIsWeb
-                  ? MediaQuery.of(context).size.height * 0.78
-                  : MediaQuery.of(context).size.height - 72,
-              color: lightBackground,
-              child: _constraintBoxUserDashboard(context)),
+          child: Column(
+            children: [
+              const SizedBox(height: 52),
+              Container(
+                width: 900,
+                color: lightBackground,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    CustomElevatedButton(
+                      onPressed: () {
+                        _showAddUserModal(context);
+                      },
+                      text: 'Agregar Tarea',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                color: lightBackground,
+                child: Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: kIsWeb
+                        ? MediaQuery.of(context).size.height * 0.78
+                        : MediaQuery.of(context).size.height - 72,
+                    color: lightBackground,
+                    child: _constraintBoxUserDashboard(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -88,6 +133,7 @@ void _showFilterModal(BuildContext context) {
             borderRadius: BorderRadius.all(Radius.circular(50.0))),
         child: SizedBox(
           width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
+          height: 600,
           child: const FilterTasks(),
         ),
       );
