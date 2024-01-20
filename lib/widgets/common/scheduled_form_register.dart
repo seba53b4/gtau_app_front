@@ -126,9 +126,9 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   }
 
   void _loadInfoFromResponse(RegisterScheduled registerScheduled) {
+    _typeController.text = registerScheduled.tipoPto ?? '';
+    _cotaController.text = registerScheduled.cotaTapa ?? '';
     if (registerScheduled.inspectioned) {
-      _typeController.text = registerScheduled.tipoPto ?? '';
-      _cotaController.text = registerScheduled.cotaTapa ?? '';
       _depthController.text = registerScheduled.profundidad ?? '';
       aperture = registerScheduled.apertura ??
           AppLocalizations.of(context)!

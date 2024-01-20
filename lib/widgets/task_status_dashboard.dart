@@ -33,20 +33,37 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late TaskFilterProvider taskFilterProvider;
   late String token;
+  late bool alreadyUpdated;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      updateTaskListState(TaskStatus.Pending.value, false);
-    });
+
     _tabController = TabController(vsync: this, length: 4);
     taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
     taskListScheduledViewModel =
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
     taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
-    token = context.read<UserProvider>().getToken!;
+    alreadyUpdated = false;
+  }
+
+  void _loadFromStorage() {
+    if (token.isNotEmpty && !alreadyUpdated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        updateTaskListState(TaskStatus.Pending.value, false);
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<bool> _clearPref() async {
@@ -176,6 +193,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   }
 
   void updateTaskListState(String status, bool isScheduled) async {
+    setState(() {
+      alreadyUpdated = true;
+    });
     if (isScheduled) {
       taskListScheduledViewModel.clearListByStatus(status);
       await taskListScheduledViewModel
@@ -214,20 +234,25 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   Widget _buildTaskList(String status,
       GlobalKey<ScaffoldState> _scaffoldKeyDashboard, bool isScheduled) {
     return FadeTransition(
-      key: ValueKey<int>(_currentIndex),
-      opacity: const AlwaysStoppedAnimation(1.0),
-      child: Center(
-        child: isScheduled
-            ? TaskListScheduled(
-                status: status,
-                scaffoldKey: _scaffoldKeyDashboard,
-              )
-            : TaskList(
-                status: status,
-                scaffoldKey: _scaffoldKeyDashboard,
-              ),
-      ),
-    );
+        key: ValueKey<int>(_currentIndex),
+        opacity: const AlwaysStoppedAnimation(1.0),
+        child: Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            token = userProvider.getToken ?? '';
+            _loadFromStorage();
+            return Center(
+              child: isScheduled
+                  ? TaskListScheduled(
+                      status: status,
+                      scaffoldKey: _scaffoldKeyDashboard,
+                    )
+                  : TaskList(
+                      status: status,
+                      scaffoldKey: _scaffoldKeyDashboard,
+                    ),
+            );
+          },
+        ));
   }
 
   Widget _buildCustomTab({required String text, required bool isSelected}) {

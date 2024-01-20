@@ -1,22 +1,22 @@
 class AuthData {
   late final String accessToken;
-  final int expiresIn;
+  late int? expiresIn;
   final String refreshToken;
-  final String tokenType;
-  final String idToken;
-  final int notBeforePolicy;
-  final String sessionState;
-  final String scope;
+  late String? tokenType;
+  late String? idToken;
+  late int? notBeforePolicy;
+  late String? sessionState;
+  late String? scope;
 
   AuthData({
     required this.accessToken,
-    required this.expiresIn,
+    this.expiresIn,
     required this.refreshToken,
-    required this.tokenType,
-    required this.idToken,
-    required this.notBeforePolicy,
-    required this.sessionState,
-    required this.scope,
+    this.tokenType,
+    this.idToken,
+    this.notBeforePolicy,
+    this.sessionState,
+    this.scope,
   });
 
   factory AuthData.fromJson(Map<String, dynamic> json) {

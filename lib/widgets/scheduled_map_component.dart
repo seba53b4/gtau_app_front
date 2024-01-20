@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +10,12 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/scheduled/catchment_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
-import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/radio_dropdown.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/element_type.dart';
 import '../models/scheduled/register_scheduled.dart';
+import '../models/scheduled/zone.dart';
 import '../providers/user_provider.dart';
 import '../services/scheduled_service.dart';
 import '../utils/map_functions.dart';
@@ -24,17 +26,21 @@ import 'common/menu_button_map.dart';
 import 'common/menu_button_map_options.dart';
 import 'common/scheduled_form_widget.dart';
 import 'element_scheduled_modal.dart';
+import 'loading_overlay.dart';
 
 class ScheduledMapComponent extends StatefulWidget {
   final int? idSheduled;
+  final ScheduledZone? scheduledZone;
 
-  const ScheduledMapComponent({super.key, required this.idSheduled});
+  const ScheduledMapComponent(
+      {super.key, required this.idSheduled, this.scheduledZone});
 
   @override
   _ScheduledMapComponentState createState() => _ScheduledMapComponentState();
 }
 
-class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
+class _ScheduledMapComponentState extends State<ScheduledMapComponent>
+    with TickerProviderStateMixin {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
   MapType _currentMapType = MapType.satellite;
@@ -63,9 +69,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
   // Indices { S, R, C };
   Set<int> selectedIndices = {0, 1, 2};
-
+  int selectedSubZone = 0;
   late int? elementSelectedId = null;
   late ElementType? elementSelectedType = null;
+  late AnimationController _animationController;
 
   @override
   void initState() {
@@ -74,6 +81,13 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     selectedItemsProvider = context.read<SelectedItemsProvider>();
     scheduledViewModel = context.read<ScheduledViewModel>();
     token = context.read<UserProvider>().getToken!;
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 5),
+    );
+    if (!kIsWeb) {
+      getCurrentLocation();
+    }
   }
 
   @override
@@ -83,9 +97,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     setState(() {
       mapWidth = mapInit;
     });
-    bool isNewLocation = scheduledViewModel.positionToBeLoaded();
-    _initializeSheduledElements(isNewLocation: isNewLocation)
-        .then((value) => null);
+
+    _initializeSheduledElements(isNewLocation: true).then((value) => null);
   }
 
   @override
@@ -105,12 +118,11 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       Position currentPosition = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.best);
       setState(() {
-        final locationGPS =
-            LatLng(currentPosition.latitude, currentPosition.longitude);
+        location = LatLng(currentPosition.latitude, currentPosition.longitude);
 
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
-          position: locationGPS,
+          position: location!,
         );
         markers.add(newMarker);
       });
@@ -131,17 +143,22 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
   }
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
-    await scheduledViewModel
-        .fetchScheduledElements(token, widget.idSheduled!)
-        .then((entities) {
-      if (entities != null) {
-        updateElementsOnMap(
-            isCache: false,
-            isNewLocation: isNewLocation,
-            scheduledElements: entities);
-      }
-      return entities;
-    }).catchError((error) async {
+    double? latitude, longitude;
+    int radio = 200;
+    if (!kIsWeb) {
+      latitude = location?.latitude;
+      longitude = location?.longitude;
+    }
+    ScheduledElements? entities = await scheduledViewModel
+        .fetchScheduledElements(
+            token: token,
+            scheduledId: widget.idSheduled!,
+            originLatitude: latitude,
+            originLongitude: longitude,
+            radiusMeters: radio,
+            subzone:
+                widget.scheduledZone!.subZones!.elementAt(selectedSubZone).id!)
+        .catchError((error) async {
       // Manejo de error
       await showCustomMessageDialog(
         context: context,
@@ -151,6 +168,12 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       );
       return null;
     });
+    if (entities != null) {
+      await updateElementsOnMap(
+          isCache: false,
+          isNewLocation: isNewLocation,
+          scheduledElements: entities);
+    }
   }
 
   Color _onColorParamBehaviorSection(SectionScheduled section) {
@@ -183,18 +206,18 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
         : scheduledNotInspectionedElement;
   }
 
-  void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) {
+  void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) async {
     ElementType elementType = ElementType.section;
     if (selectedItemsProvider.isPolylineSelected(
         line!.polylineId, elementType)) {
       selectedItemsProvider.togglePolylineSelected(
           line.polylineId, elementType);
       openFormElementWeb(false);
-      updateElementsOnMap();
+      await updateElementsOnMap();
     } else {
       if (selectedItemsProvider.isSomeElementSelected()) {
         selectedItemsProvider.clearAllElements();
-        updateElementsOnMap();
+        await updateElementsOnMap();
       } else {
         selectedItemsProvider.clearAllElements();
       }
@@ -205,15 +228,16 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     }
   }
 
-  void _onTapParamBehaviorCircle(int ogcFid, Circle? point, ElementType type) {
+  void _onTapParamBehaviorCircle(
+      int ogcFid, Circle? point, ElementType type) async {
     if (selectedItemsProvider.isCircleSelected(point!.circleId, type)) {
       selectedItemsProvider.toggleCircleSelected(point.circleId, type);
       openFormElementWeb(false);
-      updateElementsOnMap();
+      await updateElementsOnMap();
     } else {
       if (selectedItemsProvider.isSomeElementSelected()) {
         selectedItemsProvider.clearAllElements();
-        updateElementsOnMap();
+        await updateElementsOnMap();
       } else {
         selectedItemsProvider.clearAllElements();
       }
@@ -228,6 +252,11 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       setState(() {
         _scheduledFormWidgetKey = UniqueKey();
         viewDetailElementInfo = newStatus;
+        if (viewDetailElementInfo) {
+          _animationController.forward(); // Inicia la animación de apertura
+        } else {
+          _animationController.reverse(); // Inicia la animación de cierre
+        }
       });
     }
   }
@@ -281,25 +310,29 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     }
     setState(() {
       polylines = getPolylines(sections);
+      polylines.addAll(getPolylinesSubZone());
       circles = getCircles(catchments, registers);
     });
+    if (kIsWeb) {
+      if (isNewLocation) {
+        await scheduledViewModel.getRandomPosition(polylines, circles);
+      }
+      setState(() {
+        location = scheduledViewModel.getPosition();
+      });
 
-    if (isNewLocation) {
-      await scheduledViewModel.getRandomPosition(polylines, circles);
+      if (isNewLocation) {
+        final GoogleMapController controller = await _mapController.future;
+        controller.moveCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(location!.latitude, location!.longitude),
+              zoom: zoomMap,
+            ),
+          ),
+        );
+      }
     }
-    setState(() {
-      location = scheduledViewModel.getPosition();
-    });
-
-    final GoogleMapController controller = await _mapController.future;
-    controller.moveCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(location!.latitude, location!.longitude),
-          zoom: zoomMap,
-        ),
-      ),
-    );
   }
 
   void updateElementsOnMapOnFilter() {
@@ -321,14 +354,15 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
 
     setState(() {
       polylines = getPolylines(sectionsFilter);
+      polylines.addAll(getPolylinesSubZone());
       circles = getCircles(catchmentsFilter, registersFilter);
     });
   }
 
-  void resetSelectionsOnMap() {
+  void resetSelectionsOnMap() async {
     if (selectedItemsProvider.isSomeElementSelected()) {
       selectedItemsProvider.clearAllElements();
-      updateElementsOnMap();
+      await updateElementsOnMap();
     }
   }
 
@@ -340,9 +374,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
         Polyline pol = section.line!.copyWith(
           zIndexParam: 0,
           colorParam: _onColorParamBehaviorSection(section),
-          onTapParam: () {
+          onTapParam: () async {
             _onTapParamBehaviorPolyline(section.ogcFid!, section.line);
-            updateElementsOnMap();
+            await updateElementsOnMap();
           },
         );
         setPol.add(pol);
@@ -351,6 +385,11 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
       }
     }
     return setPol;
+  }
+
+  Set<Polyline> getPolylinesSubZone() {
+    return Set<Polyline>.from(
+        widget.scheduledZone!.subZones!.elementAt(selectedSubZone).polylines);
   }
 
   Set<Circle> getCircles(List<CatchmentScheduled>? catchments,
@@ -364,10 +403,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           radiusParam: catchment.point!.radius,
           strokeWidthParam: catchment.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorCatchment(catchment),
-          onTapParam: () {
+          onTapParam: () async {
             _onTapParamBehaviorCircle(
                 catchment.ogcFid!, catchment.point, ElementType.catchment);
-            updateElementsOnMap();
+            await updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -381,10 +420,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
           radiusParam: register.point!.radius,
           strokeWidthParam: register.point!.strokeWidth,
           strokeColorParam: _onColorParamBehaviorRegister(register),
-          onTapParam: () {
+          onTapParam: () async {
             _onTapParamBehaviorCircle(
                 register.ogcFid!, register.point, ElementType.register);
-            updateElementsOnMap();
+            await updateElementsOnMap();
           },
         );
         setCir.add(circle);
@@ -397,6 +436,16 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
     setState(() {
       selectedIndices = indices;
     });
+  }
+
+  void handleZoneIconSelected(int value) {
+    setState(() {
+      selectedSubZone = value;
+    });
+  }
+
+  void onCloseSingleDropDown() async {
+    await _initializeSheduledElements(isNewLocation: true);
   }
 
   @override
@@ -413,7 +462,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
               child: Stack(
                 children: [
                   AnimatedContainer(
-                    duration: const Duration(milliseconds: 0),
+                    duration: _animationController.duration ??
+                        const Duration(milliseconds: 100),
                     width: viewDetailElementInfo
                         ? mapWidth - modalWidth
                         : mapWidth,
@@ -449,18 +499,42 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                     ),
                   ),
                   Positioned(
+                    top: kIsWeb ? 0 : null,
+                    left: MediaQuery.of(context).size.width / 2 -
+                        (kIsWeb ? 180 : 100),
+                    bottom: kIsWeb ? null : 0,
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.8),
+                          borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(kIsWeb ? 24.0 : 0.0),
+                              bottomRight: Radius.circular(kIsWeb ? 24.0 : 0.0),
+                              topLeft: Radius.circular(!kIsWeb ? 24.0 : 0.0),
+                              topRight: Radius.circular(!kIsWeb ? 24.0 : 0.0)),
+                        ),
+                        child: Text(
+                          '${widget.scheduledZone!.name} - ${widget.scheduledZone!.subZones!.elementAt(selectedSubZone).cuenca}',
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: kIsWeb ? 26 : 18),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
                     left: 16.0,
                     top: 50,
                     bottom: null,
                     right: null,
-                    child: FloatingActionButton(
-                      foregroundColor: primarySwatch,
-                      backgroundColor: lightBackground,
+                    child: MenuElevatedButton(
+                      colorChangeOnPress: false,
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      tooltip: appLocalizations.placeholder_back_button,
-                      child: const Icon(Icons.arrow_back),
+                      tooltipMessage: appLocalizations.placeholder_back_button,
+                      icon: Icons.arrow_back,
                     ),
                   ),
                   LoadingOverlay(
@@ -512,6 +586,20 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
                             selectedIndices: selectedIndices,
                             onIconsSelected: handleIconsSelected,
                           ),
+                          if (kIsWeb) const SizedBox(height: 6),
+                          SingleSelectDropdown(
+                            onChanged: (int value) {
+                              handleZoneIconSelected(value);
+                            },
+                            onClose: () {
+                              onCloseSingleDropDown();
+                            },
+                            icon: Icons.map_outlined,
+                            items: widget.scheduledZone!.subZones!.map((e) {
+                              return e.cuenca!;
+                            }).toList(),
+                            selectedItemIndex: selectedSubZone,
+                          ),
                         ],
                       ),
                     ),
@@ -524,7 +612,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 0),
+                  duration: _animationController?.duration ??
+                      const Duration(milliseconds: 100),
                   onEnd: () {},
                   curve: Curves.easeIn,
                   width: viewDetailElementInfo ? modalWidth : 0,

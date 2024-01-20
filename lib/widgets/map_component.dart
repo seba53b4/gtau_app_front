@@ -110,9 +110,6 @@ class _MapComponentState extends State<MapComponent> {
           }
         }
       });
-      setState(() {
-        lastDistanceSelected = 0;
-      });
     }
   }
 

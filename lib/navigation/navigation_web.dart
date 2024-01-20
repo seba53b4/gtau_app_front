@@ -16,7 +16,9 @@ import 'package:provider/provider.dart';
 import '../constants/theme_constants.dart';
 
 class NavigationWeb extends StatefulWidget {
-  const NavigationWeb({super.key});
+  final bool isAdmin;
+
+  const NavigationWeb({super.key, this.isAdmin = false});
 
   @override
   State<NavigationWeb> createState() => _NavigationWeb();
@@ -29,8 +31,8 @@ class _NavigationWeb extends State<NavigationWeb> {
   bool isNavRailExtended = false;
 
   List screens = [
-    HomeScreen(),
-    HomeScreen(),
+    const HomeScreen(),
+    const HomeScreen(),
     const MapScreen(),
     const ProfileScreen(),
   ];
@@ -42,7 +44,6 @@ class _NavigationWeb extends State<NavigationWeb> {
   }
 
   void _updateOptionsNav() {
-    final userStateProvider = Provider.of<UserProvider>(context, listen: false);
     NavigationRailDestination navHome = _buildCircularDestination(
         icon: Icon(Icons.home, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_home));
@@ -67,7 +68,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         icon: Icon(GtauIcons.userProfile, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
-    if (userStateProvider.isAdmin!) {
+    if (widget.isAdmin) {
       optionsNav = [
         navHome,
         navAddTask,
@@ -78,8 +79,8 @@ class _NavigationWeb extends State<NavigationWeb> {
       ];
       setState(() {
         screens = [
-          HomeScreen(),
-          HomeScreen(),
+          const HomeScreen(),
+          const HomeScreen(),
           TaskCreationScreen(
             type: '',
           ),

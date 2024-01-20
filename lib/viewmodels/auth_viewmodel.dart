@@ -22,15 +22,12 @@ class AuthViewModel extends ChangeNotifier {
       final authData = await _authService.fetchAuth(username, password);
 
       if (authData != null) {
-        print('Usuario y contraseña válidos');
         return authData;
       }
       _error = true;
-      print('Contraseña incorrecta');
       return null;
     } catch (error) {
       _error = true;
-      print('Error al obtener los datos de autenticación: $error');
       throw Exception('Error al obtener los datos de autenticación');
     } finally {
       _isLoading = false;

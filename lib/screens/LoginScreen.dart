@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gtau_app_front/models/auth_data.dart';
 import 'package:gtau_app_front/models/user_state.dart';
 import 'package:gtau_app_front/navigation/navigation.dart';
@@ -17,7 +18,6 @@ import '../widgets/common/customMessageDialog.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_taost.dart';
 import '../widgets/common/custom_textfield.dart';
-import '../widgets/loading_overlay.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -31,9 +31,20 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   late AuthResult? authData;
   bool onError = false;
+  bool isLoggedIn = false;
+  bool isAdmin = false;
+  String accessToken = '';
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  late UserProvider userStateProvider;
 
-  Future<AuthResult?> _fetchAuth(BuildContext context, String username,
-      String password) async {
+  @override
+  void initState() {
+    super.initState();
+    userStateProvider = context.read<UserProvider>();
+  }
+
+  Future<AuthResult?> _fetchAuth(
+      BuildContext context, String username, String password) async {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     return await authViewModel
         .fetchAuth(username, password)
@@ -45,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
         customText: AppLocalizations.of(context)!.error_service_not_available,
         messageType: DialogMessageType.error,
       );
+      return null;
     });
   }
 
@@ -58,27 +70,34 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void setUserData(BuildContext context, bool isLoggedIn, String username,
-      AuthData authData, bool isAdmin) {
+      AuthData authData, bool isAdminUser) async {
     if (isLoggedIn) {
       final filterProvider = context.read<TaskFilterProvider>();
       filterProvider.setUserNameFilter(username);
-      final userStateProvider = context.read<UserProvider>();
       userStateProvider.updateUserState(UserState(
           username: username,
           isLoggedIn: true,
           authData: authData,
-          isAdmin: isAdmin));
+          isAdmin: isAdminUser));
+      setState(() {
+        isAdmin = isAdminUser;
+      });
+      await _storage.write(key: 'access_token', value: authData.accessToken);
+      await _storage.write(key: 'refresh_token', value: authData.refreshToken);
+      await _storage.write(key: 'isAdmin', value: isAdminUser.toString());
+      await _storage.write(key: 'username', value: username);
     }
   }
 
-  goToNav(BuildContext context) {
+  goToNav(BuildContext context) async {
     if (kIsWeb) {
-      Navigator.pushReplacement(
+      await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const NavigationWeb()),
+        MaterialPageRoute(
+            builder: (context) => NavigationWeb(isAdmin: isAdmin)),
       );
     } else {
-      Navigator.pushReplacement(
+      await Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const BottomNavigation()),
       );
@@ -91,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if ((username.isEmpty || password.isEmpty)) {
       await _showWrongCredentialsToast(context);
-      return null;
+      return;
     }
 
     AuthResult? authResponse = await _fetchAuth(context, username, password);
@@ -129,55 +148,52 @@ class _LoginScreenState extends State<LoginScreen> {
     return Consumer<AuthViewModel>(builder: (context, authviewModel, child) {
       bool isLoading = authviewModel.isLoading;
 
-      return LoadingOverlay(
-        isLoading: isLoading,
-        child: Scaffold(
-          body: Container(
-            color: const Color.fromRGBO(253, 255, 252, 1),
-            child: Center(
-              child: BoxContainer(
-                width: kIsWeb ? 400 : 340,
-                height: kIsWeb ? 400 : 360,
-                padding: const EdgeInsets.all(8.0),
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(AppLocalizations.of(context)!.titleApp),
-                    const SizedBox(height: 24.0),
-                    CustomTextField(
-                      controller: usernameController,
-                      hintText: AppLocalizations.of(context)!
-                          .default_input_username_hint,
-                      keyboardType: TextInputType.text,
-                      obscureText: false,
-                      hasError: onError,
-                    ),
-                    CustomTextField(
-                      controller: passwordController,
-                      hintText: AppLocalizations.of(context)!
-                          .default_input_password_hint,
-                      keyboardType: TextInputType.text,
-                      obscureText: true,
-                      hasError: onError,
-                    ),
-                    const SizedBox(height: 16.0),
-                    CustomElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            onError = false;
-                          });
-                          onLogInPressed(context);
-                        },
-                        text:
-                        AppLocalizations.of(context)!.default_login_button),
-                    const SizedBox(height: kIsWeb ? 24 : 4),
-                    TextButton(
-                        onPressed: () => onForgotPressed(context),
-                        child: Text(AppLocalizations.of(context)!
-                            .default_forgot_password)),
-                  ],
-                ),
+      return Scaffold(
+        body: Container(
+          color: const Color.fromRGBO(253, 255, 252, 1),
+          child: Center(
+            child: BoxContainer(
+              width: kIsWeb ? 400 : 340,
+              height: kIsWeb ? 400 : 360,
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(AppLocalizations.of(context)!.titleApp),
+                  const SizedBox(height: 24.0),
+                  CustomTextField(
+                    controller: usernameController,
+                    hintText: AppLocalizations.of(context)!
+                        .default_input_username_hint,
+                    keyboardType: TextInputType.text,
+                    obscureText: false,
+                    hasError: onError,
+                  ),
+                  CustomTextField(
+                    controller: passwordController,
+                    hintText: AppLocalizations.of(context)!
+                        .default_input_password_hint,
+                    keyboardType: TextInputType.text,
+                    obscureText: true,
+                    hasError: onError,
+                  ),
+                  const SizedBox(height: 16.0),
+                  CustomElevatedButton(
+                      showLoading: isLoading,
+                      onPressed: () {
+                        setState(() {
+                          onError = false;
+                        });
+                        onLogInPressed(context);
+                      },
+                      text: AppLocalizations.of(context)!.default_login_button),
+                  const SizedBox(height: kIsWeb ? 24 : 4),
+                  TextButton(
+                      onPressed: () => onForgotPressed(context),
+                      child: Text(AppLocalizations.of(context)!
+                          .default_forgot_password)),
+                ],
               ),
             ),
           ),

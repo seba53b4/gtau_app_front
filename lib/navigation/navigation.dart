@@ -17,7 +17,7 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   int myCurrentIndex = 0;
 
-  List screens = [HomeScreen(), MapMobile(), ProfileScreen()];
+  List screens = [const HomeScreen(), const MapMobile(), const ProfileScreen()];
 
   @override
   Widget build(BuildContext context) {

@@ -10,6 +10,7 @@ import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:gtau_app_front/widgets/common/informe_upload_component.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -252,8 +253,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         messageType: type,
         onAcceptPressed: () {
           if (type == DialogMessageType.success && !widget.detail) {
-            Widget nav =
-                kIsWeb ? const NavigationWeb() : const BottomNavigation();
+            final isAdmin = context.read<UserProvider>().isAdmin;
+            Widget nav = kIsWeb
+                ? NavigationWeb(isAdmin: isAdmin != null && isAdmin)
+                : const BottomNavigation();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => nav),
@@ -342,7 +345,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       "longitud": selectedItemsProvider.inspectionPosition.longitude.toString()
     };
 
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String addDateUpdated = formattedDate(addDateController.text);
     final Map<String, dynamic> requestBody = {
       "status": taskStatus,
       "inspectionType": "inspectionType Default",
@@ -362,9 +365,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   }
 
   Map<String, dynamic> createBodyToUpdate() {
-    late String addDateUpdated = formattedDateToUpdate(addDateController.text);
+    late String addDateUpdated = formattedDate(addDateController.text);
     late String? releasedDateSelected = releasedDateController.text.isNotEmpty
-        ? formattedDateToUpdate(releasedDateController.text)
+        ? formattedDate(releasedDateController.text)
         : null;
 
     var selectedItemsProvider = context.read<SelectedItemsProvider>();
@@ -530,7 +533,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               child: Column(
                 children: [
                   Visibility(
-                    visible: widget.detail && selectedIndex == 1,
+                    visible: widget.detail && selectedIndex == 1 && kIsWeb,
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: Padding(
@@ -1289,14 +1292,20 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             width: widthRow,
                             child: Column(
                               children: [
-                                /*UserImage(
-                                    onFileChanged: (imagesFiles) {
-                                      this.imagesFiles = imagesFiles;
-                                    },
-                                    idTask: widget.idTask),*/
                                 ImageGalleryModal(idTask: widget.idTask!),
                               ],
                             ),
+                          ),
+                          Text(
+                            AppLocalizations.of(context)!.informe_title,
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            width: widthRow,
+                            child: Column(children: [
+                              InformeUploadComponent(idTask: widget.idTask!)
+                            ]),
                           ),
                         ],
                       ),
