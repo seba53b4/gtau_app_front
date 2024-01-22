@@ -28,7 +28,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
         label: AppLocalizations.of(context)!.navigation_label_home,
       ),
       _buildCircularDestination(
-        icon: const Icon(Icons.map),
+        icon: const Icon(GtauIcons.worldMap),
         label: AppLocalizations.of(context)!.navigation_label_map,
       ),
       _buildCircularDestination(
