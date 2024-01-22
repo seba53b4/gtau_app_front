@@ -376,4 +376,30 @@ class ScheduledService {
       rethrow;
     }
   }
+
+   Future<List<TaskScheduled>?> searchTasksScheduled(String token, Map<String, dynamic> body,
+      int page, int size) async {
+    try {
+      final url = Uri.parse('$baseUrl/search?page=$page&size=$size');
+      final String jsonBody = jsonEncode(body);
+      final response =
+      await http.post(url, headers: _getHeaders(token), body: jsonBody);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final content = data['content'];
+        return content.map<TaskScheduled>((taskScheduledData) {
+          return TaskScheduled.fromJson(json: taskScheduledData);
+        }).toList();
+      } else {
+        print('No se pudieron traer datos');
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in searchTasksScheduled: $error');
+      }
+      rethrow;
+    }
+  }
 }
