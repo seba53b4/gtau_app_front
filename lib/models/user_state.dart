@@ -27,7 +27,7 @@ class UserState {
 
   AuthData? get getAuthData => authData;
 
-  set setAuthData(AuthData? value) {
+  void setAuthData(AuthData? value) {
     authData = value;
     if (value != null) {
       jwt = value.accessToken;

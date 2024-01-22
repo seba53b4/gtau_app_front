@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/auth_data.dart';
 import '../models/user_state.dart';
 
 class UserProvider with ChangeNotifier {
@@ -9,6 +10,11 @@ class UserProvider with ChangeNotifier {
 
   void updateUserState(UserState userState) {
     _userState = userState;
+    notifyListeners();
+  }
+
+  void updateUserStateAuthInfo(AuthData authData) {
+    _userState!.setAuthData(authData);
     notifyListeners();
   }
 
