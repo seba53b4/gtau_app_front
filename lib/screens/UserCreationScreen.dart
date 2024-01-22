@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/user_data.dart';
-import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
@@ -14,7 +13,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
-import '../navigation/navigation.dart';
 import '../providers/selected_items_provider.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/common/custom_dropdown.dart';
@@ -77,7 +75,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   }
 
   Future updateUserListState(BuildContext context) async {
-    final status = 'ACTIVE';
+    const status = 'ACTIVE';
     final userListViewModel =
         Provider.of<UserListViewModel>(context, listen: false);
     userListViewModel.clearListByStatus(status!);
@@ -86,6 +84,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
   @override
   void initState() {
+    super.initState();
     Hive.initFlutter().then((value) => null);
     if (widget.idUser == '') {
       roleController.text = notAssigned;
@@ -126,7 +125,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
       return true;
     } catch (error) {
-      print(error);
+      //print(error);
       throw Exception('Error al obtener los datos');
     }
   }
@@ -135,16 +134,22 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     try {
       final response = await userListViewModel.createUser(token!, body);
       if (response) {
-        print('Usuario ha sido creado correctamente');
+        if (kDebugMode) {
+          print('Usuario ha sido creado correctamente');
+        }
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         await showMessageDialog(DialogMessageType.error);
-        print('No se pudieron traer datos');
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
         return false;
       }
     } catch (error) {
-      print(error);
+      if (kDebugMode) {
+        print(error);
+      }
       throw Exception('Error al obtener los datos');
     }
   }
@@ -160,33 +165,34 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
           await userListViewModel.updateUser(token!, widget.idUser!, body);
 
       if (response) {
-        print('Usuario ha sido actualizado correctamente');
+        if (kDebugMode) {
+          print('Usuario ha sido actualizado correctamente');
+        }
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        print('No se pudieron traer datos');
+        if (kDebugMode) {
+          print('No se pudieron traer datos');
+        }
         await showMessageDialog(DialogMessageType.error);
         return false;
       }
     } catch (error) {
-      print(error);
+      if (kDebugMode) {
+        print(error);
+      }
       throw Exception('Error al obtener los datos');
     }
   }
 
   Future<void> showMessageDialog(DialogMessageType type) async {
+    // bool isAdmin =
+    //     Provider.of<UserProvider>(context, listen: false).isAdmin ?? false;
     await showCustomMessageDialog(
         context: context,
         messageType: type,
         onAcceptPressed: () {
-          if (type == DialogMessageType.success && !widget.detail) {
-            Widget nav =
-                kIsWeb ? const NavigationWeb() : const BottomNavigation();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => nav),
-            );
-          }
+          Navigator.pop(context);
         });
   }
 
@@ -235,6 +241,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         onEnablePressed: () async {
           Navigator.of(context).pop();
           await handleAcceptOnShowDialogCreateUser();
+          await updateUserListState(context);
         },
         acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
@@ -278,7 +285,6 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       "username": usernameController.text,
       "rol": roleFinal
     };
-    //print('role final: $roleFinal y rol contr: $userRole');
     return requestBody;
   }
 
@@ -311,7 +317,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       onEnablePressed: () async {
         Navigator.of(context).pop();
         await handleAcceptOnShowDialogEditUser();
-        updateUserListState(context);
+        await updateUserListState(context);
         Navigator.of(context).pop();
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
@@ -343,9 +349,8 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   Widget build(BuildContext context) {
     double widthRow = 640;
     double heightRow = 128;
-    
+
     notAssigned = AppLocalizations.of(context)!.createUserPage_rolePlaceholder;
-    //userRole = notAssigned;
 
     return Consumer<UserListViewModel>(
         builder: (context, userListViewModel, child) {

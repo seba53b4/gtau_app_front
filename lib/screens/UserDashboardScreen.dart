@@ -5,13 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
-import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_icon_button.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
 import 'package:gtau_app_front/widgets/user_filter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../widgets/filter_tasks.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({Key? key});
@@ -161,7 +158,7 @@ Widget _constraintBoxUserDashboard(BuildContext context) {
             ? MediaQuery.of(context).size.height * 0.78
             : MediaQuery.of(context).size.height - 164,
       ),
-      child: UserDashboard(),
+      child: const UserDashboard(),
     ),
   );
 }
