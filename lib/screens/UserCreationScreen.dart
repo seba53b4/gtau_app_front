@@ -35,7 +35,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   late UserData user;
 
   int selectedIndex = 0;
-  static const String notAssigned = "Sin asignar";
+  static String notAssigned = "Sin Asignar";
   String userRole = notAssigned;
 
   final roleController = TextEditingController();
@@ -336,6 +336,9 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   Widget build(BuildContext context) {
     double widthRow = 640;
     double heightRow = 128;
+    
+    notAssigned = AppLocalizations.of(context)!.createUserPage_rolePlaceholder;
+    //userRole = notAssigned;
 
     return Consumer<UserListViewModel>(
         builder: (context, userListViewModel, child) {
