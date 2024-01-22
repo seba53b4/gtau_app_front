@@ -96,6 +96,34 @@ class UserListViewModel extends ChangeNotifier {
     }
   }
 
+  Future<List<String>?> fetchUsernames(
+      BuildContext context) async {
+    final token = context.read<UserProvider>().getToken;
+    try {
+      _SetIsLoadingPrefValue(true);
+      _error = false;
+      _isLoading = true;
+      
+
+      notifyListeners();
+      final responseListUsers =
+          await _userService.getUsernames(token!);
+      
+
+      return responseListUsers;
+    } catch (error) {
+      _error = true;
+      print(error);
+      _SetIsLoadingPrefValue(false);
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      _SetIsLoadingPrefValue(false);
+      page++;
+      notifyListeners();
+    }
+  }
+
   Future<UserData?> fetchUser(token, String idUser) async {
     try {
       _SetIsLoadingPrefValue(true);

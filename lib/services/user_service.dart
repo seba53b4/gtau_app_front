@@ -47,6 +47,25 @@ class UserService {
     }
   }
 
+  Future<List<String>?> getUsernames(String token) async {
+    try {
+      final url = Uri.parse(baseUrl);
+      final response = await http.get(url, headers: _getHeaders(token));
+
+      if (response.statusCode == 200) {
+        return parseUsernamesListResponse(response);
+      } else {
+        print('Error getUsernames re null');
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in getUsernames: $error');
+      }
+      rethrow;
+    }
+  }
+
   Future<UserData?> getUserById(String token, String userId) async {
     try {
       final url = Uri.parse('$baseUrl/$userId');
@@ -191,5 +210,13 @@ class UserService {
     }).toList();
   }
 
+  parseUsernamesListResponse(http.Response response) {
+
+    final data = json.decode(response.body);
+
+    return data.map<UserData>((userData) {
+      return userData['username'];
+    }).toList();
+  }
   
 }
