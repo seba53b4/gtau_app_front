@@ -122,6 +122,9 @@ class TaskListScheduledViewModel extends ChangeNotifier {
 
       final responseListTask =
           await _scheduledService.searchTasksScheduled(token!, body, page, size);
+      
+      final responseLength = responseListTask?.length;
+      print('largo response: $responseLength');
 
       _tasks[status] = responseListTask!;
 

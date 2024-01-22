@@ -3,7 +3,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:gtau_app_front/providers/task_filters_provider.dart';
+import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/filter_tasks.dart';
@@ -19,6 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _enteredUsername = '';
   Timer? _debounce;
+  bool isSwitched = false;
+  late TaskListViewModel taskListViewModel;
+  late TaskListScheduledViewModel taskListScheduledViewModel;
 
   @override
   void dispose() {
@@ -48,20 +56,61 @@ class _HomeScreenState extends State<HomeScreen> {
     return prefs.clear();
   }
 
+  void updateTaskList() async {
+    final status =
+        Provider.of<TaskFilterProvider>(context, listen: false).statusFilter;
+    final filterProvider = Provider.of<TaskFilterProvider>(context);
+      taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
+      taskListScheduledViewModel = Provider.of<TaskListScheduledViewModel>(context, listen: false);
+      final String token = Provider.of<UserProvider>(context, listen: false).getToken!;
+    if(isSwitched==true){
+      
+      filterProvider.setInspectionTypeFilter('SCHEDULED');
+      taskListViewModel.clearListByStatus(filterProvider.statusFilter!);
+      await taskListViewModel.initializeTasks(context, status!, "");
+    }else{
+       filterProvider.setInspectionTypeFilter('INSPECTION');
+       taskListScheduledViewModel
+       .clearListByStatus(filterProvider.statusFilter!);
+       await taskListScheduledViewModel.fetchScheduledTasks(token, status!);
+    }
+  }
+  
+
   @override
   Widget build(BuildContext context) {
     _clearPref();
+    
+    
     return Scaffold(
       body: Container(
         color: lightBackground,
         child: Center(
-          child: Container(
+          child: Column(
+            children: [
+              const SizedBox(height: 52),
+              Switch(
+                value: isSwitched, 
+                onChanged: (value) {
+                  setState(() {
+                    isSwitched = value;
+                    updateTaskList();
+                  }
+                  );
+                }
+              ),
+              const SizedBox(height: 8),
+              Container(
               width: MediaQuery.of(context).size.width,
               height: kIsWeb
                   ? MediaQuery.of(context).size.height * 0.78
                   : MediaQuery.of(context).size.height - 72,
               color: lightBackground,
               child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+            ]
+          ),
+          
+          
         ),
       ),
       floatingActionButton: FloatingActionButton(

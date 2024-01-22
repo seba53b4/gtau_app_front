@@ -241,8 +241,8 @@ class _FilterTasksState extends State<FilterTasks> {
     } else {
       taskListScheduledViewModel
           .clearListByStatus(filterProvider.statusFilter!);
-      //await taskListScheduledViewModel.fetchScheduledTasks(token, filterProvider.statusFilter!);
-      await taskListScheduledViewModel.fetchTasksFromFilters(token, filterProvider.statusFilter!, filterProvider.buildSearchBody());
+      await taskListScheduledViewModel.fetchScheduledTasks(token, filterProvider.statusFilter!);
+      //await taskListScheduledViewModel.fetchTasksFromFilters(token, filterProvider.statusFilter!, filterProvider.buildSearchBody());
     }
   }
 }
