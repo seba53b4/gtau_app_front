@@ -40,7 +40,7 @@ class _UserDashboard extends State<UserDashboard>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      updateTaskListState('ACTIVE');
+      updateUserListState('ACTIVE');
     });
     _tabController = TabController(vsync: this, length: 4);
     taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
@@ -109,7 +109,7 @@ class _UserDashboard extends State<UserDashboard>
     }
   }
 
-  void updateTaskListState(String status) async {
+  void updateUserListState(String status) async {
       final userName = Provider.of<TaskFilterProvider>(context, listen: false)
           .userNameFilter;
       final userListViewModel =

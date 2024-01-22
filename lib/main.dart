@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/providers/selected_items_provider.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
+import 'package:gtau_app_front/providers/user_filter_provider.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/screens/AuthCheckScreen.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
@@ -43,6 +44,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<TaskFilterProvider>(
           create: (context) => TaskFilterProvider(),
+        ),
+        ChangeNotifierProvider<UserFilterProvider>(
+          create: (context) => UserFilterProvider(),
         ),
         ChangeNotifierProvider<TaskListViewModel>(
           create: (context) => TaskListViewModel(),

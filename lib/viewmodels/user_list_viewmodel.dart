@@ -59,7 +59,6 @@ class UserListViewModel extends ChangeNotifier {
 
   void clearListByStatus(String status) {
     _users[status]?.clear();
-    page = 0;
   }
 
   Future<List<UserData>?> initializeUsers(
@@ -113,6 +112,31 @@ class UserListViewModel extends ChangeNotifier {
         _error = true;
         return null;
       }
+    } catch (error) {
+      _SetIsLoadingPrefValue(false);
+      _error = true;
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _SetIsLoadingPrefValue(false);
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<List<UserData>?> fetchUserByFilter(token, String? username, String? email, String? firstName, String? lastName, String? role) async {
+    try {
+      _SetIsLoadingPrefValue(true);
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+      
+      final responseListUsers = await _userService.searchUsers(token, username, email, firstName, lastName, role);
+      _users["ACTIVE"] = responseListUsers!;
+
+      return responseListUsers;
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;

@@ -134,6 +134,46 @@ class UserService {
     }
   }
 
+  Future<List<UserData>?> searchUsers(String token, String? username, String? email, String? firstName, String? lastName, String? role) async {
+    try {
+      var urlString = '$baseUrl/search?';
+      var extras = false;
+      if(username != null || email != null || firstName != null || lastName != null || role != null ){
+        extras = true;
+      }
+      
+      if(username!=null) urlString = urlString + 'username=$username&';
+      if(email!=null) urlString = urlString + 'email=$email&';
+      if(firstName!=null) urlString = urlString + 'firstName=$firstName&';
+      if(lastName!=null) urlString = urlString + 'lastName=$lastName&';
+      if(role!=null) urlString = urlString + 'rol=$role&';
+
+      if (extras == true) {
+        urlString = urlString.substring(0, urlString.length - 1);
+      }
+
+      //print('$urlString');
+
+
+      var url = Uri.parse(urlString);
+      
+      final response =
+      await http.get(url, headers: _getHeadersAlt(token));
+
+      if (response.statusCode == 200) {
+        return parseUserListResponse(response);
+      } else {
+        print('No se pudieron traer datos');
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in searchUsers: $error');
+      }
+      rethrow;
+    }
+  }
+
   parseUserListResponse(http.Response response) {
 
     final data = json.decode(response.body);

@@ -6,6 +6,7 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
+import 'package:gtau_app_front/widgets/user_filter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/filter_tasks.dart';
@@ -134,7 +135,7 @@ void _showFilterModal(BuildContext context) {
         child: SizedBox(
           width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
           height: 600,
-          child: const FilterTasks(),
+          child: const UserFilter(),
         ),
       );
     },
