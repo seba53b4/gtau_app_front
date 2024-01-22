@@ -58,6 +58,11 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     page = 0;
   }
 
+  Future<List<TaskScheduled>?> initializeScheduledTasks(
+      String token, String status, String? user) async {
+    return await fetchScheduledTasks(token, status);
+  }
+
   Future<List<TaskScheduled>?> fetchScheduledTasks(
       String token, String status) async {
     try {
