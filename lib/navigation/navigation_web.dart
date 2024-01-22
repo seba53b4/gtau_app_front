@@ -53,7 +53,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
     NavigationRailDestination navMap = _buildCircularDestination(
-        icon: Icon(Icons.map, size: iconSize),
+        icon: Icon(GtauIcons.worldMap, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_map));
 
     NavigationRailDestination navProfile = _buildCircularDestination(

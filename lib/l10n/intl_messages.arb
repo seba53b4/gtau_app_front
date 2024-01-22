@@ -213,5 +213,7 @@
     "list_item_user": "Usuario:     ",
     "no_users_found": "No hay usuarios aquí para ver",
     "filter_users_title": "Filtrar usuarios",
-    "createuser_editor_title": "Edición de usuario"
+    "createuser_editor_title": "Edición de usuario",
+    "list_item_firstname": "Nombre:         ",
+    "list_item_lastname": "Apellido:         "
 }
