@@ -197,6 +197,13 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     return prefs.clear();
   }
 
+  void _SoftClearPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    //prefs.setBool("is_loading", false);
+    prefs.setInt("actual_page", 1);
+    prefs.setInt("tasks_length", 0);
+  }
+
   void handleSubmit() {
     String bodyMsg = '';
     final bool emailValid = RegExp(

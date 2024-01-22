@@ -129,7 +129,7 @@ class UserListViewModel extends ChangeNotifier {
       _SetIsLoadingPrefValue(true);
       _isLoading = true;
       _error = false;
-      notifyListeners();
+      //notifyListeners();
       final responseTask = await _userService.getUserById(token, idUser);
       if (responseTask != null) {
         return responseTask;
