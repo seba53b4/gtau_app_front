@@ -126,14 +126,6 @@ class _UserListComponentState extends State<UserList> {
     await userListViewModel?.initializeUsers(context, 'ACTIVE', '');
   }
 
-  /*Future updateTaskListFilteredState(BuildContext context,
-      String encodedBody) async {
-    final userName = userFilterProvider?.userNameFilter;
-    final status = userFilterProvider?.lastStatus;
-    await userListViewModel?.nextPageFilteredListByStatus(
-        context, status!, userName, encodedBody);
-  }*/
-
   @override
   Widget build(BuildContext context) {
     final userListSize = userListViewModel?.size;
@@ -161,7 +153,7 @@ class _UserListComponentState extends State<UserList> {
                       var users = userListViewModel.users['ACTIVE'];
                       var usersLength = users?.length ?? 0;
 
-                      //usersLength = usersLength + 1;
+                      usersLength = usersLength + 1;
                       controller =
                           ScrollController(initialScrollOffset: position);
                       controller.addListener(_ScrollPosition);
@@ -182,8 +174,31 @@ class _UserListComponentState extends State<UserList> {
                                   return UserListItem(
                                       user: user,
                                       scaffoldKey: widget.scaffoldKey);
-                                } else {
-                                  
+                                } else if (usersLength == 1){
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: Center(
+                                      child:
+                                        Column(children: <Widget>[
+                                          Padding(
+                                            padding:
+                                              const EdgeInsets.symmetric(
+                                            vertical: 10),
+                                            child: SvgPicture.asset(
+                                                    'lib/assets/empty_userlist.svg',
+                                                    width: 100,
+                                                    height: 100,
+                                                    color: Colors.black
+                                                .withOpacity(0.6),),
+                                            ),
+                                          Text(
+                                            AppLocalizations.of(context)!
+                                              .no_users_found,
+                                            style: TextStyle(
+                                            color: Colors.black
+                                                .withOpacity(0.6),
+                                            fontSize: 18)),
+                                        ])));
                                 }
                               },
                             ),

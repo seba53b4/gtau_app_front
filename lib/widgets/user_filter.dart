@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/app_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
+import 'package:gtau_app_front/models/value_label.dart';
 import 'package:gtau_app_front/providers/user_filter_provider.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
@@ -88,13 +89,18 @@ class _UserFilterState extends State<UserFilter> {
     final appLocalizations = AppLocalizations.of(context)!;
     final userProvider = context.read<UserProvider>();
     final filterProvider = Provider.of<UserFilterProvider>(context);
+    final List<ValueLabel> _suggestionsRoles = [
+      ValueLabel(AppLocalizations.of(context)!.createUserPage_rolePlaceholder, notAssigned),
+      ValueLabel(AppLocalizations.of(context)!.createUserPage_roleValueOperator, 'OPERADOR'),
+      ValueLabel(AppLocalizations.of(context)!.createUserPage_roleValueAdmin, 'ADMINISTRADOR'),
+    ];
     return Scaffold(
       appBar: AppBar(
           title: Padding(
         padding: const EdgeInsets.only(right: 80),
         child: Center(
             child: Text(
-          appLocalizations.filter_task_title,
+          appLocalizations.filter_users_title,
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: kIsWeb ? 18 : 22),
         )),
@@ -114,10 +120,10 @@ class _UserFilterState extends State<UserFilter> {
                   const SizedBox(height: 8),
                   
                   DropdownButtonFilter(
-                    suggestions: filterProvider.suggestionsRoles,
+                    suggestions: _suggestionsRoles,
                     valueSetter: filterProvider.setRoleFilter,
                     dropdownValue: filterProvider.roleFilter ??
-                        filterProvider.suggestionsRoles.first.value,
+                        _suggestionsRoles.first.value,
                     label: appLocalizations.createUserPage_roleTitle,
                     enabled: true,
                   ),

@@ -366,8 +366,9 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                             Text(
                               widget.detail
                                   ? AppLocalizations.of(context)!
-                                      .createuser_main_title
-                                  : 'Edición de usuario',
+                                      .createuser_editor_title
+                                  : AppLocalizations.of(context)!
+                                      .createuser_main_title,
                               style: const TextStyle(fontSize: 32.0),
                             ),
                             const SizedBox(height: 24.0),

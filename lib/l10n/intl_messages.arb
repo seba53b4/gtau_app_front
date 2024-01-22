@@ -210,5 +210,8 @@
     "scheduled_process_creating_error": "Se ha producido un error al crear programada",
     "retry_button" : "Reintentar",
     "list_item_date": "Fecha:         ",
-    "list_item_user": "Usuario:     "
+    "list_item_user": "Usuario:     ",
+    "no_users_found": "No hay usuarios aquí para ver",
+    "filter_users_title": "Filtrar usuarios",
+    "createuser_editor_title": "Edición de usuario"
 }

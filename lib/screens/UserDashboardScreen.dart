@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_icon_button.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
 import 'package:gtau_app_front/widgets/user_filter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,11 +87,11 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    CustomElevatedButton(
+                    CustomElevatedIconButton(
                       onPressed: () {
                         _showAddUserModal(context);
                       },
-                      text: 'Agregar Tarea',
+                      icon: GtauIcons.userAdd,
                     ),
                   ],
                 ),

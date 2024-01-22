@@ -6,7 +6,7 @@ import '../models/value_label.dart';
 
 class UserFilterProvider with ChangeNotifier {
 
-  static const String notAssigned = "Sin asignar";
+  static const String notAssigned = "Sin_asignar";
 
   String? _userNameFilter;
 
