@@ -54,4 +54,28 @@ class AuthService {
       rethrow;
     }
   }
+
+  Future<AuthResult> refreshAuthData(String refreshToken) async {
+    try {
+      final response = await http.post(
+        Uri.parse(dotenv.get('API_AUTH', fallback: 'NOT_FOUND')),
+        headers: _getHeaders(),
+        body: {'grant_type': 'refresh_token', 'refresh_token': refreshToken},
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        final authData = AuthData.fromJson(jsonResponse);
+        print('el refresh token:' + authData.refreshToken);
+        return AuthResult(authData, response.statusCode);
+      } else {
+        return AuthResult(null, response.statusCode);
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error en refreshAccessToken: $error');
+      }
+      rethrow;
+    }
+  }
 }

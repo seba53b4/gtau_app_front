@@ -13,6 +13,8 @@ import '../models/user_state.dart';
 import '../navigation/navigation.dart';
 import '../navigation/navigation_web.dart';
 import '../providers/user_provider.dart';
+import '../services/auth_service.dart';
+import '../viewmodels/auth_viewmodel.dart';
 
 class AuthCheck extends StatefulWidget {
   const AuthCheck({super.key});
@@ -48,13 +50,17 @@ class _AuthCheckState extends State<AuthCheck> {
     String? storedAccessToken = await _storage.read(key: 'access_token');
 
     if (storedAccessToken != null) {
+      await loadUserStateFromStorage();
       if (!isTokenExpired(storedAccessToken)) {
         setState(() {
-          isLoggedIn = true;
           accessToken = storedAccessToken;
         });
-        await loadUserStateFromStorage();
+      } else {
+        updateAuthStored();
       }
+      setState(() {
+        isLoggedIn = true;
+      });
     }
     setState(() {
       loading = false;
@@ -62,18 +68,46 @@ class _AuthCheckState extends State<AuthCheck> {
     return;
   }
 
-  Future<void> loadUserStateFromStorage() async {
-    String? accessToken = await _storage.read(key: 'access_token');
-    String? refreshToken = await _storage.read(key: 'refresh_token');
-    String? isAdminStore = await _storage.read(key: 'isAdmin');
-    String? username = await _storage.read(key: 'username');
+  void updateAuthStored() async {
+    AuthViewModel authViewModel =
+        Provider.of<AuthViewModel>(context, listen: false);
+    String? refreshTokenStore = await _storage.read(key: 'refresh_token');
+    AuthResult? refreshData =
+        await authViewModel.refreshAuth(refreshTokenStore!);
 
+    if (refreshData != null && refreshData.authData != null) {
+      userStateProvider.updateUserStateAuthInfo(refreshData.authData!);
+      await _storage.write(
+          key: 'access_token', value: refreshData.authData!.accessToken);
+      await _storage.write(
+          key: 'refresh_token', value: refreshData.authData!.refreshToken);
+    }
+  }
+
+  void updateUserState(
+      {required bool isLoggedIn,
+      required bool isAdmin,
+      required String username,
+      required AuthData authData}) {
     userStateProvider.updateUserState(UserState(
+        isLoggedIn: isLoggedIn,
+        isAdmin: isAdmin,
+        username: username,
+        authData: authData));
+  }
+
+  Future<void> loadUserStateFromStorage() async {
+    String? accessTokenStore = await _storage.read(key: 'access_token');
+    String? refreshTokenStore = await _storage.read(key: 'refresh_token');
+    String? isAdminStore = await _storage.read(key: 'isAdmin');
+    String? usernameStore = await _storage.read(key: 'username');
+
+    updateUserState(
         isLoggedIn: true,
         isAdmin: isAdminStore == 'true',
-        username: username,
-        authData:
-            AuthData(accessToken: accessToken!, refreshToken: refreshToken!)));
+        username: usernameStore!,
+        authData: AuthData(
+            accessToken: accessTokenStore!, refreshToken: refreshTokenStore!));
   }
 
   bool isTokenExpired(String accessToken) {

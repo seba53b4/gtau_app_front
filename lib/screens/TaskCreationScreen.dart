@@ -8,6 +8,8 @@ import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/common/informe_upload_component.dart';
@@ -450,6 +452,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     }
     clearElementsFetched();
     _ResetPrefs();
+    await updateTaskList();
   }
 
   Future resetTaskList() async {
@@ -461,6 +464,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status!);
     await taskListViewModel.initializeTasks(context, status, userName);
+
+    final scheduledListViewModel =
+        Provider.of<TaskListScheduledViewModel>(context, listen: false);
+    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    scheduledListViewModel.clearListByStatus(status!);
+    await scheduledListViewModel.fetchScheduledTasks(token!, status);
   }
 
   Future updateTaskList() async {
@@ -473,6 +482,12 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     final status = taskFilterProvider.lastStatus;
     taskListViewModel.clearListByStatus(status!);
     await taskListViewModel.initializeTasks(context, status, userName);
+
+    final scheduledListViewModel =
+        Provider.of<TaskListScheduledViewModel>(context, listen: false);
+    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    scheduledListViewModel.clearListByStatus(status!);
+    await scheduledListViewModel.fetchScheduledTasks(token!, status);
   }
 
   void handleEditTask() {

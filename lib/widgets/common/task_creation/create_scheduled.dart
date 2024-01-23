@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
+import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -118,6 +119,17 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     });
   }
 
+
+  Future updateTaskList() async {
+
+    final scheduledListViewModel =
+        Provider.of<TaskListScheduledViewModel>(context, listen: false);
+    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final status = Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+    scheduledListViewModel.clearListByStatus(status!);
+    await scheduledListViewModel.fetchScheduledTasks(token!, status);
+  }
+
   void loadInfoFromTaskScheduledResponse(TaskScheduled? taskScheduled) {
     if (taskScheduled != null) {
       titleController.text = taskScheduled.title ?? '';
@@ -207,6 +219,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         creatingScheduledError = false;
       });
       startCreationProcess();
+      updateTaskList();
     });
   }
 
@@ -279,11 +292,13 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         token, widget.scheduledId!, body);
     if (isUpdated) {
       await showMessageDialog(DialogMessageType.success);
+      await updateTaskList();
       return true;
     } else {
       await showMessageDialog(DialogMessageType.error);
       return false;
     }
+    
   }
 
   void handleEdit() {

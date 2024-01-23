@@ -19,16 +19,37 @@ class AuthViewModel extends ChangeNotifier {
       _error = false;
       notifyListeners();
 
-      final authData = await _authService.fetchAuth(username, password);
+      final authDataResponse = await _authService.fetchAuth(username, password);
 
-      if (authData != null) {
-        return authData;
+      if (authDataResponse.authData != null) {
+        return authDataResponse;
       }
       _error = true;
       return null;
     } catch (error) {
       _error = true;
       throw Exception('Error al obtener los datos de autenticación');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<AuthResult?> refreshAuth(String refreshToken) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+
+      final authDataResponse = await _authService.refreshAuthData(refreshToken);
+
+      if (authDataResponse.authData != null) {
+        return authDataResponse;
+      }
+      return null;
+    } catch (error) {
+      _error = true;
+      throw Exception('Error al obtener los datos de refresh auth');
     } finally {
       _isLoading = false;
       notifyListeners();
