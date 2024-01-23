@@ -877,6 +877,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                     ]),
                                   ]),
                             ),
+                            const SizedBox(height: 20.0),
                             // Segunda fila
                             SizedBox(
                                 height: 100,
@@ -961,7 +962,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                     ),
                                   ],
                                 )),
-                            //const SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             // Tercera columna
                             SizedBox(
                               height: 120,

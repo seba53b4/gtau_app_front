@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/services/auth_service.dart';
 
+import '../models/user_info.dart';
+
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
@@ -29,6 +31,28 @@ class AuthViewModel extends ChangeNotifier {
     } catch (error) {
       _error = true;
       throw Exception('Error al obtener los datos de autenticación');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<UserInfo?> getUserRole(String token) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+
+      final userInfoResponse = await _authService.getUserRole(token);
+
+      if (userInfoResponse != null) {
+        return userInfoResponse;
+      }
+      _error = true;
+      return null;
+    } catch (error) {
+      _error = true;
+      throw Exception('Error getUserRole');
     } finally {
       _isLoading = false;
       notifyListeners();
