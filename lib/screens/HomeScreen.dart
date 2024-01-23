@@ -66,19 +66,14 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Container(
         color: lightBackground,
         child: Center(
-          child: Column(
-            children: [
-              Container(
+          child: Container(
               width: MediaQuery.of(context).size.width,
               height: kIsWeb
                   ? MediaQuery.of(context).size.height * 0.78
                   : MediaQuery.of(context).size.height - 72,
               color: lightBackground,
-              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
-            ]
+              child: _constraintBoxTaskDashboard(context, _enteredUsername)
           ),
-          
-          
         ),
       ),
       floatingActionButton: FloatingActionButton(
