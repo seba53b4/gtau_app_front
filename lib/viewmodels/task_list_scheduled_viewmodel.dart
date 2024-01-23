@@ -123,8 +123,7 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       final responseListTask =
           await _scheduledService.searchTasksScheduled(token!, body, page, size);
       
-      final responseLength = responseListTask?.length;
-      print('largo response: $responseLength');
+      
 
       _tasks[status] = responseListTask!;
 
@@ -147,11 +146,10 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      /*Map<String,dynamic> body = json.decode(encodedBody);*/
+      Map<String,dynamic> body = json.decode(encodedBody);
 
-      //Se esta esperando que se implemente el search scheduled en el backend
       final responseListTask =
-          await _scheduledService.getScheduledTasks(token, page, size, status);
+          await _scheduledService.searchTasksScheduled(token, body, page, size);
 
       _tasks[status]?.addAll(responseListTask!);
       final size_list = responseListTask?.length ?? 0;
