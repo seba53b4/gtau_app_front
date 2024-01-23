@@ -4,6 +4,49 @@ import '../models/task_status.dart';
 import '../models/value_label.dart';
 
 class TaskFilterProvider with ChangeNotifier {
+
+  bool? _isScheduled = false;
+
+  bool? get isScheduled => _isScheduled;
+
+  void setisScheduled(bool scheduled) {
+    _isScheduled = scheduled;
+    notifyListeners();
+  }
+
+  String? _scheduledTitleFilter;
+
+  String? get scheduledTitleFilter => _scheduledTitleFilter;
+
+  void setScheduledTitleFilter(String? newTitle) {
+    _scheduledTitleFilter = newTitle;
+  }
+
+  String? _scheduledDescriptionFilter;
+
+  String? get scheduledDescriptionFilter => _scheduledDescriptionFilter;
+
+  void setScheduledDescriptionFilter(String? newDescription) {
+    _scheduledDescriptionFilter = newDescription;
+  }
+
+  DateTime? _scheduledAddDateFilter;
+
+  DateTime? get scheduledAddDateFilter => _scheduledAddDateFilter;
+
+  void setScheduledAddDateFilter(DateTime? newAddDate) {
+    _scheduledAddDateFilter = newAddDate;
+  }
+
+  DateTime? _scheduledReleasedDateFilter;
+
+  DateTime? get scheduledReleasedDateFilter => _scheduledReleasedDateFilter;
+
+  void setScheduledReleasedDateFilter(DateTime? newReleasedDate) {
+    _scheduledReleasedDateFilter = newReleasedDate;
+  }
+
+
   String? _userNameFilter;
 
   String? get userNameFilter => _userNameFilter;
@@ -27,6 +70,11 @@ class TaskFilterProvider with ChangeNotifier {
 
   void setInspectionTypeFilter(String? newInspectionType) {
     _inspectionTypeFilter = newInspectionType;
+    if(newInspectionType! == 'SCHEDULED'){
+      setisScheduled(true);
+    }else{
+      setisScheduled(false);
+    }
   }
 
   String? _workNumberFilter;
@@ -157,11 +205,11 @@ class TaskFilterProvider with ChangeNotifier {
       }
     }
 
-    addFilterIfValid(_observationsFilter, "cn", "title");
+    addFilterIfValid(_scheduledTitleFilter, "cn", "title");
     addFilterIfValid(_statusFilter, "eq", "status");
-    addFilterIfValid(_descriptionFilter, "cn", "description");
-    addDateFilterIfValid(_addDateFilter, "addDate");
-    addDateFilterIfValid(_addDateFilter, "releasedDate");
+    addFilterIfValid(_scheduledDescriptionFilter, "cn", "description");
+    addDateFilterIfValid(_scheduledAddDateFilter, "addDate");
+    addDateFilterIfValid(_scheduledReleasedDateFilter, "releasedDate");
 
     return {
       "dataOption": "all", // Esto es un and, también puede ser any (or)
@@ -184,6 +232,11 @@ class TaskFilterProvider with ChangeNotifier {
     _materialFilter = null;
     _observationsFilter = null;
     _conclusionsFilter = null;
+    _scheduledTitleFilter = null;
+    _scheduledDescriptionFilter = null;
+    _scheduledAddDateFilter = null;
+    _scheduledReleasedDateFilter = null;
+    _isScheduled = false;
     notifyListeners();
   }
 
