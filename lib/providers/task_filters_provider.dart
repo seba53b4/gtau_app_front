@@ -140,6 +140,35 @@ class TaskFilterProvider with ChangeNotifier {
     };
   }
 
+  Map<String, dynamic> buildScheduledSearchBody() {
+    final List<Map<String, dynamic>> searchCriteriaList = [];
+
+    void addFilterIfValid(String? filterValue, String op, String filterKey) {
+      if (filterValue != null && filterValue.isNotEmpty) {
+        searchCriteriaList.add(
+            {"filterKey": filterKey, "operation": op, "value": filterValue});
+      }
+    }
+
+    void addDateFilterIfValid(DateTime? filterValue, String filterKey) {
+      if (filterValue != null) {
+        searchCriteriaList.add(
+            {"filterKey": filterKey, "operation": "eq", "value": filterValue});
+      }
+    }
+
+    addFilterIfValid(_observationsFilter, "cn", "title");
+    addFilterIfValid(_statusFilter, "eq", "status");
+    addFilterIfValid(_descriptionFilter, "cn", "description");
+    addDateFilterIfValid(_addDateFilter, "addDate");
+    addDateFilterIfValid(_addDateFilter, "releasedDate");
+
+    return {
+      "dataOption": "all", // Esto es un and, también puede ser any (or)
+      "searchCriteriaList": searchCriteriaList,
+    };
+  }
+
   void resetFilters(bool updateUser) {
     if (updateUser) {
       _userNameFilter = "";

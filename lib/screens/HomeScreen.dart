@@ -55,26 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     return prefs.clear();
   }
-
-  void updateTaskList() async {
-    final status =
-        Provider.of<TaskFilterProvider>(context, listen: false).statusFilter;
-    final filterProvider = Provider.of<TaskFilterProvider>(context);
-      taskListViewModel = Provider.of<TaskListViewModel>(context, listen: false);
-      taskListScheduledViewModel = Provider.of<TaskListScheduledViewModel>(context, listen: false);
-      final String token = Provider.of<UserProvider>(context, listen: false).getToken!;
-    if(isSwitched==true){
-      
-      filterProvider.setInspectionTypeFilter('SCHEDULED');
-      taskListViewModel.clearListByStatus(filterProvider.statusFilter!);
-      await taskListViewModel.initializeTasks(context, status!, "");
-    }else{
-       filterProvider.setInspectionTypeFilter('INSPECTION');
-       taskListScheduledViewModel
-       .clearListByStatus(filterProvider.statusFilter!);
-       await taskListScheduledViewModel.fetchScheduledTasks(token, status!);
-    }
-  }
   
 
   @override
@@ -88,18 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 52),
-              Switch(
-                value: isSwitched, 
-                onChanged: (value) {
-                  setState(() {
-                    isSwitched = value;
-                    updateTaskList();
-                  }
-                  );
-                }
-              ),
-              const SizedBox(height: 8),
               Container(
               width: MediaQuery.of(context).size.width,
               height: kIsWeb
