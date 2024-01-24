@@ -80,6 +80,10 @@ class _FilterTasksState extends State<FilterTasks> {
     await taskListViewModel.initializeTasks(context, status, userName);
   }
 
+  Future resetAwaitTaskList() async {
+    await resetTaskList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
@@ -238,11 +242,12 @@ class _FilterTasksState extends State<FilterTasks> {
                                   const SizedBox(width: 10.0),
                                   CustomElevatedButton(
                                     onPressed: () {
-                                      resetTaskList();
+                                      //resetAwaitTaskList();
+                                      _ResetPrefs();
                                       _ResetScrollPosition();
                                       _SetFilteredValue(true);
                                       context.read<TaskFilterProvider>().search();
-                                      _SoftClearPref();
+                                      
                                       updateTaskList();
                                       Navigator.of(context).pop();
                                     },
@@ -264,15 +269,15 @@ class _FilterTasksState extends State<FilterTasks> {
   }
 
   void updateTaskList() async {
-    if (filterProvider.inspectionTypeFilter?.allMatches('SCHEDULED') == null) {
+    var isScheduled = filterProvider.isScheduled!;
+    if(isScheduled){
+      taskListScheduledViewModel
+          .clearListByStatus(filterProvider.statusFilter!);
+      await taskListScheduledViewModel.fetchTasksFromFilters(token, filterProvider.statusFilter!, filterProvider.buildScheduledSearchBody());
+    }else{
       taskListViewModel.clearListByStatus(filterProvider.statusFilter!);
       await taskListViewModel.fetchTasksFromFilters(context,
           filterProvider.statusFilter!, filterProvider.buildSearchBody());
-    } else {
-      taskListScheduledViewModel
-          .clearListByStatus(filterProvider.statusFilter!);
-      //await taskListScheduledViewModel.fetchScheduledTasks(token, filterProvider.statusFilter!);
-      await taskListScheduledViewModel.fetchTasksFromFilters(token, filterProvider.statusFilter!, filterProvider.buildScheduledSearchBody());
     }
   }
 }

@@ -127,8 +127,7 @@ class TaskListScheduledViewModel extends ChangeNotifier {
 
       final responseListTask =
           await _scheduledService.searchTasksScheduled(token!, body, page, size);
-      
-      
+
 
       _tasks[status] = responseListTask!;
 

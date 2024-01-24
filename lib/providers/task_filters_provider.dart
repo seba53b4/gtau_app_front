@@ -171,7 +171,7 @@ class TaskFilterProvider with ChangeNotifier {
 
     addFilterIfValid(_userNameFilter, "eq", "username");
     addFilterIfValid(_statusFilter, "eq", "status");
-    addFilterIfValid(_inspectionTypeFilter, "eq", "inspectionType");
+    //addFilterIfValid(_inspectionTypeFilter, "eq", "inspectionType");
     addFilterIfValid(_workNumberFilter, "cn", "workNumber");
     addDateFilterIfValid(_addDateFilter, "addDate");
     addFilterIfValid(_applicantFilter, "cn", "applicant");
