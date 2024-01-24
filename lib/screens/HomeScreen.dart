@@ -3,7 +3,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:gtau_app_front/providers/task_filters_provider.dart';
+import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/filter_tasks.dart';
@@ -19,6 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _enteredUsername = '';
   Timer? _debounce;
+  bool isSwitched = false;
+  late TaskListViewModel taskListViewModel;
+  late TaskListScheduledViewModel taskListScheduledViewModel;
 
   @override
   void dispose() {
@@ -47,10 +55,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     return prefs.clear();
   }
+  
 
   @override
   Widget build(BuildContext context) {
     _clearPref();
+    
+    
     return Scaffold(
       body: Container(
         color: lightBackground,
@@ -61,7 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ? MediaQuery.of(context).size.height * 0.78
                   : MediaQuery.of(context).size.height - 72,
               color: lightBackground,
-              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+              child: _constraintBoxTaskDashboard(context, _enteredUsername)
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

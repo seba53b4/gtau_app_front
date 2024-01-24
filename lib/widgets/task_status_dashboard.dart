@@ -241,7 +241,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
             token = userProvider.getToken ?? '';
             _loadFromStorage();
             return Center(
-              child: isScheduled
+              child: taskFilterProvider.isScheduled!
                   ? TaskListScheduled(
                       status: status,
                       scaffoldKey: _scaffoldKeyDashboard,
