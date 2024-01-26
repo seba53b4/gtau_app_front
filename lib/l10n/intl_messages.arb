@@ -215,5 +215,7 @@
     "filter_users_title": "Filtrar usuarios",
     "createuser_editor_title": "Edición de usuario",
     "list_item_firstname": "Nombre:         ",
-    "list_item_lastname": "Apellido:         "
+    "list_item_lastname": "Apellido:         ",
+    "createuser_error_message": "El alias y/o el correo electronico ya estan siendo utilizados por otro usuario",
+    "createuser_success_message": "El usuario se ha creado exitosamente"
 }

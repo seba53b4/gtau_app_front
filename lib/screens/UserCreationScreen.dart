@@ -140,7 +140,12 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        await showMessageDialog(DialogMessageType.error);
+        await showCustomMessageDialog(
+        context: context,
+        customText: AppLocalizations.of(context)!.createuser_error_message,
+        onAcceptPressed: () {},
+        messageType: DialogMessageType.error,
+        );
         if (kDebugMode) {
           print('No se pudieron traer datos');
         }
@@ -174,7 +179,12 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         if (kDebugMode) {
           print('No se pudieron traer datos');
         }
-        await showMessageDialog(DialogMessageType.error);
+        await showCustomMessageDialog(
+        context: context,
+        customText: AppLocalizations.of(context)!.createuser_error_message,
+        onAcceptPressed: () {},
+        messageType: DialogMessageType.error,
+        );
         return false;
       }
     } catch (error) {
@@ -291,7 +301,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   Future handleAcceptOnShowDialogEditUser() async {
     Map<String, dynamic> requestBody = createBodyToUpdate();
     bool isUpdated = await _updateUser(requestBody);
-    if (isUpdated) {
+    if (isUpdated == true) {
       reset();
     }
     _ResetPrefs();
@@ -300,7 +310,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   Future handleAcceptOnShowDialogCreateUser() async {
     Map<String, dynamic> requestBody = createBodyToCreate();
     bool isUpdated = await _createUser(requestBody);
-    if (isUpdated) {
+    if (isUpdated == true) {
       reset();
     }
     _ResetPrefs();
