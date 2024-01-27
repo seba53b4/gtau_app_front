@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../models/enums/message_type.dart';
+import '../../models/scheduled/element_found.dart';
 import '../../providers/user_provider.dart';
 import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
@@ -76,6 +77,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
   late String token;
   late ScheduledViewModel? scheduledViewModel;
   late UserProvider userStateProvider;
+  String elementFound = FoundStatusType.Found.toLabel();
 
   @override
   void initState() {
@@ -141,6 +143,9 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
     _diamController2.text = (sectionScheduled.diametro2 ?? '').toString();
     _longitudeController.text = (sectionScheduled.longitud ?? '').toString();
     _typeController.text = sectionScheduled.tipoTra ?? '';
+    setState(() {
+      elementFound = parseElementFoundLabel(sectionScheduled.notFound ?? false);
+    });
     if (sectionScheduled.inspectioned) {
       _userNameController.text = sectionScheduled.username!;
       _observationsController.text = sectionScheduled.observaciones ?? '';
@@ -195,6 +200,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
       "longitud": _longitudeController.text.isNotEmpty
           ? double.parse(_longitudeController.text)
           : null,
+      "notFound": isElementNotFound(elementFound) ?? false,
       "nivelSedimentacion": sedimentLevel,
       "observacionAguaArriba": upStreamCheckbox,
       "observacionAguaAbajo": downStreamCheckbox,
@@ -340,6 +346,24 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                               DateTime.now(),
                         ),
                       ),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_element_found),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: elementFound,
+                            items: [
+                              FoundStatusType.Found.toLabel(),
+                              FoundStatusType.NotFound.toLabel()
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                elementFound = str;
+                              });
+                            }),
+                        const SizedBox(height: 8)
+                      ]),
                       if (sectionScheduled.inspectioned)
                         const SizedBox(height: 12),
                       ContainerBottomDivider(children: [

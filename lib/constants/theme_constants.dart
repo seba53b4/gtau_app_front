@@ -5,6 +5,7 @@ Color baseColor = const Color.fromRGBO(200, 217, 184, 0.25);
 Color softGrey = const Color.fromRGBO(88, 87, 89, 0.15);
 Color scheduledNotInspectionedElement = const Color.fromRGBO(203, 35, 30, 1);
 Color scheduledInspectionedElement = const Color.fromRGBO(19, 215, 105, 1);
+Color scheduledNotFoundElement = const Color.fromRGBO(120, 60, 20, 1);
 Color zoneColor = Colors.blueAccent;
 Color arrowColor = const Color.fromRGBO(247, 247, 247, 1);
 Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
