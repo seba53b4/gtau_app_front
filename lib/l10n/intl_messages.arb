@@ -217,5 +217,9 @@
     "list_item_firstname": "Nombre:         ",
     "list_item_lastname": "Apellido:         ",
     "createuser_error_message": "El alias y/o el correo electronico ya estan siendo utilizados por otro usuario",
-    "createuser_success_message": "El usuario se ha creado exitosamente"
+    "createuser_success_message": "El usuario se ha creado exitosamente",
+    "passwordrecovery_title": "Recuperacion de contraseña",
+    "passwordrecovery_description": "Ingrese el correo electronico de su cuenta",
+    "passwordrecovery_success": "Se ha enviado exitosamente el correo electronico para la recuperacion de su cuenta",
+    "passwordrecovery_fail": "No se pudo enviar el correo electronico"
 }

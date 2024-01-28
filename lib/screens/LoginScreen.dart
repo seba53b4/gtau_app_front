@@ -174,6 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.all(Radius.circular(50.0))),
         child: SizedBox(
           width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
+          height: kIsWeb ? 516 : MediaQuery.of(context).size.height,
           child: const ForgotPassModal(),
         ),
       );
