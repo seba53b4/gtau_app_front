@@ -10,6 +10,7 @@ import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:gtau_app_front/widgets/forgotpass_modal.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
@@ -164,7 +165,25 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void onForgotPressed(BuildContext context) {}
+  void _showForgotPassModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(50.0))),
+        child: SizedBox(
+          width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
+          child: const ForgotPassModal(),
+        ),
+      );
+    },
+  );
+}
+
+  void onForgotPressed(BuildContext context) {
+    _showForgotPassModal(context);
+  }
 
   @override
   Widget build(BuildContext context) {
