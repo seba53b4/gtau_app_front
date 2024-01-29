@@ -24,7 +24,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
   Widget build(BuildContext context) {
     late List<BottomNavigationBarItem> optionsNav = [
       _buildCircularDestination(
-        icon: const Icon(Icons.home),
+        icon: const Icon(GtauIcons.home),
         label: AppLocalizations.of(context)!.navigation_label_home,
       ),
       _buildCircularDestination(
