@@ -51,6 +51,7 @@ class UserService {
     try {
       final url = Uri.parse(baseUrl);
       final response = await http.get(url, headers: _getHeaders(token));
+      
 
       if (response.statusCode == 200) {
         return parseUsernamesListResponse(response);
@@ -214,9 +215,11 @@ class UserService {
 
     final data = json.decode(response.body);
 
-    return data.map<UserData>((userData) {
-      return userData['username'];
+    var list = data.map<String>((userData) {
+      return userData['username'].toString();
     }).toList();
+
+    return list;
   }
   
 }

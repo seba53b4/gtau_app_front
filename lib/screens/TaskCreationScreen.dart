@@ -10,6 +10,7 @@ import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/common/informe_upload_component.dart';
@@ -78,6 +79,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   final conclusionsController = TextEditingController();
   final addDateController = TextEditingController();
   final releasedDateController = TextEditingController();
+  late UserListViewModel userListViewModel;
+  late String token;
+  late List<String> listUsers;
 
   SelectedItemsProvider? selectedItemsProvider;
 
@@ -105,6 +109,8 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     selectedItemsProvider = context.read<SelectedItemsProvider>();
+    userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
+    token = Provider.of<UserProvider>(context, listen: false).getToken!;
   }
 
   @override
@@ -144,6 +150,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     super.initState();
     if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
+      //listUsers = await getUsernames();
       releasedDate = DateTime.now();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.
@@ -153,6 +160,25 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       });
     } else {
       startDate = DateTime.now();
+    }
+  }
+
+  Future<List<String>> _listUserNames() async {
+    var list = [notAssigned];
+    try {
+      final response = await userListViewModel.fetchUsernames(context);
+      if (response != null) {
+        list.addAll(response);
+        return list;
+      } else {
+        return list;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
+      return list;
     }
   }
 
@@ -603,6 +629,11 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             ),
                             const SizedBox(height: 24.0),
                             // Primera fila
+                            FutureBuilder<List<String>>(
+                                              future: _listUserNames(), // a previously-obtained Future<String> or null
+                                              builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                                                if (snapshot.hasData) {
+                                                  return 
                             SizedBox(
                               height: heightRow,
                               width: widthRow,
@@ -646,18 +677,15 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             ),
                                             const SizedBox(height: 12.0),
                                             CustomDropdown(
-                                              value: userAssigned,
-                                              items: const [
-                                                notAssigned,
-                                                'gtau-oper',
-                                                'gtau-admin'
-                                              ],
-                                              onChanged: (String? value) {
-                                                setState(() {
-                                                  userAssigned = value!;
-                                                });
-                                              },
-                                            ),
+                                                    value: userAssigned,
+                                                    items: snapshot.data!,
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        userAssigned = value!;
+                                                      });
+                                                    },
+                                                  ),
+                                            
                                             const SizedBox(
                                                 height: AppConstants
                                                     .taskColumnSpace),
@@ -688,6 +716,93 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           height: AppConstants.taskColumnSpace),
                                     ]),
                                   ]),
+                            );
+                            }else{
+                              return SizedBox(
+                              height: heightRow,
+                              width: widthRow,
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .createTaskPage_numberWorkTitle,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
+                                        CustomTextFormField(
+                                          readOnly: widget.detail,
+                                          hintText: AppLocalizations.of(
+                                                  context)!
+                                              .createTaskPage_numberWorkTitle,
+                                          controller: numWorkController,
+                                          textInputType: TextInputType.number,
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                            width: AppConstants.taskRowSpace),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createTaskPage_assignedUserTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                            const SizedBox(height: 12.0),
+                                            CustomDropdown(
+                                                    value: notAssigned,
+                                                    items: [notAssigned],
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        userAssigned = value!;
+                                                      });
+                                                    },
+                                                  ),
+                                            
+                                            const SizedBox(
+                                                height: AppConstants
+                                                    .taskColumnSpace),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Column(children: [
+                                      Text(
+                                        AppLocalizations.of(context)!
+                                            .editTaskPage_statusTitle,
+                                        style: const TextStyle(fontSize: 16.0),
+                                      ),
+                                      const SizedBox(height: 12.0),
+                                      CustomDropdown(
+                                        isStatus: true,
+                                        value: taskStatus,
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            taskStatus = value!;
+                                          });
+                                        },
+                                        items: TaskStatus.values
+                                            .map((status) => status.value)
+                                            .toList(),
+                                      ),
+                                      const SizedBox(
+                                          height: AppConstants.taskColumnSpace),
+                                    ]),
+                                  ]),
+                            );
+                            }
+                            }
                             ),
                             // Segunda fila
                             SizedBox(
