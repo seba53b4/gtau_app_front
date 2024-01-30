@@ -151,6 +151,7 @@
     "form_scheduled_catchm_deposit": "Estado de depósito",
     "form_scheduled_catchm_top_status_1": "Estado de la tapa 1",
     "form_scheduled_catchm_top_status_2": "Estado de la tapa 2",
+    "form_scheduled_element_found": "Elemento Encontrado",
     "filter_task_title": "Filtrar tareas",
     "inspection_type": "Tipo de inspección",
     "user": "Usuario",
@@ -219,5 +220,6 @@
     "createuser_error_message": "El alias y/o el correo electronico ya estan siendo utilizados por otro usuario",
     "createuser_success_message": "El usuario se ha creado exitosamente",
     "listuser_title": "Gestión usuarios",
-    "listuser_user_notfound": "El usuario asignado a esta tarea no se encuentra actualmente en el sistema"
+    "listuser_user_notfound": "El usuario asignado a esta tarea no se encuentra actualmente en el sistema",
+    "listuser_title": "Gestión usuarios"
 }
