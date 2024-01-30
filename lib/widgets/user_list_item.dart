@@ -38,7 +38,7 @@ class UserListItem extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(50.0))),
           child: SizedBox(
             width: 700,
-            height: 516,
+            height: 536,
             child: UserCreationScreen(
               detail: true,
               idUser: user!.getId,

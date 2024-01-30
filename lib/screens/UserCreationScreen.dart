@@ -281,10 +281,10 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   Map<String, dynamic> createBodyToUpdate() {
     var roleFinal = '';
     var contr = roleController.text;
-    if (userRole ==
+    if (roleController.text ==
         AppLocalizations.of(context)!.createUserPage_roleValueOperator) {
       roleFinal = 'OPERADOR';
-    } else if (userRole ==
+    } else if (roleController.text ==
         AppLocalizations.of(context)!.createUserPage_roleValueAdmin) {
       roleFinal = 'ADMINISTRADOR';
     }
@@ -317,7 +317,27 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   }
 
   void handleEditTask() {
-    showCustomDialog(
+    String bodyMsg = '';
+    final bool emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(emailController.text);
+    final bool isRoleValid = roleController.text != notAssigned;
+    if (emailValid == false)
+      bodyMsg = bodyMsg +
+          AppLocalizations.of(context)!.createUserPage_emailWarning +
+          '\n';
+    if (isRoleValid == false)
+      bodyMsg =
+          bodyMsg + AppLocalizations.of(context)!.createUserPage_roleWarning;
+    if (emailValid == false || isRoleValid == false) {
+      showCustomMessageDialog(
+        context: context,
+        customText: bodyMsg,
+        onAcceptPressed: () {},
+        messageType: DialogMessageType.error,
+      );
+    } else {
+      showCustomDialog(
       context: context,
       title: AppLocalizations.of(context)!.dialogWarning,
       content: AppLocalizations.of(context)!.dialogContent,
@@ -328,11 +348,11 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
         Navigator.of(context).pop();
         await handleAcceptOnShowDialogEditUser();
         await updateUserListState(context);
-        Navigator.of(context).pop();
       },
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
       cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
-    );
+      );
+    }
   }
 
   void resetSelectionOnMap() {
