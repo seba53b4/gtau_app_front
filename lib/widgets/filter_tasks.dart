@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/task_status.dart';
+import 'package:gtau_app_front/models/value_label.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/text_field_filter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +32,9 @@ class _FilterTasksState extends State<FilterTasks> {
   late TaskFilterProvider filterProvider;
   late TaskListViewModel taskListViewModel;
   late TaskListScheduledViewModel taskListScheduledViewModel;
+  late UserListViewModel userListViewModel;
   late String token;
+    static const String notAssigned = "no-asignada";
 
   @override
   void initState() {
@@ -40,6 +44,26 @@ class _FilterTasksState extends State<FilterTasks> {
     taskListScheduledViewModel =
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
     token = Provider.of<UserProvider>(context, listen: false).getToken!;
+    userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
+  }
+
+  Future<List<ValueLabel>> _listUserNames() async {
+    var list = [notAssigned];
+    try {
+      final response = await userListViewModel.fetchUsernames(context);
+      if (response != null) {
+        list.addAll(response);
+        return list.map((e) => ValueLabel(e, e)).toList();
+      } else {
+        return list.map((e) => ValueLabel(e, e)).toList();
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos');
+      return list.map((e) => ValueLabel(e, e)).toList();
+    }
   }
 
   _ResetScrollPosition() async {
@@ -156,15 +180,35 @@ class _FilterTasksState extends State<FilterTasks> {
                       visible: filterProvider.isScheduled == false,
                       child: Column(
                         children: <Widget>[
-                          DropdownButtonFilter(
-                            suggestions: filterProvider.suggestionsUsers,
-                            valueSetter: filterProvider.setUserNameFilter,
-                            dropdownValue: !userProvider.isAdmin!
-                                ? userProvider.userName!
-                                : (filterProvider.userNameFilter ??
-                                    filterProvider.suggestionsUsers.first.value),
-                            label: appLocalizations.user,
-                            enabled: userProvider.isAdmin! ? true : false,
+
+
+                          FutureBuilder<List<ValueLabel>>(
+                            future: _listUserNames(), // a previously-obtained Future<String> or null
+                            builder: (BuildContext context, AsyncSnapshot<List<ValueLabel>> snapshot) {
+                              if (snapshot.hasData) {
+                                return DropdownButtonFilter(
+                                  suggestions: snapshot.data!,
+                                  valueSetter: filterProvider.setUserNameFilter,
+                                  dropdownValue: !userProvider.isAdmin!
+                                      ? userProvider.userName!
+                                      : (filterProvider.userNameFilter ??
+                                          snapshot.data!.first.value),
+                                  label: appLocalizations.user,
+                                  enabled: userProvider.isAdmin! ? true : false,
+                                );
+                              }else{
+                                return DropdownButtonFilter(
+                                  suggestions: filterProvider.suggestionsUsers,
+                                  valueSetter: filterProvider.setUserNameFilter,
+                                  dropdownValue: !userProvider.isAdmin!
+                                      ? userProvider.userName!
+                                      : (filterProvider.userNameFilter ??
+                                          filterProvider.suggestionsUsers.first.value),
+                                  label: appLocalizations.user,
+                                  enabled: userProvider.isAdmin! ? true : false,
+                                );
+                              }
+                            }
                           ),
                           const SizedBox(height: 16),
                           TextFieldFilter(
