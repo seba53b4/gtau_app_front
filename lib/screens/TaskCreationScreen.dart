@@ -1061,21 +1061,47 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                               const TextStyle(fontSize: 12.0),
                                         ),
                                         const SizedBox(height: 12.0),
-                                        CustomDropdown(
-                                          width: 148,
-                                          //height: 54,
-                                          fontSize: 12,
-                                          value: userAssigned,
-                                          items: const [
-                                            notAssigned,
-                                            'gtau-oper',
-                                            'gtau-admin'
-                                          ],
-                                          onChanged: (String? value) {
-                                            setState(() {
-                                              userAssigned = value!;
-                                            });
-                                          },
+                                        FutureBuilder<List<String>>(
+                                          future: _listUserNames(), // a previously-obtained Future<String> or null
+                                          builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                                            if (snapshot.hasData) {
+                                              if(snapshot.data!.contains(userAssigned)== false){
+                                                Future.delayed(Duration.zero, () => showCustomMessageDialog(
+                                                  context: context,
+                                                  customText: AppLocalizations.of(context)!.listuser_user_notfound,
+                                                  onAcceptPressed: () {},
+                                                  messageType: DialogMessageType.error,
+                                                ));
+                                              }
+                                              return CustomDropdown(
+                                                width: 148,
+                                                //height: 54,
+                                                fontSize: 12,
+                                                value: (snapshot.data!.contains(userAssigned)== true) ? userAssigned : notAssigned,
+                                                items: snapshot.data!,
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    userAssigned = value!;
+                                                  }
+                                                  );
+                                                }
+                                              );
+                                            }else{
+                                              return CustomDropdown(
+                                                width: 148,
+                                                //height: 54,
+                                                fontSize: 12,
+                                                value: notAssigned,
+                                                items: [notAssigned],
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    userAssigned = value!;
+                                                  }
+                                                  );
+                                                }
+                                              );
+                                            }
+                                          }
                                         ),
                                         const SizedBox(
                                             width:
