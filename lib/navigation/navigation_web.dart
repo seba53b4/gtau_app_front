@@ -41,7 +41,7 @@ class _NavigationWeb extends State<NavigationWeb> {
 
   void _updateOptionsNav() {
     NavigationRailDestination navHome = _buildCircularDestination(
-        icon: Icon(Icons.home, size: iconSize),
+        icon: Icon(GtauIcons.home, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_home));
 
     NavigationRailDestination navAddTask = _buildCircularDestination(
@@ -50,7 +50,7 @@ class _NavigationWeb extends State<NavigationWeb> {
 
     NavigationRailDestination navListUser = _buildCircularDestination(
         icon: Icon(GtauIcons.userList, size: iconSize),
-        label: Text(AppLocalizations.of(context)!.navigation_label_profile));
+        label: Text(AppLocalizations.of(context)!.listuser_title));
 
     NavigationRailDestination navMap = _buildCircularDestination(
         icon: Icon(GtauIcons.worldMap, size: iconSize),
