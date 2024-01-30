@@ -141,6 +141,8 @@ class ShapeLoadViewModel extends ChangeNotifier {
       _elementType = ElementType.catchment;
     } else if (linesParcelas != null) {
       _elementType = ElementType.lot;
+      _blockMaxSize = 1;
+      _lastBlock = 1;
     }
     _processing = true;
     notifyListeners();
@@ -151,12 +153,11 @@ class ShapeLoadViewModel extends ChangeNotifier {
     if (lines == null || startIndex < 0 || startIndex >= lines.length) {
       return null;
     }
-    //print('startIndex: ' + startIndex.toString());
+
     int endIndex = startIndex + _blockMaxSize;
     if (endIndex > lines.length) {
       endIndex = lines.length;
       _lastBlock = endIndex - startIndex;
-      print('lastBlock: ' + _lastBlock.toString());
     }
 
     List<dynamic> sublist = lines.sublist(startIndex, endIndex);
@@ -210,16 +211,6 @@ class ShapeLoadViewModel extends ChangeNotifier {
         _processAlreadyRunning = false;
         break;
       case StatusProcess.ERROR:
-        // _message = webSocketResponseShapeLoad.message;
-        // _isLoading = false;
-        // _error = true;
-        // closeWebSocket();
-
-        // print('elementos procesados: ' +
-        //     _elementsProcessed.toString() +
-        //     ' de ' +
-        //     _linesData.length.toString() +
-        //     ' elementos');
         int prevProcessed = _elementsProcessed;
         if (_linesData.length - _elementsProcessed < _blockMaxSize) {
           _elementsProcessed += _lastBlock;
@@ -228,7 +219,6 @@ class ShapeLoadViewModel extends ChangeNotifier {
         }
         _linesError
             .addAll(_linesData.sublist(prevProcessed, _elementsProcessed));
-        //print('lineas que dieron error: ' + _linesError.toString());
         _percent = calculatePercentLoad();
         if (_elementsProcessed < _linesData.length) {
           sendMessage(elementType: _elementType!);
@@ -254,11 +244,6 @@ class ShapeLoadViewModel extends ChangeNotifier {
         break;
       case StatusProcess.FINISHED:
         if (webSocketResponseShapeLoad.result) {
-          // print('elementos procesados: ' +
-          //     _elementsProcessed.toString() +
-          //     ' de ' +
-          //     _linesData.length.toString() +
-          //     ' elementos');
           if (_linesData.length - _elementsProcessed < _blockMaxSize) {
             _elementsProcessed += _lastBlock;
           } else {

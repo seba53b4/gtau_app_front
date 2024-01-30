@@ -51,7 +51,8 @@ class _NavigationWeb extends State<NavigationWeb> {
 
     NavigationRailDestination navInfoUpdate = _buildCircularDestination(
         icon: Icon(Icons.update, size: iconSize),
-        label: Text('Actualizar Elementos'));
+        label: Text(
+            AppLocalizations.of(context)!.navigation_label_update_elements));
 
     NavigationRailDestination navListUser = _buildCircularDestination(
         icon: Icon(GtauIcons.userList, size: iconSize),
