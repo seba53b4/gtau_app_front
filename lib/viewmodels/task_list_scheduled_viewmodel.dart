@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -113,16 +115,45 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     }
   }
 
+  Future<List<TaskScheduled>?> fetchTasksFromFilters(
+      String token, String status, Map<String, dynamic> body) async {
+    try {
+      _isLoading = true;
+      _SetIsLoadingPrefValue(true);
+      _error = false;
+      notifyListeners();
+      String encodedMap = json.encode(body);
+      _SetBodyPrefValue(encodedMap);
+
+      final responseListTask =
+          await _scheduledService.searchTasksScheduled(token!, body, page, size);
+
+
+      _tasks[status] = responseListTask!;
+
+      return responseListTask;
+    } catch (error) {
+      _error = true;
+      _SetIsLoadingPrefValue(false);
+      print(error);
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      _SetIsLoadingPrefValue(false);
+      page++;
+      notifyListeners();
+    }
+  }
+
   Future<List<TaskScheduled>?> fetchNextPageTasksFilteredScheduled(
       String token, String status, String encodedBody) async {
     try {
       _isLoading = true;
       _error = false;
-      /*Map<String,dynamic> body = json.decode(encodedBody);*/
+      Map<String,dynamic> body = json.decode(encodedBody);
 
-      //Se esta esperando que se implemente el search scheduled en el backend
       final responseListTask =
-          await _scheduledService.getScheduledTasks(token, page, size, status);
+          await _scheduledService.searchTasksScheduled(token, body, page, size);
 
       _tasks[status]?.addAll(responseListTask!);
       final size_list = responseListTask?.length ?? 0;

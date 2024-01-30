@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../constants/theme_constants.dart';
 import '../enums/point_type_enum.dart';
 
-Circle? buildCircle(Map<String, dynamic> json, PointType type) {
+Circle? buildCircle(Map<String, dynamic> json, PointType type, bool notFound) {
   if (json.containsKey('geoJSON') && json['geoJSON'] is Map<String, dynamic>) {
     Map<String, dynamic> geoJson = json['geoJSON'];
     List<dynamic> coordenates = geoJson['coordinates'];
@@ -21,8 +21,9 @@ Circle? buildCircle(Map<String, dynamic> json, PointType type) {
           radius: 1.3,
           strokeWidth: 7,
           consumeTapEvents: true,
-          strokeColor: scheduledNotInspectionedElement,
-          // registerDefaultColor,
+          strokeColor: notFound
+              ? scheduledNotFoundElement
+              : scheduledNotInspectionedElement,
           fillColor: Colors.grey);
     } else {
       circle = Circle(
@@ -31,8 +32,9 @@ Circle? buildCircle(Map<String, dynamic> json, PointType type) {
           radius: 2,
           strokeWidth: 2,
           consumeTapEvents: true,
-          strokeColor: scheduledNotInspectionedElement,
-          //catchmentDefaultColor,
+          strokeColor: notFound
+              ? scheduledNotFoundElement
+              : scheduledNotInspectionedElement,
           fillColor: Colors.black);
     }
 

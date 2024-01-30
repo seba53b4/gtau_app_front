@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/auth_data.dart';
+import '../models/user_info.dart';
 
 class AuthResult {
   final AuthData? authData;
@@ -55,6 +56,34 @@ class AuthService {
     }
   }
 
+  Future<UserInfo?> getUserRole(String token) async {
+    try {
+      Map<String, String> headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': "Bearer $token",
+      };
+
+      String url =
+          "${dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND')}/usuarios/me";
+      final response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return UserInfo.fromJson(jsonResponse);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error en getUserRole: $error');
+      }
+      rethrow;
+    }
+  }
+
   Future<AuthResult> refreshAuthData(String refreshToken) async {
     try {
       final response = await http.post(
@@ -66,7 +95,6 @@ class AuthService {
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         final authData = AuthData.fromJson(jsonResponse);
-        print('el refresh token:' + authData.refreshToken);
         return AuthResult(authData, response.statusCode);
       } else {
         return AuthResult(null, response.statusCode);

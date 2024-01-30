@@ -181,29 +181,43 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
         section.line!.polylineId, ElementType.section)) {
       return selectedColor;
     }
-    return section.inspectioned
-        ? scheduledInspectionedElement
-        : scheduledNotInspectionedElement;
+    if (section.notFound ?? false) {
+      return scheduledNotFoundElement;
+    } else {
+      return section.inspectioned
+          ? scheduledInspectionedElement
+          : scheduledNotInspectionedElement;
+    }
   }
 
   Color _onColorParamBehaviorCatchment(CatchmentScheduled catchment) {
-    return _commonColorBehaviorOnCircle(catchment.point!.circleId,
-        catchment.inspectioned, ElementType.catchment);
+    return _commonColorBehaviorOnCircle(
+        catchment.point!.circleId,
+        catchment.inspectioned,
+        catchment.notFound ?? false,
+        ElementType.catchment);
   }
 
   Color _onColorParamBehaviorRegister(RegisterScheduled register) {
     return _commonColorBehaviorOnCircle(
-        register.point!.circleId, register.inspectioned, ElementType.register);
+        register.point!.circleId,
+        register.inspectioned,
+        register.notFound ?? false,
+        ElementType.register);
   }
 
   Color _commonColorBehaviorOnCircle(
-      CircleId circleId, bool inspectioned, ElementType type) {
+      CircleId circleId, bool inspectioned, bool notFound, ElementType type) {
     if (selectedItemsProvider.isCircleSelected(circleId, type)) {
       return selectedColor;
     }
-    return inspectioned
-        ? scheduledInspectionedElement
-        : scheduledNotInspectionedElement;
+    if (notFound) {
+      return scheduledNotFoundElement;
+    } else {
+      return inspectioned
+          ? scheduledInspectionedElement
+          : scheduledNotInspectionedElement;
+    }
   }
 
   void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) async {

@@ -2,31 +2,25 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
-import 'package:gtau_app_front/providers/task_filters_provider.dart';
-import 'package:gtau_app_front/providers/user_provider.dart';
-import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
-import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
-import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
-import 'package:provider/provider.dart';
+import 'package:gtau_app_front/screens/UserCreationScreen.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_icon_button.dart';
+import 'package:gtau_app_front/widgets/user_dashboard.dart';
+import 'package:gtau_app_front/widgets/user_filter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../widgets/filter_tasks.dart';
-
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class UserDashboardScreen extends StatefulWidget {
+  const UserDashboardScreen({Key? key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _UserDashboardScreen createState() => _UserDashboardScreen();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _UserDashboardScreen extends State<UserDashboardScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _enteredUsername = '';
   Timer? _debounce;
-  bool isSwitched = false;
-  late TaskListViewModel taskListViewModel;
-  late TaskListScheduledViewModel taskListScheduledViewModel;
 
   @override
   void dispose() {
@@ -55,24 +49,65 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     return prefs.clear();
   }
-  
+
+  void _showAddUserModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+          child: SizedBox(
+            width: 700,
+            height: 516,
+            child: UserCreationScreen(),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     _clearPref();
-    
-    
     return Scaffold(
       body: Container(
         color: lightBackground,
         child: Center(
-          child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: kIsWeb
-                  ? MediaQuery.of(context).size.height * 0.78
-                  : MediaQuery.of(context).size.height - 72,
-              color: lightBackground,
-              child: _constraintBoxTaskDashboard(context, _enteredUsername)
+          child: Column(
+            children: [
+              const SizedBox(height: 52),
+              Container(
+                width: 900,
+                color: lightBackground,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    CustomElevatedIconButton(
+                      onPressed: () {
+                        _showAddUserModal(context);
+                      },
+                      icon: GtauIcons.userAdd,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                color: lightBackground,
+                child: Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: kIsWeb
+                        ? MediaQuery.of(context).size.height * 0.78
+                        : MediaQuery.of(context).size.height - 72,
+                    color: lightBackground,
+                    child: _constraintBoxUserDashboard(context),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -98,14 +133,15 @@ void _showFilterModal(BuildContext context) {
             borderRadius: BorderRadius.all(Radius.circular(50.0))),
         child: SizedBox(
           width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
-          child: const FilterTasks(),
+          height: 600,
+          child: const UserFilter(),
         ),
       );
     },
   );
 }
 
-Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
+Widget _constraintBoxUserDashboard(BuildContext context) {
   double widthDashboard = 980;
   double paddingDashboard =
       (MediaQuery.of(context).size.width - widthDashboard) > 0 && kIsWeb
@@ -122,7 +158,7 @@ Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
             ? MediaQuery.of(context).size.height * 0.78
             : MediaQuery.of(context).size.height - 164,
       ),
-      child: TaskStatusDashboard(userName: userName),
+      child: const UserDashboard(),
     ),
   );
 }
