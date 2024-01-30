@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
@@ -23,15 +24,15 @@ class _BottomNavigationState extends State<BottomNavigation> {
   Widget build(BuildContext context) {
     late List<BottomNavigationBarItem> optionsNav = [
       _buildCircularDestination(
-        icon: const Icon(Icons.home),
+        icon: const Icon(GtauIcons.home),
         label: AppLocalizations.of(context)!.navigation_label_home,
       ),
       _buildCircularDestination(
-        icon: const Icon(Icons.map),
+        icon: const Icon(GtauIcons.worldMap),
         label: AppLocalizations.of(context)!.navigation_label_map,
       ),
       _buildCircularDestination(
-        icon: const Icon(Icons.person),
+        icon: const Icon(GtauIcons.userProfile),
         label: AppLocalizations.of(context)!.navigation_label_profile,
       )
     ];
