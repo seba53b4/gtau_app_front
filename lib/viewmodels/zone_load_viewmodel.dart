@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import '../models/scheduled/response_websocket.dart';
+import '../models/scheduled/response_websocket_zone_load.dart';
 import '../services/zone_websocket_service.dart';
 
 enum SocketConnectionStatus { connecting, connected, disconnected }
 
 class ZoneLoadViewModel extends ChangeNotifier {
-  late ZoneWebSocketService _socketService;
+  late WebSocketService _socketService;
   static const String proccesIsAlreadyRunning = "Process is already running";
   SocketConnectionStatus _connectionStatus = SocketConnectionStatus.connecting;
 
@@ -72,7 +72,7 @@ class ZoneLoadViewModel extends ChangeNotifier {
   bool get isRetrying => _isRetrying;
 
   void initWS() {
-    _socketService = ZoneWebSocketService(
+    _socketService = WebSocketService(
       onMessage: (message) {
         _handleWebSocketMessage(message);
       },
@@ -139,8 +139,8 @@ class ZoneLoadViewModel extends ChangeNotifier {
   }
 
   void _handleWebSocketMessage(String message) {
-    WebSocketResponse webSocketResponse =
-        WebSocketResponse.fromJson(json.decode(message));
+    WebSocketZoneLoadResponse webSocketResponse =
+        WebSocketZoneLoadResponse.fromJson(json.decode(message));
 
     switch (webSocketResponse.status) {
       case StatusProcess.STARTING:

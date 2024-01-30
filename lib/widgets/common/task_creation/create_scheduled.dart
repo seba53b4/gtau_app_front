@@ -119,13 +119,12 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     });
   }
 
-
   Future updateTaskList() async {
-
     final scheduledListViewModel =
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
     final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    final status = Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
+    final status =
+        Provider.of<TaskFilterProvider>(context, listen: false).lastStatus;
     scheduledListViewModel.clearListByStatus(status!);
     await scheduledListViewModel.fetchScheduledTasks(token!, status);
   }
@@ -298,7 +297,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
       await showMessageDialog(DialogMessageType.error);
       return false;
     }
-    
   }
 
   void handleEdit() {

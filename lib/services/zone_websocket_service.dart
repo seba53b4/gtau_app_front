@@ -1,11 +1,11 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class ZoneWebSocketService {
+class WebSocketService {
   late WebSocketChannel _webSocketChannel;
   bool _isConnected = false;
 
-  ZoneWebSocketService(
+  WebSocketService(
       {required Function(dynamic) onMessage,
       required Function() onDone,
       required Function(dynamic) onError}) {

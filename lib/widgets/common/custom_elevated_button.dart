@@ -52,7 +52,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
           colors = [primarySwatch[300]!, primarySwatch[100]!];
       }
     } else {
-      colors = [Colors.grey, Colors.grey[400]!];
+      colors = [lightBackground, lightBackground];
     }
 
     return ElevatedButton(
