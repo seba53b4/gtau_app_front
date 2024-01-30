@@ -6,6 +6,7 @@ import 'common.dart';
 class RegisterScheduled extends PointDataScheduled {
   final String? tipoPto;
   final int? idRegistro;
+  final bool? notFound;
   final String? tipoPavimento;
   final String? estadoRegistro;
   final String? cotaTapa;
@@ -20,6 +21,7 @@ class RegisterScheduled extends PointDataScheduled {
 
   RegisterScheduled(
       {this.tipoPto,
+      this.notFound,
       this.tipoPavimento,
       this.estadoRegistro,
       this.cotaTapa,
@@ -41,6 +43,7 @@ class RegisterScheduled extends PointDataScheduled {
     return RegisterScheduled(
         tipoPto: json['tipo'] as String?,
         idRegistro: json['idRegistro'] as int?,
+        notFound: json['notFound'] as bool?,
         tipoPavimento: json['tipoPavimento'] as String?,
         estadoRegistro: json['estadoRegistro'] as String?,
         cotaTapa: json['cotaTapa'] as String?,
@@ -55,6 +58,8 @@ class RegisterScheduled extends PointDataScheduled {
             : null,
         username: json['username'] as String?,
         ogcFid: json['ogcFid'] as int?,
-        point: isFetch ? null : buildCircle(json, PointType.register));
+        point: isFetch
+            ? null
+            : buildCircle(json, PointType.register, json['notFound'] ?? false));
   }
 }
