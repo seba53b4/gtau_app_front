@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/MapScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
+import 'package:gtau_app_front/screens/UserDashboardScreen.dart';
 
 import '../constants/theme_constants.dart';
 
@@ -39,25 +41,30 @@ class _NavigationWeb extends State<NavigationWeb> {
 
   void _updateOptionsNav() {
     NavigationRailDestination navHome = _buildCircularDestination(
-        icon: Icon(Icons.home, size: iconSize),
+        icon: Icon(GtauIcons.home, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_home));
 
     NavigationRailDestination navAddTask = _buildCircularDestination(
-        icon: Icon(Icons.add, size: iconSize),
+        icon: Icon(GtauIcons.taskAdd, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
+    NavigationRailDestination navListUser = _buildCircularDestination(
+        icon: Icon(GtauIcons.userList, size: iconSize),
+        label: Text(AppLocalizations.of(context)!.listuser_title));
+
     NavigationRailDestination navMap = _buildCircularDestination(
-        icon: Icon(Icons.map, size: iconSize),
+        icon: Icon(GtauIcons.worldMap, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_map));
 
     NavigationRailDestination navProfile = _buildCircularDestination(
-        icon: Icon(Icons.person, size: iconSize),
+        icon: Icon(GtauIcons.userProfile, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
     if (widget.isAdmin) {
       optionsNav = [
         navHome,
         navAddTask,
+        navListUser,
         navMap,
         navProfile,
       ];
@@ -68,6 +75,7 @@ class _NavigationWeb extends State<NavigationWeb> {
           TaskCreationScreen(
             type: '',
           ),
+          const UserDashboardScreen(),
           const MapScreen(),
           const ProfileScreen(),
         ];

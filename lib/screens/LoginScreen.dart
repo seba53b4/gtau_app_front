@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gtau_app_front/models/auth_data.dart';
+import 'package:gtau_app_front/models/user_info.dart';
 import 'package:gtau_app_front/models/user_state.dart';
 import 'package:gtau_app_front/navigation/navigation.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
@@ -58,6 +59,26 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return null;
     });
+  }
+
+  Future<String?> _getUserRole(String token) async {
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    UserInfo? userInfo =
+        await authViewModel.getUserRole(token).catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_service_not_available,
+        messageType: DialogMessageType.error,
+      );
+      return null;
+    });
+
+    if (userInfo != null) {
+      return userInfo.rol;
+    }
+    return null;
   }
 
   _showWrongCredentialsToast(BuildContext context) {
@@ -116,8 +137,10 @@ class _LoginScreenState extends State<LoginScreen> {
     AuthResult? authResponse = await _fetchAuth(context, username, password);
 
     if (context.mounted && authResponse?.authData != null) {
+      String? admin = await _getUserRole(authResponse!.authData!.accessToken);
+      print('role' + admin.toString());
       setUserData(context, true, username, authResponse!.authData!,
-          username == 'gtau-admin' ? true : false);
+          admin == 'ADMINISTRADOR' ? true : false);
       goToNav(context);
     } else {
       setState(() {
