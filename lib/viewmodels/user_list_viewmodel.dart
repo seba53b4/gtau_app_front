@@ -105,7 +105,7 @@ class UserListViewModel extends ChangeNotifier {
       _isLoading = true;
       
 
-      notifyListeners();
+      //notifyListeners();
       final responseListUsers =
           await _userService.getUsernames(token!);
       

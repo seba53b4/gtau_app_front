@@ -217,5 +217,7 @@
     "list_item_firstname": "Nombre:         ",
     "list_item_lastname": "Apellido:         ",
     "createuser_error_message": "El alias y/o el correo electronico ya estan siendo utilizados por otro usuario",
-    "createuser_success_message": "El usuario se ha creado exitosamente"
+    "createuser_success_message": "El usuario se ha creado exitosamente",
+    "listuser_title": "Gestion usuarios",
+    "listuser_user_notfound": "El usuario asignado a esta tarea no se encuentra actualmente en el sistema"
 }
