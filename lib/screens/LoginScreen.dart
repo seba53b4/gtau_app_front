@@ -138,7 +138,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (context.mounted && authResponse?.authData != null) {
       String? admin = await _getUserRole(authResponse!.authData!.accessToken);
-      print('role' + admin.toString());
       setUserData(context, true, username, authResponse!.authData!,
           admin == 'ADMINISTRADOR' ? true : false);
       goToNav(context);

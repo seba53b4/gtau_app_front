@@ -6,6 +6,7 @@ import '../enums/section_color_enum.dart';
 class SectionScheduled {
   final int? ogcFid;
   final int? idTramo;
+  final bool? notFound;
   final String? tipoTra;
   final double? diametro;
   final double? diametro2;
@@ -25,6 +26,7 @@ class SectionScheduled {
     this.diametro2,
     this.idTramo,
     this.ogcFid,
+    this.notFound,
     this.tipoTra,
     this.diametro,
     this.longitud,
@@ -45,6 +47,7 @@ class SectionScheduled {
     return SectionScheduled(
       ogcFid: json['ogcFid'] as int?,
       idTramo: json['idTramo'] as int?,
+      notFound: json['notFound'] as bool?,
       tipoTra: json['tipoTra'] as String?,
       diametro: json['diametro'] as double?,
       diametro2: json['diametro2'] as double?,
