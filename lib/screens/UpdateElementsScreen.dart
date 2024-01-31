@@ -127,11 +127,18 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
           shapeLoadViewModel.linesError.map<String>((error) {
         return error.toString();
       }).toList();
+      if (shapeLoadViewModel.result != null) {
+        geojsonFromFile = {};
+      }
       return LoadingOverlay(
         isLoading: false,
         child: Center(
             child: BoxContainer(
-                height: isMaxSize ? 800 : 460,
+                height: isMaxSize
+                    ? 800
+                    : errorFileUpload
+                        ? 480
+                        : 460,
                 width: 600,
                 padding: const EdgeInsets.all(24),
                 child: Column(
@@ -158,28 +165,28 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                               onPressed: (bool val) {
                                 updateSwitchSelection(0, val);
                               },
-                              text: 'Tramos',
+                              text: appLocalizations.sections,
                             ),
                             CustomSwitchButton(
                               value: options[1]!,
                               onPressed: (bool val) {
                                 updateSwitchSelection(1, val);
                               },
-                              text: 'Captaciones',
+                              text: appLocalizations.catchments,
                             ),
                             CustomSwitchButton(
                               value: options[2]!,
                               onPressed: (bool val) {
                                 updateSwitchSelection(2, val);
                               },
-                              text: 'Registros',
+                              text: appLocalizations.registers,
                             ),
                             CustomSwitchButton(
                               value: options[3]!,
                               onPressed: (bool val) {
                                 updateSwitchSelection(3, val);
                               },
-                              text: 'Parcelas',
+                              text: appLocalizations.lots,
                             ),
                           ],
                         )),
@@ -233,16 +240,16 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                     Visibility(
                       visible: !isPreparing && !shapeLoadViewModel.processing,
                       child: CustomElevatedButton(
-                          text: 'Iniciar',
+                          text: appLocalizations.shape_load_process_button,
                           onPressed: () async {
+                            setState(() {
+                              shapeLoadViewModel.reset();
+                            });
                             if (geojsonFromFile.isEmpty) {
                               setState(() {
                                 errorFileUpload = true;
                               });
                             } else {
-                              setState(() {
-                                shapeLoadViewModel.reset();
-                              });
                               await manageLoadZoneProcess();
                             }
                           }),
@@ -256,7 +263,11 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                         child: Column(
                           children: [
                             Text(
-                              'Procesando',
+                              isPreparing
+                                  ? appLocalizations.shape_load_init
+                                  : shapeLoadViewModel.processing
+                                      ? appLocalizations.shape_load_proccesing
+                                      : appLocalizations.shape_load_init,
                               style: const TextStyle(
                                 fontSize: 18,
                               ),
@@ -300,9 +311,9 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                       visible: shapeLoadViewModel.result ?? false,
                       child: Text(shapeLoadViewModel.result ?? false
                           ? shapeLoadViewModel.linesError.isEmpty
-                              ? 'FINALIZADO OK'
-                              : 'FINALIZADO CON ERRORES'
-                          : 'FINALIZADO CON ERROR'),
+                              ? appLocalizations.shape_laod_success
+                              : appLocalizations.shape_laod_with_errors
+                          : appLocalizations.shape_laod_with_errors),
                     ),
                     if (isMaxSize) const SizedBox(height: 24),
                     Visibility(
@@ -313,15 +324,27 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                           color: lightBackground,
                         ),
                         height: 200,
-                        width: widthContent,
+                        width: widthContent - 120,
                         child: ListView.builder(
                           itemCount: errorsLines.length,
                           itemBuilder: (context, index) {
-                            return ListTile(
-                              textColor: Colors.black87,
-                              title: Text(errorsLines[index],
+                            return Container(
+                              margin: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.045),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: ListTile(
+                                iconColor: Colors.red,
+                                leading:
+                                    const Icon(Icons.error, color: Colors.red),
+                                textColor: Colors.black87,
+                                title: Text(
+                                  errorsLines[index],
                                   style: const TextStyle(
-                                      color: Colors.black87, fontSize: 12)),
+                                      color: Colors.black87, fontSize: 12),
+                                ),
+                              ),
                             );
                           },
                         ),

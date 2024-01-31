@@ -12,6 +12,7 @@ enum SocketConnectionStatus { connecting, connected, disconnected }
 class ShapeLoadViewModel extends ChangeNotifier {
   late WebSocketService _socketService;
   static const String proccesIsAlreadyRunning = "Process is already running";
+  static const String processType = "ENTITIES_CHARGE";
   SocketConnectionStatus _connectionStatus = SocketConnectionStatus.connecting;
 
   SocketConnectionStatus get connectionStatus => _connectionStatus;
@@ -73,6 +74,8 @@ class ShapeLoadViewModel extends ChangeNotifier {
 
   List<dynamic> get linesError => _linesError;
 
+  List<dynamic>? _linesProcess = [];
+
   void initWS() {
     _socketService = WebSocketService(
       onMessage: (message) {
@@ -93,27 +96,25 @@ class ShapeLoadViewModel extends ChangeNotifier {
     required ElementType elementType,
   }) {
     Map<String, Object?> message = {
-      'type': 'ENTITIES_CHARGE',
+      'type': processType,
       'token': _token,
     };
 
+    _linesProcess = _getSublist(_linesData, _elementsProcessed);
+    message['entityType'] = _elementType!.pluralName;
+
     switch (_elementType!.type) {
       case 'T':
-        message['entityType'] = 'TRAMOS';
-        message['linesTramos'] = _getSublist(_linesData, _elementsProcessed);
+        message['linesTramos'] = _linesProcess;
         break;
       case 'R':
-        message['entityType'] = 'REGISTROS';
-        message['linesRegistros'] = _getSublist(_linesData, _elementsProcessed);
+        message['linesRegistros'] = _linesProcess;
         break;
       case 'C':
-        message['entityType'] = 'CAPTACIONES';
-        message['linesCaptaciones'] =
-            _getSublist(_linesData, _elementsProcessed);
+        message['linesCaptaciones'] = _linesProcess;
         break;
       case 'P':
-        message['entityType'] = 'PARCELAS';
-        message['linesParcelas'] = _getSublist(_linesData, _elementsProcessed);
+        message['linesParcelas'] = _linesProcess;
         break;
     }
 
@@ -131,7 +132,7 @@ class ShapeLoadViewModel extends ChangeNotifier {
     _token = token ?? _token;
 
     _linesData =
-        (linesTramos ?? linesRegistros ?? linesCaptaciones ?? linesParcelas)!;
+    (linesTramos ?? linesRegistros ?? linesCaptaciones ?? linesParcelas)!;
 
     if (linesTramos != null) {
       _elementType = ElementType.section;
@@ -202,7 +203,7 @@ class ShapeLoadViewModel extends ChangeNotifier {
 
   void _handleWebSocketMessage(String message) {
     WebSocketResponseShapeLoad webSocketResponseShapeLoad =
-        WebSocketResponseShapeLoad.fromJson(json.decode(message));
+    WebSocketResponseShapeLoad.fromJson(json.decode(message));
 
     switch (webSocketResponseShapeLoad.status) {
       case StatusProcess.STARTING:
@@ -211,14 +212,15 @@ class ShapeLoadViewModel extends ChangeNotifier {
         _processAlreadyRunning = false;
         break;
       case StatusProcess.ERROR:
-        int prevProcessed = _elementsProcessed;
+      //int prevProcessed = _elementsProcessed;
         if (_linesData.length - _elementsProcessed < _blockMaxSize) {
           _elementsProcessed += _lastBlock;
         } else {
           _elementsProcessed += _blockMaxSize;
         }
-        _linesError
-            .addAll(_linesData.sublist(prevProcessed, _elementsProcessed));
+
+        _linesError.addAll(webSocketResponseShapeLoad.errorIds!);
+
         _percent = calculatePercentLoad();
         if (_elementsProcessed < _linesData.length) {
           sendMessage(elementType: _elementType!);

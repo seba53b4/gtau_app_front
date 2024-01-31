@@ -6,12 +6,16 @@ class WebSocketResponseShapeLoad {
   bool result;
   String? message;
   String entityType;
+  List<String>? errorIds;
+  String? detail;
 
   WebSocketResponseShapeLoad({
     this.type,
     required this.status,
     required this.result,
     this.message,
+    this.detail,
+    this.errorIds,
     required this.entityType,
   });
 
@@ -22,6 +26,12 @@ class WebSocketResponseShapeLoad {
       result: json['result'],
       message: json['message'],
       entityType: json['entityType'],
+      errorIds: json['errorIds'] != null
+          ? (json['errorIds'] as List)
+              .map((dynamic id) => id.toString())
+              .toList()
+          : null,
+      detail: json['detail'],
     );
   }
 
