@@ -5,7 +5,7 @@ import 'package:gtau_app_front/models/enums/element_type.dart';
 
 import '../models/scheduled/response_websocket_shape_load.dart';
 import '../models/scheduled/response_websocket_zone_load.dart';
-import '../services/zone_websocket_service.dart';
+import '../services/websocket_service.dart';
 
 enum SocketConnectionStatus { connecting, connected, disconnected }
 

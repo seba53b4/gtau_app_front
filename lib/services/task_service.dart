@@ -1,12 +1,13 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as p;
+
+import '../utils/common_utils.dart';
 
 class TaskService {
   final String baseUrl;
@@ -21,11 +22,11 @@ class TaskService {
     };
   }
 
-  Future<List<Task>?> getTasks(String token, String user, int page, int size,
-      String status) async {
+  Future<List<Task>?> getTasks(
+      String token, String user, int page, int size, String status) async {
     try {
       String userByType =
-      dotenv.get('BY_USER_N_TYPE_URL', fallback: 'NOT_FOUND');
+          dotenv.get('BY_USER_N_TYPE_URL', fallback: 'NOT_FOUND');
       final url = Uri.parse(
           '$baseUrl/$userByType?page=$page&size=$size&user=$user&status=$status');
       final response = await http.get(url, headers: _getHeaders(token));
@@ -33,13 +34,12 @@ class TaskService {
       if (response.statusCode == 200) {
         return parseTaskListResponse(response);
       } else {
-        print('Error getTasks re null');
+        printOnDebug('Error getTasks re null');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in getTasks: $error');
-      }
+      printOnDebug('Error in getTasks: $error');
+
       rethrow;
     }
   }
@@ -74,9 +74,7 @@ class TaskService {
       final response = await http.delete(url, headers: _getHeaders(token));
       return response.statusCode == 204;
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in deleteTask: $error');
-      }
+      printOnDebug('Error in deleteTask: $error');
       rethrow;
     }
   }
@@ -113,15 +111,11 @@ class TaskService {
                 ? LatLng(position['latitud'], position['longitud'])
                 : const LatLng(0, 0));
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in fetchTask: $error');
-      }
+      printOnDebug('Error in fetchTask: $error');
       rethrow;
     }
   }
@@ -132,69 +126,60 @@ class TaskService {
       final response = await http.get(url, headers: _getHeaders(token));
       if (response.statusCode == 200) {
         List<dynamic> decode = json.decode(response.body) as List<dynamic>;
-        List<String> newList = await decode.map((e) => e["image"].toString())
-            .toList();
+        List<String> newList =
+            await decode.map((e) => e["image"].toString()).toList();
         await new Future.delayed(
             Duration(seconds: 1)); /*Simulamos el delay de una lenta conexion*/
         return await newList;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return [];
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in fetchTaskImages: $error');
-      }
+      printOnDebug('Error in fetchTaskImages: $error');
       rethrow;
     }
   }
 
-  Future<List<String>> fetchTaskImagesWithDelay(token, int idTask,
-      int delaysec) async {
+  Future<List<String>> fetchTaskImagesWithDelay(
+      token, int idTask, int delaysec) async {
     try {
       final url = Uri.parse('$baseUrl/$idTask/images');
       final response = await http.get(url, headers: _getHeaders(token));
       if (response.statusCode == 200) {
         List<dynamic> decode = json.decode(response.body) as List<dynamic>;
-        List<String> newList = await decode.map((e) => e["image"].toString())
-            .toList();
+        List<String> newList =
+            await decode.map((e) => e["image"].toString()).toList();
         await new Future.delayed(Duration(
             seconds: delaysec)); /*Simulamos el delay de una lenta conexion*/
         return await newList;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return [];
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in fetchTaskImages: $error');
-      }
+      printOnDebug('Error in fetchTaskImages: $error');
       rethrow;
     }
   }
 
-  Future<bool> updateTask(String token, int idTask,
-      Map<String, dynamic> body) async {
+  Future<bool> updateTask(
+      String token, int idTask, Map<String, dynamic> body) async {
     try {
       final url = Uri.parse('$baseUrl/$idTask');
       final String jsonBody = jsonEncode(body);
       final response =
-      await http.put(url, headers: _getHeaders(token), body: jsonBody);
+          await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
-        print('Tarea ha sido actualizada correctamente');
+        printOnDebug('Tarea ha sido actualizada correctamente');
         return true;
       } else {
-        print('Error en update de tarea');
+        printOnDebug('Error en update de tarea');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in updateTask: $error');
-      }
+      printOnDebug('Error in updateTask: $error');
+
       rethrow;
     }
   }
@@ -204,25 +189,24 @@ class TaskService {
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse(baseUrl);
       final response =
-      await http.post(url, headers: _getHeaders(token), body: jsonBody);
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 201) {
-        print('Tarea ha sido creada correctamente');
+        printOnDebug('Tarea ha sido creada correctamente');
         return true;
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in createTask: $error');
-      }
+      printOnDebug('Error in createTask: $error');
+
       rethrow;
     }
   }
 
-  Future<List<String>?> putBase64Images(String token, int id,
-      String path) async {
+  Future<List<String>?> putBase64Images(
+      String token, int id, String path) async {
     try {
       Uri uri = Uri.parse(path);
       String basename = p.basename(uri.path);
@@ -239,7 +223,7 @@ class TaskService {
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse('$baseUrl/$id/image/v2');
       final response =
-      await http.post(url, headers: _getHeaders(token), body: jsonBody);
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -248,16 +232,14 @@ class TaskService {
         var id = jsonResponse['inspectionTaskId'];
 
         return jsonResponse.entries.map<String>((entry) {
-          return "${entry.key}: ${entry
-              .value}"; //Agrego esto por aca solo para que no salte error
+          return "${entry.key}: ${entry.value}"; //Agrego esto por aca solo para que no salte error
         }).toList();
       } else {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al guardar imagenes: $error');
-      }
+      printOnDebug('Error al guardar imagenes: $error');
+
       rethrow;
     }
   }
@@ -266,9 +248,7 @@ class TaskService {
     final response = await http.get(Uri.parse(imageUrl));
     if (response.statusCode == 200) {
       String content = response.headers['content-type'].toString();
-      String ext = content
-          .split('/')
-          .last;
+      String ext = content.split('/').last;
       final List<int> imageBytes = response.bodyBytes;
       final String base64String = base64Encode(imageBytes);
       return {
@@ -290,27 +270,23 @@ class TaskService {
           contentType: MediaType('image', 'jpg')));
       var response = await request.send();
 
-
       return response.statusCode == 200;
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al guardar imagenes: $error');
-      }
+      printOnDebug('Error al guardar imagenes: $error');
+
       rethrow;
     }
   }
 
   Future<bool> deleteTaskImage(String token, int id, String path) async {
     try {
-      var fileName = path
-          .split("/")
-          .last;
+      var fileName = path.split("/").last;
       final Map<String, dynamic> body = {"name": fileName};
 
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse('$baseUrl/$id/image');
       final response =
-      await http.delete(url, headers: _getHeaders(token), body: jsonBody);
+          await http.delete(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 200) {
         final bool jsonResponse = json.decode(response.body);
@@ -320,31 +296,29 @@ class TaskService {
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al guardar imagenes: $error');
-      }
+      printOnDebug('Error al guardar imagenes: $error');
+
       rethrow;
     }
   }
 
-  Future<List<Task>?> searchTasks(String token, Map<String, dynamic> body,
-      int page, int size) async {
+  Future<List<Task>?> searchTasks(
+      String token, Map<String, dynamic> body, int page, int size) async {
     try {
       final url = Uri.parse('$baseUrl/search?page=$page&size=$size');
       final String jsonBody = jsonEncode(body);
       final response =
-      await http.post(url, headers: _getHeaders(token), body: jsonBody);
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 200) {
         return parseTaskListResponse(response);
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in createTask: $error');
-      }
+      printOnDebug('Error in createTask: $error');
+
       rethrow;
     }
   }
@@ -389,20 +363,17 @@ class TaskService {
         List<dynamic> decode = json.decode(response.body) as List<dynamic>;
         return decode.map((e) => e["informe"].toString()).toList();
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return [];
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in fetchTaskInformes: $error');
-      }
+      printOnDebug('Error in fetchTaskInformes: $error');
       rethrow;
     }
   }
 
-  Future<String> putBase64Informes(String token, int id, Map<String, dynamic> informe) async {
+  Future<String> putBase64Informes(
+      String token, int id, Map<String, dynamic> informe) async {
     try {
       // Uri uri = Uri.parse(path);
       // String basename = p.basename(uri.path);
@@ -418,7 +389,8 @@ class TaskService {
 
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse('$baseUrl/$id/informe/v2');
-      final response = await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      final response =
+          await http.post(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         //Cuando ingresa a la galeria la imagen se renderiza de todas formas, no es necesario hacer nada aca.
@@ -428,9 +400,8 @@ class TaskService {
         return '';
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al guardar informes: $error');
-      }
+      printOnDebug('Error al guardar informes: $error');
+
       rethrow;
     }
   }
@@ -452,11 +423,8 @@ class TaskService {
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al borrar informe: $error');
-      }
+      printOnDebug('Error al borrar informe: $error');
       rethrow;
     }
   }
-
 }

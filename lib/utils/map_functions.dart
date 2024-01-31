@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../constants/theme_constants.dart';
+import 'common_utils.dart';
 
 double calculateDistance(LatLng point1, LatLng point2) {
   final double dx = point1.latitude - point2.latitude;
@@ -81,9 +81,7 @@ Set<Polyline> polylineArrows(List<LatLng> points, PolylineId polylineId) {
       points: [midPoint, sidePoint2],
     ));
   } catch (error) {
-    if (kDebugMode) {
-      print(error);
-    }
+    printOnDebug(error);
   }
 
   return ret;

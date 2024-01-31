@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:gtau_app_front/services/task_service.dart';
 
+import '../utils/common_utils.dart';
 import '../widgets/image_gallery_modal.dart';
 
 class ImagesViewModel extends ChangeNotifier {
@@ -31,15 +32,13 @@ class ImagesViewModel extends ChangeNotifier {
       _isLoading = true;
       _error = false;
       final List<String> responseTask =
-      await _taskService.fetchTaskImages(token, idTask);
+          await _taskService.fetchTaskImages(token, idTask);
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
       } else {
         _photos = [];
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
       }
 
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
@@ -50,9 +49,7 @@ class ImagesViewModel extends ChangeNotifier {
       return responseTask;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     }
   }
@@ -85,11 +82,10 @@ class ImagesViewModel extends ChangeNotifier {
         }
       } else {
         final resultprocess =
-        await _taskService.putMultipartImages(token, id, path);
+            await _taskService.putMultipartImages(token, id, path);
         result = result && resultprocess;
       }
     }
-    print('jajxd');
     /*await new Future.delayed(const Duration(seconds: 2));*/
     _isLoading = false;
     notifyListeners();
@@ -106,9 +102,7 @@ class ImagesViewModel extends ChangeNotifier {
 
       if (!response) {
         _error = true;
-        if (kDebugMode) {
-          print('Error al eliminar la imagen');
-        }
+        printOnDebug('Error al eliminar la imagen');
       }
 
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
@@ -120,9 +114,8 @@ class ImagesViewModel extends ChangeNotifier {
       return response;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
+
       throw Exception('Error al eliminar imagen');
     }
   }

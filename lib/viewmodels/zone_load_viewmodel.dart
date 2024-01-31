@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../models/scheduled/response_websocket_zone_load.dart';
-import '../services/zone_websocket_service.dart';
+import '../services/websocket_service.dart';
 
 enum SocketConnectionStatus { connecting, connected, disconnected }
 
