@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:gtau_app_front/models/enums/checkbox_state_patologias.dart';
+import 'package:gtau_app_front/models/enums/element_type.dart';
 import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/custom_textfield.dart';
@@ -18,6 +19,7 @@ import '../../models/scheduled/element_found.dart';
 import '../../providers/user_provider.dart';
 import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
+import '../scheduled_image_gallery_modal.dart';
 import 'chip_registered_element.dart';
 import 'container_divider.dart';
 import 'container_scheduled_info.dart';
@@ -537,6 +539,26 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
                         ),
                       ]),
                       // Patologías - END
+                      const SizedBox(height: 10.0),
+                      ContainerBottomDivider(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.images_title,
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                ScheduledImageGalleryModal(
+                                    scheduledId: widget.scheduledId,
+                                    elementId: widget.sectionId,
+                                    elementType: ElementType.section),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 10.0),
                       ScheduledFormTitle(
                           titleText: AppLocalizations.of(context)!

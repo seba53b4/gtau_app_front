@@ -8,7 +8,6 @@ import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/catchment_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
-import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
@@ -39,7 +38,7 @@ import '../widgets/common/custom_toggle_buttons.dart';
 import '../widgets/common/inspection_location_select.dart';
 import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
-import '../widgets/image_gallery_modal.dart';
+import '../widgets/task_image_gallery_modal.dart';
 
 class TaskCreationScreen extends StatefulWidget {
   var type = 'inspection';
@@ -630,187 +629,215 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             const SizedBox(height: 24.0),
                             // Primera fila
                             FutureBuilder<List<String>>(
-                              future: _listUserNames(), // a previously-obtained Future<String> or null
-                              builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-                                if (snapshot.hasData) {
-                                  if(snapshot.data!.contains(userAssigned)== false){
-                                    Future.delayed(Duration.zero, () => showCustomMessageDialog(
-                                      context: context,
-                                      customText: AppLocalizations.of(context)!.listuser_user_notfound,
-                                      onAcceptPressed: () {},
-                                      messageType: DialogMessageType.error,
-                                    ));
+                                future: _listUserNames(),
+                                // a previously-obtained Future<String> or null
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<List<String>> snapshot) {
+                                  if (snapshot.hasData) {
+                                    if (snapshot.data!.contains(userAssigned) ==
+                                        false) {
+                                      Future.delayed(
+                                          Duration.zero,
+                                          () => showCustomMessageDialog(
+                                                context: context,
+                                                customText: AppLocalizations.of(
+                                                        context)!
+                                                    .listuser_user_notfound,
+                                                onAcceptPressed: () {},
+                                                messageType:
+                                                    DialogMessageType.error,
+                                              ));
+                                    }
+                                    return SizedBox(
+                                      height: heightRow,
+                                      width: widthRow,
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                Text(
+                                                  AppLocalizations.of(context)!
+                                                      .createTaskPage_numberWorkTitle,
+                                                  style: const TextStyle(
+                                                      fontSize: 16.0),
+                                                ),
+                                                const SizedBox(
+                                                    height: AppConstants
+                                                        .taskColumnSpace),
+                                                CustomTextFormField(
+                                                  readOnly: widget.detail,
+                                                  hintText: AppLocalizations.of(
+                                                          context)!
+                                                      .createTaskPage_numberWorkTitle,
+                                                  controller: numWorkController,
+                                                  textInputType:
+                                                      TextInputType.number,
+                                                ),
+                                              ],
+                                            ),
+                                            Column(
+                                              children: [
+                                                const SizedBox(
+                                                    width: AppConstants
+                                                        .taskRowSpace),
+                                                Column(
+                                                  children: [
+                                                    Text(
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .createTaskPage_assignedUserTitle,
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 12.0),
+                                                    CustomDropdown(
+                                                      value: (snapshot.data!
+                                                                  .contains(
+                                                                      userAssigned) ==
+                                                              true)
+                                                          ? userAssigned
+                                                          : notAssigned,
+                                                      items: snapshot.data!,
+                                                      onChanged:
+                                                          (String? value) {
+                                                        setState(() {
+                                                          userAssigned = value!;
+                                                        });
+                                                      },
+                                                    ),
+                                                    const SizedBox(
+                                                        height: AppConstants
+                                                            .taskColumnSpace),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Column(children: [
+                                              Text(
+                                                AppLocalizations.of(context)!
+                                                    .editTaskPage_statusTitle,
+                                                style: const TextStyle(
+                                                    fontSize: 16.0),
+                                              ),
+                                              const SizedBox(height: 12.0),
+                                              CustomDropdown(
+                                                isStatus: true,
+                                                value: taskStatus,
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    taskStatus = value!;
+                                                  });
+                                                },
+                                                items: TaskStatus.values
+                                                    .map((status) =>
+                                                        status.value)
+                                                    .toList(),
+                                              ),
+                                              const SizedBox(
+                                                  height: AppConstants
+                                                      .taskColumnSpace),
+                                            ]),
+                                          ]),
+                                    );
+                                  } else {
+                                    return SizedBox(
+                                      height: heightRow,
+                                      width: widthRow,
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                Text(
+                                                  AppLocalizations.of(context)!
+                                                      .createTaskPage_numberWorkTitle,
+                                                  style: const TextStyle(
+                                                      fontSize: 16.0),
+                                                ),
+                                                const SizedBox(
+                                                    height: AppConstants
+                                                        .taskColumnSpace),
+                                                CustomTextFormField(
+                                                  readOnly: widget.detail,
+                                                  hintText: AppLocalizations.of(
+                                                          context)!
+                                                      .createTaskPage_numberWorkTitle,
+                                                  controller: numWorkController,
+                                                  textInputType:
+                                                      TextInputType.number,
+                                                ),
+                                              ],
+                                            ),
+                                            Column(
+                                              children: [
+                                                const SizedBox(
+                                                    width: AppConstants
+                                                        .taskRowSpace),
+                                                Column(
+                                                  children: [
+                                                    Text(
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .createTaskPage_assignedUserTitle,
+                                                      style: const TextStyle(
+                                                          fontSize: 16.0),
+                                                    ),
+                                                    const SizedBox(
+                                                        height: 12.0),
+                                                    CustomDropdown(
+                                                      value: notAssigned,
+                                                      items: [notAssigned],
+                                                      onChanged:
+                                                          (String? value) {
+                                                        setState(() {
+                                                          userAssigned = value!;
+                                                        });
+                                                      },
+                                                    ),
+                                                    const SizedBox(
+                                                        height: AppConstants
+                                                            .taskColumnSpace),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Column(children: [
+                                              Text(
+                                                AppLocalizations.of(context)!
+                                                    .editTaskPage_statusTitle,
+                                                style: const TextStyle(
+                                                    fontSize: 16.0),
+                                              ),
+                                              const SizedBox(height: 12.0),
+                                              CustomDropdown(
+                                                isStatus: true,
+                                                value: taskStatus,
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    taskStatus = value!;
+                                                  });
+                                                },
+                                                items: TaskStatus.values
+                                                    .map((status) =>
+                                                        status.value)
+                                                    .toList(),
+                                              ),
+                                              const SizedBox(
+                                                  height: AppConstants
+                                                      .taskColumnSpace),
+                                            ]),
+                                          ]),
+                                    );
                                   }
-                                  return SizedBox(
-                                  height: heightRow,
-                                  width: widthRow,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              style:
-                                                  const TextStyle(fontSize: 16.0),
-                                            ),
-                                            const SizedBox(
-                                                height:
-                                                    AppConstants.taskColumnSpace),
-                                            CustomTextFormField(
-                                              readOnly: widget.detail,
-                                              hintText: AppLocalizations.of(
-                                                      context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              controller: numWorkController,
-                                              textInputType: TextInputType.number,
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            const SizedBox(
-                                                width: AppConstants.taskRowSpace),
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!
-                                                      .createTaskPage_assignedUserTitle,
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0),
-                                                ),
-                                                const SizedBox(height: 12.0),
-                                                CustomDropdown(
-                                                        value: (snapshot.data!.contains(userAssigned)== true) ? userAssigned : notAssigned,
-                                                        items: snapshot.data!,
-                                                        onChanged: (String? value) {
-                                                          setState(() {
-                                                            userAssigned = value!;
-                                                          });
-                                                        },
-                                                      ),
-                                                
-                                                const SizedBox(
-                                                    height: AppConstants
-                                                        .taskColumnSpace),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        Column(children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .editTaskPage_statusTitle,
-                                            style: const TextStyle(fontSize: 16.0),
-                                          ),
-                                          const SizedBox(height: 12.0),
-                                          CustomDropdown(
-                                            isStatus: true,
-                                            value: taskStatus,
-                                            onChanged: (String? value) {
-                                              setState(() {
-                                                taskStatus = value!;
-                                              });
-                                            },
-                                            items: TaskStatus.values
-                                                .map((status) => status.value)
-                                                .toList(),
-                                          ),
-                                          const SizedBox(
-                                              height: AppConstants.taskColumnSpace),
-                                        ]),
-                                      ]),
-                                );
-                                }else{
-                                  return SizedBox(
-                                  height: heightRow,
-                                  width: widthRow,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              style:
-                                                  const TextStyle(fontSize: 16.0),
-                                            ),
-                                            const SizedBox(
-                                                height:
-                                                    AppConstants.taskColumnSpace),
-                                            CustomTextFormField(
-                                              readOnly: widget.detail,
-                                              hintText: AppLocalizations.of(
-                                                      context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              controller: numWorkController,
-                                              textInputType: TextInputType.number,
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            const SizedBox(
-                                                width: AppConstants.taskRowSpace),
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!
-                                                      .createTaskPage_assignedUserTitle,
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0),
-                                                ),
-                                                const SizedBox(height: 12.0),
-                                                CustomDropdown(
-                                                        value: notAssigned,
-                                                        items: [notAssigned],
-                                                        onChanged: (String? value) {
-                                                          setState(() {
-                                                            userAssigned = value!;
-                                                          });
-                                                        },
-                                                      ),
-                                                
-                                                const SizedBox(
-                                                    height: AppConstants
-                                                        .taskColumnSpace),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        Column(children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .editTaskPage_statusTitle,
-                                            style: const TextStyle(fontSize: 16.0),
-                                          ),
-                                          const SizedBox(height: 12.0),
-                                          CustomDropdown(
-                                            isStatus: true,
-                                            value: taskStatus,
-                                            onChanged: (String? value) {
-                                              setState(() {
-                                                taskStatus = value!;
-                                              });
-                                            },
-                                            items: TaskStatus.values
-                                                .map((status) => status.value)
-                                                .toList(),
-                                          ),
-                                          const SizedBox(
-                                              height: AppConstants.taskColumnSpace),
-                                        ]),
-                                      ]),
-                                );
-                                }
-                            }
-                            ),
+                                }),
                             // Segunda fila
                             SizedBox(
                               height: heightRow,
@@ -1062,47 +1089,60 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                         ),
                                         const SizedBox(height: 12.0),
                                         FutureBuilder<List<String>>(
-                                          future: _listUserNames(), // a previously-obtained Future<String> or null
-                                          builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-                                            if (snapshot.hasData) {
-                                              if(snapshot.data!.contains(userAssigned)== false){
-                                                Future.delayed(Duration.zero, () => showCustomMessageDialog(
-                                                  context: context,
-                                                  customText: AppLocalizations.of(context)!.listuser_user_notfound,
-                                                  onAcceptPressed: () {},
-                                                  messageType: DialogMessageType.error,
-                                                ));
+                                            future: _listUserNames(),
+                                            // a previously-obtained Future<String> or null
+                                            builder: (BuildContext context,
+                                                AsyncSnapshot<List<String>>
+                                                    snapshot) {
+                                              if (snapshot.hasData) {
+                                                if (snapshot.data!.contains(
+                                                        userAssigned) ==
+                                                    false) {
+                                                  Future.delayed(
+                                                      Duration.zero,
+                                                      () =>
+                                                          showCustomMessageDialog(
+                                                            context: context,
+                                                            customText:
+                                                                AppLocalizations.of(
+                                                                        context)!
+                                                                    .listuser_user_notfound,
+                                                            onAcceptPressed:
+                                                                () {},
+                                                            messageType:
+                                                                DialogMessageType
+                                                                    .error,
+                                                          ));
+                                                }
+                                                return CustomDropdown(
+                                                    width: 148,
+                                                    //height: 54,
+                                                    fontSize: 12,
+                                                    value: (snapshot.data!.contains(
+                                                                userAssigned) ==
+                                                            true)
+                                                        ? userAssigned
+                                                        : notAssigned,
+                                                    items: snapshot.data!,
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        userAssigned = value!;
+                                                      });
+                                                    });
+                                              } else {
+                                                return CustomDropdown(
+                                                    width: 148,
+                                                    //height: 54,
+                                                    fontSize: 12,
+                                                    value: notAssigned,
+                                                    items: [notAssigned],
+                                                    onChanged: (String? value) {
+                                                      setState(() {
+                                                        userAssigned = value!;
+                                                      });
+                                                    });
                                               }
-                                              return CustomDropdown(
-                                                width: 148,
-                                                //height: 54,
-                                                fontSize: 12,
-                                                value: (snapshot.data!.contains(userAssigned)== true) ? userAssigned : notAssigned,
-                                                items: snapshot.data!,
-                                                onChanged: (String? value) {
-                                                  setState(() {
-                                                    userAssigned = value!;
-                                                  }
-                                                  );
-                                                }
-                                              );
-                                            }else{
-                                              return CustomDropdown(
-                                                width: 148,
-                                                //height: 54,
-                                                fontSize: 12,
-                                                value: notAssigned,
-                                                items: [notAssigned],
-                                                onChanged: (String? value) {
-                                                  setState(() {
-                                                    userAssigned = value!;
-                                                  }
-                                                  );
-                                                }
-                                              );
-                                            }
-                                          }
-                                        ),
+                                            }),
                                         const SizedBox(
                                             width:
                                                 AppConstants.taskColumnSpace),
@@ -1455,7 +1495,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             width: widthRow,
                             child: Column(
                               children: [
-                                ImageGalleryModal(idTask: widget.idTask!),
+                                TaskImageGalleryModal(idTask: widget.idTask!),
                               ],
                             ),
                           ),
