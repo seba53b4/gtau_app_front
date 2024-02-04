@@ -32,7 +32,7 @@ class ImagesViewModel extends ChangeNotifier {
       _isLoading = true;
       _error = false;
       final List<String> responseTask =
-      await _imagesService.fetchTaskImages(token, idTask);
+          await _imagesService.fetchTaskImages(token, idTask);
 
       if (responseTask.isNotEmpty) {
         _photos = parsePhotos(responseTask);
@@ -58,29 +58,30 @@ class ImagesViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<String>> fetchImagesScheduledElement(token, int scheduledId,
-      int elementId, ElementType elementType) async {
+  Future<List<String>> fetchImagesScheduledElement(
+      token, int scheduledId, int elementId, ElementType elementType) async {
     try {
       _isLoading = true;
       _error = false;
       final List<String> response =
-      await _imagesService.fetchImagesScheduledElement(
-          token, scheduledId, elementId, elementType);
+          await _imagesService.fetchImagesScheduledElement(
+              token, scheduledId, elementId, elementType);
 
       if (response.isNotEmpty) {
         _photos = parsePhotos(response);
       } else {
         _photos = [];
+
         if (kDebugMode) {
-          print('No se pudieron traer datos');
+          print('Imagenes vacío');
         }
       }
 
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
-      Future.microtask(() {
-        _isLoading = false;
-        notifyListeners();
-      });
+      // await Future.microtask(() {
+      //   _isLoading = false;
+      //   notifyListeners();
+      // });
       return response;
     } catch (error) {
       _error = true;
@@ -88,6 +89,9 @@ class ImagesViewModel extends ChangeNotifier {
         print(error);
       }
       throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -136,22 +140,23 @@ class ImagesViewModel extends ChangeNotifier {
         }
       } else {
         final resultprocess =
-        await _imagesService.putMultipartImages(token, id, path);
+            await _imagesService.putMultipartImages(token, id, path);
         result = result && resultprocess;
       }
     }
-    print('jajxd');
     /*await new Future.delayed(const Duration(seconds: 2));*/
     _isLoading = false;
     notifyListeners();
     return result;
   }
 
-  Future<bool> scheduledUploadImages(String token,
-      int scheduledId,
-      int elementId,
-      List<String> listpath,
-      ElementType elementType,) async {
+  Future<bool> scheduledUploadImages(
+    String token,
+    int scheduledId,
+    int elementId,
+    List<String> listpath,
+    ElementType elementType,
+  ) async {
     _isLoading = true;
     bool result = true;
     notifyListeners();
@@ -182,7 +187,7 @@ class ImagesViewModel extends ChangeNotifier {
       notifyListeners();
 
       final bool response =
-      await _imagesService.deleteTaskImage(token, id, path);
+          await _imagesService.deleteTaskImage(token, id, path);
 
       if (!response) {
         _error = true;
@@ -207,15 +212,15 @@ class ImagesViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> deleteImageScheduled(String token, int scheduledId,
-      String path) async {
+  Future<bool> deleteImageScheduled(
+      String token, int scheduledId, String path) async {
     try {
       _isLoading = true;
       _error = false;
       notifyListeners();
 
-      final bool response =
-      await _imagesService.deleteTaskImageScheduled(token, scheduledId, path);
+      final bool response = await _imagesService.deleteTaskImageScheduled(
+          token, scheduledId, path);
 
       if (!response) {
         _error = true;
@@ -239,6 +244,4 @@ class ImagesViewModel extends ChangeNotifier {
       throw Exception('Error al eliminar imagen');
     }
   }
-
-
 }

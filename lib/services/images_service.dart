@@ -60,8 +60,8 @@ class ImagesService {
         List<dynamic> decode = json.decode(response.body) as List<dynamic>;
         List<String> newList =
             await decode.map((e) => e["image"].toString()).toList();
-        await new Future.delayed(
-            Duration(seconds: 1)); /*Simulamos el delay de una lenta conexion*/
+        // await Future.delayed(
+        //     Duration(seconds: 1)); /*Simulamos el delay de una lenta conexion*/
         return await newList;
       } else {
         if (kDebugMode) {
@@ -156,8 +156,8 @@ class ImagesService {
       final Map<String, dynamic> body = {
         "image": "$content,$base64",
         "name": "$basename.$extension",
-        "EntityTypeEnum": elementType.pluralName,
-        "Long": elementId
+        "type": elementType.pluralName,
+        "entityId": elementId
       };
 
       final String jsonBody = jsonEncode(body);
@@ -167,10 +167,6 @@ class ImagesService {
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        //Cuando ingresa a la galeria la imagen se renderiza de todas formas, no es necesario hacer nada aca.
-        var image = jsonResponse['image'];
-        var id = jsonResponse['inspectionTaskId'];
-
         return jsonResponse.entries.map<String>((entry) {
           return "${entry.key}: ${entry.value}"; //Agrego esto por aca solo para que no salte error
         }).toList();
