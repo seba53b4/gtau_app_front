@@ -160,7 +160,7 @@ class ImagesViewModel extends ChangeNotifier {
     _isLoading = true;
     bool result = true;
     notifyListeners();
-    for (var path in listpath!) {
+    for (var path in listpath) {
       if (kIsWeb) {
         final finalList = await _imagesService.putBase64ImagesScheduled(
             token, scheduledId, elementId, path, elementType);

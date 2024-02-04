@@ -41,6 +41,8 @@ class RegisterScheduled extends PointDataScheduled {
   factory RegisterScheduled.fromJson(
       {required Map<String, dynamic> json, bool isFetch = false}) {
     return RegisterScheduled(
+        ogcFid:
+            (json['ogcFid'] is num) ? (json['ogcFid'] as num).toInt() : null,
         tipoPto: json['tipo'] as String?,
         idRegistro: json['idRegistro'] as int?,
         notFound: json['notFound'] as bool?,
@@ -57,7 +59,6 @@ class RegisterScheduled extends PointDataScheduled {
             ? DateTime.parse(json['inspectionedDate'] as String)
             : null,
         username: json['username'] as String?,
-        ogcFid: json['ogcFid'] as int?,
         point: isFetch
             ? null
             : buildCircle(json, PointType.register, json['notFound'] ?? false));

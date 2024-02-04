@@ -45,7 +45,7 @@ class SectionScheduled {
   factory SectionScheduled.fromJson(
       {required Map<String, dynamic> json, bool isFetch = false}) {
     return SectionScheduled(
-      ogcFid: json['ogcFid'] as int?,
+      ogcFid: (json['ogcFid'] is num) ? (json['ogcFid'] as num).toInt() : null,
       idTramo: json['idTramo'] as int?,
       notFound: json['notFound'] as bool?,
       tipoTra: json['tipoTra'] as String?,
