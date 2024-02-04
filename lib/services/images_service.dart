@@ -220,8 +220,8 @@ class ImagesService {
       int elementId, String path, ElementType elementType) async {
     try {
       final params = {
-        'entity_type': elementType.pluralName,
-        'entity_id': elementId
+        'entity_type': '${elementType.pluralName}',
+        'entity_id': '$elementId'
       };
       final query = Uri(queryParameters: params).query;
       final url = Uri.parse('$baseUrlScheduled/$scheduledId/image?$query');
