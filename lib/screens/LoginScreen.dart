@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gtau_app_front/models/auth_data.dart';
 import 'package:gtau_app_front/models/user_info.dart';
 import 'package:gtau_app_front/models/user_state.dart';
@@ -10,6 +11,7 @@ import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
@@ -169,58 +171,122 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Consumer<AuthViewModel>(builder: (context, authviewModel, child) {
       bool isLoading = authviewModel.isLoading;
-
-      return Scaffold(
-        body: Container(
-          color: const Color.fromRGBO(253, 255, 252, 1),
-          child: Center(
-            child: BoxContainer(
-              width: kIsWeb ? 400 : 340,
-              height: kIsWeb ? 400 : 360,
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(AppLocalizations.of(context)!.titleApp),
-                  const SizedBox(height: 24.0),
-                  CustomTextField(
-                    controller: usernameController,
-                    hintText: AppLocalizations.of(context)!
-                        .default_input_username_hint,
-                    keyboardType: TextInputType.text,
-                    obscureText: false,
-                    hasError: onError,
-                  ),
-                  CustomTextField(
-                    controller: passwordController,
-                    hintText: AppLocalizations.of(context)!
-                        .default_input_password_hint,
-                    keyboardType: TextInputType.text,
-                    obscureText: true,
-                    hasError: onError,
-                  ),
-                  const SizedBox(height: 16.0),
-                  CustomElevatedButton(
-                      showLoading: isLoading,
-                      onPressed: () {
-                        setState(() {
-                          onError = false;
-                        });
-                        onLogInPressed(context);
-                      },
-                      text: AppLocalizations.of(context)!.default_login_button),
-                  const SizedBox(height: kIsWeb ? 24 : 4),
-                  TextButton(
-                      onPressed: () => onForgotPressed(context),
-                      child: Text(AppLocalizations.of(context)!
-                          .default_forgot_password)),
-                ],
+      if(kIsWeb==true){
+        return Scaffold(
+          body: Container(
+            color: const Color.fromRGBO(253, 255, 252, 1),
+            child: Center(
+              child: BoxContainer(
+                width: kIsWeb ? 400 : 340,
+                height: kIsWeb ? 400 : 360,
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(AppLocalizations.of(context)!.titleApp),
+                    const SizedBox(height: 24.0),
+                    CustomTextField(
+                      controller: usernameController,
+                      hintText: AppLocalizations.of(context)!
+                          .default_input_username_hint,
+                      keyboardType: TextInputType.text,
+                      obscureText: false,
+                      hasError: onError,
+                    ),
+                    CustomTextField(
+                      controller: passwordController,
+                      hintText: AppLocalizations.of(context)!
+                          .default_input_password_hint,
+                      keyboardType: TextInputType.text,
+                      obscureText: true,
+                      hasError: onError,
+                    ),
+                    const SizedBox(height: 16.0),
+                    CustomElevatedButton(
+                        showLoading: isLoading,
+                        onPressed: () {
+                          setState(() {
+                            onError = false;
+                          });
+                          onLogInPressed(context);
+                        },
+                        text: AppLocalizations.of(context)!.default_login_button),
+                    const SizedBox(height: kIsWeb ? 24 : 4),
+                    TextButton(
+                        onPressed: () => onForgotPressed(context),
+                        child: Text(AppLocalizations.of(context)!
+                            .default_forgot_password)),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
+        );
+      }else{
+        return Scaffold(
+          body: Container(
+            color: const Color.fromRGBO(253, 255, 252, 1),
+            child: Center(
+              child: Container(
+                  padding: const EdgeInsets.all(8),
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'lib/assets/tunnel_logo_v3_letters.svg',
+                        width: 50,
+                        height: 50),
+                      const SizedBox(height: 24.0),
+                      CustomTextField(
+                        controller: usernameController,
+                        hintText: AppLocalizations.of(context)!
+                            .default_input_username_hint,
+                        keyboardType: TextInputType.text,
+                        obscureText: false,
+                        width: MediaQuery.of(context).size.width,
+                        hasError: onError,
+                      ),
+                      CustomTextField(
+                        controller: passwordController,
+                        hintText: AppLocalizations.of(context)!
+                            .default_input_password_hint,
+                        keyboardType: TextInputType.text,
+                        obscureText: true,
+                        width: MediaQuery.of(context).size.width,
+                        hasError: onError,
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        child: TextButton(
+                          onPressed: () => onForgotPressed(context),
+                          child: Text(AppLocalizations.of(context)!.default_forgot_password)),
+                      ),
+                      const SizedBox(height: kIsWeb ? 24 : 4),
+                      CustomElevatedButtonLength(
+                          width: 400,
+                          showLoading: isLoading,
+                          onPressed: () {
+                            setState(() {
+                              onError = false;
+                            });
+                            onLogInPressed(context);
+                          },
+                          text: AppLocalizations.of(context)!.default_login_button
+                      ),
+                    ],
+                  ),
+                ),
+              
+            ),
+          ),
+        );
+      }
+
+      
     });
   }
 }
