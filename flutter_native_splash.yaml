@@ -24,6 +24,7 @@ flutter_native_splash:
   # png file and should be sized for 4x pixel density.
   image: lib/assets/background_1.png
   android: true
+  ios: true
   web: false
 
   # The branding property allows you to specify an image used as branding in the splash screen.
@@ -58,8 +59,12 @@ flutter_native_splash:
     # 768 pixels in diameter.
     #image: assets/android12splash.png
 
+    image: lib/assets/tunnel_logo_v3_alone_scaled.png
+
     # Splash screen background color.
     color: "#4f981b"
+
+    icon_background_color: "#ffffff"
 
   # App icon background color.
   #icon_background_color: "#111111"
