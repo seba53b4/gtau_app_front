@@ -15,11 +15,13 @@ import 'package:gtau_app_front/widgets/common/top_status_scheduled.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
+import '../../models/enums/element_type.dart';
 import '../../models/scheduled/element_found.dart';
 import '../../providers/user_provider.dart';
 import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
 import '../loading_overlay.dart';
+import '../scheduled_image_gallery_modal.dart';
 import 'chip_registered_element.dart';
 import 'container_scheduled_info.dart';
 import 'customDialog.dart';
@@ -482,6 +484,26 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                           },
                         ),
                       ]),
+                      const SizedBox(height: 10.0),
+                      ContainerBottomDivider(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.images_title,
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                ScheduledImageGalleryModal(
+                                    scheduledId: widget.scheduledId,
+                                    elementId: widget.registerId,
+                                    elementType: ElementType.register),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       // Estado de la tapa - END
                       const SizedBox(height: 10.0),
                       ScheduledFormTitle(

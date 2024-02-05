@@ -43,7 +43,8 @@ class CatchmentScheduled extends PointDataScheduled {
   factory CatchmentScheduled.fromJson(
       {required Map<String, dynamic> json, bool isFetch = false}) {
     return CatchmentScheduled(
-        ogcFid: json['ogcFid'] as int?,
+        ogcFid:
+            (json['ogcFid'] is num) ? (json['ogcFid'] as num).toInt() : null,
         tipo: json['tipo'] as String?,
         notFound: json['notFound'] as bool?,
         idCaptacion: json['idCaptacion'] as int?,

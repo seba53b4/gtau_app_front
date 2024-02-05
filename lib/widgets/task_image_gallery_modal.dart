@@ -6,35 +6,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gallery_image_viewer/gallery_image_viewer.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/dto/image_data.dart';
 import 'package:gtau_app_front/widgets/common/customDialog.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/photo.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
 import '../viewmodels/images_viewmodel.dart';
 import 'common/custom_elevated_button.dart';
 
-class ImageGalleryModal extends StatefulWidget {
+class TaskImageGalleryModal extends StatefulWidget {
   final int? idTask;
 
-  const ImageGalleryModal({super.key, this.idTask});
+  const TaskImageGalleryModal({super.key, this.idTask});
 
   @override
-  State<ImageGalleryModal> createState() => _ImageGalleryModalState(idTask, []);
+  State<TaskImageGalleryModal> createState() =>
+      _TaskImageGalleryModalState(idTask, []);
 }
 
-class _ImageGalleryModalState extends State<ImageGalleryModal> {
+class _TaskImageGalleryModalState extends State<TaskImageGalleryModal> {
   int? idTask;
   List<Photo> photos;
 
-  _ImageGalleryModalState(this.idTask, this.photos);
+  _TaskImageGalleryModalState(this.idTask, this.photos);
 
   @override
   Widget build(BuildContext context) {
@@ -438,70 +437,6 @@ class _GelleryShowState extends State<_GelleryShow> {
     }
     return false;
   }
-}
-
-class Photo {
-  String url;
-  bool isSelected;
-
-  Photo({required this.url, this.isSelected = false});
-}
-
-class PhotoViewPage extends StatelessWidget {
-  final List<Photo> photos;
-  final int index;
-
-  const PhotoViewPage({
-    Key? key,
-    required this.photos,
-    required this.index,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: PhotoViewGallery.builder(
-        itemCount: photos.length,
-        builder: (context, index) => PhotoViewGalleryPageOptions.customChild(
-          child: CachedNetworkImage(
-            imageUrl: photos[index].url,
-            placeholder: (context, url) => Container(
-              color: softGrey,
-            ),
-            errorWidget: (context, url, error) => Container(
-              color: Colors.red.shade400,
-            ),
-          ),
-          minScale: PhotoViewComputedScale.covered,
-          heroAttributes: PhotoViewHeroAttributes(tag: photos[index]),
-        ),
-        pageController: PageController(initialPage: index),
-        enableRotation: true,
-      ),
-    );
-  }
-}
-
-class CustomImageProvider extends EasyImageProvider {
-  @override
-  final int initialIndex;
-  final List<String> imageUrls;
-
-  CustomImageProvider({required this.imageUrls, this.initialIndex = 0})
-      : super();
-
-  @override
-  ImageProvider<Object> imageBuilder(BuildContext context, int index) {
-    return NetworkImage(imageUrls[index]);
-  }
-
-  @override
-  int get imageCount => imageUrls.length;
 }
 
 Future<List<String>> _fetchTaskImages(BuildContext context, int idTask) async {
