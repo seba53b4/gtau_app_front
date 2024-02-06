@@ -144,7 +144,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
     double? latitude, longitude;
-    int radio = 200;
+    int? radio = kIsWeb ? null : 200;
     if (!kIsWeb) {
       latitude = location?.latitude;
       longitude = location?.longitude;
