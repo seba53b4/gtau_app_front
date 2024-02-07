@@ -29,10 +29,10 @@ class BackgroundGradient extends StatelessWidget {
           BoxDecoration(
             gradient: RadialGradient(
             center: Alignment.center,      
-            radius: 2.5,      
-            focalRadius: 2      ,
+            radius: 2,      
+            focalRadius: 2,
             // begin: Alignment.center,      
-            // end: Alignment.centerRight,      
+            // end: Alignment.centerRight,   
             colors: [
               primarySwatch[50]!,      
               primarySwatch[900]!,      

@@ -178,9 +178,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return Scaffold(
           body: BackgroundGradient(
             child: Center(
-              child: BoxContainerWhite(
-                width: kIsWeb ? 400 : 340,
-                height: kIsWeb ? 400 : 360,
+              child: FittedBox(
+                        child:BoxContainerWhite(
                 padding: const EdgeInsets.all(8.0),
                 alignment: Alignment.center,
                 child: Column(
@@ -188,11 +187,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Padding(
                       padding: EdgeInsets.all(16.0),
-                      child: SvgPicture.asset(
-                        'lib/assets/tunnel_logo_text.svg',
-                        width: 50,
-                        height: 50),
+                      child:SvgPicture.asset(
+                          'lib/assets/tunnel_logo_final.svg',
+                          width: 400,
+                          height: 300,),
                     ),
+                    
                     const SizedBox(height: 12.0),
                     CustomTextField(
                       controller: usernameController,
@@ -200,6 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           .default_input_username_hint,
                       keyboardType: TextInputType.text,
                       obscureText: false,
+                      width: 400,
                       hasError: onError,
                     ),
                     CustomTextField(
@@ -208,11 +209,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           .default_input_password_hint,
                       keyboardType: TextInputType.text,
                       obscureText: true,
+                      width: 400,
                       hasError: onError,
                     ),
                     const SizedBox(height: 16.0),
-                    CustomElevatedButton(
+                    CustomElevatedButtonLength(
                         showLoading: isLoading,
+                        width: 400,
                         onPressed: () {
                           setState(() {
                             onError = false;
@@ -224,10 +227,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextButton(
                         onPressed: () => onForgotPressed(context),
                         child: Text(AppLocalizations.of(context)!
-                            .default_forgot_password)),
+                            .default_forgot_password,
+                        style: TextStyle(color: subtitleColor))
+                    ),
+                    const SizedBox(height: 16.0),
                   ],
                 ),
               ),
+            ),
             ),
           ),
         );
@@ -244,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SvgPicture.asset(
-                        'lib/assets/tunnel_logo_v3_letters.svg',
+                        'lib/assets/tunnel_logo_text.svg',
                         width: 50,
                         height: 50),
                       const SizedBox(height: 24.0),

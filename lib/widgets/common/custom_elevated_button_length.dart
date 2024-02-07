@@ -40,7 +40,7 @@ class _CustomElevatedButtonLengthState extends State<CustomElevatedButtonLength>
     if (widget.backgroundColor == null) {
       switch (widget.messageType) {
         case MessageType.success:
-          colors = [primarySwatch[300]!, primarySwatch[100]!];
+          colors = [primarySwatch[300]!, primarySwatch[300]!];
           break;
         case MessageType.error:
           colors = [Colors.red[400]!, Colors.red[300]!];
@@ -49,7 +49,7 @@ class _CustomElevatedButtonLengthState extends State<CustomElevatedButtonLength>
           colors = [Colors.orange, Colors.orangeAccent];
           break;
         case null:
-          colors = [primarySwatch[300]!, primarySwatch[100]!];
+          colors = [primarySwatch[300]!, primarySwatch[300]!];
       }
     } else {
       colors = [Colors.grey, Colors.grey[400]!];
@@ -91,6 +91,7 @@ class _CustomElevatedButtonLengthState extends State<CustomElevatedButtonLength>
                     widget.text,
                     style: TextStyle(
                       color: widget.textColor ?? Colors.white,
+                      fontSize: 16,
                     ),
                   ),
                 ),
