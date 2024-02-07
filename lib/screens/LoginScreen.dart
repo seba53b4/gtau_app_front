@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/auth_data.dart';
 import 'package:gtau_app_front/models/user_info.dart';
 import 'package:gtau_app_front/models/user_state.dart';
@@ -10,7 +11,9 @@ import 'package:gtau_app_front/navigation/navigation.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:provider/provider.dart';
 
@@ -173,10 +176,9 @@ class _LoginScreenState extends State<LoginScreen> {
       bool isLoading = authviewModel.isLoading;
       if(kIsWeb==true){
         return Scaffold(
-          body: Container(
-            color: const Color.fromRGBO(253, 255, 252, 1),
+          body: BackgroundGradient(
             child: Center(
-              child: BoxContainer(
+              child: BoxContainerWhite(
                 width: kIsWeb ? 400 : 340,
                 height: kIsWeb ? 400 : 360,
                 padding: const EdgeInsets.all(8.0),
@@ -184,8 +186,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(AppLocalizations.of(context)!.titleApp),
-                    const SizedBox(height: 24.0),
+                    Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: SvgPicture.asset(
+                        'lib/assets/tunnel_logo_text.svg',
+                        width: 50,
+                        height: 50),
+                    ),
+                    const SizedBox(height: 12.0),
                     CustomTextField(
                       controller: usernameController,
                       hintText: AppLocalizations.of(context)!
@@ -263,7 +271,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: TextButton(
                           onPressed: () => onForgotPressed(context),
-                          child: Text(AppLocalizations.of(context)!.default_forgot_password)),
+                          child: Text(
+                            AppLocalizations.of(context)!.default_forgot_password,
+                            style: TextStyle(color: subtitleColor)
+                            )
+                          ),
                       ),
                       const SizedBox(height: kIsWeb ? 24 : 4),
                       CustomElevatedButtonLength(
