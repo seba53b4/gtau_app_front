@@ -149,7 +149,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     token = Provider.of<UserProvider>(context, listen: false).getToken!;
     if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
-
       releasedDate = DateTime.now();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Llama a updateTaskListState después de que la construcción del widget haya finalizado.

@@ -93,7 +93,6 @@ class UserListViewModel extends ChangeNotifier {
       _error = false;
       _isLoading = true;
 
-      await Future.delayed(Duration(seconds: 2));
       //notifyListeners();
       final responseListUsers = await _userService.getUsernames(token!);
 

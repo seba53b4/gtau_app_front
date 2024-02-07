@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
 import '../utils/date_utils.dart';
+import '../utils/task_utils.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
 import 'loading_overlay.dart';
@@ -92,7 +93,8 @@ class TaskListItemScheduled extends StatelessWidget {
                         padding: const EdgeInsetsDirectional.symmetric(
                             horizontal: 8),
                         child: Text(
-                          'Titulo programada ${taskScheduled!.id}',
+                          getParsedText(
+                              '${taskScheduled?.title}', kIsWeb ? 74 : 56),
                           style: TextStyle(fontSize: fontSize),
                         ),
                       )),
