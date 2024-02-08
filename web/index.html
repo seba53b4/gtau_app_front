@@ -40,6 +40,7 @@
     // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = null;
 
+
     </script>
     <!-- This script adds the flutter initialization JS code -->
     <script defer src="flutter.js"></script>
@@ -61,16 +62,21 @@
         }
       });
     });
-
+    // Attach your callback function to the `window` object
+    window.initMap = function() {
+      // JS API is loaded and available
+    };
     // Loading GOOGLE_API_KEY from dotenv property
     document.addEventListener("google-maps-api-key-loaded", function (e){
-      var googleapis = e.detail.GOOGLE_API_KEY;
-      var script = document.createElement('script');
-      script.src = "https://maps.googleapis.com/maps/api/js?key=" + googleapis + "&callback=initMap";
-      script.defer = true;
-      script.async = true;
-      document.head.appendChild(script);
+        if (!document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]')) {
+          var googleapis = e.detail.GOOGLE_API_KEY;
+          var script = document.createElement('script');
+          script.src = "https://maps.googleapis.com/maps/api/js?key=" + googleapis + "&callback=initMap&loading=async";
+          script.async = true;
+          document.head.appendChild(script);
+          }
     });
+
 
 </script>
 </body>
