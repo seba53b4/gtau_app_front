@@ -42,7 +42,6 @@ String parseDateTime(DateTime? dt) {
 // }
 
 String formattedDate(String dateString) {
-  print('dateString: ' + dateString);
   // Define el formato de entrada de la fecha
   DateFormat inputFormat = DateFormat(formatDate);
 
@@ -59,7 +58,6 @@ String formattedDate(String dateString) {
   // Formatea la fecha en el formato deseado
   DateFormat outputFormat = DateFormat(formatDateBackendCompatible);
   String formattedDateStr = outputFormat.format(uruguayDateTime);
-  print('date parseada:' + formattedDateStr);
   return formattedDateStr;
 }
 
