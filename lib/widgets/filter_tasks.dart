@@ -101,6 +101,7 @@ class _FilterTasksState extends State<FilterTasks> {
     final taskListViewModel =
         Provider.of<TaskListViewModel>(context, listen: false);
     taskListViewModel.clearListByStatus(status!);
+    filterProvider.setisScheduled(false);
     await taskListViewModel.initializeTasks(context, status, userName);
   }
 
@@ -160,7 +161,7 @@ class _FilterTasksState extends State<FilterTasks> {
                             ),
                       const SizedBox(height: 16),
                       Visibility(
-                        visible: filterProvider.isScheduled == true,
+                        visible: (filterProvider.inspectionTypeFilter ?? "" ) == "SCHEDULED",
                         child: Column(
                           children: <Widget>[
                             TextFieldFilter(
@@ -179,7 +180,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         ),
                       ),
                       Visibility(
-                        visible: filterProvider.isScheduled == false,
+                        visible: (filterProvider.inspectionTypeFilter ?? "" ) != "SCHEDULED",
                         child: Column(
                           children: <Widget>[
 
@@ -357,7 +358,7 @@ class _FilterTasksState extends State<FilterTasks> {
                             ),
                       const SizedBox(height: 16),
                       Visibility(
-                        visible: filterProvider.isScheduled == true,
+                        visible: (filterProvider.inspectionTypeFilter ?? "" ) == "SCHEDULED",
                         child: Column(
                           children: <Widget>[
                             TextFieldFilter(
@@ -376,7 +377,7 @@ class _FilterTasksState extends State<FilterTasks> {
                         ),
                       ),
                       Visibility(
-                        visible: filterProvider.isScheduled == false,
+                        visible: (filterProvider.inspectionTypeFilter ?? "" ) != "SCHEDULED",
                         child: Column(
                           children: <Widget>[
 
@@ -512,6 +513,11 @@ class _FilterTasksState extends State<FilterTasks> {
   }
 
   void updateTaskList() async {
+    if(filterProvider.inspectionTypeFilter! == 'SCHEDULED'){
+      filterProvider.setisScheduled(true);
+    }else{
+      filterProvider.setisScheduled(false);
+    }
     var isScheduled = filterProvider.isScheduled!;
     if(isScheduled){
       taskListScheduledViewModel

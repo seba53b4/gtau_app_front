@@ -70,11 +70,7 @@ class TaskFilterProvider with ChangeNotifier {
 
   void setInspectionTypeFilter(String? newInspectionType) {
     _inspectionTypeFilter = newInspectionType;
-    if(newInspectionType! == 'SCHEDULED'){
-      setisScheduled(true);
-    }else{
-      setisScheduled(false);
-    }
+    notifyListeners();
   }
 
   String? _workNumberFilter;
