@@ -116,8 +116,7 @@ class TaskListItem extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appLocalizations.list_item_date +
-                                    parseDateTime(task!.getAddDate!),
+                                '${appLocalizations.list_item_date}         ${parseDateTime(task!.getAddDate!)}',
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                               Text(

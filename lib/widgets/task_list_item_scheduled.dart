@@ -47,6 +47,7 @@ class TaskListItemScheduled extends StatelessWidget {
     double dividerHeight = kIsWeb ? 32 : 24;
     double taskInfoSpace = kIsWeb ? 150 : 115;
     double iconSize = kIsWeb ? 26 : 24;
+    final appLocalizations = AppLocalizations.of(context)!;
 
     return InkWell(
       onTap: () {
@@ -119,8 +120,7 @@ class TaskListItemScheduled extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                parseDateTimeOnFormatHour(
-                                    taskScheduled!.addDate),
+                                '${appLocalizations.list_item_date}         ${parseDateTime(taskScheduled!.addDate)}',
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                               // Text(
