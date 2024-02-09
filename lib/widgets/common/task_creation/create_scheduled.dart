@@ -207,7 +207,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   Future<TaskScheduled?> handleAcceptOnShowDialogCreateTask() async {
     Map<String, dynamic> body = bodyScheduledTask();
-    print('body create progrm: ' + body.toString());
     return await taskListScheduledViewModel.createScheduledTask(token, body);
   }
 
