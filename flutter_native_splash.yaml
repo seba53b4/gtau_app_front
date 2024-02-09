@@ -14,7 +14,7 @@ flutter_native_splash:
   # of your splash screen to a solid color.  Use background_image to set the background of your
   # splash screen to a png image.  This is useful for gradients. The image will be stretch to the
   # size of the app. Only one parameter can be used, color and background_image cannot both be set.
-  color: "#9CCC65"
+  color: "#52a716"
   #background_image: "assets/background_1.png"
 
   # Optional parameters are listed below.  To enable a parameter, uncomment the line by removing
@@ -22,7 +22,7 @@ flutter_native_splash:
 
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
-  image: lib/assets/background_1.png
+  image: lib/assets/tunnel_logo_alone_a11.png
   android: true
   ios: true
   web: false
@@ -62,7 +62,7 @@ flutter_native_splash:
     image: lib/assets/tunnel_logo_v3_alone_scaled.png
 
     # Splash screen background color.
-    color: "#4f981b"
+    color: "#52a716"
 
     icon_background_color: "#ffffff"
 
