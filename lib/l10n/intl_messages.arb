@@ -221,5 +221,6 @@
     "createuser_success_message": "El usuario se ha creado exitosamente",
     "listuser_title": "Gestión usuarios",
     "listuser_user_notfound": "El usuario asignado a esta tarea no se encuentra actualmente en el sistema",
-    "listuser_title": "Gestión usuarios"
+    "listuser_title": "Gestión usuarios",
+    "session_expired_msg": "Su sesión ha expirado. Intente autenticarse nuevamente."
 }
