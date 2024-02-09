@@ -12,7 +12,6 @@ import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/background_gradient.dart';
-import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +20,6 @@ import '../models/enums/message_type.dart';
 import '../providers/task_filters_provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/common/customMessageDialog.dart';
-import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_taost.dart';
 import '../widgets/common/custom_textfield.dart';
 
@@ -174,94 +172,33 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Consumer<AuthViewModel>(builder: (context, authviewModel, child) {
       bool isLoading = authviewModel.isLoading;
-      if(kIsWeb==true){
+      if (kIsWeb) {
         return Scaffold(
           body: BackgroundGradient(
             child: Center(
               child: FittedBox(
-                        child:BoxContainerWhite(
-                padding: const EdgeInsets.all(8.0),
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child:SvgPicture.asset(
-                          'lib/assets/tunnel_logo_final.svg',
-                          width: 400,
-                          height: 300,),
-                    ),
-                    
-                    const SizedBox(height: 12.0),
-                    CustomTextField(
-                      controller: usernameController,
-                      hintText: AppLocalizations.of(context)!
-                          .default_input_username_hint,
-                      keyboardType: TextInputType.text,
-                      obscureText: false,
-                      width: 400,
-                      hasError: onError,
-                    ),
-                    CustomTextField(
-                      controller: passwordController,
-                      hintText: AppLocalizations.of(context)!
-                          .default_input_password_hint,
-                      keyboardType: TextInputType.text,
-                      obscureText: true,
-                      width: 400,
-                      hasError: onError,
-                    ),
-                    const SizedBox(height: 16.0),
-                    CustomElevatedButtonLength(
-                        showLoading: isLoading,
-                        width: 400,
-                        onPressed: () {
-                          setState(() {
-                            onError = false;
-                          });
-                          onLogInPressed(context);
-                        },
-                        text: AppLocalizations.of(context)!.default_login_button),
-                    const SizedBox(height: kIsWeb ? 24 : 4),
-                    TextButton(
-                        onPressed: () => onForgotPressed(context),
-                        child: Text(AppLocalizations.of(context)!
-                            .default_forgot_password,
-                        style: TextStyle(color: subtitleColor))
-                    ),
-                    const SizedBox(height: 16.0),
-                  ],
-                ),
-              ),
-            ),
-            ),
-          ),
-        );
-      }else{
-        return Scaffold(
-          body: Container(
-            color: const Color.fromRGBO(253, 255, 252, 1),
-            child: Center(
-              child: Container(
-                  padding: const EdgeInsets.all(8),
+                child: BoxContainerWhite(
+                  padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width * 0.9,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset(
-                        'lib/assets/tunnel_logo_text.svg',
-                        width: 50,
-                        height: 50),
-                      const SizedBox(height: 24.0),
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: SvgPicture.asset(
+                          'lib/assets/tunnel_logo_final.svg',
+                          width: 200,
+                          height: 200,
+                        ),
+                      ),
+                      const SizedBox(height: 12.0),
                       CustomTextField(
                         controller: usernameController,
                         hintText: AppLocalizations.of(context)!
                             .default_input_username_hint,
                         keyboardType: TextInputType.text,
                         obscureText: false,
-                        width: MediaQuery.of(context).size.width,
+                        width: 400,
                         hasError: onError,
                       ),
                       CustomTextField(
@@ -270,42 +207,98 @@ class _LoginScreenState extends State<LoginScreen> {
                             .default_input_password_hint,
                         keyboardType: TextInputType.text,
                         obscureText: true,
-                        width: MediaQuery.of(context).size.width,
+                        width: 400,
                         hasError: onError,
                       ),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: TextButton(
-                          onPressed: () => onForgotPressed(context),
-                          child: Text(
-                            AppLocalizations.of(context)!.default_forgot_password,
-                            style: TextStyle(color: subtitleColor)
-                            )
-                          ),
-                      ),
-                      const SizedBox(height: kIsWeb ? 24 : 4),
+                      const SizedBox(height: 16.0),
                       CustomElevatedButtonLength(
-                          width: 400,
                           showLoading: isLoading,
+                          width: 400,
                           onPressed: () {
                             setState(() {
                               onError = false;
                             });
                             onLogInPressed(context);
                           },
-                          text: AppLocalizations.of(context)!.default_login_button
-                      ),
+                          text: AppLocalizations.of(context)!
+                              .default_login_button),
+                      const SizedBox(height: kIsWeb ? 24 : 4),
+                      TextButton(
+                          onPressed: () => onForgotPressed(context),
+                          child: Text(
+                              AppLocalizations.of(context)!
+                                  .default_forgot_password,
+                              style: TextStyle(color: subtitleColor))),
+                      const SizedBox(height: 16.0),
                     ],
                   ),
                 ),
-              
+              ),
+            ),
+          ),
+        );
+      } else {
+        return Scaffold(
+          body: Container(
+            color: const Color.fromRGBO(253, 255, 252, 1),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset('lib/assets/tunnel_logo_text.svg',
+                        width: 50, height: 50),
+                    const SizedBox(height: 24.0),
+                    CustomTextField(
+                      controller: usernameController,
+                      hintText: AppLocalizations.of(context)!
+                          .default_input_username_hint,
+                      keyboardType: TextInputType.text,
+                      obscureText: false,
+                      width: MediaQuery.of(context).size.width,
+                      hasError: onError,
+                    ),
+                    CustomTextField(
+                      controller: passwordController,
+                      hintText: AppLocalizations.of(context)!
+                          .default_input_password_hint,
+                      keyboardType: TextInputType.text,
+                      obscureText: true,
+                      width: MediaQuery.of(context).size.width,
+                      hasError: onError,
+                    ),
+                    Container(
+                      alignment: Alignment.centerRight,
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: TextButton(
+                          onPressed: () => onForgotPressed(context),
+                          child: Text(
+                              AppLocalizations.of(context)!
+                                  .default_forgot_password,
+                              style: TextStyle(color: subtitleColor))),
+                    ),
+                    const SizedBox(height: kIsWeb ? 24 : 4),
+                    CustomElevatedButtonLength(
+                        width: 400,
+                        showLoading: isLoading,
+                        onPressed: () {
+                          setState(() {
+                            onError = false;
+                          });
+                          onLogInPressed(context);
+                        },
+                        text:
+                            AppLocalizations.of(context)!.default_login_button),
+                  ],
+                ),
+              ),
             ),
           ),
         );
       }
-
-      
     });
   }
 }
