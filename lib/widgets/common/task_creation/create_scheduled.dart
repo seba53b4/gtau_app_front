@@ -207,7 +207,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   Future<TaskScheduled?> handleAcceptOnShowDialogCreateTask() async {
     Map<String, dynamic> body = bodyScheduledTask();
-
     return await taskListScheduledViewModel.createScheduledTask(token, body);
   }
 
@@ -238,6 +237,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   void startCreationProcess() async {
     if (geojsonFromFile.isNotEmpty) {
+      
       TaskScheduled? taskCreated = await handleAcceptOnShowDialogCreateTask();
 
       setState(() {

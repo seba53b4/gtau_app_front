@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/models/user_data.dart';
 import 'package:gtau_app_front/services/task_service.dart';
 import 'package:gtau_app_front/services/user_service.dart';
@@ -14,9 +11,7 @@ import '../providers/user_provider.dart';
 class UserListViewModel extends ChangeNotifier {
   final TaskService _taskService = TaskService();
   final UserService _userService = UserService();
-  final Map<String, List<UserData>> _users = {
-    "ACTIVE": []
-  };
+  final Map<String, List<UserData>> _users = {"ACTIVE": []};
 
   bool _isLoading = false;
 
@@ -30,7 +25,6 @@ class UserListViewModel extends ChangeNotifier {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   int page = 0;
   int size = kIsWeb ? 12 : 10;
-
 
   void _SetBodyPrefValue(String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -53,8 +47,8 @@ class UserListViewModel extends ChangeNotifier {
     }
   }
 
-  void setPage(int newPage){
-    page=newPage;
+  void setPage(int newPage) {
+    page = newPage;
   }
 
   void clearListByStatus(String status) {
@@ -63,24 +57,20 @@ class UserListViewModel extends ChangeNotifier {
 
   Future<List<UserData>?> initializeUsers(
       BuildContext context, String status, String? user) async {
-      return await fetchUsers(context, user);
+    return await fetchUsers(context, user);
   }
-  
-  Future<List<UserData>?> fetchUsers(
-      BuildContext context, String? user) async {
+
+  Future<List<UserData>?> fetchUsers(BuildContext context, String? user) async {
     final token = context.read<UserProvider>().getToken;
     try {
       _SetIsLoadingPrefValue(true);
       _error = false;
       _isLoading = true;
-      
 
       notifyListeners();
-      final responseListUsers =
-          await _userService.getUsers(token!);
+      final responseListUsers = await _userService.getUsers(token!);
 
       _users["ACTIVE"] = responseListUsers!;
-      
 
       return responseListUsers;
     } catch (error) {
@@ -96,19 +86,15 @@ class UserListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<String>?> fetchUsernames(
-      BuildContext context) async {
+  Future<List<String>?> fetchUsernames(BuildContext context) async {
     final token = context.read<UserProvider>().getToken;
     try {
       _SetIsLoadingPrefValue(true);
       _error = false;
       _isLoading = true;
-      
 
       //notifyListeners();
-      final responseListUsers =
-          await _userService.getUsernames(token!);
-      
+      final responseListUsers = await _userService.getUsernames(token!);
 
       return responseListUsers;
     } catch (error) {
@@ -154,14 +140,16 @@ class UserListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<UserData>?> fetchUserByFilter(token, String? username, String? email, String? firstName, String? lastName, String? role) async {
+  Future<List<UserData>?> fetchUserByFilter(token, String? username,
+      String? email, String? firstName, String? lastName, String? role) async {
     try {
       _SetIsLoadingPrefValue(true);
       _isLoading = true;
       _error = false;
       notifyListeners();
-      
-      final responseListUsers = await _userService.searchUsers(token, username, email, firstName, lastName, role);
+
+      final responseListUsers = await _userService.searchUsers(
+          token, username, email, firstName, lastName, role);
       _users["ACTIVE"] = responseListUsers!;
 
       return responseListUsers;
@@ -203,7 +191,6 @@ class UserListViewModel extends ChangeNotifier {
     }
   }
 
-  
   Future<bool> updateUser(
       String token, String idUser, Map<String, dynamic> body) async {
     try {
