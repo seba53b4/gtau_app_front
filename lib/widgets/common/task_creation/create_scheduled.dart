@@ -210,16 +210,23 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     return await taskListScheduledViewModel.createScheduledTask(token, body);
   }
 
+  void initProcess() {
+    setState(() {
+      creatingScheduledError = false;
+    });
+    startCreationProcess();
+    if (!creatingScheduledError) {
+      updateTaskList();
+    }
+  }
+
   void handleSubmit() {
     if (geojsonFromFile.isNotEmpty) {
       _showConfirmationDialog(cancelPressed: () {
         Navigator.of(context).pop();
       }, acceptPressed: () {
-        setState(() {
-          creatingScheduledError = false;
-        });
-        startCreationProcess();
-        updateTaskList();
+        initProcess();
+        Navigator.of(context).pop();
       });
     } else {
       setState(() {
@@ -230,31 +237,27 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   void startCreationProcess() async {
     if (geojsonFromFile.isNotEmpty) {
-      setState(() {
-        creatingScheduled = true;
-      });
-      TaskScheduled? taskCreated =
-          await handleAcceptOnShowDialogCreateTask().catchError((error) async {
-        setState(() {
-          creatingScheduledError = true;
-        });
-        showGenericModalError(onAcceptPressed: () {
-          Navigator.of(context).pop();
-        });
-        return null;
-      });
+      
+      TaskScheduled? taskCreated = await handleAcceptOnShowDialogCreateTask();
+
       setState(() {
         taskScheduledResponse = taskCreated;
       });
 
       if (taskScheduledResponse != null) {
-        Navigator.of(context).pop();
+        setState(() {
+          creatingScheduled = true;
+        });
         bool created = await scheduledViewModel.createScheduledZone(
             token, taskScheduledResponse!.id!, geojsonFromFile);
         setState(() {
           zoneCreated = created;
         });
         await manageLoadZoneProcess(taskScheduledResponse!);
+      } else {
+        setState(() {
+          creatingScheduledError = true;
+        });
       }
     }
   }
@@ -333,7 +336,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         return Consumer<ZoneLoadViewModel>(
             builder: (context, zoneLoadViewModel, child) {
           return LoadingOverlay(
-              isLoading: scheduledViewModel.isLoading,
+              isLoading: scheduledViewModel.isLoading ||
+                  taskListScheduledViewModel.isLoading,
               child: Column(children: [
                 Visibility(
                   visible: widget.isEdit && kIsWeb,
@@ -358,13 +362,15 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                   child: Column(
                     children: [
                       BoxContainer(
-                        height: creatingScheduled
-                            ? 730 + heightToAddOnCreate
-                            : widget.isEdit
-                                ? kIsWeb
-                                    ? 600
-                                    : 835
-                                : 706,
+                        height: creatingScheduledError
+                            ? 890
+                            : creatingScheduled
+                                ? 730 + heightToAddOnCreate
+                                : widget.isEdit
+                                    ? kIsWeb
+                                        ? 600
+                                        : 835
+                                    : 706,
                         width: widthRow * 1.15,
                         padding: const EdgeInsets.all(24),
                         child: Form(
@@ -1055,7 +1061,9 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                       ),
                       const SizedBox(height: AppConstants.taskColumnSpace),
                       Visibility(
-                        visible: !creatingScheduled && isAdmin,
+                        visible: !creatingScheduled &&
+                            isAdmin &&
+                            !creatingScheduledError,
                         child: CustomElevatedButton(
                           onPressed: () async {
                             if (geojsonFromFile.isEmpty) {
