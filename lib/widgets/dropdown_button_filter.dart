@@ -10,7 +10,8 @@ class DropdownButtonFilter extends StatefulWidget {
       required this.valueSetter,
       required this.dropdownValue,
       required this.label,
-      required this.enabled})
+      required this.enabled,
+      this.width,})
       : super(key: key);
 
   final List<ValueLabel> suggestions;
@@ -18,6 +19,7 @@ class DropdownButtonFilter extends StatefulWidget {
   final String dropdownValue;
   final String label;
   final bool enabled;
+  final double? width;
 
   @override
   State<DropdownButtonFilter> createState() => _DropdownButtonFilterState();
@@ -53,6 +55,7 @@ class _DropdownButtonFilterState extends State<DropdownButtonFilter> {
       controller: TextEditingController(),
       label: Text(widget.label),
       enabled: widget.enabled,
+      width: widget.width,
       dropdownMenuEntries: entries,
       onSelected: (String? newValue) {
         setState(() {
