@@ -37,6 +37,31 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
+  Future<bool> recoverPassword(String email, Map<String, dynamic> body) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+
+      final response = await _authService.recoverPassword(email, body);
+
+      if (response) {
+        notifyListeners();
+        return true;
+      } else {
+        _error = true;
+        print('No se pudieron traer datos');
+        return false;
+      }
+    } catch (error) {
+      _error = true;
+      throw Exception('Error al obtener los datos de autenticación');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<UserInfo?> getUserRole(String token) async {
     try {
       _isLoading = true;

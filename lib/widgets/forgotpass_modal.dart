@@ -2,11 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
+import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customDialog.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:gtau_app_front/widgets/common/custom_text_form_field.dart';
+import 'package:provider/provider.dart';
 
 class ForgotPassModal extends StatefulWidget {
   const ForgotPassModal({
@@ -29,7 +31,8 @@ class _ForgotPassModalState extends State<ForgotPassModal> {
   Future<bool> _recoverPassword(BuildContext context) async {
     try {
       //final response = await taskListViewModel.createTask(token!, body);
-      final response = true;
+      final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+      final response = await authViewModel.recoverPassword(emailController.text, createBodyToChangePass());
       if (response) {
         print('Se ha enviado mail de recuperacion de cuenta');
         await showCustomMessageDialog(
@@ -78,6 +81,13 @@ class _ForgotPassModalState extends State<ForgotPassModal> {
       acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
       cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
     );
+  }
+
+  Map<String, dynamic> createBodyToChangePass() {
+    final Map<String, dynamic> requestBody = {
+      "email": emailController.text
+    };
+    return requestBody;
   }
 
   @override

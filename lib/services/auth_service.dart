@@ -28,6 +28,14 @@ class AuthService {
     };
   }
 
+  Map<String, String> _getHeaders_forgotpass() {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization':
+          "Bearer  ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
+    };
+  }
+
   Future<AuthResult> fetchAuth(String username, String password) async {
     try {
       final response = await http.post(
@@ -51,6 +59,37 @@ class AuthService {
     } catch (error) {
       if (kDebugMode) {
         print('Error en fetchAuth: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<bool> recoverPassword(String email, Map<String, dynamic> body) async {
+    try {
+      Map<String, String> headersAlt = {
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
+      };
+
+      final String jsonBody = jsonEncode(body);
+      String url =
+          "${dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND')}/usuarios/forgot-password";
+      final response =
+          await http.post(Uri.parse(url), headers: headersAlt, body: jsonBody);
+
+      final codigo = response.statusCode;
+      print('code: $codigo');
+
+      if (response.statusCode == 201) {
+        print('Se ha enviado mail de recuperacion de contrasena');
+        return true;
+      } else {
+        print('No se pudieron traer datos');
+        return false;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error in recoverPassword: $error');
       }
       rethrow;
     }
