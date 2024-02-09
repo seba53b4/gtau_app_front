@@ -34,8 +34,8 @@ class BackgroundGradient extends StatelessWidget {
             // begin: Alignment.center,      
             // end: Alignment.centerRight,   
             colors: [
-              primarySwatch[50]!,      
-              primarySwatch[900]!,      
+              baseBackgroundG1,      
+              baseBackgroundG2,      
             ],            
           ),      
         ),          

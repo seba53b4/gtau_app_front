@@ -22,6 +22,9 @@ Color lotDefaultColorChip = Colors.black45;
 Color catchmentDefaultColor = Colors.pink;
 Color baseContainerG1 = const Color.fromRGBO(174, 213, 129, 0.25);
 Color baseContainerG2 = const Color.fromRGBO(174, 213, 129, 0.30);
+Color baseBackgroundG1 = primarySwatch[400]!;
+Color baseBackgroundG2 = const Color(0xFF2a3611);
+Color boxContainerBorder = const Color(0xFF4f4f4f);
 
 MaterialColor primarySwatch = const MaterialColor(
   0xFF52a716,

@@ -31,7 +31,7 @@ class BoxContainerWhite extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: primarySwatch[700]!,
+              color: boxContainerBorder,
               width: 5.0,
             ),
           ),
