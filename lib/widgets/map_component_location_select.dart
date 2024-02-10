@@ -14,6 +14,7 @@ import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/theme_constants.dart';
+import '../utils/map_functions.dart';
 import 'common/menu_button_map.dart';
 
 class MapComponentLocationSelect extends StatefulWidget {
@@ -29,7 +30,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
   String? errorMsg;
-  final MapType _currentMapType = MapType.satellite;
+  final MapType _currentMapType = MapType.hybrid;
   Set<Marker> markers = {};
   Set<Marker> markersGPS = {};
   bool locationManual = false;
@@ -208,6 +209,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                                 if (!_mapController.isCompleted) {
                                   _mapController.complete(controller);
                                 }
+                                controller.setMapStyle(customMapStyle);
                               },
                               onTap: (LatLng latLng) {
                                 if (locationManual) {

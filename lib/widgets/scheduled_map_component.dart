@@ -42,7 +42,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     with TickerProviderStateMixin {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
-  MapType _currentMapType = MapType.satellite;
+  MapType _currentMapType = MapType.hybrid;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   Set<Circle> circles = {};
@@ -506,6 +506,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                           if (!_mapController.isCompleted) {
                             _mapController.complete(controller);
                           }
+                          controller.setMapStyle(customMapStyle);
                         },
                         onTap: (LatLng latLng) {},
                       ),
@@ -562,7 +563,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                               setState(() {
                                 _currentMapType =
                                     _currentMapType == MapType.normal
-                                        ? MapType.satellite
+                                        ? MapType.hybrid
                                         : MapType.normal;
                               });
                             },
