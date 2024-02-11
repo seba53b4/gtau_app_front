@@ -159,7 +159,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     } else {
       startDate = DateTime.now();
     }
-    _listUserNames();
+    if (!widget.scheduledEdit) {
+      _listUserNames();
+    }
   }
 
   void _listUserNames() async {
