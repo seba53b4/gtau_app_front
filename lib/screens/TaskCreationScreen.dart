@@ -147,6 +147,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     selectedItemsProvider = context.read<SelectedItemsProvider>();
     userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
     token = Provider.of<UserProvider>(context, listen: false).getToken!;
+    if (!widget.scheduledEdit) {
+      _listUserNames();
+    }
     if (widget.detail) {
       widget.type == 'inspection' ? selectedIndex = 1 : selectedIndex = 0;
       releasedDate = DateTime.now();
@@ -158,9 +161,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       });
     } else {
       startDate = DateTime.now();
-    }
-    if (!widget.scheduledEdit) {
-      _listUserNames();
     }
   }
 
@@ -179,9 +179,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         return null;
       });
       if (response != null) {
-        setState(() {
-          listUsers.addAll(response);
-        });
+        listUsers.addAll(response);
       }
     } catch (error) {
       if (kDebugMode) {
@@ -201,9 +199,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
       final responseTask =
           await taskListViewModel.fetchTask(token, widget.idTask!);
       if (responseTask != null) {
-        setState(() {
-          task = responseTask;
-        });
+        task = responseTask;
       }
 
       selectedItemsProvider.saveInitialSelections(task.sections, task.registers,

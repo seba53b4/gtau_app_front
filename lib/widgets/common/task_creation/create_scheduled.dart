@@ -367,7 +367,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                 ? 730 + heightToAddOnCreate
                                 : widget.isEdit
                                     ? kIsWeb
-                                        ? 798
+                                        ? 808
                                         : 835
                                     : 706,
                         width: widthRow * 1.15,

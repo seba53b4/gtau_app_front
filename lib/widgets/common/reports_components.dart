@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:provider/provider.dart';
@@ -69,6 +71,8 @@ class _ReportComponentState extends State<ReportComponent> {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
+
     return Consumer<ScheduledViewModel>(
         builder: (context, scheduledViewModel, child) {
       return Column(
@@ -91,18 +95,29 @@ class _ReportComponentState extends State<ReportComponent> {
                   alignment: Alignment.center,
                   children: [
                     IconButton(
-                      icon: report == null
-                          ? const Icon(Icons.file_download_off)
-                          : const Icon(Icons.download_rounded),
-                      iconSize: 50,
                       onPressed: () {
                         downloadReport();
                       },
+                      iconSize: 60,
+                      icon: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: lightBackground,
+                        ),
+                        child: Icon(
+                          report != null
+                              ? Icons.download_rounded
+                              : Icons.file_download_off,
+                          color: report != null ? primarySwatch[500] : redColor,
+                        ),
+                      ),
                     ),
                     if (isHovered)
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.8),
+                          color: primarySwatch[900]!.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         padding: const EdgeInsets.all(8),
@@ -111,8 +126,10 @@ class _ReportComponentState extends State<ReportComponent> {
                             downloadReport();
                           },
                           child: Text(
-                            report == null ? 'No Procesado' : 'Descargar',
-                            style: TextStyle(color: Colors.white),
+                            report == null
+                                ? appLocalizations.report_not_processed
+                                : appLocalizations.download_informe_btn,
+                            style: TextStyle(color: lightBackground),
                           ),
                         ),
                       ),
@@ -121,12 +138,11 @@ class _ReportComponentState extends State<ReportComponent> {
               ),
             ),
           ),
-          Text(
-            report == null
-                ? 'Sin Datos'
-                : 'Fecha último procesamiento: ${parseDateTimeOnFormatHour(report!.date!)}',
-            style: const TextStyle(fontSize: 14.0),
-          ),
+          if (report != null)
+            Text(
+              '${appLocalizations.report_date_msg} ${parseDateTimeOnFormatHour(report!.date!)}',
+              style: const TextStyle(fontSize: 14.0),
+            ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -137,7 +153,7 @@ class _ReportComponentState extends State<ReportComponent> {
                   postReport();
                 },
                 maxWidth: 120,
-                text: 'Procesar reporte',
+                text: appLocalizations.report_process,
               ),
             ],
           )
