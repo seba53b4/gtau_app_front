@@ -574,16 +574,17 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                                 : Icons.satellite,
                           ),
                           if (kIsWeb) const SizedBox(height: 6),
-                          MenuElevatedButton(
-                              onPressed: () async {
-                                setState(() {
-                                  markers.clear();
-                                });
-                                await getCurrentLocation();
-                              },
-                              icon: Icons.my_location,
-                              tooltipMessage:
-                                  appLocalizations.map_component_get_location),
+                          if (!kIsWeb)
+                            MenuElevatedButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    markers.clear();
+                                  });
+                                  await getCurrentLocation();
+                                },
+                                icon: Icons.my_location,
+                                tooltipMessage: appLocalizations
+                                    .map_component_get_location),
                           if (kIsWeb) const SizedBox(height: 6),
                           MultiSelectPopupMenuButton(
                             texts: [

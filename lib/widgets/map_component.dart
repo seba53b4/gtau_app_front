@@ -135,7 +135,7 @@ class _MapComponentState extends State<MapComponent> {
     try {
       if (selectedItemsProvider.inspectionPosition.latitude == 0 &&
           selectedItemsProvider.inspectionPosition.longitude == 0) {
-        getCurrentLocation();
+        if (!kIsWeb) getCurrentLocation();
       } else {
         setState(() {
           final locationGPS = selectedItemsProvider.inspectionPosition;
@@ -667,20 +667,21 @@ class _MapComponentState extends State<MapComponent> {
                                   icon: Icons.area_chart_outlined,
                                 ),
                                 if (kIsWeb) const SizedBox(height: 6),
-                                MenuElevatedButton(
-                                    onPressed: () {
-                                      markersGPS.clear();
-                                      getCurrentLocation();
-                                      _getMarkers();
-                                      setState(() {
-                                        polylines = {};
-                                        circles = {};
-                                      });
-                                    },
-                                    icon: Icons.my_location,
-                                    tooltipMessage:
-                                        AppLocalizations.of(context)!
-                                            .map_component_get_location),
+                                if (!kIsWeb)
+                                  MenuElevatedButton(
+                                      onPressed: () {
+                                        markersGPS.clear();
+                                        getCurrentLocation();
+                                        _getMarkers();
+                                        setState(() {
+                                          polylines = {};
+                                          circles = {};
+                                        });
+                                      },
+                                      icon: Icons.my_location,
+                                      tooltipMessage:
+                                          AppLocalizations.of(context)!
+                                              .map_component_get_location),
                                 if (kIsWeb) const SizedBox(height: 6),
                                 MenuElevatedButton(
                                   colorChangeOnPress: true,
