@@ -8,6 +8,7 @@ import 'package:gtau_app_front/models/scheduled/section_scheduled.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/scheduled/report.dart';
 import '../models/scheduled/zone.dart';
 import '../utils/common_utils.dart';
 
@@ -386,6 +387,69 @@ class ScheduledService {
     } catch (error) {
       printOnDebug('Error in searchTasksScheduled: $error');
 
+      rethrow;
+    }
+  }
+
+  Future<ScheduledZone?> fetchReport(String token, int scheduledId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/report');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return ScheduledZone.fromJson(json: jsonResponse);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener zone: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<Report?> fetchReportScheduled(String token, int scheduledId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/report');
+      final response = await http.get(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return Report.fromJson(json: jsonResponse);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener fetchReportScheduled: $error');
+      }
+      rethrow;
+    }
+  }
+
+  Future<Report?> postReportScheduled(String token, int scheduledId) async {
+    try {
+      final url = Uri.parse('$baseUrl/$scheduledId/report');
+      final response = await http.post(
+        url,
+        headers: _getHeaders(token),
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return Report.fromJson(json: jsonResponse);
+      } else {
+        return null;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error al obtener postReportScheduled: $error');
+      }
       rethrow;
     }
   }

@@ -15,3 +15,11 @@ String parseTaskStatus(BuildContext context, String status) {
       return AppLocalizations.of(context)!.task_status_done;
   }
 }
+
+String getParsedText(String text, int maxLength) {
+  if (text.length <= maxLength) {
+    return text;
+  } else {
+    return '${text.substring(0, maxLength - 3)}...';
+  }
+}

@@ -44,7 +44,7 @@ class _MapComponentState extends State<MapComponent> {
   int distanceSelected = 0;
   int lastDistanceSelected = 8;
   LatLng? lastLocation;
-  MapType _currentMapType = MapType.satellite;
+  MapType _currentMapType = MapType.hybrid;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   Set<Circle> circles = {};
@@ -610,6 +610,7 @@ class _MapComponentState extends State<MapComponent> {
                                 if (!_mapController.isCompleted) {
                                   _mapController.complete(controller);
                                 }
+                                controller.setMapStyle(customMapStyle);
                               },
                               onTap: (LatLng latLng) {
                                 if (locationManual) {
@@ -645,9 +646,9 @@ class _MapComponentState extends State<MapComponent> {
                                   onPressed: () {
                                     setState(() {
                                       _currentMapType =
-                                          _currentMapType == MapType.normal
-                                              ? MapType.satellite
-                                              : MapType.normal;
+                                          _currentMapType == MapType.hybrid
+                                              ? MapType.normal
+                                              : MapType.hybrid;
                                     });
                                   },
                                   tooltipMessage: AppLocalizations.of(context)!

@@ -18,17 +18,25 @@ class InformeViewModel extends ChangeNotifier {
 
   bool get error => _error;
 
+  bool _alreadyProcess = false;
+
   List<Map<String, dynamic>> parseInformes(List<String> urls) {
     return urls.map((url) => {"url": url}).toList();
   }
 
   void reset() {
     _informes = [];
+    _alreadyProcess = false;
   }
 
   Future<List<Map<String, dynamic>>> fetchTaskInformes(
       token, int idTask) async {
     try {
+      // Bug en re render widget padre - Se debe controlar bien el reset del viewmodel
+      if (!_alreadyProcess) {
+        _alreadyProcess = true;
+        return _informes;
+      }
       _isLoading = true;
       _error = false;
       final List<String> responseTask =
@@ -59,11 +67,7 @@ class InformeViewModel extends ChangeNotifier {
     _isLoading = true;
     String result = '';
     notifyListeners();
-    // if (kIsWeb) {
     result = await _taskService.putBase64Informes(token, id, informe);
-    // } else {
-    //   result = await _taskService.putMultipartInformes(token, id, informe);
-    // }
     _isLoading = false;
     notifyListeners();
     return result;
@@ -75,20 +79,9 @@ class InformeViewModel extends ChangeNotifier {
     String result = '';
     notifyListeners();
     for (var informe in listinformes!) {
-      // if (kIsWeb) {
       result = await _taskService.putBase64Informes(token, id, informe);
-      // if (finalList == null) {
-      //   result = result && false;
-      // } else {
-      //   result = result && true;
-      // }
-      // } else {
-      //   final resultprocess =
-      //   await _taskService.putMultipartInformes(token, id, informe);
-      //   result = result && resultprocess;
-      // }
     }
-    /*await new Future.delayed(const Duration(seconds: 2));*/
+
     _isLoading = false;
     notifyListeners();
     return result;

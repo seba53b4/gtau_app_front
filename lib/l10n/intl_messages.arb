@@ -31,8 +31,8 @@
     "default_observationsPlaceholder": "Ingrese observaciones",
     "default_conclusionsPlaceholder": "Ingrese conclusiones",
     "default_selectPlaceholder": "Seleccione una opción",
-    "default_input_username_hint": "Nombre del usuario",
-    "default_input_password_hint": "Ingresa la constraseña",
+    "default_input_username_hint": "Nombre de Usuario",
+    "default_input_password_hint": "Constraseña",
     "default_login_button": "Ingresar",
     "default_logout_button": "Cerrar sesión",
     "default_forgot_password": "¿Olvidaste tu contraseña?",
@@ -212,7 +212,7 @@
     "scheduled_process_error": "Hubo un error, espere unos minutos y vuelva a intentar.",
     "scheduled_process_creating_error": "Se ha producido un error al crear programada",
     "retry_button" : "Reintentar",
-    "list_item_date": "Fecha:         ",
+    "list_item_date": "Fecha:",
     "list_item_user": "Usuario:     ",
     "no_users_found": "No hay usuarios aquí para ver",
     "filter_users_title": "Filtrar usuarios",
@@ -226,5 +226,12 @@
     "shape_load_init": "Iniciando",
     "shape_load_proccesing": "Procesando",
     "shape_laod_success": "FINALIZADO OK",
-    "shape_laod_with_errors": "FINALIZADO CON ERRORES"
+    "shape_laod_with_errors": "FINALIZADO CON ERRORES",
+    "listuser_title": "Gestión usuarios",
+    "listuser_user_notfound": "El usuario asignado a esta tarea no se encuentra actualmente en el sistema",
+    "listuser_title": "Gestión usuarios",
+    "session_expired_msg": "Su sesión ha expirado. Intente autenticarse nuevamente.",
+    "report_not_processed" : "No Procesado",
+    "report_date_msg" : "Fecha último procesamiento:",
+    "report_process": "Procesar reporte"
 }

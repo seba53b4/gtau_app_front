@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
 import '../utils/date_utils.dart';
+import '../utils/task_utils.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
@@ -32,14 +33,6 @@ class TaskListItem extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String getParsedText(String text, int maxLength) {
-    if (text.length <= maxLength) {
-      return text;
-    } else {
-      return '${text.substring(0, maxLength - 3)}...';
-    }
   }
 
   @override
@@ -123,8 +116,7 @@ class TaskListItem extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appLocalizations.list_item_date +
-                                    parseDateTime(task!.getAddDate!),
+                                '${appLocalizations.list_item_date}         ${parseDateTime(task!.getAddDate!)}',
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                               Text(

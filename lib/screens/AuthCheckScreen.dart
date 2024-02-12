@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gtau_app_front/screens/LoginScreen.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
@@ -9,12 +10,14 @@ import 'package:provider/provider.dart';
 
 import '../constants/theme_constants.dart';
 import '../models/auth_data.dart';
+import '../models/enums/message_type.dart';
 import '../models/user_state.dart';
 import '../navigation/navigation.dart';
 import '../navigation/navigation_web.dart';
 import '../providers/user_provider.dart';
 import '../services/auth_service.dart';
 import '../viewmodels/auth_viewmodel.dart';
+import '../widgets/common/custom_taost.dart';
 
 class AuthCheck extends StatefulWidget {
   const AuthCheck({super.key});
@@ -81,7 +84,26 @@ class _AuthCheckState extends State<AuthCheck> {
           key: 'access_token', value: refreshData.authData!.accessToken);
       await _storage.write(
           key: 'refresh_token', value: refreshData.authData!.refreshToken);
+    } else {
+      logoutSession();
     }
+  }
+
+  void logoutSession() async {
+    userStateProvider.logout();
+    await _showWrongCredentialsToast(context);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
+
+  _showWrongCredentialsToast(BuildContext context) {
+    CustomToast.show(
+      context,
+      title: AppLocalizations.of(context)!.warning,
+      message: AppLocalizations.of(context)!.session_expired_msg,
+      type: MessageType.warning,
+    );
   }
 
   void updateUserState(

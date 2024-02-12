@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +43,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     with TickerProviderStateMixin {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
-  MapType _currentMapType = MapType.satellite;
+  MapType _currentMapType = MapType.hybrid;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   Set<Circle> circles = {};
@@ -145,7 +144,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
     double? latitude, longitude;
-    int radio = 200;
+    int? radio = kIsWeb ? null : 200;
     if (!kIsWeb) {
       latitude = location?.latitude;
       longitude = location?.longitude;
@@ -508,6 +507,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                           if (!_mapController.isCompleted) {
                             _mapController.complete(controller);
                           }
+                          controller.setMapStyle(customMapStyle);
                         },
                         onTap: (LatLng latLng) {},
                       ),
@@ -518,23 +518,20 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                     left: MediaQuery.of(context).size.width / 2 -
                         (kIsWeb ? 180 : 100),
                     bottom: kIsWeb ? null : 0,
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                      child: Container(
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.8),
-                          borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(kIsWeb ? 24.0 : 0.0),
-                              bottomRight: Radius.circular(kIsWeb ? 24.0 : 0.0),
-                              topLeft: Radius.circular(!kIsWeb ? 24.0 : 0.0),
-                              topRight: Radius.circular(!kIsWeb ? 24.0 : 0.0)),
-                        ),
-                        child: Text(
-                          '${widget.scheduledZone!.name} - ${widget.scheduledZone!.subZones!.elementAt(selectedSubZone).cuenca}',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: kIsWeb ? 26 : 18),
-                        ),
+                    child: Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.8),
+                        borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(kIsWeb ? 24.0 : 0.0),
+                            bottomRight: Radius.circular(kIsWeb ? 24.0 : 0.0),
+                            topLeft: Radius.circular(!kIsWeb ? 24.0 : 0.0),
+                            topRight: Radius.circular(!kIsWeb ? 24.0 : 0.0)),
+                      ),
+                      child: Text(
+                        '${widget.scheduledZone!.name} - ${widget.scheduledZone!.subZones!.elementAt(selectedSubZone).cuenca}',
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: kIsWeb ? 26 : 18),
                       ),
                     ),
                   ),
@@ -567,7 +564,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                               setState(() {
                                 _currentMapType =
                                     _currentMapType == MapType.normal
-                                        ? MapType.satellite
+                                        ? MapType.hybrid
                                         : MapType.normal;
                               });
                             },

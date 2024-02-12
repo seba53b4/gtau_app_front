@@ -157,7 +157,7 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                   var position = snapshot.data?[0] as double;
                   var isFiltered = snapshot.data?[1] ?? false;
                   var actualPage = snapshot.data?[3] as int;
-                  var isLoading = snapshot.data?[4] as bool;
+                  //var isLoading = snapshot.data?[4] as bool;
                   return Consumer<TaskListScheduledViewModel>(
                     builder: (context, taskListScheduledViewModel, child) {
                       var tasks =
@@ -206,7 +206,7 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                 } else {
                                   if (tasksLength == 1) {
                                     return Visibility(
-                                      visible: !isLoading,
+                                      visible: true,
                                       child: Padding(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 15),

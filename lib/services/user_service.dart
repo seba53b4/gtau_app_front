@@ -4,8 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gtau_app_front/models/user_data.dart';
 import 'package:http/http.dart' as http;
 
-import '../utils/common_utils.dart';
-
 class UserService {
   final String baseUrl;
 
@@ -124,8 +122,6 @@ class UserService {
       final response =
           await http.put(url, headers: _getHeaders(token), body: jsonBody);
 
-      var responseCode = response.statusCode;
-
       if (response.statusCode == 200) {
         printOnDebug('Se ha actualizado el usuario');
         return true;
@@ -153,11 +149,11 @@ class UserService {
         extras = true;
       }
 
-      if (username != null) urlString = urlString + 'username=$username&';
-      if (email != null) urlString = urlString + 'email=$email&';
-      if (firstName != null) urlString = urlString + 'firstName=$firstName&';
-      if (lastName != null) urlString = urlString + 'lastName=$lastName&';
-      if (role != null) urlString = urlString + 'rol=$role&';
+      if (username != null) urlString = '${urlString}username=$username&';
+      if (email != null) urlString = '${urlString}email=$email&';
+      if (firstName != null) urlString = '${urlString}firstName=$firstName&';
+      if (lastName != null) urlString = '${urlString}lastName=$lastName&';
+      if (role != null) urlString = '${urlString}rol=$role&';
 
       if (extras == true) {
         urlString = urlString.substring(0, urlString.length - 1);
@@ -196,8 +192,10 @@ class UserService {
   parseUsernamesListResponse(http.Response response) {
     final data = json.decode(response.body);
 
-    return data.map<UserData>((userData) {
-      return userData['username'];
+    var list = data.map<String>((userData) {
+      return userData['username'].toString();
     }).toList();
+
+    return list;
   }
 }
