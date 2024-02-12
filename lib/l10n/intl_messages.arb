@@ -225,5 +225,11 @@
     "session_expired_msg": "Su sesión ha expirado. Intente autenticarse nuevamente.",
     "report_not_processed" : "No Procesado",
     "report_date_msg" : "Fecha último procesamiento:",
-    "report_process": "Procesar reporte"
+    "report_process": "Procesar reporte",
+    "report_title" : "Reportes",
+    "name" : "Nombre",
+    "user" : "Usuario",
+    "email" : "Email",
+    "role" : "Rol",
+    "version": "Versión"
 }

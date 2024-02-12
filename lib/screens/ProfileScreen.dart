@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:gtau_app_front/constants/app_constants.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/user_data.dart';
@@ -9,7 +11,6 @@ import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../assets/font/gtauicons.dart';
-import '../constants/app_constants.dart';
 import '../viewmodels/user_list_viewmodel.dart';
 import '../widgets/common/customMessageDialog.dart';
 import '../widgets/common/custom_elevated_button.dart';
@@ -29,7 +30,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     username = context.read<UserProvider>().userName!;
     isAdmin = context.read<UserProvider>().isAdmin!;
@@ -46,7 +46,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final resp = await userListViewModel
         .fetchUserByUsername(token, username)
         .catchError((error) async {
-      // Manejo de error
       showGenericModalError();
       return null;
     });
@@ -83,6 +82,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const double rowHeigthSpace = 12;
+    double heightCard = MediaQuery.of(context).size.height;
+    double widthCard = MediaQuery.of(context).size.width;
+    final appLocalizations = AppLocalizations.of(context)!;
+
     return Consumer<UserListViewModel>(
       builder: (context, userListViewModel, child) {
         return LoadingOverlay(
@@ -91,79 +95,93 @@ class _ProfileScreenState extends State<ProfileScreen> {
             backgroundColor: lightBackground,
             body: Center(
               child: SizedBox(
-                width: 400,
-                height: 600,
+                width: kIsWeb ? widthCard * 0.3 : widthCard,
+                height: kIsWeb ? heightCard * 0.85 : heightCard,
                 child: Card(
                   child: Visibility(
                     visible: !userListViewModel.isLoading,
                     child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: primarySwatch[200]!, width: 2),
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    isAdmin
-                                        ? GtauIcons.roleAdmin
-                                        : GtauIcons.roleOper,
-                                    size: 70,
-                                    color: primarySwatch,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 36),
-                              const Divider(
-                                color: Colors.grey,
-                                thickness: 1,
-                                indent: 20,
-                                endIndent: 20,
-                              ),
-                              const SizedBox(height: 24),
-                              CustomProfileRow(
-                                label: 'Nombre',
-                                value:
-                                    '${userData?.getFirstname} ${userData?.getLastname}',
-                              ),
-                              const SizedBox(height: 12),
-                              CustomProfileRow(
-                                label: 'Usuario',
-                                value: '${userData?.getUsername}',
-                              ),
-                              const SizedBox(height: 12),
-                              CustomProfileRow(
-                                label: 'Email',
-                                value: '${userData?.getEmail}',
-                              ),
-                              const SizedBox(height: 12),
-                              CustomProfileRow(
-                                label: 'Rol',
-                                value: '${userData?.getRol}',
-                              ),
-                              const SizedBox(height: 32),
-                            ],
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 250,
+                          width: 400,
+                          padding: const EdgeInsets.only(top: 24, bottom: 24),
+                          decoration: BoxDecoration(
+                            color: primarySwatch[200],
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            ),
                           ),
-                          CustomElevatedButton(
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            margin: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: lightBackground,
+                                width: 2,
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                isAdmin
+                                    ? GtauIcons.roleAdmin
+                                    : GtauIcons.roleOper,
+                                size: 68,
+                                color: lightBackground,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Divider(
+                          color: Colors.grey,
+                          thickness: 1,
+                          indent: 20,
+                          endIndent: 20,
+                        ),
+                        const SizedBox(height: 24),
+                        CustomProfileRow(
+                          label: appLocalizations.name,
+                          value:
+                              '${userData?.getFirstname} ${userData?.getLastname}',
+                        ),
+                        const SizedBox(height: rowHeigthSpace),
+                        CustomProfileRow(
+                          label: appLocalizations.user,
+                          value: '${userData?.getUsername}',
+                        ),
+                        const SizedBox(height: rowHeigthSpace),
+                        CustomProfileRow(
+                          label: appLocalizations.email,
+                          value: '${userData?.getEmail}',
+                        ),
+                        const SizedBox(height: rowHeigthSpace),
+                        CustomProfileRow(
+                          label: appLocalizations.role,
+                          value: isAdmin ? 'Administrador' : 'Operario',
+                        ),
+                        const Spacer(),
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          child: CustomElevatedButton(
                             onPressed: () => handleLogOutPress(context),
                             messageType: MessageType.error,
                             text: AppLocalizations.of(context)!
                                 .default_logout_button,
                           ),
-                          Text(
-                            'Versión: ' + AppConstants.appVersion,
-                            style: TextStyle(fontSize: 14, color: Colors.grey),
-                          ),
-                        ]),
+                        ),
+                        Text(
+                          '${appLocalizations.version} ${AppConstants.appVersion}',
+                          style:
+                              const TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                        const SizedBox(height: rowHeigthSpace),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -184,6 +202,7 @@ class CustomProfileRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
@@ -205,11 +224,13 @@ class CustomProfileRow extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             Text(
-              value,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              value.contains('null')
+                  ? appLocalizations.component_detail_no_data
+                  : value,
+              style: const TextStyle(fontSize: 16, color: Colors.black87),
             ),
           ],
         ),

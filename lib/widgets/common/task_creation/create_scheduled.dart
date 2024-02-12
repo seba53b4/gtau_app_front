@@ -368,7 +368,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                 : widget.isEdit
                                     ? kIsWeb
                                         ? 808
-                                        : 835
+                                        : 847
                                     : 706,
                         width: widthRow * 1.15,
                         padding: const EdgeInsets.all(24),
@@ -754,7 +754,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                       visible: kIsWeb,
                                       child: Column(children: [
                                         Text(
-                                          'Reportes',
+                                          appLocalizations.report_title,
                                           style:
                                               const TextStyle(fontSize: 16.0),
                                         ),
