@@ -137,13 +137,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: rowHeigthSpace),
                         const Divider(
                           color: Colors.grey,
                           thickness: 1,
                           indent: 20,
                           endIndent: 20,
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 48),
                         CustomProfileRow(
                           label: appLocalizations.name,
                           value:
