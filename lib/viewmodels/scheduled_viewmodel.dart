@@ -6,6 +6,7 @@ import 'package:gtau_app_front/models/scheduled/zone.dart';
 import 'package:gtau_app_front/services/scheduled_service.dart';
 
 import '../models/scheduled/catchment_scheduled.dart';
+import '../models/scheduled/report.dart';
 import '../utils/map_functions.dart';
 
 class ScheduledViewModel extends ChangeNotifier {
@@ -29,6 +30,14 @@ class ScheduledViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  bool _isLoadingZone = false;
+
+  bool get isLoadingZone => _isLoadingZone;
+
+  bool _isLoadingReport = false;
+
+  bool get isLoadingReport => _isLoadingReport;
+
   bool _error = false;
 
   bool get error => _error;
@@ -40,6 +49,10 @@ class ScheduledViewModel extends ChangeNotifier {
   ScheduledZone? _scheduledZone;
 
   ScheduledZone? get scheduledZone => _scheduledZone;
+
+  Report? _scheduledReport;
+
+  Report? get scheduledReport => _scheduledReport;
 
   LatLng getPosition() {
     return _initPosition ?? initLocation;
@@ -53,6 +66,9 @@ class ScheduledViewModel extends ChangeNotifier {
     _catchments.clear();
     _sections.clear();
     _registers.clear();
+    _scheduledReport = null;
+    _isLoadingReport = false;
+    _isLoadingZone = false;
     _error = false;
     _isLoading = false;
   }
@@ -278,7 +294,7 @@ class ScheduledViewModel extends ChangeNotifier {
       String token, int scheduledId, Map<String, dynamic> body) async {
     try {
       _error = false;
-      _isLoading = true;
+      _isLoadingZone = true;
 
       notifyListeners();
       bool response =
@@ -288,7 +304,7 @@ class ScheduledViewModel extends ChangeNotifier {
       _error = true;
       throw Exception('Error al obtener crear createScheduledZone');
     } finally {
-      _isLoading = false;
+      _isLoadingZone = false;
       notifyListeners();
     }
   }
@@ -299,7 +315,7 @@ class ScheduledViewModel extends ChangeNotifier {
   ) async {
     try {
       _error = false;
-      _isLoading = true;
+      _isLoadingZone = true;
 
       notifyListeners();
       final response =
@@ -310,7 +326,47 @@ class ScheduledViewModel extends ChangeNotifier {
       _error = true;
       throw Exception('Error al obtener los datos fetchZoneFromScheduled');
     } finally {
-      _isLoading = false;
+      _isLoadingZone = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Report?> fetchReportScheduled(String token, int scheduledId) async {
+    try {
+      _error = false;
+      _isLoadingReport = true;
+
+      notifyListeners();
+      Report? response =
+          await _scheduledService.fetchReportScheduled(token, scheduledId);
+      return response;
+    } catch (error) {
+      _error = true;
+      throw Exception('Error al obtener crear fetchReportScheduled');
+    } finally {
+      _isLoadingReport = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Report?> postReportScheduled(
+    String token,
+    int scheduledId,
+  ) async {
+    try {
+      _error = false;
+      _isLoadingReport = true;
+
+      notifyListeners();
+      Report? response =
+          await _scheduledService.postReportScheduled(token, scheduledId);
+      _scheduledReport = response;
+      return response;
+    } catch (error) {
+      _error = true;
+      throw Exception('Error al obtener los datos postReportScheduled');
+    } finally {
+      _isLoadingReport = false;
       notifyListeners();
     }
   }

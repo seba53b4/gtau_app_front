@@ -5,6 +5,7 @@ import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:gtau_app_front/widgets/common/reports_components.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
@@ -112,12 +113,10 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     ScheduledZone? scheduledZoneResp = await scheduledViewModel
         .fetchZoneFromScheduled(token, widget.scheduledId!);
 
-    setState(() {
-      isZoneLoaded = scheduledZoneResp != null;
-      if (scheduledZoneResp != null) {
-        scheduledZone = scheduledZoneResp;
-      }
-    });
+    isZoneLoaded = scheduledZoneResp != null;
+    if (scheduledZoneResp != null) {
+      scheduledZone = scheduledZoneResp;
+    }
   }
 
   Future updateTaskList() async {
@@ -237,7 +236,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
 
   void startCreationProcess() async {
     if (geojsonFromFile.isNotEmpty) {
-      
       TaskScheduled? taskCreated = await handleAcceptOnShowDialogCreateTask();
 
       setState(() {
@@ -337,7 +335,8 @@ class _CreateScheduledState extends State<ScheduledComponent> {
             builder: (context, zoneLoadViewModel, child) {
           return LoadingOverlay(
               isLoading: scheduledViewModel.isLoading ||
-                  taskListScheduledViewModel.isLoading,
+                  taskListScheduledViewModel.isLoading ||
+                  scheduledViewModel.isLoadingZone,
               child: Column(children: [
                 Visibility(
                   visible: widget.isEdit && kIsWeb,
@@ -368,7 +367,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                 ? 730 + heightToAddOnCreate
                                 : widget.isEdit
                                     ? kIsWeb
-                                        ? 600
+                                        ? 808
                                         : 835
                                     : 706,
                         width: widthRow * 1.15,
@@ -749,7 +748,20 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                       _showMapElement(context);
                                     },
                                     text: appLocalizations.see_map_button,
-                                  )
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Visibility(
+                                      visible: kIsWeb,
+                                      child: Column(children: [
+                                        Text(
+                                          'Reportes',
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        ReportComponent(
+                                            scheduledId: widget.scheduledId!),
+                                        const SizedBox(height: 12),
+                                      ])),
                                 ]),
                               ),
                               Visibility(
