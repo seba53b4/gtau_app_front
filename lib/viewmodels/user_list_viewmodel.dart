@@ -170,7 +170,6 @@ class UserListViewModel extends ChangeNotifier {
       _isLoading = true;
       _error = false;
       notifyListeners();
-      await Future.delayed(Duration(seconds: 3));
       final responseListUsers = await _userService.searchUsers(
           token, username, null, null, null, null);
 
