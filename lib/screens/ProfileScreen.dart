@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Container(
                           height: 250,
-                          width: 400,
+                          width: kIsWeb ? widthCard * 0.3 : widthCard,
                           padding: const EdgeInsets.only(top: 24, bottom: 24),
                           decoration: BoxDecoration(
                             color: primarySwatch[200],
