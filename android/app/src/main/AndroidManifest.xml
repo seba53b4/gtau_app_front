@@ -4,7 +4,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="gtau_app_front">
+        android:label="PipeTracker">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAtZvXMCcSD-WLWBxytSscflOCFhX_yF2o" />

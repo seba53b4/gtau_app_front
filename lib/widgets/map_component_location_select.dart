@@ -242,19 +242,20 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                             left: kIsWeb ? 16 : null,
                             child: Column(
                               children: [
-                                MenuElevatedButton(
-                                    onPressed: () {
-                                      markersGPS.clear();
-                                      getCurrentLocation();
-                                      _getMarkers();
-                                      setState(() {
-                                        locationManual = false;
-                                      });
-                                    },
-                                    icon: Icons.my_location,
-                                    tooltipMessage:
-                                        AppLocalizations.of(context)!
-                                            .map_component_get_location),
+                                if (!kIsWeb)
+                                  MenuElevatedButton(
+                                      onPressed: () {
+                                        markersGPS.clear();
+                                        getCurrentLocation();
+                                        _getMarkers();
+                                        setState(() {
+                                          locationManual = false;
+                                        });
+                                      },
+                                      icon: Icons.my_location,
+                                      tooltipMessage:
+                                          AppLocalizations.of(context)!
+                                              .map_component_get_location),
                                 if (kIsWeb) const SizedBox(height: 6),
                                 MenuElevatedButton(
                                   colorChangeOnPress: true,

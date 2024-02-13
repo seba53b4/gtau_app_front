@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/models/user_data.dart';
-import 'package:gtau_app_front/services/task_service.dart';
 import 'package:gtau_app_front/services/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +9,6 @@ import '../providers/user_provider.dart';
 import '../utils/common_utils.dart';
 
 class UserListViewModel extends ChangeNotifier {
-  final TaskService _taskService = TaskService();
   final UserService _userService = UserService();
   final Map<String, List<UserData>> _users = {"ACTIVE": []};
 
@@ -158,6 +156,27 @@ class UserListViewModel extends ChangeNotifier {
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<UserData?> fetchUserByUsername(token, String? username) async {
+    try {
+      _isLoading = true;
+      _error = false;
+      notifyListeners();
+      final responseListUsers = await _userService.searchUsers(
+          token, username, null, null, null, null);
+
+      return responseListUsers?.first;
+    } catch (error) {
+      _error = true;
+      if (kDebugMode) {
+        print(error);
+      }
+      throw Exception('Error al obtener los datos: fetchUserByUsername');
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
