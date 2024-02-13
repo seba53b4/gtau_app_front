@@ -70,7 +70,7 @@ class _TaskListComponentState extends State<TaskList> {
     int value = prefs.getInt("tasks_length") ?? 0;
     int actualPage = prefs.getInt("actual_page") ?? 0;
 
-    if (newTasksLength == (value * actualPage) - actualPage) {
+    if (newTasksLength == value - 1) {
       return false;
     }
     return true;
@@ -162,24 +162,26 @@ class _TaskListComponentState extends State<TaskList> {
                           ScrollController(initialScrollOffset: position);
                       controller.addListener(_ScrollPosition);
                       controller.addListener(() {
-                        if ((controller.position.maxScrollExtent ==
-                                controller.offset) &&
-                            tasks!.length % taskListSize! == 0 &&
-                            nextPage) {
-                          if (isFiltered == true) {
-                            setState(() {
-                              final encodedBodyFiltered =
-                                  snapshot.data?[2] as String;
-                              updateTaskListFilteredState(
-                                  context, encodedBodyFiltered);
-                            });
-                          } else {
-                            setState(() {
-                              updateTaskListState(context);
-                            });
-                          }
+                        if(controller.hasClients == true){
+                          if ((controller.position.maxScrollExtent ==
+                                  controller.offset) &&
+                              tasks!.length % taskListSize! == 0 &&
+                              nextPage) {
+                            if (isFiltered == true) {
+                              setState(() {
+                                final encodedBodyFiltered =
+                                    snapshot.data?[2] as String;
+                                updateTaskListFilteredState(
+                                    context, encodedBodyFiltered);
+                              });
+                            } else {
+                              setState(() {
+                                updateTaskListState(context);
+                              });
+                            }
 
-                          _SetActualTasksLength(tasksLength);
+                            _SetActualTasksLength(tasksLength);
+                          }
                         }
                       });
 
@@ -188,6 +190,7 @@ class _TaskListComponentState extends State<TaskList> {
                           Expanded(
                             child: ListView.builder(
                               controller: controller,
+                              shrinkWrap: true,
                               padding: const EdgeInsets.all(8),
                               itemCount: tasksLength,
                               itemBuilder: (context, index) {
@@ -259,47 +262,89 @@ class _TaskListComponentState extends State<TaskList> {
                                                     )));
                                               } else {
                                                 _SetFilteredValue(false);
-                                                return const Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 0));
+                                                return Visibility(
+                                                  visible: !isLoadingNow,
+                                                  child:Padding(
+                                                    padding: const EdgeInsets.symmetric(
+                                                        vertical: 5),
+                                                    child: Center(
+                                                        child:
+                                                            Column(children: <Widget>[
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                                vertical: 10),
+                                                        child: SvgPicture.asset(
+                                                            'lib/assets/taskslist_empty.svg',
+                                                            width: 50,
+                                                            height: 50),
+                                                      ),
+                                                      Text(
+                                                          AppLocalizations.of(context)!
+                                                              .no_more_tasks_found,
+                                                          style: TextStyle(
+                                                              color: Colors.black
+                                                                  .withOpacity(0.6),
+                                                              fontSize: 15)),
+                                                    ]))));
                                               }
                                             } else {
                                               return const LoadingWidget();
                                             }
                                           });
-                                    } else {
-                                      if (actualPage > 1) {
-                                        return Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Center(
-                                                child:
-                                                    Column(children: <Widget>[
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 10),
-                                                child: SvgPicture.asset(
-                                                    'lib/assets/taskslist_empty.svg',
-                                                    width: 50,
-                                                    height: 50),
-                                              ),
-                                              Text(
-                                                  AppLocalizations.of(context)!
-                                                      .no_more_tasks_found,
-                                                  style: TextStyle(
-                                                      color: Colors.black
-                                                          .withOpacity(0.6),
-                                                      fontSize: 15)),
-                                            ])));
                                       } else {
-                                        return const Padding(
-                                          padding:
-                                              EdgeInsets.symmetric(vertical: 0),
-                                        );
+                                        if (actualPage > 1) {
+                                          return Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                  vertical: 5),
+                                              child: Center(
+                                                  child:
+                                                      Column(children: <Widget>[
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                          vertical: 10),
+                                                  child: SvgPicture.asset(
+                                                      'lib/assets/taskslist_empty.svg',
+                                                      width: 50,
+                                                      height: 50),
+                                                ),
+                                                Text(
+                                                    AppLocalizations.of(context)!
+                                                        .no_more_tasks_found,
+                                                    style: TextStyle(
+                                                        color: Colors.black
+                                                            .withOpacity(0.6),
+                                                        fontSize: 15)),
+                                              ])));
+                                        } else {
+                                          return Visibility(
+                                                  visible: !isLoadingNow && actualPage != 1,
+                                                  child:Padding(
+                                                    padding: const EdgeInsets.symmetric(
+                                                        vertical: 5),
+                                                    child: Center(
+                                                        child:
+                                                            Column(children: <Widget>[
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                                vertical: 10),
+                                                        child: SvgPicture.asset(
+                                                            'lib/assets/taskslist_empty.svg',
+                                                            width: 50,
+                                                            height: 50),
+                                                      ),
+                                                      Text(
+                                                          AppLocalizations.of(context)!
+                                                        .no_more_tasks_found,
+                                                          style: TextStyle(
+                                                              color: Colors.black
+                                                                  .withOpacity(0.6),
+                                                              fontSize: 15)),
+                                                    ]))));
+                                        }
                                       }
-                                    }
                                   }
                                 }
                               },
