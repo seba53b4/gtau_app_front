@@ -95,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             backgroundColor: lightBackground,
             body: Center(
               child: SizedBox(
-                width: kIsWeb ? widthCard * 0.3 : widthCard,
+                width: kIsWeb ? 520 : widthCard,
                 height: kIsWeb ? heightCard * 0.85 : heightCard,
                 child: Card(
                   child: Visibility(
@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         Container(
                           height: 250,
-                          width: kIsWeb ? widthCard * 0.3 : widthCard,
+                          width: kIsWeb ? 520 : widthCard,
                           padding: const EdgeInsets.only(top: 24, bottom: 24),
                           decoration: BoxDecoration(
                             color: primarySwatch[200],
