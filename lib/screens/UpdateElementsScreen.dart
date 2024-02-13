@@ -103,7 +103,9 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
       return true;
     } catch (error) {
       showGenericModalError(
-          context: context, message: 'Archivo con tipo elementos inválidos');
+          context: context,
+          message:
+              AppLocalizations.of(context)!.shape_laod_file_format_error_msg);
       return false;
     }
   }
