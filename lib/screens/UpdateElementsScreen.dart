@@ -365,13 +365,21 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                     ),
                     if (isMaxSize) const SizedBox(height: 24),
                     Visibility(
-                      visible: shapeLoadViewModel.result ?? false,
-                      child: Text(shapeLoadViewModel.result ?? false
-                          ? shapeLoadViewModel.linesError.isEmpty
-                              ? appLocalizations.shape_laod_success
-                              : appLocalizations.shape_laod_with_errors
-                          : appLocalizations.shape_laod_with_errors),
-                    ),
+                        visible: shapeLoadViewModel.result ?? false,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(shapeLoadViewModel.result ?? false
+                                ? shapeLoadViewModel.linesError.isEmpty
+                                    ? appLocalizations.shape_laod_success
+                                    : appLocalizations.shape_laod_with_errors
+                                : appLocalizations.shape_laod_with_errors),
+                            const SizedBox(width: 6),
+                            InfoIcon(
+                                message:
+                                    appLocalizations.shape_load_error_info),
+                          ],
+                        )),
                     if (isMaxSize) const SizedBox(height: 24),
                     Visibility(
                       visible: shapeLoadViewModel.result ?? false,
