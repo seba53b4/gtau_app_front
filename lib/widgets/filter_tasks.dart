@@ -513,7 +513,7 @@ class _FilterTasksState extends State<FilterTasks> {
   }
 
   void updateTaskList() async {
-    if(filterProvider.inspectionTypeFilter! == 'SCHEDULED'){
+    if((filterProvider.inspectionTypeFilter ?? "" ) == "SCHEDULED"){
       filterProvider.setisScheduled(true);
     }else{
       filterProvider.setisScheduled(false);
