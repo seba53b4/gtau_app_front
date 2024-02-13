@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/enums/element_type.dart';
 import '../services/images_service.dart';
+import '../utils/common_utils.dart';
 import '../widgets/photo.dart';
 
 class ImagesViewModel extends ChangeNotifier {

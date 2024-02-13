@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:gtau_app_front/models/shape_load/catchment_feature.dart';
+import 'package:gtau_app_front/models/shape_load/lot_feature.dart';
+import 'package:gtau_app_front/models/shape_load/register_feature.dart';
+import 'package:gtau_app_front/models/shape_load/section_feature.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -10,7 +14,9 @@ import 'package:provider/provider.dart';
 import '../models/enums/message_type.dart';
 import '../providers/user_provider.dart';
 import '../utils/geojson_utils.dart';
+import '../utils/messagesUtils.dart';
 import '../viewmodels/shape_load_viewmodel.dart';
+import '../widgets/common/customDialog.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/file_upload_component.dart';
 import '../widgets/common/info_icon.dart';
@@ -31,6 +37,7 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
   late ShapeLoadViewModel? shapeLoadViewModel;
   late String token;
   bool isPreparing = false;
+  bool isValidFile = false;
 
   @override
   void initState() {
@@ -79,9 +86,29 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
     return -1;
   }
 
-  void initializeProcess() {
-    int selectedIndex = findSelectedIndex();
-    final List<dynamic> linesData = getFeaturesArray(geojsonFromFile);
+  bool checkLinesDataOnSelection(int selectedIndex, List<dynamic> linesData) {
+    try {
+      switch (selectedIndex) {
+        case 0:
+          SectionFeature.fromJson(linesData.first);
+        case 1:
+          CatchmentFeature.fromJson(linesData.first);
+        case 2:
+          RegisterFeature.fromJson(linesData.first);
+        case 3:
+          LotFeature.fromJson(linesData.first);
+        default:
+          return false;
+      }
+      return true;
+    } catch (error) {
+      showGenericModalError(
+          context: context, message: 'Archivo con tipo elementos inválidos');
+      return false;
+    }
+  }
+
+  void initializeProcess(int selectedIndex, List<dynamic> linesData) {
     switch (selectedIndex) {
       case 0:
         shapeLoadViewModel!.initializeProcessShapeLoad(
@@ -103,17 +130,43 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
     }
   }
 
-  Future<void> manageLoadZoneProcess() async {
+  Future<void> manageLoadShapeProcess() async {
     setState(() {
       isPreparing = true;
     });
 
-    shapeLoadViewModel!.initWS();
-    await shapeLoadViewModel!.waitForWebSocketConnection();
-    setState(() {
-      isPreparing = false;
-    });
-    initializeProcess();
+    int selectedIndex = findSelectedIndex();
+    final List<dynamic> linesData = getFeaturesArray(geojsonFromFile);
+
+    if (checkLinesDataOnSelection(selectedIndex, linesData)) {
+      shapeLoadViewModel!.initWS();
+      await shapeLoadViewModel!.waitForWebSocketConnection();
+      setState(() {
+        isPreparing = false;
+      });
+      initializeProcess(selectedIndex, linesData);
+    } else {
+      setState(() {
+        isPreparing = false;
+      });
+    }
+  }
+
+  void handleSubmitTask() {
+    showCustomDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.dialogWarning,
+      content: AppLocalizations.of(context)!.dialogContent,
+      onDisablePressed: () {
+        Navigator.of(context).pop();
+      },
+      onEnablePressed: () async {
+        Navigator.of(context).pop();
+        await manageLoadShapeProcess();
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
   }
 
   @override
@@ -219,12 +272,14 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                               onDeleteSelection: () {
                                 setState(() {
                                   errorFileUpload = false;
+                                  isValidFile = false;
                                   geojsonFromFile = {};
                                 });
                               },
                               onFileAdded: (Map<String, dynamic> fileContent) {
                                 setState(() {
                                   geojsonFromFile = fileContent;
+                                  isValidFile = false;
                                   shapeLoadViewModel.reset();
                                   errorFileUpload = false;
                                 });
@@ -250,7 +305,7 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                                 errorFileUpload = true;
                               });
                             } else {
-                              await manageLoadZoneProcess();
+                              handleSubmitTask();
                             }
                           }),
                     ),

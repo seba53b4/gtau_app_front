@@ -4,6 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gtau_app_front/models/user_data.dart';
 import 'package:http/http.dart' as http;
 
+import '../utils/common_utils.dart';
+
 class UserService {
   final String baseUrl;
 
