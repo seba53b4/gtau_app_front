@@ -45,18 +45,21 @@ class _BottomNavigationState extends State<BottomNavigation> {
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
               colors: [
-                primarySwatch[100]!,
-                primarySwatch[200]!,
+                lightBackground,
+                lightBackground,
               ],
             ),
           ),
           child: BottomNavigationBar(
               elevation: 0,
               type: BottomNavigationBarType.fixed,
-              selectedItemColor: lightBackground,
-              selectedIconTheme: IconThemeData(color: lightBackground),
+              selectedItemColor: primarySwatch[500]!,
+              unselectedIconTheme: const IconThemeData(color: Colors.black26),
+              selectedIconTheme: IconThemeData(color: primarySwatch[500]!),
               selectedLabelStyle: GoogleFonts.sora(
-                  color: lightBackground, fontWeight: FontWeight.w500),
+                  color: primarySwatch[500]!, fontWeight: FontWeight.w500),
+              unselectedLabelStyle: GoogleFonts.sora(
+                  color: Colors.black26),
               backgroundColor: Colors.transparent,
               currentIndex: myCurrentIndex,
               onTap: (value) {
