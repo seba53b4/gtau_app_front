@@ -100,19 +100,22 @@ class _NavigationWeb extends State<NavigationWeb> {
                 begin: Alignment.center,
                 end: Alignment.centerRight,
                 colors: [
-                  primarySwatch[100]!,
-                  primarySwatch[50]!,
+                  lightBackground,
+                  Colors.white70,
                 ],
               ),
             ),
             child: NavigationRail(
+              selectedIconTheme: const IconThemeData(
+                color: Colors.white,
+              ),
               extended: isNavRailExtended,
               backgroundColor: Colors.transparent,
               useIndicator: true,
-              indicatorColor: lightBackground,
+              indicatorColor: primarySwatch[500]!,
               selectedLabelTextStyle: GoogleFonts.sora(
                 textStyle: TextStyle(
-                    color: lightBackground,
+                    color: primarySwatch[400]!,
                     fontSize: 20,
                     fontWeight: FontWeight.w500),
               ),

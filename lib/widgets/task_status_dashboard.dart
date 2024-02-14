@@ -98,7 +98,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         child: Scaffold(
             key: scaffoldKeyDashboard,
             appBar: AppBar(
-              backgroundColor: primarySwatch[200],
+              backgroundColor: primarySwatch[500],
               toolbarHeight: 0,
               bottom: TabBar(
                 controller: _tabController,

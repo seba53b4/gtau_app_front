@@ -10,6 +10,7 @@ import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/common/informe_upload_component.dart';
@@ -575,9 +576,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           child: Scaffold(
             body: SingleChildScrollView(
               controller: _scrollController,
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 12.0, vertical: 12.0),
+              child: BackgroundGradient(
                 child: Column(
                   children: [
                     Visibility(
