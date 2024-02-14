@@ -127,7 +127,7 @@ class _GelleryShowState extends State<_GelleryShow> {
                 floatingActionButton: FloatingActionButton(
                   onPressed: () => _selectPhoto(),
                   foregroundColor: null,
-                  backgroundColor: null,
+                  backgroundColor: primarySwatch[200]!,
                   shape: null,
                   child: const Icon(Icons.add),
                 )));

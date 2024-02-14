@@ -46,6 +46,13 @@ class TaskListItem extends StatelessWidget {
     double iconSize = kIsWeb ? 26 : 24;
     final appLocalizations = AppLocalizations.of(context)!;
 
+    if (!kIsWeb) {
+      final widthScreen = MediaQuery.of(context).size.width;
+      if (widthScreen < 400) {
+        titleSpace = widthScreen * 0.25;
+      }
+    }
+
     return InkWell(
       onTap: () {
         _goToTaskCreationPage(context);

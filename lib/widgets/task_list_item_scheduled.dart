@@ -41,13 +41,20 @@ class TaskListItemScheduled extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
-    double fontSize = kIsWeb ? 15 : 12;
+    double fontSize = kIsWeb ? 15 : 11;
     double fontSizeInfo = kIsWeb ? 12 : 9;
     double titleSpace = kIsWeb ? 200 : 120;
     double dividerHeight = kIsWeb ? 32 : 24;
     double taskInfoSpace = kIsWeb ? 150 : 115;
     double iconSize = kIsWeb ? 26 : 24;
     final appLocalizations = AppLocalizations.of(context)!;
+
+    if (!kIsWeb) {
+      final widthScreen = MediaQuery.of(context).size.width;
+      if (widthScreen < 400) {
+        titleSpace = widthScreen * 0.25;
+      }
+    }
 
     return InkWell(
       onTap: () {

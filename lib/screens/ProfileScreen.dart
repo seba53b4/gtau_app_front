@@ -96,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             body: Center(
               child: SizedBox(
                 width: kIsWeb ? 520 : widthCard,
-                height: kIsWeb ? heightCard * 0.85 : heightCard,
+                height: kIsWeb ? heightCard * 0.85 : heightCard * 0.86,
                 child: Card(
                   child: Visibility(
                     visible: !userListViewModel.isLoading,
@@ -105,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Container(
-                          height: 250,
+                          height: kIsWeb ? 250 : heightCard * 0.25,
                           width: kIsWeb ? 520 : widthCard,
                           padding: const EdgeInsets.only(top: 24, bottom: 24),
                           decoration: BoxDecoration(
@@ -131,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 isAdmin
                                     ? GtauIcons.roleAdmin
                                     : GtauIcons.roleOper,
-                                size: 68,
+                                size: kIsWeb ? 68 : 40,
                                 color: lightBackground,
                               ),
                             ),
@@ -144,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           indent: 20,
                           endIndent: 20,
                         ),
-                        const SizedBox(height: 48),
+                        const SizedBox(height: kIsWeb ? 48 : 12),
                         CustomProfileRow(
                           label: appLocalizations.name,
                           value:
