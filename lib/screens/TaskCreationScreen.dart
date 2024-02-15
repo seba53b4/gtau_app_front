@@ -1305,7 +1305,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                             //     selectedItemsProvider: selectedItemsProvider),
                             // const SizedBox(
                             //     height: AppConstants.taskColumnSpace),
-                            ElementsSelected(widget: widget),
+                            SizedBox(
+                              width: widthRow,
+                              child: ElementsSelected(widget: widget),
+                            ),
                             const SizedBox(
                                 height: AppConstants.taskColumnSpace),
                             if (widget.detail)

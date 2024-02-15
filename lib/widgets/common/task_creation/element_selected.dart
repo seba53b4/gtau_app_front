@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +57,19 @@ class ElementsSelected extends StatelessWidget {
             );
           }));
 
+          int splitValue = kIsWeb ? 4 : 2;
+
+          final List<List<EntityIdContainer>> splitList = [];
+          for (int i = 0; i < elementsList.length; i += splitValue) {
+            int endIndex = i + splitValue;
+            if (endIndex > elementsList.length) {
+              endIndex = elementsList.length;
+            }
+            splitList.add(elementsList.sublist(i, endIndex));
+          }
+
+          double paddingElements = kIsWeb ? 8 : 4;
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -73,26 +87,42 @@ class ElementsSelected extends StatelessWidget {
                   const MapModal(),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: softGrey,
-                      borderRadius: BorderRadius.circular(24.0),
-                    ),
-                    child: Wrap(
-                      spacing: 15.0,
-                      runSpacing: 15.0,
-                      children: elementsList.isNotEmpty
-                          ? elementsList
-                          : [
-                              Text(
-                                AppLocalizations.of(context)!
-                                    .no_elements_registered,
-                                style: const TextStyle(fontSize: 16.0),
-                              )
-                            ],
-                    ),
-                  ),
+                      // constraints: BoxConstraints(maxWidth: 600),
+                      // Establece el ancho máximo
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: softGrey,
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                      child: elementsList.isNotEmpty
+                          ? Column(
+                              children: splitList.map((subList) {
+                                return Row(
+                                  children: subList.map((item) {
+                                    return Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: paddingElements,
+                                          vertical: paddingElements - 2),
+                                      child: item,
+                                    );
+                                  }).toList(),
+                                );
+                              }).toList(),
+                            )
+                          : Text(
+                              AppLocalizations.of(context)!
+                                  .no_elements_registered,
+                              style: const TextStyle(fontSize: 16.0),
+                            )),
                 ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                AppLocalizations.of(context)!
+                    .createTaskPage_selectUbicationTitle,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
               ),
               const SizedBox(height: 12),
               Container(
@@ -102,9 +132,9 @@ class ElementsSelected extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24.0),
                 ),
                 child: Wrap(
-                  direction: Axis.vertical,
-                  spacing: 8.0,
-                  runSpacing: 15.0,
+                  direction: kIsWeb ? Axis.horizontal : Axis.vertical,
+                  spacing: kIsWeb ? 8.0 : 4,
+                  runSpacing: kIsWeb ? 8.0 : 6,
                   children: [
                     Chip(
                       backgroundColor: Colors.white70,
