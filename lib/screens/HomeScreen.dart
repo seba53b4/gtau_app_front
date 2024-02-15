@@ -61,37 +61,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: BackgroundGradient(
-        decoration: BoxDecoration(
-                gradient: RadialGradient(
-                center: Alignment.center,      
-                radius: 2,      
-                focalRadius: 2,
-                // begin: Alignment.center,      
-                // end: Alignment.centerRight,   
-                colors: [
-                  Colors.black38 ,      
-                  Colors.black45      
-                ],            
-              ),
-            ),
             child: Center(
-          child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: kIsWeb
-                  ? MediaQuery.of(context).size.height * 0.78
-                  : MediaQuery.of(context).size.height - 72,
-              color: Colors.transparent,
-              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
-        ),
+              child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: kIsWeb
+                      ? MediaQuery.of(context).size.height * 0.78
+                      : MediaQuery.of(context).size.height - 72,
+                  color: Colors.transparent,
+                  child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+            ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showFilterModal(context);
         },
-        foregroundColor: null,
-        backgroundColor: primarySwatch[200]!,
+        foregroundColor: primarySwatch[700]!,
+        backgroundColor: Colors.white,
         shape: null,
-        child: const Icon(Icons.filter),
+        child: const Icon(Icons.filter_alt_rounded),
       ),
     );
   }

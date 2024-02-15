@@ -142,15 +142,29 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
             ),
             body: BackgroundGradient(
               decoration: BoxDecoration(
+                border: kIsWeb ? Border(
+                  left: BorderSide( //                   <--- left side
+                    color: lightBackground,
+                    width: 5.0,
+                  ),
+                  right: BorderSide( //                    <--- top side
+                    color: lightBackground,
+                    width: 5.0,
+                  ),
+                  bottom: BorderSide( //                    <--- top side
+                    color: lightBackground,
+                    width: 5.0,
+                  ),
+                ) : null,
                 gradient: RadialGradient(
                 center: Alignment.center,      
                 radius: 2,      
                 focalRadius: 2,
                 // begin: Alignment.center,      
                 // end: Alignment.centerRight,   
-                colors: [
-                  primarySwatch[50]! ,      
-                  primarySwatch[100]!      
+                colors: const [
+                  Colors.black26 ,      
+                  Colors.black26       
                 ],            
               ),
             ),
@@ -280,7 +294,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
           style: TextStyle(
             fontSize: kIsWeb ? 20 : 13,
             color: isSelected ? primarySwatch[500]! : Colors.black26,
-            fontWeight: kIsWeb ? null : FontWeight.w500,
+            fontWeight: isSelected ? FontWeight.w600 : (kIsWeb ? FontWeight.w500 : FontWeight.w500),
             height: 1.0,
           ),
         ),

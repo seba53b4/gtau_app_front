@@ -5,6 +5,7 @@ import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/reports_components.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -360,7 +361,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                 Center(
                   child: Column(
                     children: [
-                      BoxContainer(
+                      BoxContainerWhite(
                         height: creatingScheduledError
                             ? 890
                             : creatingScheduled
