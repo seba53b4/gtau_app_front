@@ -17,6 +17,7 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 import '../../models/enums/message_type.dart';
 import '../../models/scheduled/element_found.dart';
 import '../../providers/user_provider.dart';
+import '../../utils/common_utils.dart';
 import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
 import '../scheduled_image_gallery_modal.dart';
@@ -222,7 +223,7 @@ class _ScheduledFormSection extends State<ScheduledFormSection> {
       );
       showMessageOnScreen(result);
     } catch (error) {
-      print("Error: $error");
+      printOnDebug("Error: $error");
       showMessageErrorOnFetch();
     }
   }

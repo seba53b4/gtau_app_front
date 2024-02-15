@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:gtau_app_front/services/task_service.dart';
 
+import '../utils/common_utils.dart';
+
 class InformeViewModel extends ChangeNotifier {
   final TaskService _taskService = TaskService();
 
@@ -44,9 +46,7 @@ class InformeViewModel extends ChangeNotifier {
         _informes = parseInformes(responseTask);
       } else {
         _informes = [];
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
       }
 
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
@@ -57,9 +57,7 @@ class InformeViewModel extends ChangeNotifier {
       return _informes;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     }
   }
@@ -100,9 +98,7 @@ class InformeViewModel extends ChangeNotifier {
 
       if (!response) {
         _error = true;
-        if (kDebugMode) {
-          print('Error al eliminar el informe');
-        }
+        printOnDebug('Error al eliminar el informe');
       }
 
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
@@ -114,9 +110,7 @@ class InformeViewModel extends ChangeNotifier {
       return response;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al eliminar informes');
     }
   }

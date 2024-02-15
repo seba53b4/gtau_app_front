@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 
 class UserListViewModel extends ChangeNotifier {
   final UserService _userService = UserService();
@@ -73,7 +74,7 @@ class UserListViewModel extends ChangeNotifier {
       return responseListUsers;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       _SetIsLoadingPrefValue(false);
       throw Exception('Error al obtener los datos');
     } finally {
@@ -97,7 +98,7 @@ class UserListViewModel extends ChangeNotifier {
       return responseListUsers;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       _SetIsLoadingPrefValue(false);
       throw Exception('Error al obtener los datos');
     } finally {
@@ -118,18 +119,15 @@ class UserListViewModel extends ChangeNotifier {
       if (responseTask != null) {
         return responseTask;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
+
         _error = true;
         return null;
       }
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
@@ -154,9 +152,7 @@ class UserListViewModel extends ChangeNotifier {
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
@@ -194,15 +190,15 @@ class UserListViewModel extends ChangeNotifier {
       final response = await _userService.deleteUser(token, id);
 
       if (response) {
-        print('Usuario ha sido eliminado correctamente');
+        printOnDebug('Usuario ha sido eliminado correctamente');
         return true;
       } else {
-        print('No se pudo eliminar el usuario');
+        printOnDebug('No se pudo eliminar el usuario');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al eliminar el usuario');
     } finally {
       _isLoading = false;
@@ -219,18 +215,18 @@ class UserListViewModel extends ChangeNotifier {
       notifyListeners();
       final response = await _userService.updateUser(token, idUser, body);
       if (response) {
-        print('Usuario ha sido actualizada correctamente');
+        printOnDebug('Usuario ha sido actualizada correctamente');
         notifyListeners();
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
@@ -250,12 +246,12 @@ class UserListViewModel extends ChangeNotifier {
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;

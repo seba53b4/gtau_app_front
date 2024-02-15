@@ -25,6 +25,7 @@ import '../models/task.dart';
 import '../navigation/navigation.dart';
 import '../providers/selected_items_provider.dart';
 import '../providers/task_filters_provider.dart';
+import '../utils/common_utils.dart';
 import '../utils/date_utils.dart';
 import '../utils/imagesbundle.dart';
 import '../viewmodels/images_viewmodel.dart';
@@ -226,7 +227,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
 
       return true;
     } catch (error) {
-      print(error);
+      printOnDebug(error.toString());
       throw Exception('Error al obtener los datos');
     }
   }
@@ -238,16 +239,16 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
     try {
       final response = await taskListViewModel.createTask(token!, body);
       if (response) {
-        print('Tarea ha sido creada correctamente');
+        printOnDebug('Tarea ha sido creada correctamente');
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         await showMessageDialog(DialogMessageType.error);
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
-      print(error);
+      printOnDebug(error.toString());
       throw Exception('Error al obtener los datos');
     }
   }
@@ -266,16 +267,16 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           await taskListViewModel.updateTask(token!, widget.idTask!, body);
 
       if (response) {
-        print('Tarea ha sido actualizada correctamente');
+        printOnDebug('Tarea ha sido actualizada correctamente');
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         await showMessageDialog(DialogMessageType.error);
         return false;
       }
     } catch (error) {
-      print(error);
+      printOnDebug(error.toString());
       throw Exception('Error al obtener los datos');
     }
   }
@@ -350,7 +351,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
         cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
       );
     } else {
-      print(
+      printOnDebug(
           'Programada: ${scheduledNumberController.text} Descripcion: ${descriptionController.text}');
     }
   }
@@ -468,7 +469,7 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           final response = await imagesViewModel.uploadImage(
               token!, widget.idTask!, image.getPath);
         } catch (error) {
-          print(error);
+          printOnDebug(error.toString());
           throw Exception('Error al subir imagen');
         }
       });
@@ -1301,14 +1302,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   ),
                             const SizedBox(
                                 height: AppConstants.taskColumnSpace),
-
-                            // Elementos seleccionados
-                            ElementsSelected(widget: widget),
-                            const SizedBox(height: 10.0),
-                            // Button elementos a seleccionar
                             InspectionLocationSelect(
                                 selectedItemsProvider: selectedItemsProvider),
-                            const SizedBox(height: 10.0),
+                            const SizedBox(
+                                height: AppConstants.taskColumnSpace),
+                            ElementsSelected(widget: widget),
+                            const SizedBox(
+                                height: AppConstants.taskColumnSpace),
                             if (widget.detail)
                               Column(
                                 children: [

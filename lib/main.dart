@@ -15,6 +15,7 @@ import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/section_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/shape_load_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
@@ -83,6 +84,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<ZoneLoadViewModel>(
           create: (context) => ZoneLoadViewModel(),
+        ),
+        ChangeNotifierProvider<ShapeLoadViewModel>(
+          create: (context) => ShapeLoadViewModel(),
         ),
       ],
       child: const MyApp(),

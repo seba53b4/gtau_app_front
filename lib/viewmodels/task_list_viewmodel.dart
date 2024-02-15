@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 
 class TaskListViewModel extends ChangeNotifier {
   final TaskService _taskService = TaskService();
@@ -100,7 +101,7 @@ class TaskListViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       _SetIsLoadingPrefValue(false);
       throw Exception('Error al obtener los datos');
     } finally {
@@ -142,7 +143,7 @@ class TaskListViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -177,7 +178,7 @@ class TaskListViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -205,7 +206,7 @@ class TaskListViewModel extends ChangeNotifier {
     } catch (error) {
       _error = true;
       _SetIsLoadingPrefValue(false);
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -223,15 +224,15 @@ class TaskListViewModel extends ChangeNotifier {
       final response = await _taskService.deleteTask(token, id);
 
       if (response) {
-        print('Tarea ha sido eliminada correctamente');
+        printOnDebug('Tarea ha sido eliminada correctamente');
         return true;
       } else {
-        print('No se pudo eliminar la tarea');
+        printOnDebug('No se pudo eliminar la tarea');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al eliminar la tarea');
     } finally {
       _isLoading = false;
@@ -249,18 +250,15 @@ class TaskListViewModel extends ChangeNotifier {
       if (responseTask != null) {
         return responseTask;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
+
         _error = true;
         return null;
       }
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
@@ -278,18 +276,18 @@ class TaskListViewModel extends ChangeNotifier {
       notifyListeners();
       final response = await _taskService.updateTask(token, idTask, body);
       if (response) {
-        print('Tarea ha sido actualizada correctamente');
+        printOnDebug('Tarea ha sido actualizada correctamente');
         notifyListeners();
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
@@ -305,17 +303,17 @@ class TaskListViewModel extends ChangeNotifier {
       notifyListeners();
       final response = await _taskService.createTask(token, body);
       if (response) {
-        print('Tarea ha sido creada correctamente');
+        printOnDebug('Tarea ha sido creada correctamente');
         notifyListeners();
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;

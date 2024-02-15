@@ -7,7 +7,7 @@ enum StatusProcess {
   ERROR,
 }
 
-class WebSocketResponse {
+class WebSocketZoneLoadResponse {
   String? type;
   StatusProcess status;
   bool result;
@@ -16,7 +16,7 @@ class WebSocketResponse {
   ElementStatus? registrosStatus;
   ElementStatus? captacionesStatus;
 
-  WebSocketResponse({
+  WebSocketZoneLoadResponse({
     this.type,
     required this.status,
     required this.result,
@@ -26,8 +26,8 @@ class WebSocketResponse {
     this.captacionesStatus,
   });
 
-  factory WebSocketResponse.fromJson(Map<String, dynamic> json) {
-    return WebSocketResponse(
+  factory WebSocketZoneLoadResponse.fromJson(Map<String, dynamic> json) {
+    return WebSocketZoneLoadResponse(
       type: json['type'],
       status: _parseStatus(json['status']),
       result: json['result'],

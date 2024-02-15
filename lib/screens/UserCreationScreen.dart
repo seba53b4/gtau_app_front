@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
@@ -14,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
 import '../providers/selected_items_provider.dart';
+import '../utils/common_utils.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/common/custom_dropdown.dart';
 import '../widgets/common/custom_elevated_button.dart';
@@ -58,7 +58,9 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     userListViewModel = Provider.of<UserListViewModel>(context, listen: false);
-    token = Provider.of<UserProvider>(context, listen: false).getToken!;
+    token = Provider
+        .of<UserProvider>(context, listen: false)
+        .getToken!;
   }
 
   @override
@@ -77,7 +79,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   Future updateUserListState(BuildContext context) async {
     const status = 'ACTIVE';
     final userListViewModel =
-        Provider.of<UserListViewModel>(context, listen: false);
+    Provider.of<UserListViewModel>(context, listen: false);
     userListViewModel.clearListByStatus(status!);
     await userListViewModel.initializeUsers(context, "ACTIVE", "");
   }
@@ -98,13 +100,15 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   }
 
   Future<bool> _fetchUser() async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final token = Provider
+        .of<UserProvider>(context, listen: false)
+        .getToken;
     final userListViewModel =
-        Provider.of<UserListViewModel>(context, listen: false);
+    Provider.of<UserListViewModel>(context, listen: false);
 
     try {
       final responseUser =
-          await userListViewModel.fetchUser(token, widget.idUser!);
+      await userListViewModel.fetchUser(token, widget.idUser!);
       if (responseUser != null) {
         setState(() {
           user = responseUser;
@@ -125,7 +129,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
       return true;
     } catch (error) {
-      //print(error);
+      printOnDebug(error.toString());
       throw Exception('Error al obtener los datos');
     }
   }
@@ -134,63 +138,56 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     try {
       final response = await userListViewModel.createUser(token!, body);
       if (response) {
-        if (kDebugMode) {
-          print('Usuario ha sido creado correctamente');
-        }
+        printOnDebug('Usuario ha sido creado correctamente');
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         await showCustomMessageDialog(
-        context: context,
-        customText: AppLocalizations.of(context)!.createuser_error_message,
-        onAcceptPressed: () {},
-        messageType: DialogMessageType.error,
+          context: context,
+          customText: AppLocalizations.of(context)!.createuser_error_message,
+          onAcceptPressed: () {},
+          messageType: DialogMessageType.error,
         );
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error.toString());
       throw Exception('Error al obtener los datos');
     }
   }
 
   Future<bool> _updateUser(Map<String, dynamic> body) async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    final token = Provider
+        .of<UserProvider>(context, listen: false)
+        .getToken;
 
     final userListViewModel =
-        Provider.of<UserListViewModel>(context, listen: false);
+    Provider.of<UserListViewModel>(context, listen: false);
 
     try {
       final response =
-          await userListViewModel.updateUser(token!, widget.idUser!, body);
+      await userListViewModel.updateUser(token!, widget.idUser!, body);
 
       if (response) {
-        if (kDebugMode) {
-          print('Usuario ha sido actualizado correctamente');
-        }
+        printOnDebug('Usuario ha sido actualizado correctamente');
+
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
+
         await showCustomMessageDialog(
-        context: context,
-        customText: AppLocalizations.of(context)!.createuser_error_message,
-        onAcceptPressed: () {},
-        messageType: DialogMessageType.error,
+          context: context,
+          customText: AppLocalizations.of(context)!.createuser_error_message,
+          onAcceptPressed: () {},
+          messageType: DialogMessageType.error,
         );
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
+
       throw Exception('Error al obtener los datos');
     }
   }
@@ -223,7 +220,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   void handleSubmit() {
     String bodyMsg = '';
     final bool emailValid = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(emailController.text);
     final bool isRoleValid = roleController.text != notAssigned;
     if (emailValid == false)
@@ -384,217 +381,227 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
     return Consumer<UserListViewModel>(
         builder: (context, userListViewModel, child) {
-      return LoadingOverlay(
-        isLoading: userListViewModel.isLoading,
-        child: Scaffold(
-          body: Container(
-            margin:
+          return LoadingOverlay(
+            isLoading: userListViewModel.isLoading,
+            child: Scaffold(
+              body: Container(
+                margin:
                 const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 12.0),
-                Center(
-                  child: Visibility(
-                    visible: true,
-                    child: Form(
-                      key: _formKey,
-                      child: BoxContainer(
-                        width: widthRow * 1.15,
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              widget.detail
-                                  ? AppLocalizations.of(context)!
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12.0),
+                    Center(
+                      child: Visibility(
+                        visible: true,
+                        child: Form(
+                          key: _formKey,
+                          child: BoxContainer(
+                            width: widthRow * 1.15,
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  widget.detail
+                                      ? AppLocalizations.of(context)!
                                       .createuser_editor_title
-                                  : AppLocalizations.of(context)!
+                                      : AppLocalizations.of(context)!
                                       .createuser_main_title,
-                              style: const TextStyle(fontSize: 32.0),
-                            ),
-                            const SizedBox(height: 24.0),
-                            // Primera fila
-                            SizedBox(
-                              height: heightRow,
-                              width: widthRow,
-                              child: Row(
-                                mainAxisAlignment:
+                                  style: const TextStyle(fontSize: 32.0),
+                                ),
+                                const SizedBox(height: 24.0),
+                                // Primera fila
+                                SizedBox(
+                                  height: heightRow,
+                                  width: widthRow,
+                                  child: Row(
+                                    mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .center,
                                     children: [
+                                      Column(
+                                        children: [
+                                          const SizedBox(
+                                              width: AppConstants.taskRowSpace),
+                                          Column(
+                                            children: [
+                                              Text(
+                                                AppLocalizations.of(context)!
+                                                    .createUserPage_roleTitle,
+                                                style:
+                                                const TextStyle(fontSize: 16.0),
+                                              ),
+                                              const SizedBox(height: 12.0),
+                                              CustomDropdown(
+                                                value: userRole,
+                                                width: AppConstants
+                                                    .textFieldWidth,
+                                                items: [
+                                                  notAssigned,
+                                                  AppLocalizations.of(context)!
+                                                      .createUserPage_roleValueOperator,
+                                                  AppLocalizations.of(context)!
+                                                      .createUserPage_roleValueAdmin
+                                                ],
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    roleController.text =
+                                                    value!;
+                                                  });
+                                                },
+                                              ),
+                                              const SizedBox(
+                                                  height:
+                                                  AppConstants.taskColumnSpace),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                       const SizedBox(
                                           width: AppConstants.taskRowSpace),
                                       Column(
                                         children: [
                                           Text(
                                             AppLocalizations.of(context)!
-                                                .createUserPage_roleTitle,
-                                            style:
-                                                const TextStyle(fontSize: 16.0),
-                                          ),
-                                          const SizedBox(height: 12.0),
-                                          CustomDropdown(
-                                            value: userRole,
-                                            width: AppConstants.textFieldWidth,
-                                            items: [
-                                              notAssigned,
-                                              AppLocalizations.of(context)!
-                                                  .createUserPage_roleValueOperator,
-                                              AppLocalizations.of(context)!
-                                                  .createUserPage_roleValueAdmin
-                                            ],
-                                            onChanged: (String? value) {
-                                              setState(() {
-                                                roleController.text = value!;
-                                              });
-                                            },
+                                                .createUserPage_emailTitle,
+                                            style: const TextStyle(
+                                                fontSize: 16.0),
                                           ),
                                           const SizedBox(
-                                              height:
-                                                  AppConstants.taskColumnSpace),
+                                              height: AppConstants
+                                                  .taskColumnSpace),
+                                          CustomTextFormField(
+                                            width: AppConstants.textFieldWidth *
+                                                2 +
+                                                AppConstants.taskRowSpace +
+                                                16,
+                                            hintText: AppLocalizations.of(
+                                                context)!
+                                                .createUserPage_emailPlaceholder,
+                                            controller: emailController,
+                                          ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                      width: AppConstants.taskRowSpace),
-                                  Column(
-                                    children: [
-                                      Text(
-                                        AppLocalizations.of(context)!
-                                            .createUserPage_emailTitle,
-                                        style: const TextStyle(fontSize: 16.0),
-                                      ),
-                                      const SizedBox(
-                                          height: AppConstants.taskColumnSpace),
-                                      CustomTextFormField(
-                                        width: AppConstants.textFieldWidth * 2 +
-                                            AppConstants.taskRowSpace +
-                                            16,
-                                        hintText: AppLocalizations.of(context)!
-                                            .createUserPage_emailPlaceholder,
-                                        controller: emailController,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20.0),
-                            // Segunda fila
-                            SizedBox(
-                              height: heightRow,
-                              width: widthRow,
-                              child: Row(
-                                  mainAxisAlignment:
+                                ),
+                                const SizedBox(height: 20.0),
+                                // Segunda fila
+                                SizedBox(
+                                  height: heightRow,
+                                  width: widthRow,
+                                  child: Row(
+                                      mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .center,
                                       children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .createUserPage_usernameTitle,
-                                          style:
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createUserPage_usernameTitle,
+                                              style:
                                               const TextStyle(fontSize: 16.0),
-                                        ),
-                                        const SizedBox(height: 12.0),
-                                        CustomTextFormField(
-                                          hintText: AppLocalizations.of(
+                                            ),
+                                            const SizedBox(height: 12.0),
+                                            CustomTextFormField(
+                                              hintText: AppLocalizations.of(
                                                   context)!
-                                              .createUserPage_usernamePlaceholder,
-                                          controller: usernameController,
+                                                  .createUserPage_usernamePlaceholder,
+                                              controller: usernameController,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .createUserPage_firstnameTitle,
-                                          style:
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createUserPage_firstnameTitle,
+                                              style:
                                               const TextStyle(fontSize: 16.0),
-                                        ),
-                                        const SizedBox(
-                                            height:
+                                            ),
+                                            const SizedBox(
+                                                height:
                                                 AppConstants.taskColumnSpace),
-                                        CustomTextFormField(
-                                          hintText: AppLocalizations.of(
+                                            CustomTextFormField(
+                                              hintText: AppLocalizations.of(
                                                   context)!
-                                              .createUserPage_firstnamePlaceholder,
-                                          controller: firstnameController,
+                                                  .createUserPage_firstnamePlaceholder,
+                                              controller: firstnameController,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .createUserPage_lastnameTitle,
-                                          style:
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createUserPage_lastnameTitle,
+                                              style:
                                               const TextStyle(fontSize: 16.0),
-                                        ),
-                                        const SizedBox(
-                                            height:
+                                            ),
+                                            const SizedBox(
+                                                height:
                                                 AppConstants.taskColumnSpace),
-                                        CustomTextFormField(
-                                          hintText: AppLocalizations.of(
+                                            CustomTextFormField(
+                                              hintText: AppLocalizations.of(
                                                   context)!
-                                              .createUserPage_lastnamePlaceholder,
-                                          controller: lastnameController,
+                                                  .createUserPage_lastnamePlaceholder,
+                                              controller: lastnameController,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  ]),
+                                      ]),
+                                ),
+                                // Tercera fila
+                              ],
                             ),
-                            // Tercera fila
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Container(
-                  height: 50.0,
-                  margin: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomElevatedButton(
-                        messageType: MessageType.error,
-                        onPressed: handleCancel,
-                        text: AppLocalizations.of(context)!.buttonCancelLabel,
-                      ),
-                      const SizedBox(width: 12.0),
-                      CustomElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            if (widget.idUser == '') {
-                              handleSubmit();
-                            } else {
-                              // Se quita acción de creación en Programada
-                              handleEditTask();
-                            }
-                          } else {
-                            scrollToTopScrollView();
-                          }
-                        },
-                        text: widget.idUser != ''
-                            ? AppLocalizations.of(context)!.buttonAcceptLabel
-                            : AppLocalizations.of(context)!
+                    Container(
+                      height: 50.0,
+                      margin: const EdgeInsets.symmetric(vertical: 20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomElevatedButton(
+                            messageType: MessageType.error,
+                            onPressed: handleCancel,
+                            text: AppLocalizations.of(context)!
+                                .buttonCancelLabel,
+                          ),
+                          const SizedBox(width: 12.0),
+                          CustomElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                if (widget.idUser == '') {
+                                  handleSubmit();
+                                } else {
+                                  // Se quita acción de creación en Programada
+                                  handleEditTask();
+                                }
+                              } else {
+                                scrollToTopScrollView();
+                              }
+                            },
+                            text: widget.idUser != ''
+                                ? AppLocalizations.of(context)!
+                                .buttonAcceptLabel
+                                : AppLocalizations.of(context)!
                                 .createTaskPage_submitButton,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      );
-    });
+          );
+        });
   }
 }

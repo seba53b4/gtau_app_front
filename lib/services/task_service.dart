@@ -1,10 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:http/http.dart' as http;
+
+import '../utils/common_utils.dart';
 
 class TaskService {
   final String baseUrl;
@@ -31,13 +32,12 @@ class TaskService {
       if (response.statusCode == 200) {
         return parseTaskListResponse(response);
       } else {
-        print('Error getTasks re null');
+        printOnDebug('Error getTasks re null');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in getTasks: $error');
-      }
+      printOnDebug('Error in getTasks: $error');
+
       rethrow;
     }
   }
@@ -72,9 +72,7 @@ class TaskService {
       final response = await http.delete(url, headers: _getHeaders(token));
       return response.statusCode == 204;
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in deleteTask: $error');
-      }
+      printOnDebug('Error in deleteTask: $error');
       rethrow;
     }
   }
@@ -111,15 +109,11 @@ class TaskService {
                 ? LatLng(position['latitud'], position['longitud'])
                 : const LatLng(0, 0));
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in fetchTask: $error');
-      }
+      printOnDebug('Error in fetchTask: $error');
       rethrow;
     }
   }
@@ -132,16 +126,15 @@ class TaskService {
       final response =
           await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
-        print('Tarea ha sido actualizada correctamente');
+        printOnDebug('Tarea ha sido actualizada correctamente');
         return true;
       } else {
-        print('Error en update de tarea');
+        printOnDebug('Error en update de tarea');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in updateTask: $error');
-      }
+      printOnDebug('Error in updateTask: $error');
+
       rethrow;
     }
   }
@@ -154,16 +147,15 @@ class TaskService {
           await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 201) {
-        print('Tarea ha sido creada correctamente');
+        printOnDebug('Tarea ha sido creada correctamente');
         return true;
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in createTask: $error');
-      }
+      printOnDebug('Error in createTask: $error');
+
       rethrow;
     }
   }
@@ -179,13 +171,12 @@ class TaskService {
       if (response.statusCode == 200) {
         return parseTaskListResponse(response);
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in createTask: $error');
-      }
+      printOnDebug('Error in createTask: $error');
+
       rethrow;
     }
   }
@@ -230,15 +221,11 @@ class TaskService {
         List<dynamic> decode = json.decode(response.body) as List<dynamic>;
         return decode.map((e) => e["informe"].toString()).toList();
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return [];
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in fetchTaskInformes: $error');
-      }
+      printOnDebug('Error in fetchTaskInformes: $error');
       rethrow;
     }
   }
@@ -271,9 +258,8 @@ class TaskService {
         return '';
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al guardar informes: $error');
-      }
+      printOnDebug('Error al guardar informes: $error');
+
       rethrow;
     }
   }
@@ -295,9 +281,7 @@ class TaskService {
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al borrar informe: $error');
-      }
+      printOnDebug('Error al borrar informe: $error');
       rethrow;
     }
   }
