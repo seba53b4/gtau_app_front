@@ -61,6 +61,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: BackgroundGradient(
+        decoration: BoxDecoration(
+                gradient: RadialGradient(
+                center: Alignment.center,      
+                radius: 2,      
+                focalRadius: 2,
+                // begin: Alignment.center,      
+                // end: Alignment.centerRight,   
+                colors: [
+                  Colors.black38 ,      
+                  Colors.black45      
+                ],            
+              ),
+            ),
             child: Center(
           child: Container(
               width: MediaQuery.of(context).size.width,
