@@ -40,13 +40,13 @@ class LotService {
           int ogcFid = lot['ogcFid'];
           List<LatLng> latLngList = [];
 
-          List<dynamic> multiLineCoordinates =
-              multiLineCoordinatesWrapper.first;
-          for (var coordinatesList in multiLineCoordinates) {
-            for (var coord in coordinatesList) {
-              double latitude = coord[1];
-              double longitude = coord[0];
-              latLngList.add(LatLng(latitude, longitude));
+          for (var polygonCoordinates in multiLineCoordinatesWrapper) {
+            for (var coordinatesList in polygonCoordinates) {
+              for (var coord in coordinatesList) {
+                double latitude = coord[1];
+                double longitude = coord[0];
+                latLngList.add(LatLng(latitude, longitude));
+              }
             }
           }
 
