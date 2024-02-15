@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -95,6 +95,46 @@ class ElementsSelected extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: softGrey,
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
+                child: Wrap(
+                  direction: Axis.vertical,
+                  spacing: 8.0,
+                  runSpacing: 15.0,
+                  children: [
+                    Chip(
+                      backgroundColor: Colors.white70,
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.black38,
+                        child: Icon(
+                          Icons.location_on_outlined,
+                          color: Colors.white70.withOpacity(1),
+                          size: 20,
+                        ),
+                      ),
+                      label: Text(
+                          "lat: ${selectedItemsProvider.inspectionPosition.latitude}"),
+                    ),
+                    Chip(
+                      backgroundColor: Colors.white70,
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.black38,
+                        child: Icon(
+                          Icons.location_on_outlined,
+                          color: Colors.white70.withOpacity(1),
+                          size: 20,
+                        ),
+                      ),
+                      label: Text(
+                          " long: ${selectedItemsProvider.inspectionPosition.longitude}"),
+                    )
+                  ],
+                ),
+              )
             ],
           );
         },

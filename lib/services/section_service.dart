@@ -38,7 +38,7 @@ class SectionService {
           Map<String, dynamic> geoJson = section['geoJSON'];
           List<dynamic> multiLineCoordinates = geoJson['coordinates'];
           String tipoTra = section['tipotra'];
-          int ogcFid = section['ogcFid'];
+          int ogcFid = (section['ogcFid'] as double).toInt();
           List<LatLng> latLngList = [];
 
           for (var coordinatesList in multiLineCoordinates) {

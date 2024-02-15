@@ -36,7 +36,6 @@ import '../widgets/common/custom_dropdown.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import '../widgets/common/custom_text_form_field.dart';
 import '../widgets/common/custom_toggle_buttons.dart';
-import '../widgets/common/inspection_location_select.dart';
 import '../widgets/common/task_creation/create_scheduled.dart';
 import '../widgets/common/task_creation/element_selected.dart';
 import '../widgets/task_image_gallery_modal.dart';
@@ -1302,10 +1301,10 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   ),
                             const SizedBox(
                                 height: AppConstants.taskColumnSpace),
-                            InspectionLocationSelect(
-                                selectedItemsProvider: selectedItemsProvider),
-                            const SizedBox(
-                                height: AppConstants.taskColumnSpace),
+                            // InspectionLocationSelect(
+                            //     selectedItemsProvider: selectedItemsProvider),
+                            // const SizedBox(
+                            //     height: AppConstants.taskColumnSpace),
                             ElementsSelected(widget: widget),
                             const SizedBox(
                                 height: AppConstants.taskColumnSpace),

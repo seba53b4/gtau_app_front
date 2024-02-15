@@ -53,7 +53,7 @@ class RegisterService {
               fillColor: Colors.grey);
 
           return Register(
-              ogcFid: register['ogcFid'],
+              ogcFid: (register['ogcFid'] as double).toInt(),
               tipo: register['tipo'],
               point: circle);
         }).toList();

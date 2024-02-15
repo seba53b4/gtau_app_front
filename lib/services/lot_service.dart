@@ -37,7 +37,7 @@ class LotService {
         return jsonResponse.map<Lot>((lot) {
           Map<String, dynamic> geoJson = lot['geoJSON'];
           List<dynamic> multiLineCoordinatesWrapper = geoJson['coordinates'];
-          int ogcFid = lot['ogcFid'];
+          int ogcFid = (lot['ogcFid'] as double).toInt();
           List<LatLng> latLngList = [];
 
           for (var polygonCoordinates in multiLineCoordinatesWrapper) {
