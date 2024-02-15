@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:gtau_app_front/widgets/task_list_scheduled.dart';
@@ -98,14 +99,14 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         child: Scaffold(
             key: scaffoldKeyDashboard,
             appBar: AppBar(
-              backgroundColor: primarySwatch[500],
+              backgroundColor: lightBackground,
               toolbarHeight: 0,
               bottom: TabBar(
                 controller: _tabController,
-                indicatorColor: lightBackground,
-                labelColor: Colors.white,
+                indicatorColor: primarySwatch[500],
+                labelColor: primarySwatch[500],
                 labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
-                unselectedLabelColor: Colors.white60,
+                unselectedLabelColor: Colors.black26,
                 tabs: [
                   _buildCustomTab(
                     text:
@@ -139,7 +140,21 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                 },
               ),
             ),
-            body: Consumer<TaskListViewModel>(
+            body: BackgroundGradient(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                center: Alignment.center,      
+                radius: 2,      
+                focalRadius: 2,
+                // begin: Alignment.center,      
+                // end: Alignment.centerRight,   
+                colors: [
+                  primarySwatch[50]! ,      
+                  primarySwatch[100]!      
+                ],            
+              ),
+            ),
+            child: Consumer<TaskListViewModel>(
                 builder: (context, taskListViewModel, child) {
               return LoadingOverlay(
                   isLoading: taskListViewModel.isLoading,
@@ -148,6 +163,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
               //         ?.allMatches('Programada') !=
               //     null));
             })),
+        ),
       );
     });
   }
@@ -262,8 +278,8 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         child: Text(
           text,
           style: TextStyle(
-            fontSize: kIsWeb ? 20 : 10,
-            color: isSelected ? Colors.white : Colors.white60,
+            fontSize: kIsWeb ? 20 : 13,
+            color: isSelected ? primarySwatch[500]! : Colors.black26,
             fontWeight: kIsWeb ? null : FontWeight.w500,
             height: 1.0,
           ),
