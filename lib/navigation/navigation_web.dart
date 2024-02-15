@@ -50,7 +50,7 @@ class _NavigationWeb extends State<NavigationWeb> {
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
     NavigationRailDestination navInfoUpdate = _buildCircularDestination(
-        icon: Icon(Icons.update, size: iconSize),
+        icon: Icon(Icons.file_upload_sharp, size: iconSize * 1.45),
         label: Text(
             AppLocalizations.of(context)!.navigation_label_update_elements));
 

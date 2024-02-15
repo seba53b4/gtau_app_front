@@ -1302,14 +1302,13 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                   ),
                             const SizedBox(
                                 height: AppConstants.taskColumnSpace),
-
-                            // Elementos seleccionados
-                            ElementsSelected(widget: widget),
-                            const SizedBox(height: 10.0),
-                            // Button elementos a seleccionar
                             InspectionLocationSelect(
                                 selectedItemsProvider: selectedItemsProvider),
-                            const SizedBox(height: 10.0),
+                            const SizedBox(
+                                height: AppConstants.taskColumnSpace),
+                            ElementsSelected(widget: widget),
+                            const SizedBox(
+                                height: AppConstants.taskColumnSpace),
                             if (widget.detail)
                               Column(
                                 children: [
