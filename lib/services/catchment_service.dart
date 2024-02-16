@@ -35,6 +35,7 @@ class CatchmentService {
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
+        //print("resp catchm: " + jsonResponse.toString());
         return jsonResponse.map<Catchment>((catchment) {
           Map<String, dynamic> geoJson = catchment['geoJSON'];
           List<dynamic> coordenates = geoJson['coordinates'];
@@ -53,7 +54,7 @@ class CatchmentService {
               fillColor: Colors.black);
 
           return Catchment(
-              ogcFid: catchment['ogcFid'],
+              ogcFid: (catchment['ogcFid'] as double).toInt(),
               tipo: catchment['tipo'],
               tipoboca: catchment['tipBoca'],
               point: circle);

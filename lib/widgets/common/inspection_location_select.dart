@@ -56,7 +56,7 @@ class InspectionLocationSelect extends StatelessWidget {
                         ),
                       ),
                       label: Text(
-                          "lat: ${selectedItemsProvider.inspectionPosition.latitude}"),
+                          "lat: ${(selectedItemsProvider.inspectionPosition.latitude).toStringAsFixed(6)}"),
                     ),
                     Chip(
                       backgroundColor: Colors.white70,
@@ -69,7 +69,7 @@ class InspectionLocationSelect extends StatelessWidget {
                         ),
                       ),
                       label: Text(
-                          " long: ${selectedItemsProvider.inspectionPosition.longitude}"),
+                          " long: ${(selectedItemsProvider.inspectionPosition.longitude).toStringAsFixed(6)}"),
                     )
                   ],
                 ),
