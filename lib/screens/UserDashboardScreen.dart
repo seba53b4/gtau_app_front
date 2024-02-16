@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_icon_button.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
 import 'package:gtau_app_front/widgets/user_filter.dart';
@@ -55,15 +56,14 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
   Widget build(BuildContext context) {
     _clearPref();
     return Scaffold(
-      body: Container(
-        color: lightBackground,
+      body: BackgroundGradient(
         child: Center(
           child: Column(
             children: [
               const SizedBox(height: 52),
               Container(
                 width: 900,
-                color: lightBackground,
+                color: Colors.transparent,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -79,7 +79,7 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
               ),
               const SizedBox(height: 8),
               Container(
-                color: lightBackground,
+                color: Colors.transparent,
                 child: Center(
                   child: Container(
                     width: MediaQuery
@@ -95,7 +95,7 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
                         .of(context)
                         .size
                         .height - 72,
-                    color: lightBackground,
+                    color: Colors.transparent,
                     child: _constraintBoxUserDashboard(context),
                   ),
                 ),

@@ -5,6 +5,7 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:gtau_app_front/widgets/task_list_scheduled.dart';
@@ -71,15 +72,48 @@ class _UserDashboard extends State<UserDashboard>
         width: 120,
         child: Scaffold(
             key: scaffoldKeyDashboard,
-            body: Consumer<UserListViewModel>(
-                builder: (context, userListViewModel, child) {
-              return LoadingOverlay(
-                  isLoading: userListViewModel.isLoading,
-                  child: _buildTabContent(scaffoldKeyDashboard));
-              // taskFilterProvider.inspectionTypeFilter
-              //         ?.allMatches('Programada') !=
-              //     null));
-            })),
+            body: BackgroundGradient(
+              decoration: BoxDecoration(
+                border: kIsWeb ? Border(
+                  left: BorderSide( //                   <--- left side
+                    color: lightBackground,
+                    width: 5.0,
+                  ),
+                  right: BorderSide( //                    <--- top side
+                    color: lightBackground,
+                    width: 5.0,
+                  ),
+                  bottom: BorderSide( //                    <--- top side
+                    color: lightBackground,
+                    width: 5.0,
+                  ),
+                  top: BorderSide( //                    <--- top side
+                    color: lightBackground,
+                    width: 5.0,
+                  ),
+                ) : null,
+                gradient: RadialGradient(
+                center: Alignment.center,      
+                radius: 2,      
+                focalRadius: 2,
+                // begin: Alignment.center,      
+                // end: Alignment.centerRight,   
+                colors: const [
+                  Colors.black26 ,      
+                  Colors.black26       
+                ],            
+              ),
+              ),
+              child: Consumer<UserListViewModel>(
+                  builder: (context, userListViewModel, child) {
+                return LoadingOverlay(
+                    isLoading: userListViewModel.isLoading,
+                    child: _buildTabContent(scaffoldKeyDashboard));
+                // taskFilterProvider.inspectionTypeFilter
+                //         ?.allMatches('Programada') !=
+                //     null));
+              })),
+        ),
       );
     
   }
