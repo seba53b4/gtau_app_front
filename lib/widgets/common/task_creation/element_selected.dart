@@ -69,6 +69,13 @@ class ElementsSelected extends StatelessWidget {
           }
 
           double paddingElements = kIsWeb ? 8 : 4;
+          final latitude = selectedItemsProvider.inspectionPosition.latitude;
+          final longitude = selectedItemsProvider.inspectionPosition.longitude;
+          final formattedLatitude = latitude != 0
+              ? latitude.toStringAsFixed(6)
+              : latitude.toString();
+          final formattedLongitude = longitude != 0 ? longitude.toStringAsFixed(
+              6) : longitude.toString();
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -87,8 +94,8 @@ class ElementsSelected extends StatelessWidget {
                   const MapModal(),
                   const SizedBox(width: 8),
                   Container(
-                      // constraints: BoxConstraints(maxWidth: 600),
-                      // Establece el ancho máximo
+                    // constraints: BoxConstraints(maxWidth: 600),
+                    // Establece el ancho máximo
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: softGrey,
@@ -96,24 +103,24 @@ class ElementsSelected extends StatelessWidget {
                       ),
                       child: elementsList.isNotEmpty
                           ? Column(
-                              children: splitList.map((subList) {
-                                return Row(
-                                  children: subList.map((item) {
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: paddingElements,
-                                          vertical: paddingElements - 2),
-                                      child: item,
-                                    );
-                                  }).toList(),
-                                );
-                              }).toList(),
-                            )
+                        children: splitList.map((subList) {
+                          return Row(
+                            children: subList.map((item) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: paddingElements,
+                                    vertical: paddingElements - 2),
+                                child: item,
+                              );
+                            }).toList(),
+                          );
+                        }).toList(),
+                      )
                           : Text(
-                              AppLocalizations.of(context)!
-                                  .no_elements_registered,
-                              style: const TextStyle(fontSize: 16.0),
-                            )),
+                        AppLocalizations.of(context)!
+                            .no_elements_registered,
+                        style: const TextStyle(fontSize: 16.0),
+                      )),
                 ],
               ),
               const SizedBox(height: 12),
@@ -147,7 +154,7 @@ class ElementsSelected extends StatelessWidget {
                         ),
                       ),
                       label: Text(
-                          "lat: ${(selectedItemsProvider.inspectionPosition.latitude).toStringAsFixed(6)}"),
+                          "lat: $formattedLatitude"),
                     ),
                     Chip(
                       backgroundColor: Colors.white70,
@@ -160,7 +167,7 @@ class ElementsSelected extends StatelessWidget {
                         ),
                       ),
                       label: Text(
-                          " long: ${(selectedItemsProvider.inspectionPosition.longitude).toStringAsFixed(6)}"),
+                          " long: $formattedLongitude"),
                     )
                   ],
                 ),
