@@ -73,6 +73,8 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     CustomElevatedIconButton(
+                      textColor: primarySwatch[700],
+                      backgroundColor: Colors.white,
                       onPressed: () {
                         _showAddUserModal(context);
                       },
@@ -112,8 +114,8 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
         onPressed: () {
           _showFilterModal(context);
         },
-        foregroundColor: null,
-        backgroundColor: null,
+        foregroundColor: primarySwatch[700]!,
+        backgroundColor: Colors.white,
         shape: null,
         child: const Icon(Icons.filter_alt_rounded),
       ),

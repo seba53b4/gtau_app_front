@@ -11,6 +11,7 @@ Color arrowColor = const Color.fromRGBO(247, 247, 247, 1);
 Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
 Color navColor = const Color.fromRGBO(200, 217, 184, 1);
 Color lightBackground = const Color.fromRGBO(253, 255, 252, 1);
+Color lightGrayBackground = Color.fromRGBO(238, 238, 238, 0.486);
 Color redColor = const Color.fromRGBO(219, 49, 13, 1);
 Color titleColor = const Color.fromRGBO(14, 45, 9, 1);
 Color subtitleColor =  Colors.black87;

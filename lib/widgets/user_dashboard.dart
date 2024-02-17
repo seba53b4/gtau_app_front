@@ -74,6 +74,16 @@ class _UserDashboard extends State<UserDashboard>
             key: scaffoldKeyDashboard,
             body: BackgroundGradient(
               decoration: BoxDecoration(
+                boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(187, 187, 187, 0.482),
+                      ),
+                      BoxShadow(
+                        color: Colors.white,
+                        spreadRadius: -5.0,
+                        blurRadius: 20.0,
+                      ),
+                    ],
                 borderRadius: BorderRadius.circular(20),
                 gradient: RadialGradient(
                   center: Alignment.center,      

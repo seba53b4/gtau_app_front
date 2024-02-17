@@ -94,11 +94,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
           isLoading: userListViewModel.isLoading,
           child: Scaffold(
             body: BackgroundGradient(
+              decoration: kIsWeb ? null : BoxDecoration(
+                  color: lightGrayBackground,      
+              ),   
               child: Center(
                 child: SizedBox(
                   width: kIsWeb ? 520 : widthCard,
-                  height: kIsWeb ? heightCard * 0.85 : heightCard * 0.86,
+                  height: kIsWeb ? heightCard * 0.85 : heightCard,
                   child: Card(
+                    color: kIsWeb ? null : lightGrayBackground,
+                    elevation: kIsWeb ? null : 0.0,
+                    shape: kIsWeb ? RoundedRectangleBorder(
+                      side : BorderSide(
+                        width: 6.0,
+                        color: Colors.black54, //<-- SEE HERE
+                      ),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ) : null,
                     child: Visibility(
                       visible: !userListViewModel.isLoading,
                       child: Column(
@@ -109,22 +121,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: kIsWeb ? 250 : heightCard * 0.25,
                             width: kIsWeb ? 520 : widthCard,
                             padding: const EdgeInsets.only(top: 24, bottom: 24),
-                            decoration: BoxDecoration(
-                              color: primarySwatch[200],
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(20),
-                                bottomRight: Radius.circular(20),
+                            decoration: kIsWeb ? BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: const BorderRadius.all(Radius.circular(20),
                               ),
-                            ),
+                            ) : null,
                             child: Container(
                               width: 60,
                               height: 60,
                               margin: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
+                                color: primarySwatch[500],
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: lightBackground,
-                                  width: 2,
+                                  color: Color.fromRGBO(97, 97, 97, 0.486),
+                                  width: 6.0,
                                 ),
                               ),
                               child: Center(

@@ -65,7 +65,7 @@ class TaskListItem extends StatelessWidget {
           color: lightBackground,
           boxShadow: const [
             BoxShadow(
-              color: Color.fromRGBO(94, 102, 87, 0.494),
+              color: Color.fromRGBO(128, 128, 128, 0.49),
               spreadRadius: 3,
               blurRadius: 7,
               offset: Offset(0, 3),
