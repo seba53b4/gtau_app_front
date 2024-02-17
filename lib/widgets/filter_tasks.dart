@@ -6,6 +6,7 @@ import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/models/value_label.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:gtau_app_front/widgets/text_field_filter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -132,7 +133,7 @@ class _FilterTasksState extends State<FilterTasks> {
             padding: const EdgeInsets.all(16.0),
             child: FittedBox(
               fit: BoxFit.fill,
-              child: BoxContainer(
+              child: Container(
                 width: widthRow,
                 alignment: Alignment.center,
                 child: SingleChildScrollView(
@@ -261,17 +262,11 @@ class _FilterTasksState extends State<FilterTasks> {
                       ),
                       
                       Container(
-                        padding: const EdgeInsets.all(8),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              height: 50,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CustomElevatedButton(
+                                    CustomElevatedButtonLength(
                                       onPressed: () {
                                         var taskFilterProvider =
                                             context.read<TaskFilterProvider>();
@@ -286,8 +281,8 @@ class _FilterTasksState extends State<FilterTasks> {
                                       messageType: MessageType.error,
                                       text: appLocalizations.buttonCleanLabel,
                                     ),
-                                    const SizedBox(width: 10.0),
-                                    CustomElevatedButton(
+                                    const SizedBox(height: 15),
+                                    CustomElevatedButtonLength(
                                       onPressed: () {
                                         //resetAwaitTaskList();
                                         _ResetPrefs();
@@ -300,8 +295,8 @@ class _FilterTasksState extends State<FilterTasks> {
                                       },
                                       text: appLocalizations.buttonApplyLabel,
                                     ),
-                                  ]),
-                            )
+                                    const SizedBox(height: 15),
+                                  
                           ],
                         ),
                       ),
@@ -458,33 +453,11 @@ class _FilterTasksState extends State<FilterTasks> {
                       ),
                       
                       Container(
-                        padding: const EdgeInsets.all(8),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              height: 50,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CustomElevatedButton(
-                                      onPressed: () {
-                                        var taskFilterProvider =
-                                            context.read<TaskFilterProvider>();
-                                        taskFilterProvider
-                                            .resetFilters(userProvider.isAdmin!);
-                                        taskFilterProvider.setLastStatus(
-                                            TaskStatus.Pending.value);
-                                        _ResetPrefs();
-                                        resetTaskList();
-                                        Navigator.of(context).pop();
-                                      },
-                                      messageType: MessageType.error,
-                                      text: appLocalizations.buttonCleanLabel,
-                                    ),
-                                    const SizedBox(width: 10.0),
-                                    CustomElevatedButton(
+                                    CustomElevatedButtonLength(
                                       onPressed: () {
                                         //resetAwaitTaskList();
                                         _ResetPrefs();
@@ -497,9 +470,23 @@ class _FilterTasksState extends State<FilterTasks> {
                                       },
                                       text: appLocalizations.buttonApplyLabel,
                                     ),
-                                  ]),
-                            )
-                          ],
+                                    const SizedBox(height: 5),
+                                    CustomElevatedButtonLength(
+                                        onPressed: () {
+                                          var taskFilterProvider =
+                                              context.read<TaskFilterProvider>();
+                                          taskFilterProvider
+                                              .resetFilters(userProvider.isAdmin!);
+                                          taskFilterProvider.setLastStatus(
+                                              TaskStatus.Pending.value);
+                                          _ResetPrefs();
+                                          resetTaskList();
+                                          Navigator.of(context).pop();
+                                        },
+                                        messageType: MessageType.error,
+                                        text: appLocalizations.buttonCleanLabel,
+                                    ),
+                          ]
                         ),
                       ),
                     ],
