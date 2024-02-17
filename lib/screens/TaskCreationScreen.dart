@@ -580,7 +580,6 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
               controller: _scrollController,
               child: Center(
                 child: BackgroundGradient(
-                  height:  !kIsWeb || widget.detail ? null : MediaQuery.of(context).size.height,
                   decoration: kIsWeb ? null : BoxDecoration(
                                 color: lightBackground,
                                 borderRadius: const BorderRadius.all(Radius.circular(0),
