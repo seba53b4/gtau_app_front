@@ -32,7 +32,6 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
   late Map<String, dynamic> geojsonFromFile = {};
   bool errorFileUpload = false;
   Map<int, bool> options = {};
-  int optionSelected = 0;
   bool processing = false;
   late ShapeLoadViewModel? shapeLoadViewModel;
   late String token;
@@ -309,6 +308,11 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                               setState(() {
                                 errorFileUpload = true;
                               });
+                            } else if (findSelectedIndex() == -1) {
+                              showGenericModalError(
+                                  context: context,
+                                  message: appLocalizations
+                                      .shape_laod_element_not_selected_error);
                             } else {
                               handleSubmitTask();
                             }

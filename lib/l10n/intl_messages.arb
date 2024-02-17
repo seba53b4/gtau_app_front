@@ -230,6 +230,7 @@
     "shape_laod_with_errors": "FINALIZADO CON ERRORES",
     "shape_laod_file_format_error_msg": "Archivo con tipo de elementos inválidos",
     "shape_load_error_info": "Debajo se muestran los elementos que resultaron en error (Por elemento red o padrón)",
+    "shape_laod_element_not_selected_error": "Debe seleccionar un tipo de elemento",
     "listuser_title": "Gestión usuarios",
     "listuser_user_notfound": "El usuario asignado a esta tarea no se encuentra actualmente en el sistema",
     "listuser_title": "Gestión usuarios",
