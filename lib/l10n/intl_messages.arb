@@ -208,7 +208,7 @@
     "file_upload_adding_registers" : "Agregando registros",
     "file_upload_success": "Programada creada",
     "file_upload_error": "Error en creación",
-    "file_upload_file_title": "Archivo de elementos.",
+    "file_upload_file_title": "Archivo de elementos",
     "scheduled_process_ejecuting": "Existe un proceso ejecutándose, espere unos minutos y vuelva a intentar.",
     "scheduled_process_error": "Hubo un error, espere unos minutos y vuelva a intentar.",
     "scheduled_process_creating_error": "Se ha producido un error al crear programada",
