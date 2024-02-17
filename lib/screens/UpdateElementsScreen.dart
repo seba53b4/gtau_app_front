@@ -190,7 +190,9 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
         child: Center(
             child: BoxContainer(
                 height: isMaxSize
-                    ? 800
+                    ? shapeLoadViewModel.linesError.isNotEmpty
+                        ? 800
+                        : 590
                     : errorFileUpload
                         ? 480
                         : 460,
@@ -259,9 +261,10 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                                   fontSize: 16,
                                 ),
                               ),
-                              InfoIcon(
-                                  message: appLocalizations
-                                      .info_icon_msg_file_upload),
+                              if (shapeLoadViewModel.linesError.isNotEmpty)
+                                InfoIcon(
+                                    message: appLocalizations
+                                        .info_icon_msg_file_upload),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -382,7 +385,8 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                         )),
                     if (isMaxSize) const SizedBox(height: 24),
                     Visibility(
-                      visible: shapeLoadViewModel.result ?? false,
+                      visible: (shapeLoadViewModel.result ?? false) &&
+                          shapeLoadViewModel.linesError.isNotEmpty,
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),

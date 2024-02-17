@@ -132,7 +132,7 @@ class ShapeLoadViewModel extends ChangeNotifier {
     _token = token ?? _token;
 
     _linesData =
-    (linesTramos ?? linesRegistros ?? linesCaptaciones ?? linesParcelas)!;
+        (linesTramos ?? linesRegistros ?? linesCaptaciones ?? linesParcelas)!;
 
     if (linesTramos != null) {
       _elementType = ElementType.section;
@@ -176,22 +176,6 @@ class ShapeLoadViewModel extends ChangeNotifier {
     return double.parse(result.toStringAsFixed(2));
   }
 
-  // Future<void> retryProcess(
-  //     {String? token,
-  //     required String type,
-  //     required String operation,
-  //     required int id}) async {
-  //   _token = token ?? _token;
-  //   {
-  //     _isRetrying = true;
-  //     notifyListeners();
-  //     await Future.delayed(const Duration(seconds: 1));
-  //     sendMessage(type: type, operation: operation, id: id);
-  //     _isRetrying = false;
-  //     notifyListeners();
-  //   }
-  // }
-
   Future<void> waitForWebSocketConnection() async {
     _connected = false;
     notifyListeners();
@@ -203,16 +187,17 @@ class ShapeLoadViewModel extends ChangeNotifier {
 
   void _handleWebSocketMessage(String message) {
     WebSocketResponseShapeLoad webSocketResponseShapeLoad =
-    WebSocketResponseShapeLoad.fromJson(json.decode(message));
+        WebSocketResponseShapeLoad.fromJson(json.decode(message));
 
     switch (webSocketResponseShapeLoad.status) {
       case StatusProcess.STARTING:
         _isLoading = true;
         _warning = false;
         _processAlreadyRunning = false;
+        _linesError = [];
         break;
       case StatusProcess.ERROR:
-      //int prevProcessed = _elementsProcessed;
+        //int prevProcessed = _elementsProcessed;
         if (_linesData.length - _elementsProcessed < _blockMaxSize) {
           _elementsProcessed += _lastBlock;
         } else {
@@ -288,7 +273,9 @@ class ShapeLoadViewModel extends ChangeNotifier {
     _processing = false;
     _warning = false;
     _elementsProcessed = 0;
+    _linesError.clear();
     _linesData.clear();
+    _linesProcess?.clear();
     _elementType = null;
     _connectionStatus = SocketConnectionStatus.disconnected;
   }
