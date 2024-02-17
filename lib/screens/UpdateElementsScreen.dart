@@ -254,7 +254,7 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                appLocalizations.scheduled_file_title,
+                                appLocalizations.file_upload_file_title,
                                 style: const TextStyle(
                                   fontSize: 16,
                                 ),
