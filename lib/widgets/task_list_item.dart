@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
@@ -79,14 +80,17 @@ class TaskListItem extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: primarySwatch[900],
                 radius: 20,
-                child: Text(
-                  'I',
-                  style: GoogleFonts.merriweather(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                child: Stack(children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 18,
+                      child: const Icon(GtauIcons.tasksInspection,
+                              size: 20, color: Colors.white),
+                    ),
                   ),
-                ),
+                ]),
               ),
             ),
             Expanded(

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
@@ -78,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: primarySwatch[700]!,
         backgroundColor: Colors.white,
         shape: null,
-        child: const Icon(Icons.filter_alt_rounded),
+        child: const Icon(GtauIcons.tasksFilter),
       ),
     );
   }

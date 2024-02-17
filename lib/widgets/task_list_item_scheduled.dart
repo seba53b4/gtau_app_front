@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
@@ -41,7 +42,7 @@ class TaskListItemScheduled extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
-    double fontSize = kIsWeb ? 15 : 11;
+    double fontSize = kIsWeb ? 12 : 10;
     double fontSizeInfo = kIsWeb ? 12 : 9;
     double titleSpace = kIsWeb ? 200 : 120;
     double dividerHeight = kIsWeb ? 32 : 24;
@@ -82,14 +83,17 @@ class TaskListItemScheduled extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.deepPurple,
                 radius: 20,
-                child: Text(
-                  'P',
-                  style: GoogleFonts.merriweather(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                child: Stack(children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 18,
+                      child: const Icon(GtauIcons.tasksSurvey,
+                              size: 20, color: Colors.white),
+                    ),
                   ),
-                ),
+                ]),
               ),
             ),
             Expanded(

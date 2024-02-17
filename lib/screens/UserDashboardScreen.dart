@@ -117,7 +117,7 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
         foregroundColor: primarySwatch[700]!,
         backgroundColor: Colors.white,
         shape: null,
-        child: const Icon(Icons.filter_alt_rounded),
+        child: const Icon(GtauIcons.tasksFilter),
       ),
     );
   }
