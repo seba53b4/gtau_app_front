@@ -9,6 +9,7 @@ import 'package:gtau_app_front/providers/user_filter_provider.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/custom_dropdown.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:gtau_app_front/widgets/text_field_filter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -108,7 +109,7 @@ class _UserFilterState extends State<UserFilter> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: BoxContainer(
+          child: Container(
             width: widthRow,
             alignment: Alignment.center,
             child: SingleChildScrollView(
@@ -151,17 +152,24 @@ class _UserFilterState extends State<UserFilter> {
                       label: appLocalizations.createUserPage_lastnameTitle),
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.all(8),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          height: 50,
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CustomElevatedButton(
+                                CustomElevatedButtonLength(
+                                  onPressed: () {
+                                    if(filterProvider.roleFilter == notAssigned){
+                                      filterProvider.setRoleFilter(null);
+                                    }
+                                    context.read<UserFilterProvider>().search();
+                                    _SoftClearPref();
+                                    updateUserListState(context);
+                                    Navigator.of(context).pop();
+                                  },
+                                  text: appLocalizations.buttonApplyLabel,
+                                ),
+                                const SizedBox(height: 15),
+                                CustomElevatedButtonLength(
                                   onPressed: () {
                                     var userFilterProvider =
                                         context.read<UserFilterProvider>();
@@ -174,21 +182,8 @@ class _UserFilterState extends State<UserFilter> {
                                   messageType: MessageType.error,
                                   text: appLocalizations.buttonCleanLabel,
                                 ),
-                                const SizedBox(width: 10.0),
-                                CustomElevatedButton(
-                                  onPressed: () {
-                                    if(filterProvider.roleFilter == notAssigned){
-                                      filterProvider.setRoleFilter(null);
-                                    }
-                                    context.read<UserFilterProvider>().search();
-                                    _SoftClearPref();
-                                    updateUserListState(context);
-                                    Navigator.of(context).pop();
-                                  },
-                                  text: appLocalizations.buttonApplyLabel,
-                                ),
-                              ]),
-                        )
+                                const SizedBox(height: 8),
+                              
                       ],
                     ),
                   ),

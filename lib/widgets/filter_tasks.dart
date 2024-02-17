@@ -268,6 +268,20 @@ class _FilterTasksState extends State<FilterTasks> {
                           children: [
                                     CustomElevatedButtonLength(
                                       onPressed: () {
+                                        //resetAwaitTaskList();
+                                        _ResetPrefs();
+                                        _ResetScrollPosition();
+                                        _SetFilteredValue(true);
+                                        context.read<TaskFilterProvider>().search();
+                                        
+                                        updateTaskList();
+                                        Navigator.of(context).pop();
+                                      },
+                                      text: appLocalizations.buttonApplyLabel,
+                                    ),
+                                    const SizedBox(height: 15),
+                                    CustomElevatedButtonLength(
+                                      onPressed: () {
                                         var taskFilterProvider =
                                             context.read<TaskFilterProvider>();
                                         taskFilterProvider
@@ -280,20 +294,6 @@ class _FilterTasksState extends State<FilterTasks> {
                                       },
                                       messageType: MessageType.error,
                                       text: appLocalizations.buttonCleanLabel,
-                                    ),
-                                    const SizedBox(height: 15),
-                                    CustomElevatedButtonLength(
-                                      onPressed: () {
-                                        //resetAwaitTaskList();
-                                        _ResetPrefs();
-                                        _ResetScrollPosition();
-                                        _SetFilteredValue(true);
-                                        context.read<TaskFilterProvider>().search();
-                                        
-                                        updateTaskList();
-                                        Navigator.of(context).pop();
-                                      },
-                                      text: appLocalizations.buttonApplyLabel,
                                     ),
                                     const SizedBox(height: 15),
                                   
