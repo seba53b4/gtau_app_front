@@ -166,6 +166,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _submitForm(BuildContext context) {
+    if (kIsWeb) {
+      setState(() {
+        onError = false;
+      });
+      onLogInPressed(context);
+    }
+  }
+
   void onForgotPressed(BuildContext context) {}
 
   @override
@@ -200,6 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: false,
                         width: 400,
                         hasError: onError,
+                        onSubmitted: (_) => _submitForm(context),
                       ),
                       CustomTextField(
                         controller: passwordController,
@@ -209,6 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: true,
                         width: 400,
                         hasError: onError,
+                        onSubmitted: (_) => _submitForm(context),
                       ),
                       const SizedBox(height: 16.0),
                       CustomElevatedButtonLength(
