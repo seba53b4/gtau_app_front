@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: null,
         backgroundColor: primarySwatch[200]!,
         shape: null,
-        child: const Icon(Icons.filter),
+        child: const Icon(Icons.filter_alt),
       ),
     );
   }
