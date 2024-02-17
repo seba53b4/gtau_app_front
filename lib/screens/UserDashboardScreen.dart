@@ -6,6 +6,7 @@ import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
 import 'package:gtau_app_front/widgets/common/background_gradient.dart';
+import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_icon_button.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
 import 'package:gtau_app_front/widgets/user_filter.dart';
@@ -40,8 +41,11 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+              side: BorderSide(width: 6.0, color: boxContainerBorder),
+              borderRadius: const BorderRadius.all(Radius.circular(50.0))),
           child: SizedBox(
             width: 700,
             height: 536,
@@ -149,7 +153,11 @@ Widget _constraintBoxUserDashboard(BuildContext context) {
       .size
       .width - widthDashboard) / 2
       : 0;
-  return Container(
+  return BoxContainerWhite(
+    decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
     margin: kIsWeb
         ? EdgeInsets.symmetric(horizontal: paddingDashboard)
         : const EdgeInsets.symmetric(horizontal: 0),

@@ -34,8 +34,11 @@ class UserListItem extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+              side: BorderSide(width: 6.0, color: boxContainerBorder),
+              borderRadius: const BorderRadius.all(Radius.circular(50.0))),
           child: SizedBox(
             width: 700,
             height: 536,
@@ -72,7 +75,7 @@ class UserListItem extends StatelessWidget {
           color: lightBackground,
           boxShadow: const [
             BoxShadow(
-              color: Color.fromRGBO(200, 217, 184, 0.5),
+              color: Color.fromRGBO(94, 102, 87, 0.494),
               spreadRadius: 3,
               blurRadius: 7,
               offset: Offset(0, 3),

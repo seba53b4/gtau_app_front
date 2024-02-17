@@ -7,6 +7,7 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/user_data.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
@@ -92,96 +93,97 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return LoadingOverlay(
           isLoading: userListViewModel.isLoading,
           child: Scaffold(
-            backgroundColor: lightBackground,
-            body: Center(
-              child: SizedBox(
-                width: kIsWeb ? 520 : widthCard,
-                height: kIsWeb ? heightCard * 0.85 : heightCard * 0.86,
-                child: Card(
-                  child: Visibility(
-                    visible: !userListViewModel.isLoading,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: kIsWeb ? 250 : heightCard * 0.25,
-                          width: kIsWeb ? 520 : widthCard,
-                          padding: const EdgeInsets.only(top: 24, bottom: 24),
-                          decoration: BoxDecoration(
-                            color: primarySwatch[200],
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
-                            ),
-                          ),
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            margin: const EdgeInsets.all(20),
+            body: BackgroundGradient(
+              child: Center(
+                child: SizedBox(
+                  width: kIsWeb ? 520 : widthCard,
+                  height: kIsWeb ? heightCard * 0.85 : heightCard * 0.86,
+                  child: Card(
+                    child: Visibility(
+                      visible: !userListViewModel.isLoading,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: kIsWeb ? 250 : heightCard * 0.25,
+                            width: kIsWeb ? 520 : widthCard,
+                            padding: const EdgeInsets.only(top: 24, bottom: 24),
                             decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: lightBackground,
-                                width: 2,
+                              color: primarySwatch[200],
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
                               ),
                             ),
-                            child: Center(
-                              child: Icon(
-                                isAdmin
-                                    ? GtauIcons.roleAdmin
-                                    : GtauIcons.roleOper,
-                                size: kIsWeb ? 68 : 40,
-                                color: lightBackground,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              margin: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: lightBackground,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  isAdmin
+                                      ? GtauIcons.roleAdmin
+                                      : GtauIcons.roleOper,
+                                  size: kIsWeb ? 68 : 40,
+                                  color: lightBackground,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        const Divider(
-                          color: Colors.grey,
-                          thickness: 1,
-                          indent: 20,
-                          endIndent: 20,
-                        ),
-                        const SizedBox(height: kIsWeb ? 48 : 12),
-                        CustomProfileRow(
-                          label: appLocalizations.name,
-                          value:
-                              '${userData?.getFirstname} ${userData?.getLastname}',
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        CustomProfileRow(
-                          label: appLocalizations.user,
-                          value: '${userData?.getUsername}',
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        CustomProfileRow(
-                          label: appLocalizations.email,
-                          value: '${userData?.getEmail}',
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        CustomProfileRow(
-                          label: appLocalizations.role,
-                          value: isAdmin ? 'Administrador' : 'Operario',
-                        ),
-                        const Spacer(),
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          child: CustomElevatedButton(
-                            onPressed: () => handleLogOutPress(context),
-                            messageType: MessageType.error,
-                            text: AppLocalizations.of(context)!
-                                .default_logout_button,
+                          const SizedBox(height: rowHeigthSpace),
+                          const Divider(
+                            color: Colors.grey,
+                            thickness: 1,
+                            indent: 20,
+                            endIndent: 20,
                           ),
-                        ),
-                        Text(
-                          '${appLocalizations.version} ${AppConstants.appVersion}',
-                          style:
-                              const TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                      ],
+                          const SizedBox(height: kIsWeb ? 48 : 12),
+                          CustomProfileRow(
+                            label: appLocalizations.name,
+                            value:
+                                '${userData?.getFirstname} ${userData?.getLastname}',
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                          CustomProfileRow(
+                            label: appLocalizations.user,
+                            value: '${userData?.getUsername}',
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                          CustomProfileRow(
+                            label: appLocalizations.email,
+                            value: '${userData?.getEmail}',
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                          CustomProfileRow(
+                            label: appLocalizations.role,
+                            value: isAdmin ? 'Administrador' : 'Operario',
+                          ),
+                          const Spacer(),
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 20),
+                            child: CustomElevatedButton(
+                              onPressed: () => handleLogOutPress(context),
+                              messageType: MessageType.error,
+                              text: AppLocalizations.of(context)!
+                                  .default_logout_button,
+                            ),
+                          ),
+                          Text(
+                            '${appLocalizations.version} ${AppConstants.appVersion}',
+                            style:
+                                const TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                        ],
+                      ),
                     ),
                   ),
                 ),

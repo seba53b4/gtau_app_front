@@ -107,6 +107,7 @@ Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
           ? (MediaQuery.of(context).size.width - widthDashboard) / 2
           : 0;
   return Container(
+    color: Colors.transparent,
     margin: kIsWeb
         ? EdgeInsets.symmetric(horizontal: paddingDashboard)
         : const EdgeInsets.symmetric(horizontal: 0),

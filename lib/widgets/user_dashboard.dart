@@ -74,35 +74,18 @@ class _UserDashboard extends State<UserDashboard>
             key: scaffoldKeyDashboard,
             body: BackgroundGradient(
               decoration: BoxDecoration(
-                border: kIsWeb ? Border(
-                  left: BorderSide( //                   <--- left side
-                    color: lightBackground,
-                    width: 5.0,
-                  ),
-                  right: BorderSide( //                    <--- top side
-                    color: lightBackground,
-                    width: 5.0,
-                  ),
-                  bottom: BorderSide( //                    <--- top side
-                    color: lightBackground,
-                    width: 5.0,
-                  ),
-                  top: BorderSide( //                    <--- top side
-                    color: lightBackground,
-                    width: 5.0,
-                  ),
-                ) : null,
+                borderRadius: BorderRadius.circular(20),
                 gradient: RadialGradient(
-                center: Alignment.center,      
-                radius: 2,      
-                focalRadius: 2,
-                // begin: Alignment.center,      
-                // end: Alignment.centerRight,   
-                colors: const [
-                  Colors.black26 ,      
-                  Colors.black26       
-                ],            
-              ),
+                  center: Alignment.center,      
+                  radius: 2,      
+                  focalRadius: 2,
+                  // begin: Alignment.center,      
+                  // end: Alignment.centerRight,   
+                  colors: const [
+                    Colors.black26 ,      
+                    Colors.black26       
+                  ],            
+                ),
               ),
               child: Consumer<UserListViewModel>(
                   builder: (context, userListViewModel, child) {

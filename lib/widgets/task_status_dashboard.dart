@@ -5,6 +5,7 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/background_gradient.dart';
+import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:gtau_app_front/widgets/task_list.dart';
 import 'package:gtau_app_front/widgets/task_list_scheduled.dart';
@@ -94,89 +95,95 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
           taskFilterProvider.inspectionTypeFilter?.allMatches('SCHEDULED') !=
               null;
 
-      return SizedBox(
-        width: 120,
-        child: Scaffold(
-            key: scaffoldKeyDashboard,
-            appBar: AppBar(
-              backgroundColor: lightBackground,
-              toolbarHeight: 0,
-              bottom: TabBar(
-                controller: _tabController,
-                indicatorColor: primarySwatch[500],
-                labelColor: primarySwatch[500],
-                labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
-                unselectedLabelColor: Colors.black26,
-                tabs: [
-                  _buildCustomTab(
-                    text:
-                        AppLocalizations.of(context)!.task_status_pendingTitle,
-                    isSelected: _currentIndex == 0,
+      return BoxContainerWhite(
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 6.0
+          ),
+          child: SizedBox(
+            width: 120,
+            child: Scaffold(
+                key: scaffoldKeyDashboard,
+                appBar: AppBar(
+                  backgroundColor: lightBackground,
+                  elevation: kIsWeb ? 0.0 : null, //controla el shadow de los tabs
+                  toolbarHeight: 0,
+                  bottom: TabBar(
+                    controller: _tabController,
+                    indicator: ShapeDecoration(
+                      shape: RoundedRectangleBorder(borderRadius: kIsWeb ? BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)) : 
+                      BorderRadius.only(topRight: Radius.circular(0), topLeft: Radius.circular(0))),
+                      color: primarySwatch[600]
+                    ),
+                    labelColor: Colors.white,
+                    labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
+                    unselectedLabelColor: Colors.black38,
+                    tabs: [
+                      _buildCustomTab(
+                        text:
+                            AppLocalizations.of(context)!.task_status_pendingTitle,
+                        isSelected: _currentIndex == 0,
+                      ),
+                      _buildCustomTab(
+                        text: AppLocalizations.of(context)!.task_status_doingTitle,
+                        isSelected: _currentIndex == 1,
+                      ),
+                      _buildCustomTab(
+                        text:
+                            AppLocalizations.of(context)!.task_status_blockedTitle,
+                        isSelected: _currentIndex == 2,
+                      ),
+                      _buildCustomTab(
+                        text: AppLocalizations.of(context)!.task_status_doneTitle,
+                        isSelected: _currentIndex == 3,
+                      ),
+                    ],
+                    onTap: (index) {
+                      if (_currentIndex != index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                        _clearPref();
+                        String status = getTaskStatusSelected(index);
+                        taskFilterProvider.setLastStatus(status);
+                        updateTaskListState(status, isScheduled);
+                      }
+                    },
                   ),
-                  _buildCustomTab(
-                    text: AppLocalizations.of(context)!.task_status_doingTitle,
-                    isSelected: _currentIndex == 1,
-                  ),
-                  _buildCustomTab(
-                    text:
-                        AppLocalizations.of(context)!.task_status_blockedTitle,
-                    isSelected: _currentIndex == 2,
-                  ),
-                  _buildCustomTab(
-                    text: AppLocalizations.of(context)!.task_status_doneTitle,
-                    isSelected: _currentIndex == 3,
-                  ),
-                ],
-                onTap: (index) {
-                  if (_currentIndex != index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                    _clearPref();
-                    String status = getTaskStatusSelected(index);
-                    taskFilterProvider.setLastStatus(status);
-                    updateTaskListState(status, isScheduled);
-                  }
-                },
-              ),
+                ),
+                body: BackgroundGradient(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(20),
+                                    bottomRight: Radius.circular(20),
+                                  ),
+                    gradient: RadialGradient(
+                      center: Alignment.center,      
+                      radius: 2,      
+                      focalRadius: 2,
+                      // begin: Alignment.center,      
+                      // end: Alignment.centerRight,   
+                      colors: const [
+                        Colors.black26 ,      
+                        Colors.black26       
+                      ],            
+                    ),
+                ),
+                child: Consumer<TaskListViewModel>(
+                    builder: (context, taskListViewModel, child) {
+                  return LoadingOverlay(
+                      isLoading: taskListViewModel.isLoading,
+                      child: _buildTabContent(scaffoldKeyDashboard, isScheduled));
+                  // taskFilterProvider.inspectionTypeFilter
+                  //         ?.allMatches('Programada') !=
+                  //     null));
+                })),
             ),
-            body: BackgroundGradient(
-              decoration: BoxDecoration(
-                border: kIsWeb ? Border(
-                  left: BorderSide( //                   <--- left side
-                    color: lightBackground,
-                    width: 5.0,
-                  ),
-                  right: BorderSide( //                    <--- top side
-                    color: lightBackground,
-                    width: 5.0,
-                  ),
-                  bottom: BorderSide( //                    <--- top side
-                    color: lightBackground,
-                    width: 5.0,
-                  ),
-                ) : null,
-                gradient: RadialGradient(
-                center: Alignment.center,      
-                radius: 2,      
-                focalRadius: 2,
-                // begin: Alignment.center,      
-                // end: Alignment.centerRight,   
-                colors: const [
-                  Colors.black26 ,      
-                  Colors.black26       
-                ],            
-              ),
-            ),
-            child: Consumer<TaskListViewModel>(
-                builder: (context, taskListViewModel, child) {
-              return LoadingOverlay(
-                  isLoading: taskListViewModel.isLoading,
-                  child: _buildTabContent(scaffoldKeyDashboard, isScheduled));
-              // taskFilterProvider.inspectionTypeFilter
-              //         ?.allMatches('Programada') !=
-              //     null));
-            })),
+          ),
         ),
       );
     });
@@ -293,7 +300,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
           text,
           style: TextStyle(
             fontSize: kIsWeb ? 20 : 13,
-            color: isSelected ? primarySwatch[500]! : Colors.black26,
+            color: isSelected ? Colors.white : Colors.black38,
             fontWeight: isSelected ? FontWeight.w600 : (kIsWeb ? FontWeight.w500 : FontWeight.w500),
             height: 1.0,
           ),
