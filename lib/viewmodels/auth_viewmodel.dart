@@ -27,7 +27,7 @@ class AuthViewModel extends ChangeNotifier {
         return authDataResponse;
       }
       _error = true;
-      return null;
+      return authDataResponse;
     } catch (error) {
       _error = true;
       throw Exception('Error al obtener los datos de autenticación');
