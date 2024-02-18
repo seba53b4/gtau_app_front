@@ -38,20 +38,20 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
 
   @override
   Widget build(BuildContext context) {
-    List<Color> colors = [primarySwatch[300]!, primarySwatch[100]!];
+    List<Color> colors = [primarySwatch[900]!, primarySwatch[900]!];
     if (widget.backgroundColor == null) {
       switch (widget.messageType) {
         case MessageType.success:
-          colors = [primarySwatch[300]!, primarySwatch[100]!];
+          colors = [primarySwatch[300]!, primarySwatch[300]!];
           break;
         case MessageType.error:
-          colors = [Colors.red[400]!, Colors.red[300]!];
+          colors = [bucketDelete, bucketDelete];
           break;
         case MessageType.warning:
           colors = [Colors.orange, Colors.orangeAccent];
           break;
         case null:
-          colors = [primarySwatch[300]!, primarySwatch[100]!];
+          colors = [primarySwatch[300]!, primarySwatch[300]!];
       }
     } else {
       colors = [lightBackground, lightBackground];
@@ -59,7 +59,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
 
     return ElevatedButton(
       onPressed:
-      _isLoading || widget.showLoading ? null : () => _handleButtonPress(),
+          _isLoading || widget.showLoading ? null : () => _handleButtonPress(),
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24.0),
@@ -84,19 +84,19 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
           padding: const EdgeInsets.all(4),
           child: _isLoading || widget.showLoading
               ? Center(
-            child: LoadingAnimationWidget.waveDots(
-              color: lightBackground,
-              size: 32,
-            ),
-          )
+                  child: LoadingAnimationWidget.waveDots(
+                    color: lightBackground,
+                    size: 32,
+                  ),
+                )
               : Center(
-            child: Text(
-              widget.text,
-              style: TextStyle(
-                color: widget.textColor ?? Colors.white,
-              ),
-            ),
-          ),
+                  child: Text(
+                    widget.text,
+                    style: TextStyle(
+                      color: widget.textColor ?? Colors.white,
+                    ),
+                  ),
+                ),
         ),
       ),
     );

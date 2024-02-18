@@ -108,8 +108,8 @@ class _NavigationWeb extends State<NavigationWeb> {
                 begin: Alignment.center,
                 end: Alignment.centerRight,
                 colors: [
-                  lightBackground,
-                  Colors.white70,
+                  nav1,
+                  nav2,
                 ],
               ),
             ),
@@ -120,10 +120,10 @@ class _NavigationWeb extends State<NavigationWeb> {
               extended: isNavRailExtended,
               backgroundColor: Colors.transparent,
               useIndicator: true,
-              indicatorColor: primarySwatch[500]!,
+              indicatorColor: primarySwatch[100]!,
               selectedLabelTextStyle: GoogleFonts.sora(
                 textStyle: TextStyle(
-                    color: primarySwatch[400]!,
+                    color: lightBackground,
                     fontSize: 20,
                     fontWeight: FontWeight.w500),
               ),

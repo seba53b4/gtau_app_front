@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task.dart';
@@ -87,7 +86,7 @@ class TaskListItem extends StatelessWidget {
                       backgroundColor: Colors.transparent,
                       radius: 18,
                       child: const Icon(GtauIcons.tasksInspection,
-                              size: 20, color: Colors.white),
+                          size: 20, color: Colors.white),
                     ),
                   ),
                 ]),
@@ -167,7 +166,7 @@ class TaskListItem extends StatelessWidget {
                     onPressed: () async {
                       await _showDeleteConfirmationDialog(context);
                     },
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(Icons.delete, color: bucketDelete),
                   ),
                 ),
               ],

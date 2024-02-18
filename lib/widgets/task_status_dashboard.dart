@@ -94,204 +94,220 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
       bool isScheduled =
           taskFilterProvider.inspectionTypeFilter?.allMatches('SCHEDULED') !=
               null;
-      
 
-      
-      if(kIsWeb){
+      if (kIsWeb) {
         return BoxContainerWhite(
-          decoration: kIsWeb ? BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ) : null,
+          decoration: kIsWeb
+              ? BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                )
+              : null,
           child: Padding(
-            padding: kIsWeb ? EdgeInsets.only(
-              top: 6.0
-            ) : EdgeInsets.only(
-              top: 0.0
-            ),
+            padding:
+                kIsWeb ? EdgeInsets.only(top: 6.0) : EdgeInsets.only(top: 0.0),
             child: SizedBox(
               width: 120,
               child: Scaffold(
-                  key: scaffoldKeyDashboard,
-                  appBar: AppBar(
-                    backgroundColor: lightBackground,
-                    elevation: kIsWeb ? 0.0 : null, //controla el shadow de los tabs
-                    toolbarHeight: 0,
-                    bottom: TabBar(
-                      controller: _tabController,
-                      indicator: ShapeDecoration(
-                        shape: RoundedRectangleBorder(borderRadius: kIsWeb ? BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)) : 
-                        BorderRadius.only(topRight: Radius.circular(0), topLeft: Radius.circular(0))),
-                        color: primarySwatch[600]
+                key: scaffoldKeyDashboard,
+                appBar: AppBar(
+                  backgroundColor: lightBackground,
+                  elevation: kIsWeb ? 0.0 : null,
+                  //controla el shadow de los tabs
+                  toolbarHeight: 0,
+                  bottom: TabBar(
+                    controller: _tabController,
+                    indicator: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: kIsWeb
+                                ? BorderRadius.only(
+                                    topRight: Radius.circular(20),
+                                    topLeft: Radius.circular(20))
+                                : BorderRadius.only(
+                                    topRight: Radius.circular(0),
+                                    topLeft: Radius.circular(0))),
+                        color: primarySwatch[600]),
+                    labelColor: Colors.white,
+                    labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
+                    unselectedLabelColor: Colors.black38,
+                    tabs: [
+                      _buildCustomTab(
+                        text: AppLocalizations.of(context)!
+                            .task_status_pendingTitle,
+                        isSelected: _currentIndex == 0,
                       ),
-                      labelColor: Colors.white,
-                      labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
-                      unselectedLabelColor: Colors.black38,
-                      tabs: [
-                        _buildCustomTab(
-                          text:
-                              AppLocalizations.of(context)!.task_status_pendingTitle,
-                          isSelected: _currentIndex == 0,
-                        ),
-                        _buildCustomTab(
-                          text: AppLocalizations.of(context)!.task_status_doingTitle,
-                          isSelected: _currentIndex == 1,
-                        ),
-                        _buildCustomTab(
-                          text:
-                              AppLocalizations.of(context)!.task_status_blockedTitle,
-                          isSelected: _currentIndex == 2,
-                        ),
-                        _buildCustomTab(
-                          text: AppLocalizations.of(context)!.task_status_doneTitle,
-                          isSelected: _currentIndex == 3,
-                        ),
-                      ],
-                      onTap: (index) {
-                        if (_currentIndex != index) {
-                          setState(() {
-                            _currentIndex = index;
-                          });
-                          _clearPref();
-                          String status = getTaskStatusSelected(index);
-                          taskFilterProvider.setLastStatus(status);
-                          updateTaskListState(status, isScheduled);
-                        }
-                      },
-                    ),
+                      _buildCustomTab(
+                        text: AppLocalizations.of(context)!
+                            .task_status_doingTitle,
+                        isSelected: _currentIndex == 1,
+                      ),
+                      _buildCustomTab(
+                        text: AppLocalizations.of(context)!
+                            .task_status_blockedTitle,
+                        isSelected: _currentIndex == 2,
+                      ),
+                      _buildCustomTab(
+                        text:
+                            AppLocalizations.of(context)!.task_status_doneTitle,
+                        isSelected: _currentIndex == 3,
+                      ),
+                    ],
+                    onTap: (index) {
+                      if (_currentIndex != index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                        _clearPref();
+                        String status = getTaskStatusSelected(index);
+                        taskFilterProvider.setLastStatus(status);
+                        updateTaskListState(status, isScheduled);
+                      }
+                    },
                   ),
-                  body: BackgroundGradient(
+                ),
+                body: BackgroundGradient(
                     decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(187, 187, 187, 0.482),
-                        ),
-                        BoxShadow(
-                          color: Colors.white,
-                          spreadRadius: -5.0,
-                          blurRadius: 20.0,
-                        ),
-                      ],
-                      borderRadius: kIsWeb ? const BorderRadius.only(
-                                      bottomLeft: Radius.circular(20),
-                                      bottomRight: Radius.circular(20),
-                                    ) : null,
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: Color.fromRGBO(187, 187, 187, 0.482),
+                      //   ),
+                      //   BoxShadow(
+                      //     color: Colors.white,
+                      //     spreadRadius: -5.0,
+                      //     blurRadius: 20.0,
+                      //   ),
+                      // ],
+                      borderRadius: kIsWeb
+                          ? const BorderRadius.only(
+                              bottomLeft: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            )
+                          : null,
                       gradient: RadialGradient(
-                        center: Alignment.center,      
-                        radius: 2,      
+                        center: Alignment.center,
+                        radius: 2,
                         focalRadius: 2,
-                        // begin: Alignment.center,      
-                        // end: Alignment.centerRight,   
-                        colors: const [
-                          Colors.black26 ,      
-                          Colors.black26       
-                        ],            
+                        // begin: Alignment.center,
+                        // end: Alignment.centerRight,
+                        colors: [
+                          dashboardBackground,
+                          dashboardBackground
+                          //Color.fromRGBO(217, 217, 217, 1)
+                        ],
                       ),
-                  ),
-                  child: Consumer<TaskListViewModel>(
-                      builder: (context, taskListViewModel, child) {
-                    return LoadingOverlay(
-                        isLoading: taskListViewModel.isLoading,
-                        child: _buildTabContent(scaffoldKeyDashboard, isScheduled));
-                    // taskFilterProvider.inspectionTypeFilter
-                    //         ?.allMatches('Programada') !=
-                    //     null));
-                  })),
+                    ),
+                    child: Consumer<TaskListViewModel>(
+                        builder: (context, taskListViewModel, child) {
+                      return LoadingOverlay(
+                          isLoading: taskListViewModel.isLoading,
+                          child: _buildTabContent(
+                              scaffoldKeyDashboard, isScheduled));
+                      // taskFilterProvider.inspectionTypeFilter
+                      //         ?.allMatches('Programada') !=
+                      //     null));
+                    })),
               ),
             ),
           ),
         );
-      }else{
-          return Container(
+      } else {
+        return Container(
           child: SizedBox(
-              width: 120,
-              child: Scaffold(
-                  key: scaffoldKeyDashboard,
-                  appBar: AppBar(
-                    backgroundColor: lightBackground,
-                    elevation: kIsWeb ? 0.0 : null, //controla el shadow de los tabs
-                    toolbarHeight: 0,
-                    bottom: TabBar(
-                      controller: _tabController,
-                      indicator: ShapeDecoration(
-                        shape: RoundedRectangleBorder(borderRadius: kIsWeb ? BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)) : 
-                        BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20))),
-                        color: primarySwatch[600]
-                      ),
-                      labelColor: Colors.white,
-                      labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
-                      unselectedLabelColor: Colors.black38,
-                      tabs: [
-                        _buildCustomTab(
-                          text:
-                              AppLocalizations.of(context)!.task_status_pendingTitle,
-                          isSelected: _currentIndex == 0,
-                        ),
-                        _buildCustomTab(
-                          text: AppLocalizations.of(context)!.task_status_doingTitle,
-                          isSelected: _currentIndex == 1,
-                        ),
-                        _buildCustomTab(
-                          text:
-                              AppLocalizations.of(context)!.task_status_blockedTitle,
-                          isSelected: _currentIndex == 2,
-                        ),
-                        _buildCustomTab(
-                          text: AppLocalizations.of(context)!.task_status_doneTitle,
-                          isSelected: _currentIndex == 3,
-                        ),
-                      ],
-                      onTap: (index) {
-                        if (_currentIndex != index) {
-                          setState(() {
-                            _currentIndex = index;
-                          });
-                          _clearPref();
-                          String status = getTaskStatusSelected(index);
-                          taskFilterProvider.setLastStatus(status);
-                          updateTaskListState(status, isScheduled);
-                        }
-                      },
+            width: 120,
+            child: Scaffold(
+              key: scaffoldKeyDashboard,
+              appBar: AppBar(
+                backgroundColor: lightBackground,
+                elevation: kIsWeb ? 0.0 : null,
+                //controla el shadow de los tabs
+                toolbarHeight: 0,
+                bottom: TabBar(
+                  controller: _tabController,
+                  indicator: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: kIsWeb
+                              ? BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  topLeft: Radius.circular(20))
+                              : BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  topLeft: Radius.circular(20))),
+                      color: primarySwatch[600]),
+                  labelColor: Colors.white,
+                  labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
+                  unselectedLabelColor: Colors.black38,
+                  tabs: [
+                    _buildCustomTab(
+                      text: AppLocalizations.of(context)!
+                          .task_status_pendingTitle,
+                      isSelected: _currentIndex == 0,
                     ),
-                  ),
-                  body: BackgroundGradient(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color.fromRGBO(187, 187, 187, 0.482),
-                        ),
-                        BoxShadow(
-                          color: Colors.white,
-                          spreadRadius: -5.0,
-                          blurRadius: 20.0,
-                        ),
-                      ],
-                      borderRadius: kIsWeb ? const BorderRadius.only(
-                                      bottomLeft: Radius.circular(20),
-                                      bottomRight: Radius.circular(20),
-                                    ) : null,
-                      gradient: RadialGradient(
-                        center: Alignment.center,      
-                        radius: 2,      
-                        focalRadius: 2,
-                        // begin: Alignment.center,      
-                        // end: Alignment.centerRight,   
-                        colors: const [
-                          Colors.black26 ,      
-                          Colors.black26       
-                        ],            
+                    _buildCustomTab(
+                      text:
+                          AppLocalizations.of(context)!.task_status_doingTitle,
+                      isSelected: _currentIndex == 1,
+                    ),
+                    _buildCustomTab(
+                      text: AppLocalizations.of(context)!
+                          .task_status_blockedTitle,
+                      isSelected: _currentIndex == 2,
+                    ),
+                    _buildCustomTab(
+                      text: AppLocalizations.of(context)!.task_status_doneTitle,
+                      isSelected: _currentIndex == 3,
+                    ),
+                  ],
+                  onTap: (index) {
+                    if (_currentIndex != index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                      _clearPref();
+                      String status = getTaskStatusSelected(index);
+                      taskFilterProvider.setLastStatus(status);
+                      updateTaskListState(status, isScheduled);
+                    }
+                  },
+                ),
+              ),
+              body: BackgroundGradient(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(187, 187, 187, 0.482),
                       ),
+                      BoxShadow(
+                        color: Colors.white,
+                        spreadRadius: -5.0,
+                        blurRadius: 20.0,
+                      ),
+                    ],
+                    borderRadius: kIsWeb
+                        ? const BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          )
+                        : null,
+                    gradient: RadialGradient(
+                      center: Alignment.center,
+                      radius: 2,
+                      focalRadius: 2,
+                      // begin: Alignment.center,
+                      // end: Alignment.centerRight,
+                      colors: const [Colors.black26, Colors.black26],
+                    ),
                   ),
                   child: Consumer<TaskListViewModel>(
                       builder: (context, taskListViewModel, child) {
                     return LoadingOverlay(
                         isLoading: taskListViewModel.isLoading,
-                        child: _buildTabContent(scaffoldKeyDashboard, isScheduled));
+                        child: _buildTabContent(
+                            scaffoldKeyDashboard, isScheduled));
                     // taskFilterProvider.inspectionTypeFilter
                     //         ?.allMatches('Programada') !=
                     //     null));
                   })),
-              ),
+            ),
           ),
         );
       }
@@ -410,7 +426,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
           style: TextStyle(
             fontSize: kIsWeb ? 20 : 13,
             color: isSelected ? Colors.white : Colors.black38,
-            fontWeight: isSelected ? FontWeight.w600 : (kIsWeb ? FontWeight.w500 : FontWeight.w500),
+            fontWeight: isSelected
+                ? FontWeight.w600
+                : (kIsWeb ? FontWeight.w500 : FontWeight.w500),
             height: 1.0,
           ),
         ),
