@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 import '../viewmodels/images_viewmodel.dart';
 import 'common/custom_elevated_button.dart';
 
@@ -285,14 +286,12 @@ class _ScheduledGelleryShowState extends State<_ScheduledGelleryShow> {
         bool result = await _deleteSelectedImages(photos);
 
         if (result == true) {
-          /*print('Imagen ha sido eliminada correctamente');*/
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          /*print('No se pudo eliminar la imagen');*/
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,
@@ -379,9 +378,9 @@ class _ScheduledGelleryShowState extends State<_ScheduledGelleryShow> {
       }
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
-      print('Error al seleccionar la imagen: $e');
+      printOnDebug('Error al seleccionar la imagen: $e');
     } catch (error) {
-      print('Error inesperado: $error');
+      printOnDebug('Error inesperado: $error');
     }
   }
 
@@ -397,7 +396,7 @@ class _ScheduledGelleryShowState extends State<_ScheduledGelleryShow> {
         setState(() {});
         _getImagesData();
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
       }
     }
@@ -417,7 +416,7 @@ class _ScheduledGelleryShowState extends State<_ScheduledGelleryShow> {
         setState(() {});
         _getImagesData();
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
       }
     }
@@ -459,7 +458,7 @@ class _ScheduledGelleryShowState extends State<_ScheduledGelleryShow> {
       return await imagesViewModel?.fetchImagesScheduledElement(
           token, widget.scheduledId, widget.elementId, widget.elementType);
     } catch (error) {
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     }
   }

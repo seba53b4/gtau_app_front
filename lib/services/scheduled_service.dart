@@ -29,7 +29,7 @@ class ScheduledService {
 
   ScheduledService({String? baseUrl})
       : baseUrl = baseUrl ??
-            dotenv.get('API_SCHEDULED_TASKS_URL', fallback: 'NOT_FOUND');
+      dotenv.get('API_SCHEDULED_TASKS_URL', fallback: 'NOT_FOUND');
 
   Map<String, String> _getHeaders(String token) {
     return {
@@ -38,8 +38,7 @@ class ScheduledService {
     };
   }
 
-  Future<ScheduledElements?> fetchTaskScheduledEntities(
-      String token,
+  Future<ScheduledElements?> fetchTaskScheduledEntities(String token,
       int idSchedTask,
       double? originLongitude,
       double? originLatitude,
@@ -65,17 +64,17 @@ class ScheduledService {
         final entitiesCatchment = entities['captacionesGeoJson'];
 
         List<RegisterScheduled> registerList =
-            entitiesRegister.map<RegisterScheduled>((registerData) {
+        entitiesRegister.map<RegisterScheduled>((registerData) {
           return RegisterScheduled.fromJson(json: registerData);
         }).toList();
 
         List<SectionScheduled> sectionList =
-            entitiesSection.map<SectionScheduled>((sectionData) {
+        entitiesSection.map<SectionScheduled>((sectionData) {
           return SectionScheduled.fromJson(json: sectionData);
         }).toList();
 
         List<CatchmentScheduled> catchmentList =
-            entitiesCatchment.map<CatchmentScheduled>((catchmentData) {
+        entitiesCatchment.map<CatchmentScheduled>((catchmentData) {
           return CatchmentScheduled.fromJson(json: catchmentData);
         }).toList();
 
@@ -95,8 +94,8 @@ class ScheduledService {
     }
   }
 
-  Future<SectionScheduled?> fetchSectionScheduledById(
-      String token, int scheduledId, int sectionId) async {
+  Future<SectionScheduled?> fetchSectionScheduledById(String token,
+      int scheduledId, int sectionId) async {
     try {
       final url = Uri.parse('$baseUrl/$scheduledId/tramo/$sectionId');
       final response = await http.get(
@@ -121,7 +120,7 @@ class ScheduledService {
       final url = Uri.parse('$baseUrl/$scheduledId/tramo/$sectionId');
       final String jsonBody = jsonEncode(body);
       final response =
-          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
         printOnDebug('Tramo en programada ha sido actualizado correctamente');
         return true;
@@ -136,8 +135,8 @@ class ScheduledService {
     }
   }
 
-  Future<RegisterScheduled?> fetchRegisterScheduledById(
-      String token, int scheduledId, int registerId) async {
+  Future<RegisterScheduled?> fetchRegisterScheduledById(String token,
+      int scheduledId, int registerId) async {
     try {
       final url = Uri.parse('$baseUrl/$scheduledId/registro/$registerId');
       final response = await http.get(
@@ -162,7 +161,7 @@ class ScheduledService {
       final url = Uri.parse('$baseUrl/$scheduledId/registro/$registerId');
       final String jsonBody = jsonEncode(body);
       final response =
-          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
         printOnDebug(
             'Registro en programada ha sido actualizado correctamente');
@@ -177,8 +176,8 @@ class ScheduledService {
     }
   }
 
-  Future<CatchmentScheduled?> fetchCatchmentScheduledById(
-      String token, int scheduledId, int catchmentId) async {
+  Future<CatchmentScheduled?> fetchCatchmentScheduledById(String token,
+      int scheduledId, int catchmentId) async {
     try {
       final url = Uri.parse('$baseUrl/$scheduledId/captacion/$catchmentId');
       final response = await http.get(
@@ -203,7 +202,7 @@ class ScheduledService {
       final url = Uri.parse('$baseUrl/$scheduledId/captacion/$catchmentId');
       final String jsonBody = jsonEncode(body);
       final response =
-          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
         printOnDebug(
             'Captacion en programada ha sido actualizado correctamente');
@@ -218,8 +217,8 @@ class ScheduledService {
     }
   }
 
-  Future<List<TaskScheduled>?> getScheduledTasks(
-      String token, int page, int size, String status) async {
+  Future<List<TaskScheduled>?> getScheduledTasks(String token, int page,
+      int size, String status) async {
     try {
       String userByType = dotenv.get('BY_STATUS_URL', fallback: 'NOT_FOUND');
       final url = Uri.parse(
@@ -243,13 +242,13 @@ class ScheduledService {
     }
   }
 
-  Future<TaskScheduled?> createScheduledTask(
-      String token, Map<String, dynamic> body) async {
+  Future<TaskScheduled?> createScheduledTask(String token,
+      Map<String, dynamic> body) async {
     try {
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse(baseUrl);
       final response =
-          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 201) {
         printOnDebug('Tarea ha sido creada correctamente');
@@ -288,13 +287,13 @@ class ScheduledService {
     }
   }
 
-  Future<bool> updateTaskScheduled(
-      String token, int scheduledId, Map<String, dynamic> body) async {
+  Future<bool> updateTaskScheduled(String token, int scheduledId,
+      Map<String, dynamic> body) async {
     try {
       final url = Uri.parse('$baseUrl/$scheduledId');
       final String jsonBody = jsonEncode(body);
       final response =
-          await http.put(url, headers: _getHeaders(token), body: jsonBody);
+      await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
         printOnDebug('Tarea ha sido actualizada correctamente');
         return true;
@@ -323,13 +322,13 @@ class ScheduledService {
     }
   }
 
-  Future<bool> createScheduledZone(
-      String token, int scheduledId, Map<String, dynamic> body) async {
+  Future<bool> createScheduledZone(String token, int scheduledId,
+      Map<String, dynamic> body) async {
     try {
       final String jsonBody = jsonEncode(body);
       final url = Uri.parse('$baseUrl/$scheduledId/zona');
       final response =
-          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      await http.post(url, headers: _getHeaders(token), body: jsonBody);
       String resultText = response.body;
       if (response.statusCode == 200) {
         return resultText.trim().toLowerCase() == 'true';
@@ -344,8 +343,8 @@ class ScheduledService {
     }
   }
 
-  Future<ScheduledZone?> fetchZoneFromScheduled(
-      String token, int scheduledId) async {
+  Future<ScheduledZone?> fetchZoneFromScheduled(String token,
+      int scheduledId) async {
     try {
       final url = Uri.parse('$baseUrl/$scheduledId/zona');
       final response = await http.get(
@@ -366,13 +365,13 @@ class ScheduledService {
     }
   }
 
-  Future<List<TaskScheduled>?> searchTasksScheduled(
-      String token, Map<String, dynamic> body, int page, int size) async {
+  Future<List<TaskScheduled>?> searchTasksScheduled(String token,
+      Map<String, dynamic> body, int page, int size) async {
     try {
       final url = Uri.parse('$baseUrl/search?page=$page&size=$size');
       final String jsonBody = jsonEncode(body);
       final response =
-          await http.post(url, headers: _getHeaders(token), body: jsonBody);
+      await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -405,9 +404,8 @@ class ScheduledService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener zone: $error');
-      }
+      printOnDebug('Error al obtener zone: $error');
+
       rethrow;
     }
   }
@@ -426,9 +424,8 @@ class ScheduledService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener fetchReportScheduled: $error');
-      }
+      printOnDebug('Error al obtener fetchReportScheduled: $error');
+
       rethrow;
     }
   }
@@ -447,9 +444,8 @@ class ScheduledService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener postReportScheduled: $error');
-      }
+      printOnDebug('Error al obtener postReportScheduled: $error');
+
       rethrow;
     }
   }

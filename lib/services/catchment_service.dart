@@ -15,7 +15,7 @@ class CatchmentService {
 
   CatchmentService({String? baseUrl})
       : baseUrl =
-            baseUrl ?? dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND');
+      baseUrl ?? dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND');
 
   Map<String, String> _getHeaders(String token) {
     return {
@@ -24,8 +24,8 @@ class CatchmentService {
     };
   }
 
-  Future<List<Catchment>?> fetchCatchmentsByRadius(
-      String token, double longitude, double latitude, int radiusMtr) async {
+  Future<List<Catchment>?> fetchCatchmentsByRadius(String token,
+      double longitude, double latitude, int radiusMtr) async {
     try {
       final url = Uri.parse(
           '$baseUrl/$sourcePath/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
@@ -35,7 +35,7 @@ class CatchmentService {
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        //print("resp catchm: " + jsonResponse.toString());
+
         return jsonResponse.map<Catchment>((catchment) {
           Map<String, dynamic> geoJson = catchment['geoJSON'];
           List<dynamic> coordenates = geoJson['coordinates'];

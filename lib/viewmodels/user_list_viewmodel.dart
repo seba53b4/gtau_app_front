@@ -54,13 +54,15 @@ class UserListViewModel extends ChangeNotifier {
     _users[status]?.clear();
   }
 
-  Future<List<UserData>?> initializeUsers(
-      BuildContext context, String status, String? user) async {
+  Future<List<UserData>?> initializeUsers(BuildContext context, String status,
+      String? user) async {
     return await fetchUsers(context, user);
   }
 
   Future<List<UserData>?> fetchUsers(BuildContext context, String? user) async {
-    final token = context.read<UserProvider>().getToken;
+    final token = context
+        .read<UserProvider>()
+        .getToken;
     try {
       _SetIsLoadingPrefValue(true);
       _error = false;
@@ -86,7 +88,9 @@ class UserListViewModel extends ChangeNotifier {
   }
 
   Future<List<String>?> fetchUsernames(BuildContext context) async {
-    final token = context.read<UserProvider>().getToken;
+    final token = context
+        .read<UserProvider>()
+        .getToken;
     try {
       _SetIsLoadingPrefValue(true);
       _error = false;
@@ -172,9 +176,9 @@ class UserListViewModel extends ChangeNotifier {
       return responseListUsers?.first;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+
+      printOnDebug(error);
+
       throw Exception('Error al obtener los datos: fetchUserByUsername');
     } finally {
       _isLoading = false;
@@ -206,8 +210,8 @@ class UserListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateUser(
-      String token, String idUser, Map<String, dynamic> body) async {
+  Future<bool> updateUser(String token, String idUser,
+      Map<String, dynamic> body) async {
     try {
       _SetIsLoadingPrefValue(true);
       _isLoading = true;

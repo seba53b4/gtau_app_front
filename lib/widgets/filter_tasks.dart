@@ -13,9 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 import '../viewmodels/task_list_viewmodel.dart';
-import 'common/box_container.dart';
-import 'common/custom_elevated_button.dart';
 import 'dropdown_button_filter.dart';
 
 class FilterTasks extends StatefulWidget {
@@ -35,7 +34,7 @@ class _FilterTasksState extends State<FilterTasks> {
   late TaskListScheduledViewModel taskListScheduledViewModel;
   late UserListViewModel userListViewModel;
   late String token;
-    static const String notAssigned = "no-asignada";
+  static const String notAssigned = "no-asignada";
 
   @override
   void initState() {
@@ -59,9 +58,8 @@ class _FilterTasksState extends State<FilterTasks> {
         return list.map((e) => ValueLabel(e, e)).toList();
       }
     } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
+
       throw Exception('Error al obtener los datos');
       return list.map((e) => ValueLabel(e, e)).toList();
     }
@@ -116,7 +114,7 @@ class _FilterTasksState extends State<FilterTasks> {
     final userProvider = context.read<UserProvider>();
     final filterProvider = Provider.of<TaskFilterProvider>(context);
 
-    if(kIsWeb == true){
+    if (kIsWeb == true) {
       return Scaffold(
         appBar: AppBar(
             title: Padding(
@@ -144,159 +142,168 @@ class _FilterTasksState extends State<FilterTasks> {
                     children: <Widget>[
                       const SizedBox(height: 8),
                       DropdownButtonFilter(
-                              suggestions: filterProvider.inspectionType,
-                              valueSetter: filterProvider.setInspectionTypeFilter,
-                              dropdownValue: filterProvider.inspectionTypeFilter ??
-                                  filterProvider.inspectionType.first.value,
-                              label: appLocalizations.inspection_type,
-                              enabled: true,
-                            ),
+                        suggestions: filterProvider.inspectionType,
+                        valueSetter: filterProvider.setInspectionTypeFilter,
+                        dropdownValue: filterProvider.inspectionTypeFilter ??
+                            filterProvider.inspectionType.first.value,
+                        label: appLocalizations.inspection_type,
+                        enabled: true,
+                      ),
                       const SizedBox(height: 16),
-                            DropdownButtonFilter(
-                              suggestions: filterProvider.suggestionsStatus,
-                              valueSetter: filterProvider.setLastStatus,
-                              dropdownValue: filterProvider.statusFilter ??
-                                  filterProvider.suggestionsStatus.first.value,
-                              label: appLocalizations.editTaskPage_statusTitle,
-                              enabled: true,
-                            ),
+                      DropdownButtonFilter(
+                        suggestions: filterProvider.suggestionsStatus,
+                        valueSetter: filterProvider.setLastStatus,
+                        dropdownValue: filterProvider.statusFilter ??
+                            filterProvider.suggestionsStatus.first.value,
+                        label: appLocalizations.editTaskPage_statusTitle,
+                        enabled: true,
+                      ),
                       const SizedBox(height: 16),
                       Visibility(
-                        visible: (filterProvider.inspectionTypeFilter ?? "" ) == "SCHEDULED",
-                        child: Column(
-                          children: <Widget>[
-                            TextFieldFilter(
-                              valueSetter: filterProvider.setScheduledTitleFilter,
-                              value: filterProvider.scheduledTitleFilter ?? "",
-                              label: appLocalizations.scheduled_title_input,
-                            ),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                              valueSetter: filterProvider.setScheduledDescriptionFilter,
-                              value: filterProvider.scheduledDescriptionFilter ?? "",
-                              label: appLocalizations.default_descriptionTitle,
-                            ),
-                            const SizedBox(height: 16),
-                          ]
-                        ),
+                        visible: (filterProvider.inspectionTypeFilter ?? "") ==
+                            "SCHEDULED",
+                        child: Column(children: <Widget>[
+                          TextFieldFilter(
+                            valueSetter: filterProvider.setScheduledTitleFilter,
+                            value: filterProvider.scheduledTitleFilter ?? "",
+                            label: appLocalizations.scheduled_title_input,
+                          ),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                            valueSetter:
+                                filterProvider.setScheduledDescriptionFilter,
+                            value:
+                                filterProvider.scheduledDescriptionFilter ?? "",
+                            label: appLocalizations.default_descriptionTitle,
+                          ),
+                          const SizedBox(height: 16),
+                        ]),
                       ),
                       Visibility(
-                        visible: (filterProvider.inspectionTypeFilter ?? "" ) != "SCHEDULED",
-                        child: Column(
-                          children: <Widget>[
-
-
-                            FutureBuilder<List<ValueLabel>>(
-                              future: _listUserNames(), // a previously-obtained Future<String> or null
-                              builder: (BuildContext context, AsyncSnapshot<List<ValueLabel>> snapshot) {
+                        visible: (filterProvider.inspectionTypeFilter ?? "") !=
+                            "SCHEDULED",
+                        child: Column(children: <Widget>[
+                          FutureBuilder<List<ValueLabel>>(
+                              future: _listUserNames(),
+                              // a previously-obtained Future<String> or null
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<List<ValueLabel>> snapshot) {
                                 if (snapshot.hasData) {
                                   return DropdownButtonFilter(
                                     suggestions: snapshot.data!,
-                                    valueSetter: filterProvider.setUserNameFilter,
+                                    valueSetter:
+                                        filterProvider.setUserNameFilter,
                                     dropdownValue: !userProvider.isAdmin!
                                         ? userProvider.userName!
                                         : (filterProvider.userNameFilter ??
                                             snapshot.data!.first.value),
                                     label: appLocalizations.user,
-                                    enabled: userProvider.isAdmin! ? true : false,
+                                    enabled:
+                                        userProvider.isAdmin! ? true : false,
                                   );
-                                }else{
+                                } else {
                                   return DropdownButtonFilter(
-                                    suggestions: filterProvider.suggestionsUsers,
-                                    valueSetter: filterProvider.setUserNameFilter,
+                                    suggestions:
+                                        filterProvider.suggestionsUsers,
+                                    valueSetter:
+                                        filterProvider.setUserNameFilter,
                                     dropdownValue: !userProvider.isAdmin!
                                         ? userProvider.userName!
                                         : (filterProvider.userNameFilter ??
-                                            filterProvider.suggestionsUsers.first.value),
+                                            filterProvider
+                                                .suggestionsUsers.first.value),
                                     label: appLocalizations.user,
-                                    enabled: userProvider.isAdmin! ? true : false,
+                                    enabled:
+                                        userProvider.isAdmin! ? true : false,
                                   );
                                 }
-                              }
-                            ),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                              valueSetter: filterProvider.setWorkNumberFilter,
-                              value: filterProvider.workNumberFilter ?? "",
-                              label: appLocalizations.createTaskPage_numberWorkTitle,
-                            ),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setApplicantFilter,
-                                value: filterProvider.applicantFilter ?? "",
-                                label: appLocalizations.createTaskPage_solicitantTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setLocationFilter,
-                                value: filterProvider.locationFilter ?? "",
-                                label:
-                                    appLocalizations.createTaskPage_selectUbicationTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setDescriptionFilter,
-                                value: filterProvider.descriptionFilter ?? "",
-                                label: appLocalizations.default_descriptionTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setLengthFilter,
-                                value: filterProvider.lengthFilter ?? "",
-                                label: appLocalizations.createTaskPage_longitudeTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setMaterialFilter,
-                                value: filterProvider.materialFilter ?? "",
-                                label: appLocalizations.createTaskPage_materialTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setObservationsFilter,
-                                value: filterProvider.observationsFilter ?? "",
-                                label: appLocalizations.createTaskPage_observationsTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setConclusionsFilter,
-                                value: filterProvider.conclusionsFilter ?? "",
-                                label: appLocalizations.createTaskPage_conclusionsTitle),
-                            const SizedBox(height: 16),
-                          ]
-                        ),
+                              }),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                            valueSetter: filterProvider.setWorkNumberFilter,
+                            value: filterProvider.workNumberFilter ?? "",
+                            label:
+                                appLocalizations.createTaskPage_numberWorkTitle,
+                          ),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                              valueSetter: filterProvider.setApplicantFilter,
+                              value: filterProvider.applicantFilter ?? "",
+                              label: appLocalizations
+                                  .createTaskPage_solicitantTitle),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                              valueSetter: filterProvider.setLocationFilter,
+                              value: filterProvider.locationFilter ?? "",
+                              label: appLocalizations
+                                  .createTaskPage_selectUbicationTitle),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                              valueSetter: filterProvider.setDescriptionFilter,
+                              value: filterProvider.descriptionFilter ?? "",
+                              label: appLocalizations.default_descriptionTitle),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                              valueSetter: filterProvider.setLengthFilter,
+                              value: filterProvider.lengthFilter ?? "",
+                              label: appLocalizations
+                                  .createTaskPage_longitudeTitle),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                              valueSetter: filterProvider.setMaterialFilter,
+                              value: filterProvider.materialFilter ?? "",
+                              label: appLocalizations
+                                  .createTaskPage_materialTitle),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                              valueSetter: filterProvider.setObservationsFilter,
+                              value: filterProvider.observationsFilter ?? "",
+                              label: appLocalizations
+                                  .createTaskPage_observationsTitle),
+                          const SizedBox(height: 16),
+                          TextFieldFilter(
+                              valueSetter: filterProvider.setConclusionsFilter,
+                              value: filterProvider.conclusionsFilter ?? "",
+                              label: appLocalizations
+                                  .createTaskPage_conclusionsTitle),
+                          const SizedBox(height: 16),
+                        ]),
                       ),
-                      
                       Container(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                                    CustomElevatedButtonLength(
-                                      onPressed: () {
-                                        //resetAwaitTaskList();
-                                        _ResetPrefs();
-                                        _ResetScrollPosition();
-                                        _SetFilteredValue(true);
-                                        context.read<TaskFilterProvider>().search();
-                                        
-                                        updateTaskList();
-                                        Navigator.of(context).pop();
-                                      },
-                                      text: appLocalizations.buttonApplyLabel,
-                                    ),
-                                    const SizedBox(height: 15),
-                                    CustomElevatedButtonLength(
-                                      onPressed: () {
-                                        var taskFilterProvider =
-                                            context.read<TaskFilterProvider>();
-                                        taskFilterProvider
-                                            .resetFilters(userProvider.isAdmin!);
-                                        taskFilterProvider.setLastStatus(
-                                            TaskStatus.Pending.value);
-                                        _ResetPrefs();
-                                        resetTaskList();
-                                        Navigator.of(context).pop();
-                                      },
-                                      messageType: MessageType.error,
-                                      text: appLocalizations.buttonCleanLabel,
-                                    ),
-                                    const SizedBox(height: 15),
-                                  
+                            CustomElevatedButtonLength(
+                              onPressed: () {
+                                //resetAwaitTaskList();
+                                _ResetPrefs();
+                                _ResetScrollPosition();
+                                _SetFilteredValue(true);
+                                context.read<TaskFilterProvider>().search();
+
+                                updateTaskList();
+                                Navigator.of(context).pop();
+                              },
+                              text: appLocalizations.buttonApplyLabel,
+                            ),
+                            const SizedBox(height: 15),
+                            CustomElevatedButtonLength(
+                              onPressed: () {
+                                var taskFilterProvider =
+                                    context.read<TaskFilterProvider>();
+                                taskFilterProvider
+                                    .resetFilters(userProvider.isAdmin!);
+                                taskFilterProvider
+                                    .setLastStatus(TaskStatus.Pending.value);
+                                _ResetPrefs();
+                                resetTaskList();
+                                Navigator.of(context).pop();
+                              },
+                              messageType: MessageType.error,
+                              text: appLocalizations.buttonCleanLabel,
+                            ),
+                            const SizedBox(height: 15),
                           ],
                         ),
                       ),
@@ -308,8 +315,7 @@ class _FilterTasksState extends State<FilterTasks> {
           ),
         ),
       );
-
-    }else{
+    } else {
       return Scaffold(
         appBar: AppBar(
             title: Padding(
@@ -325,174 +331,178 @@ class _FilterTasksState extends State<FilterTasks> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
-                width: MediaQuery.of(context).size.width,
-                alignment: Alignment.center,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const SizedBox(height: 8),
-                      DropdownButtonFilter(
-                              suggestions: filterProvider.inspectionType,
-                              valueSetter: filterProvider.setInspectionTypeFilter,
-                              dropdownValue: filterProvider.inspectionTypeFilter ??
-                                  filterProvider.inspectionType.first.value,
-                              label: appLocalizations.inspection_type,
-                              enabled: true,
-                            ),
-                      const SizedBox(height: 16),
-                            DropdownButtonFilter(
-                              suggestions: filterProvider.suggestionsStatus,
-                              valueSetter: filterProvider.setLastStatus,
-                              dropdownValue: filterProvider.statusFilter ??
-                                  filterProvider.suggestionsStatus.first.value,
-                              label: appLocalizations.editTaskPage_statusTitle,
-                              enabled: true,
-                            ),
-                      const SizedBox(height: 16),
-                      Visibility(
-                        visible: (filterProvider.inspectionTypeFilter ?? "" ) == "SCHEDULED",
-                        child: Column(
-                          children: <Widget>[
-                            TextFieldFilter(
-                              valueSetter: filterProvider.setScheduledTitleFilter,
-                              value: filterProvider.scheduledTitleFilter ?? "",
-                              label: appLocalizations.scheduled_title_input,
-                            ),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                              valueSetter: filterProvider.setScheduledDescriptionFilter,
-                              value: filterProvider.scheduledDescriptionFilter ?? "",
-                              label: appLocalizations.default_descriptionTitle,
-                            ),
-                            const SizedBox(height: 16),
-                          ]
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.center,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const SizedBox(height: 8),
+                    DropdownButtonFilter(
+                      suggestions: filterProvider.inspectionType,
+                      valueSetter: filterProvider.setInspectionTypeFilter,
+                      dropdownValue: filterProvider.inspectionTypeFilter ??
+                          filterProvider.inspectionType.first.value,
+                      label: appLocalizations.inspection_type,
+                      enabled: true,
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFilter(
+                      suggestions: filterProvider.suggestionsStatus,
+                      valueSetter: filterProvider.setLastStatus,
+                      dropdownValue: filterProvider.statusFilter ??
+                          filterProvider.suggestionsStatus.first.value,
+                      label: appLocalizations.editTaskPage_statusTitle,
+                      enabled: true,
+                    ),
+                    const SizedBox(height: 16),
+                    Visibility(
+                      visible: (filterProvider.inspectionTypeFilter ?? "") ==
+                          "SCHEDULED",
+                      child: Column(children: <Widget>[
+                        TextFieldFilter(
+                          valueSetter: filterProvider.setScheduledTitleFilter,
+                          value: filterProvider.scheduledTitleFilter ?? "",
+                          label: appLocalizations.scheduled_title_input,
                         ),
-                      ),
-                      Visibility(
-                        visible: (filterProvider.inspectionTypeFilter ?? "" ) != "SCHEDULED",
-                        child: Column(
-                          children: <Widget>[
-
-
-                            FutureBuilder<List<ValueLabel>>(
-                              future: _listUserNames(), // a previously-obtained Future<String> or null
-                              builder: (BuildContext context, AsyncSnapshot<List<ValueLabel>> snapshot) {
-                                if (snapshot.hasData) {
-                                  return DropdownButtonFilter(
-                                    suggestions: snapshot.data!,
-                                    valueSetter: filterProvider.setUserNameFilter,
-                                    dropdownValue: !userProvider.isAdmin!
-                                        ? userProvider.userName!
-                                        : (filterProvider.userNameFilter ??
-                                            snapshot.data!.first.value),
-                                    label: appLocalizations.user,
-                                    enabled: userProvider.isAdmin! ? true : false,
-                                  );
-                                }else{
-                                  return DropdownButtonFilter(
-                                    suggestions: filterProvider.suggestionsUsers,
-                                    valueSetter: filterProvider.setUserNameFilter,
-                                    dropdownValue: !userProvider.isAdmin!
-                                        ? userProvider.userName!
-                                        : (filterProvider.userNameFilter ??
-                                            filterProvider.suggestionsUsers.first.value),
-                                    label: appLocalizations.user,
-                                    enabled: userProvider.isAdmin! ? true : false,
-                                  );
-                                }
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                          valueSetter:
+                              filterProvider.setScheduledDescriptionFilter,
+                          value:
+                              filterProvider.scheduledDescriptionFilter ?? "",
+                          label: appLocalizations.default_descriptionTitle,
+                        ),
+                        const SizedBox(height: 16),
+                      ]),
+                    ),
+                    Visibility(
+                      visible: (filterProvider.inspectionTypeFilter ?? "") !=
+                          "SCHEDULED",
+                      child: Column(children: <Widget>[
+                        FutureBuilder<List<ValueLabel>>(
+                            future: _listUserNames(),
+                            // a previously-obtained Future<String> or null
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List<ValueLabel>> snapshot) {
+                              if (snapshot.hasData) {
+                                return DropdownButtonFilter(
+                                  suggestions: snapshot.data!,
+                                  valueSetter: filterProvider.setUserNameFilter,
+                                  dropdownValue: !userProvider.isAdmin!
+                                      ? userProvider.userName!
+                                      : (filterProvider.userNameFilter ??
+                                          snapshot.data!.first.value),
+                                  label: appLocalizations.user,
+                                  enabled: userProvider.isAdmin! ? true : false,
+                                );
+                              } else {
+                                return DropdownButtonFilter(
+                                  suggestions: filterProvider.suggestionsUsers,
+                                  valueSetter: filterProvider.setUserNameFilter,
+                                  dropdownValue: !userProvider.isAdmin!
+                                      ? userProvider.userName!
+                                      : (filterProvider.userNameFilter ??
+                                          filterProvider
+                                              .suggestionsUsers.first.value),
+                                  label: appLocalizations.user,
+                                  enabled: userProvider.isAdmin! ? true : false,
+                                );
                               }
-                            ),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                              valueSetter: filterProvider.setWorkNumberFilter,
-                              value: filterProvider.workNumberFilter ?? "",
-                              label: appLocalizations.createTaskPage_numberWorkTitle,
-                            ),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setApplicantFilter,
-                                value: filterProvider.applicantFilter ?? "",
-                                label: appLocalizations.createTaskPage_solicitantTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setLocationFilter,
-                                value: filterProvider.locationFilter ?? "",
-                                label:
-                                    appLocalizations.createTaskPage_selectUbicationTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setDescriptionFilter,
-                                value: filterProvider.descriptionFilter ?? "",
-                                label: appLocalizations.default_descriptionTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setLengthFilter,
-                                value: filterProvider.lengthFilter ?? "",
-                                label: appLocalizations.createTaskPage_longitudeTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setMaterialFilter,
-                                value: filterProvider.materialFilter ?? "",
-                                label: appLocalizations.createTaskPage_materialTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setObservationsFilter,
-                                value: filterProvider.observationsFilter ?? "",
-                                label: appLocalizations.createTaskPage_observationsTitle),
-                            const SizedBox(height: 16),
-                            TextFieldFilter(
-                                valueSetter: filterProvider.setConclusionsFilter,
-                                value: filterProvider.conclusionsFilter ?? "",
-                                label: appLocalizations.createTaskPage_conclusionsTitle),
-                            const SizedBox(height: 16),
-                          ]
+                            }),
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                          valueSetter: filterProvider.setWorkNumberFilter,
+                          value: filterProvider.workNumberFilter ?? "",
+                          label:
+                              appLocalizations.createTaskPage_numberWorkTitle,
                         ),
-                      ),
-                      
-                      Container(
-                        child: Column(
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                            valueSetter: filterProvider.setApplicantFilter,
+                            value: filterProvider.applicantFilter ?? "",
+                            label: appLocalizations
+                                .createTaskPage_solicitantTitle),
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                            valueSetter: filterProvider.setLocationFilter,
+                            value: filterProvider.locationFilter ?? "",
+                            label: appLocalizations
+                                .createTaskPage_selectUbicationTitle),
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                            valueSetter: filterProvider.setDescriptionFilter,
+                            value: filterProvider.descriptionFilter ?? "",
+                            label: appLocalizations.default_descriptionTitle),
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                            valueSetter: filterProvider.setLengthFilter,
+                            value: filterProvider.lengthFilter ?? "",
+                            label:
+                                appLocalizations.createTaskPage_longitudeTitle),
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                            valueSetter: filterProvider.setMaterialFilter,
+                            value: filterProvider.materialFilter ?? "",
+                            label:
+                                appLocalizations.createTaskPage_materialTitle),
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                            valueSetter: filterProvider.setObservationsFilter,
+                            value: filterProvider.observationsFilter ?? "",
+                            label: appLocalizations
+                                .createTaskPage_observationsTitle),
+                        const SizedBox(height: 16),
+                        TextFieldFilter(
+                            valueSetter: filterProvider.setConclusionsFilter,
+                            value: filterProvider.conclusionsFilter ?? "",
+                            label: appLocalizations
+                                .createTaskPage_conclusionsTitle),
+                        const SizedBox(height: 16),
+                      ]),
+                    ),
+                    Container(
+                      child: Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                                    CustomElevatedButtonLength(
-                                      onPressed: () {
-                                        //resetAwaitTaskList();
-                                        _ResetPrefs();
-                                        _ResetScrollPosition();
-                                        _SetFilteredValue(true);
-                                        context.read<TaskFilterProvider>().search();
-                                        
-                                        updateTaskList();
-                                        Navigator.of(context).pop();
-                                      },
-                                      text: appLocalizations.buttonApplyLabel,
-                                    ),
-                                    const SizedBox(height: 5),
-                                    CustomElevatedButtonLength(
-                                        onPressed: () {
-                                          var taskFilterProvider =
-                                              context.read<TaskFilterProvider>();
-                                          taskFilterProvider
-                                              .resetFilters(userProvider.isAdmin!);
-                                          taskFilterProvider.setLastStatus(
-                                              TaskStatus.Pending.value);
-                                          _ResetPrefs();
-                                          resetTaskList();
-                                          Navigator.of(context).pop();
-                                        },
-                                        messageType: MessageType.error,
-                                        text: appLocalizations.buttonCleanLabel,
-                                    ),
-                          ]
-                        ),
-                      ),
-                    ],
-                  ),
+                            CustomElevatedButtonLength(
+                              onPressed: () {
+                                //resetAwaitTaskList();
+                                _ResetPrefs();
+                                _ResetScrollPosition();
+                                _SetFilteredValue(true);
+                                context.read<TaskFilterProvider>().search();
+
+                                updateTaskList();
+                                Navigator.of(context).pop();
+                              },
+                              text: appLocalizations.buttonApplyLabel,
+                            ),
+                            const SizedBox(height: 5),
+                            CustomElevatedButtonLength(
+                              onPressed: () {
+                                var taskFilterProvider =
+                                    context.read<TaskFilterProvider>();
+                                taskFilterProvider
+                                    .resetFilters(userProvider.isAdmin!);
+                                taskFilterProvider
+                                    .setLastStatus(TaskStatus.Pending.value);
+                                _ResetPrefs();
+                                resetTaskList();
+                                Navigator.of(context).pop();
+                              },
+                              messageType: MessageType.error,
+                              text: appLocalizations.buttonCleanLabel,
+                            ),
+                          ]),
+                    ),
+                  ],
                 ),
               ),
+            ),
           ),
         ),
       );
@@ -500,17 +510,20 @@ class _FilterTasksState extends State<FilterTasks> {
   }
 
   void updateTaskList() async {
-    if((filterProvider.inspectionTypeFilter ?? "" ) == "SCHEDULED"){
+    if ((filterProvider.inspectionTypeFilter ?? "") == "SCHEDULED") {
       filterProvider.setisScheduled(true);
-    }else{
+    } else {
       filterProvider.setisScheduled(false);
     }
     var isScheduled = filterProvider.isScheduled!;
-    if(isScheduled){
+    if (isScheduled) {
       taskListScheduledViewModel
           .clearListByStatus(filterProvider.statusFilter!);
-      await taskListScheduledViewModel.fetchTasksFromFilters(token, filterProvider.statusFilter!, filterProvider.buildScheduledSearchBody());
-    }else{
+      await taskListScheduledViewModel.fetchTasksFromFilters(
+          token,
+          filterProvider.statusFilter!,
+          filterProvider.buildScheduledSearchBody());
+    } else {
       taskListViewModel.clearListByStatus(filterProvider.statusFilter!);
       await taskListViewModel.fetchTasksFromFilters(context,
           filterProvider.statusFilter!, filterProvider.buildSearchBody());
