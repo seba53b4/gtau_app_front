@@ -46,9 +46,7 @@ class _UserDashboard extends State<UserDashboard>
         Provider.of<TaskListScheduledViewModel>(context, listen: false);
     taskFilterProvider =
         Provider.of<TaskFilterProvider>(context, listen: false);
-    token = context
-        .read<UserProvider>()
-        .getToken!;
+    token = context.read<UserProvider>().getToken!;
   }
 
   Future<bool> _clearPref() async {
@@ -66,23 +64,13 @@ class _UserDashboard extends State<UserDashboard>
   Widget build(BuildContext context) {
     taskFilterProvider.setUserNameFilter(widget.userName);
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
-    GlobalKey<ScaffoldState>();
+        GlobalKey<ScaffoldState>();
     return SizedBox(
       width: 120,
       child: Scaffold(
         key: scaffoldKeyDashboard,
         body: BackgroundGradient(
             decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromRGBO(187, 187, 187, 0.482),
-                ),
-                BoxShadow(
-                  color: Colors.white,
-                  spreadRadius: -5.0,
-                  blurRadius: 20.0,
-                ),
-              ],
               borderRadius: BorderRadius.circular(20),
               gradient: RadialGradient(
                 center: Alignment.center,
@@ -90,21 +78,15 @@ class _UserDashboard extends State<UserDashboard>
                 focalRadius: 2,
                 // begin: Alignment.center,
                 // end: Alignment.centerRight,
-                colors: [
-                  dashboardBackground,
-                  dashboardBackground
-                ],
+                colors: [dashboardBackground, dashboardBackground],
               ),
             ),
             child: Consumer<UserListViewModel>(
                 builder: (context, userListViewModel, child) {
-                  return LoadingOverlay(
-                      isLoading: userListViewModel.isLoading,
-                      child: _buildTabContent(scaffoldKeyDashboard));
-                  // taskFilterProvider.inspectionTypeFilter
-                  //         ?.allMatches('Programada') !=
-                  //     null));
-                })),
+              return LoadingOverlay(
+                  isLoading: userListViewModel.isLoading,
+                  child: _buildTabContent(scaffoldKeyDashboard));
+            })),
       ),
     );
   }
@@ -126,19 +108,17 @@ class _UserDashboard extends State<UserDashboard>
   Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
     switch (_currentIndex) {
       case 0:
-        return _buildTaskList(
-            'ACTIVE', _scaffoldKeyDashboard);
+        return _buildTaskList('ACTIVE', _scaffoldKeyDashboard);
       default:
         return Text(AppLocalizations.of(context)!.see_more);
     }
   }
 
   void updateUserListState(String status) async {
-    final userName = Provider
-        .of<TaskFilterProvider>(context, listen: false)
-        .userNameFilter;
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
     final userListViewModel =
-    Provider.of<UserListViewModel>(context, listen: false);
+        Provider.of<UserListViewModel>(context, listen: false);
     userListViewModel.clearListByStatus(status);
     await userListViewModel
         .initializeUsers(context, status, userName)
@@ -154,8 +134,8 @@ class _UserDashboard extends State<UserDashboard>
     });
   }
 
-  Widget _buildTaskList(String status,
-      GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
+  Widget _buildTaskList(
+      String status, GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
     return FadeTransition(
       key: ValueKey<int>(_currentIndex),
       opacity: const AlwaysStoppedAnimation(1.0),
