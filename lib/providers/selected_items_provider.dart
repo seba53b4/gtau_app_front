@@ -116,6 +116,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _currentSelectedRegisters = Set<CircleId>.from(_initialSelectedRegisters);
     _currentSelectedCatchments = Set<CircleId>.from(_initialSelectedCatchments);
     _currentSelectedLots = Set<PolylineId>.from(_initialSelectedLots);
+    _currentInspectionPosition = const LatLng(0, 0);
     notifyListeners();
   }
 
