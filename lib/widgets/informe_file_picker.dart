@@ -1,9 +1,10 @@
 import 'dart:developer';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:gtau_app_front/services/task_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../utils/common_utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _paths = (await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowMultiple: false,
-        onFileLoading: (FilePickerStatus status) => print(status),
+        onFileLoading: (FilePickerStatus status) => printOnDebug(status),
         allowedExtensions: ['pdf'],
       ))
           ?.files;
@@ -34,7 +35,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (_paths != null) {
           //passing file bytes and file name for API call
           // TaskService.uploadFile(_paths!.first.bytes!, _paths!.first.name);
-          
         }
       }
     });

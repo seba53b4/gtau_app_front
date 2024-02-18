@@ -17,6 +17,7 @@ import '../models/scheduled/register_scheduled.dart';
 import '../models/scheduled/zone.dart';
 import '../providers/user_provider.dart';
 import '../services/scheduled_service.dart';
+import '../utils/common_utils.dart';
 import '../utils/map_functions.dart';
 import '../viewmodels/scheduled_viewmodel.dart';
 import 'common/button_circle.dart';
@@ -41,7 +42,7 @@ class ScheduledMapComponent extends StatefulWidget {
 class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     with TickerProviderStateMixin {
   LatLng? location;
-  static const LatLng initLocation = LatLng(-34.836231, -56.184510);
+  static const LatLng initLocation = LatLng(-34.88773, -56.13955);
   MapType _currentMapType = MapType.hybrid;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
@@ -114,10 +115,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
         return;
       }
 
-      // Position currentPosition = await Geolocator.getCurrentPosition(
-      //     desiredAccuracy: LocationAccuracy.best);
+      Position currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
       setState(() {
-        location = LatLng(initLocation.latitude, initLocation.longitude);
+        location = LatLng(currentPosition.latitude, currentPosition.longitude);
 
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
@@ -131,22 +132,22 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
       controller.moveCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
-            target: LatLng(initLocation.latitude, initLocation.longitude),
+            target: LatLng(currentPosition.latitude, currentPosition.longitude),
             zoom: zoomMap,
           ),
         ),
       );
     } catch (e) {
-      print(e.toString());
+      printOnDebug(e.toString());
     }
   }
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
     double? latitude, longitude;
-    int? radio = kIsWeb ? null : 250;
+    int? radio = kIsWeb ? null : 200;
     if (!kIsWeb) {
-      latitude = initLocation.latitude;
-      longitude = initLocation.longitude;
+      latitude = location?.latitude ?? initLocation.latitude;
+      longitude = location?.longitude ?? initLocation.latitude;
     }
     ScheduledElements? entities = await scheduledViewModel
         .fetchScheduledElements(
@@ -635,7 +636,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                     child: Column(
                       children: [
                         Container(
-                          color: primarySwatch,
+                          color: primarySwatch[400],
                           height: 50,
                           child: Row(
                             children: [
@@ -647,18 +648,20 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                                     resetSelectionsOnMap();
                                   }),
                               Container(
+                                height: 24,
                                 width: 250,
                                 padding: const EdgeInsetsDirectional.symmetric(
-                                    horizontal: 20),
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                    appLocalizations.component_detail_title,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: titleColor,
-                                        letterSpacing: 1,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
+                                    horizontal: 14),
+                                alignment: Alignment.centerRight,
+                                child: Center(
+                                    child: Text(
+                                        appLocalizations.component_detail_title,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: lightBackground,
+                                            letterSpacing: 1,
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 18))),
                               ),
                             ],
                           ),

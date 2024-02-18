@@ -6,6 +6,7 @@ import 'package:gtau_app_front/models/scheduled/zone.dart';
 import 'package:gtau_app_front/services/scheduled_service.dart';
 
 import '../models/scheduled/catchment_scheduled.dart';
+import '../utils/common_utils.dart';
 import '../models/scheduled/report.dart';
 import '../utils/map_functions.dart';
 
@@ -112,7 +113,7 @@ class ScheduledViewModel extends ChangeNotifier {
       Future.microtask(() {
         notifyListeners();
       });
-      print('Error in fetchScheduledElements: $error');
+      printOnDebug('Error in fetchScheduledElements: $error');
     }
     return null;
   }
@@ -143,7 +144,7 @@ class ScheduledViewModel extends ChangeNotifier {
       Future.microtask(() {
         notifyListeners();
       });
-      print('Error in fetchScheduledElements: $error');
+      printOnDebug('Error in fetchScheduledElements: $error');
     }
     return null;
   }
@@ -160,9 +161,7 @@ class ScheduledViewModel extends ChangeNotifier {
     } catch (error) {
       _isLoading = false;
       _error = true;
-      if (kDebugMode) {
-        print('Error in updateSectionScheduledById: $error');
-      }
+      printOnDebug('Error in updateSectionScheduledById: $error');
       rethrow;
     }
   }
@@ -194,7 +193,7 @@ class ScheduledViewModel extends ChangeNotifier {
       Future.microtask(() {
         notifyListeners();
       });
-      print('Error in fetchRegisterScheduledById: $error');
+      printOnDebug('Error in fetchRegisterScheduledById: $error');
     }
     return null;
   }
@@ -211,9 +210,8 @@ class ScheduledViewModel extends ChangeNotifier {
     } catch (error) {
       _isLoading = false;
       _error = true;
-      if (kDebugMode) {
-        print('Error in updateRegisterScheduled: $error');
-      }
+      printOnDebug('Error in updateRegisterScheduled: $error');
+
       rethrow;
     }
   }
@@ -244,7 +242,7 @@ class ScheduledViewModel extends ChangeNotifier {
       Future.microtask(() {
         notifyListeners();
       });
-      print('Error in fetchCatchmentScheduledById: $error');
+      printOnDebug('Error in fetchCatchmentScheduledById: $error');
     }
     return null;
   }
@@ -261,9 +259,7 @@ class ScheduledViewModel extends ChangeNotifier {
     } catch (error) {
       _isLoading = false;
       _error = true;
-      if (kDebugMode) {
-        print('Error in updateCatchmentScheduled: $error');
-      }
+      printOnDebug('Error in updateCatchmentScheduled: $error');
       rethrow;
     }
   }
@@ -281,9 +277,7 @@ class ScheduledViewModel extends ChangeNotifier {
     } catch (error) {
       _isLoading = false;
       _error = true;
-      if (kDebugMode) {
-        print('Error in getRandomPosition: $error');
-      }
+      printOnDebug('Error in getRandomPosition: $error');
       rethrow;
     } finally {
       notifyListeners();

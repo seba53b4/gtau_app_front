@@ -687,7 +687,10 @@ class _MapComponentState extends State<MapComponent> {
                                   colorChangeOnPress: true,
                                   onPressed: () {
                                     setState(() {
-                                      selectedItemsProvider.clearAllElements();
+                                      if (!widget.isModal) {
+                                        selectedItemsProvider
+                                            .clearAllElements();
+                                      }
                                       locationManualSelected =
                                           locationManualSelected || true;
                                       isDetailsButtonVisible = false;

@@ -14,6 +14,7 @@ import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
+import 'package:gtau_app_front/widgets/forgotpass_modal.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
@@ -166,7 +167,35 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void onForgotPressed(BuildContext context) {}
+  void _showForgotPassModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12.0))),
+          child: SizedBox(
+            width: kIsWeb ? 400 : MediaQuery.of(context).size.width,
+            height: kIsWeb ? 300 : 306,
+            child: const ForgotPassModal(),
+          ),
+        );
+      },
+    );
+  }
+
+  void onForgotPressed(BuildContext context) {
+    _showForgotPassModal(context);
+  }
+
+  void _submitForm(BuildContext context) {
+    if (kIsWeb) {
+      setState(() {
+        onError = false;
+      });
+      onLogInPressed(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -175,16 +204,18 @@ class _LoginScreenState extends State<LoginScreen> {
       if (kIsWeb) {
         return Scaffold(
           body: BackgroundGradient(
+            colors: [primarySwatch[400]!, primarySwatch[600]!],
             child: Center(
               child: FittedBox(
                 child: BoxContainerWhite(
+                  withBorder: false,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: SvgPicture.asset(
                           'lib/assets/tunnel_logo_final.svg',
                           width: 200,
@@ -200,6 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: false,
                         width: 400,
                         hasError: onError,
+                        onSubmitted: (_) => _submitForm(context),
                       ),
                       CustomTextField(
                         controller: passwordController,
@@ -209,6 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: true,
                         width: 400,
                         hasError: onError,
+                        onSubmitted: (_) => _submitForm(context),
                       ),
                       const SizedBox(height: 16.0),
                       CustomElevatedButtonLength(

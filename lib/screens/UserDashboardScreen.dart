@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/screens/UserCreationScreen.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
+import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_icon_button.dart';
 import 'package:gtau_app_front/widgets/user_dashboard.dart';
 import 'package:gtau_app_front/widgets/user_filter.dart';
@@ -28,7 +30,6 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
     super.dispose();
   }
 
-
   Future<bool> _clearPref() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.clear();
@@ -39,8 +40,10 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: lightBackground,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+              side: BorderSide(width: 1.0),
+              borderRadius: BorderRadius.all(Radius.circular(24.0))),
           child: SizedBox(
             width: 700,
             height: 536,
@@ -55,20 +58,21 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
   Widget build(BuildContext context) {
     _clearPref();
     return Scaffold(
-      body: Container(
-        color: lightBackground,
+      body: BackgroundGradient(
         child: Center(
           child: Column(
             children: [
               const SizedBox(height: 52),
               Container(
                 width: 900,
-                color: lightBackground,
+                color: Colors.transparent,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     CustomElevatedIconButton(
+                      textColor: primarySwatch[700],
+                      backgroundColor: Colors.white,
                       onPressed: () {
                         _showAddUserModal(context);
                       },
@@ -79,23 +83,14 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
               ),
               const SizedBox(height: 8),
               Container(
-                color: lightBackground,
+                color: Colors.transparent,
                 child: Center(
                   child: Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
+                    width: MediaQuery.of(context).size.width,
                     height: kIsWeb
-                        ? MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.78
-                        : MediaQuery
-                        .of(context)
-                        .size
-                        .height - 72,
-                    color: lightBackground,
+                        ? MediaQuery.of(context).size.height * 0.78
+                        : MediaQuery.of(context).size.height - 72,
+                    color: Colors.transparent,
                     child: _constraintBoxUserDashboard(context),
                   ),
                 ),
@@ -108,10 +103,10 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
         onPressed: () {
           _showFilterModal(context);
         },
-        foregroundColor: null,
-        backgroundColor: null,
+        foregroundColor: primarySwatch[700]!,
+        backgroundColor: Colors.white,
         shape: null,
-        child: const Icon(Icons.filter_alt_rounded),
+        child: const Icon(GtauIcons.tasksFilter),
       ),
     );
   }
@@ -123,12 +118,9 @@ void _showFilterModal(BuildContext context) {
     builder: (BuildContext context) {
       return Dialog(
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(50.0))),
+            borderRadius: BorderRadius.all(Radius.circular(24.0))),
         child: SizedBox(
-          width: kIsWeb ? 640 : MediaQuery
-              .of(context)
-              .size
-              .width,
+          width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
           height: 600,
           child: const UserFilter(),
         ),
@@ -140,34 +132,23 @@ void _showFilterModal(BuildContext context) {
 Widget _constraintBoxUserDashboard(BuildContext context) {
   double widthDashboard = 980;
   double paddingDashboard =
-  (MediaQuery
-      .of(context)
-      .size
-      .width - widthDashboard) > 0 && kIsWeb
-      ? (MediaQuery
-      .of(context)
-      .size
-      .width - widthDashboard) / 2
-      : 0;
-  return Container(
+      (MediaQuery.of(context).size.width - widthDashboard) > 0 && kIsWeb
+          ? (MediaQuery.of(context).size.width - widthDashboard) / 2
+          : 0;
+  return BoxContainerWhite(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+    ),
     margin: kIsWeb
         ? EdgeInsets.symmetric(horizontal: paddingDashboard)
         : const EdgeInsets.symmetric(horizontal: 0),
     child: ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery
-            .of(context)
-            .size
-            .width,
+        maxWidth: MediaQuery.of(context).size.width,
         maxHeight: kIsWeb
-            ? MediaQuery
-            .of(context)
-            .size
-            .height * 0.78
-            : MediaQuery
-            .of(context)
-            .size
-            .height - 164,
+            ? MediaQuery.of(context).size.height * 0.78
+            : MediaQuery.of(context).size.height - 164,
       ),
       child: const UserDashboard(),
     ),

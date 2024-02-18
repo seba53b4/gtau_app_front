@@ -103,18 +103,22 @@ class _ReportComponentState extends State<ReportComponent> {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: lightBackground,
-                        ),
+                            shape: BoxShape.circle,
+                            color: lightBackground.withOpacity(0.5),
+                            border: Border.all(
+                                strokeAlign: 1,
+                                color: Colors.black.withOpacity(0.35))),
                         child: Icon(
                           report != null
                               ? Icons.download_rounded
                               : Icons.file_download_off,
-                          color: report != null ? primarySwatch[500] : redColor,
+                          color: report != null
+                              ? primarySwatch[700]
+                              : bucketDelete,
                         ),
                       ),
                     ),
-                    if (isHovered)
+                    if (isHovered && report == null)
                       Container(
                         decoration: BoxDecoration(
                           color: primarySwatch[900]!.withOpacity(0.8),
@@ -126,9 +130,7 @@ class _ReportComponentState extends State<ReportComponent> {
                             downloadReport();
                           },
                           child: Text(
-                            report == null
-                                ? appLocalizations.report_not_processed
-                                : appLocalizations.download_informe_btn,
+                            appLocalizations.report_not_processed,
                             style: TextStyle(color: lightBackground),
                           ),
                         ),
@@ -148,6 +150,7 @@ class _ReportComponentState extends State<ReportComponent> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomElevatedButton(
+                backgroundColors: [primarySwatch[700]!, primarySwatch[700]!],
                 showLoading: scheduledViewModel.isLoadingReport,
                 onPressed: () {
                   postReport();

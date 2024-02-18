@@ -75,29 +75,39 @@ class _AuthCheckState extends State<AuthCheck> {
     AuthViewModel authViewModel =
         Provider.of<AuthViewModel>(context, listen: false);
     String? refreshTokenStore = await _storage.read(key: 'refresh_token');
-    AuthResult? refreshData =
-        await authViewModel.refreshAuth(refreshTokenStore!);
+    if (refreshTokenStore != null) {
+      AuthResult? refreshData =
+          await authViewModel.refreshAuth(refreshTokenStore);
 
-    if (refreshData != null && refreshData.authData != null) {
-      userStateProvider.updateUserStateAuthInfo(refreshData.authData!);
-      await _storage.write(
-          key: 'access_token', value: refreshData.authData!.accessToken);
-      await _storage.write(
-          key: 'refresh_token', value: refreshData.authData!.refreshToken);
-    } else {
-      logoutSession();
+      if (refreshData != null && refreshData.authData != null) {
+        userStateProvider.updateUserStateAuthInfo(refreshData.authData!);
+        await _storage.write(
+            key: 'access_token', value: refreshData.authData!.accessToken);
+        await _storage.write(
+            key: 'refresh_token', value: refreshData.authData!.refreshToken);
+      } else {
+        logoutSession();
+      }
     }
+  }
+
+  void deleteSessionData() {
+    _storage.delete(key: 'refresh_token');
+    _storage.delete(key: 'access_token');
+    _storage.delete(key: 'username');
+    _storage.delete(key: 'isAdmin');
   }
 
   void logoutSession() async {
     userStateProvider.logout();
-    await _showWrongCredentialsToast(context);
+    deleteSessionData();
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => LoginScreen()),
     );
+    await _showExpiredSessionToast(context);
   }
 
-  _showWrongCredentialsToast(BuildContext context) {
+  _showExpiredSessionToast(BuildContext context) {
     CustomToast.show(
       context,
       title: AppLocalizations.of(context)!.warning,
@@ -154,9 +164,7 @@ class _AuthCheckState extends State<AuthCheck> {
       return loading
           ? LoadingOverlay(
               isLoading: true,
-              child: Container(
-                color: lightBackground,
-              ))
+              child: Container(color: lightBackground, child: LoginScreen()))
           : !isLoggedIn
               ? LoginScreen()
               : kIsWeb && isLoggedIn

@@ -53,10 +53,11 @@ class _CustomElevatedIconButton extends State<CustomElevatedIconButton> {
           colors = [primarySwatch[300]!, primarySwatch[100]!];
       }
     } else {
-      colors = [Colors.grey, Colors.grey[400]!];
+      colors = [Colors.white, Colors.white];
     }
 
     return ElevatedButton(
+      onHover: (value) {  },
       onPressed:
           _isLoading || widget.showLoading ? null : () => _handleButtonPress(),
       style: ElevatedButton.styleFrom(

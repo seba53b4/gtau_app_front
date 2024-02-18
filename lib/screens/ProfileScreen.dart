@@ -7,12 +7,14 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/models/user_data.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
+import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../assets/font/gtauicons.dart';
+import '../utils/messagesUtils.dart';
 import '../viewmodels/user_list_viewmodel.dart';
-import '../widgets/common/customMessageDialog.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import 'LoginScreen.dart';
 
@@ -46,26 +48,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final resp = await userListViewModel
         .fetchUserByUsername(token, username)
         .catchError((error) async {
-      showGenericModalError();
+      showGenericModalError(context: context);
       return null;
     });
 
     setState(() {
       userData = resp;
     });
-  }
-
-  void showGenericModalError({Function? onAcceptPressed}) async {
-    await showCustomMessageDialog(
-      context: context,
-      onAcceptPressed: () {
-        if (onAcceptPressed != null) {
-          onAcceptPressed();
-        }
-      },
-      customText: AppLocalizations.of(context)!.error_generic_text,
-      messageType: DialogMessageType.error,
-    );
   }
 
   void handleLogOutPress(BuildContext context) async {
@@ -92,96 +81,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return LoadingOverlay(
           isLoading: userListViewModel.isLoading,
           child: Scaffold(
-            backgroundColor: lightBackground,
-            body: Center(
-              child: SizedBox(
-                width: kIsWeb ? 520 : widthCard,
-                height: kIsWeb ? heightCard * 0.85 : heightCard * 0.86,
-                child: Card(
-                  child: Visibility(
-                    visible: !userListViewModel.isLoading,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: kIsWeb ? 250 : heightCard * 0.25,
-                          width: kIsWeb ? 520 : widthCard,
-                          padding: const EdgeInsets.only(top: 24, bottom: 24),
-                          decoration: BoxDecoration(
-                            color: primarySwatch[200],
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
-                            ),
-                          ),
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            margin: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: lightBackground,
-                                width: 2,
+            body: BackgroundGradient(
+              decoration: kIsWeb ? null : BoxDecoration(
+                  color: lightGrayBackground,      
+              ),   
+              child: Center(
+                child: SizedBox(
+                  width: kIsWeb ? 520 : widthCard,
+                  height: kIsWeb ? heightCard * 0.85 : heightCard,
+                  child: Card(
+                    color: kIsWeb ? null : lightGrayBackground,
+                    elevation: kIsWeb ? null : 0.0,
+                    shape: kIsWeb ? RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ) : null,
+                    child: Visibility(
+                      visible: !userListViewModel.isLoading,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: kIsWeb ? 250 : heightCard * 0.25,
+                            width: kIsWeb ? 520 : widthCard,
+                            padding: const EdgeInsets.only(top: 24, bottom: 24),
+                            decoration: kIsWeb ? BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: const BorderRadius.all(Radius.circular(20),
+                              ),
+                            ) : null,
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              margin: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(128, 128, 128, 0.49),
+                                    spreadRadius: 3,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                                color: primarySwatch[700],
+                                shape: BoxShape.circle,
+                              ),
+                              child: Align(
+                                alignment: kIsWeb ? Alignment.topCenter : Alignment.center,
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  radius: kIsWeb ? 70 : 60,
+                                  child: Icon(
+                                    isAdmin
+                                        ? GtauIcons.roleAdmin
+                                        : GtauIcons.roleOper,
+                                    size: kIsWeb ? 78 : 60,
+                                    color: lightBackground,
+                                  ),
+                                ),
                               ),
                             ),
-                            child: Center(
-                              child: Icon(
-                                isAdmin
-                                    ? GtauIcons.roleAdmin
-                                    : GtauIcons.roleOper,
-                                size: kIsWeb ? 68 : 40,
-                                color: lightBackground,
-                              ),
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                          const Divider(
+                            color: Colors.grey,
+                            thickness: 1,
+                            indent: 20,
+                            endIndent: 20,
+                          ),
+                          const SizedBox(height: kIsWeb ? 48 : 12),
+                          CustomProfileRow(
+                            label: appLocalizations.name,
+                            value:
+                                '${userData?.getFirstname} ${userData?.getLastname}',
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                          CustomProfileRow(
+                            label: appLocalizations.user,
+                            value: '${userData?.getUsername}',
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                          CustomProfileRow(
+                            label: appLocalizations.email,
+                            value: '${userData?.getEmail}',
+                          ),
+                          const SizedBox(height: rowHeigthSpace),
+                          CustomProfileRow(
+                            label: appLocalizations.role,
+                            value: isAdmin ? 'Administrador' : 'Operario',
+                          ),
+                          const Spacer(),
+                          Container(
+                            margin: const EdgeInsets.only(left: 20, right:20, bottom:20),
+                            child: CustomElevatedButtonLength(
+                              onPressed: () => handleLogOutPress(context),
+                              messageType: MessageType.error,
+                              text: AppLocalizations.of(context)!
+                                  .default_logout_button,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        const Divider(
-                          color: Colors.grey,
-                          thickness: 1,
-                          indent: 20,
-                          endIndent: 20,
-                        ),
-                        const SizedBox(height: kIsWeb ? 48 : 12),
-                        CustomProfileRow(
-                          label: appLocalizations.name,
-                          value:
-                              '${userData?.getFirstname} ${userData?.getLastname}',
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        CustomProfileRow(
-                          label: appLocalizations.user,
-                          value: '${userData?.getUsername}',
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        CustomProfileRow(
-                          label: appLocalizations.email,
-                          value: '${userData?.getEmail}',
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                        CustomProfileRow(
-                          label: appLocalizations.role,
-                          value: isAdmin ? 'Administrador' : 'Operario',
-                        ),
-                        const Spacer(),
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          child: CustomElevatedButton(
-                            onPressed: () => handleLogOutPress(context),
-                            messageType: MessageType.error,
-                            text: AppLocalizations.of(context)!
-                                .default_logout_button,
+                          Text(
+                            '${appLocalizations.version} ${AppConstants.appVersion}',
+                            style:
+                                const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
-                        ),
-                        Text(
-                          '${appLocalizations.version} ${AppConstants.appVersion}',
-                          style:
-                              const TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                        const SizedBox(height: rowHeigthSpace),
-                      ],
+                          const SizedBox(height: rowHeigthSpace),
+                        ],
+                      ),
                     ),
                   ),
                 ),

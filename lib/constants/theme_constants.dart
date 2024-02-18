@@ -1,31 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Color baseColor = const Color.fromRGBO(200, 217, 184, 0.25);
-Color softGrey = const Color.fromRGBO(88, 87, 89, 0.15);
-Color scheduledNotInspectionedElement = const Color.fromRGBO(203, 35, 30, 1);
-Color scheduledInspectionedElement = const Color.fromRGBO(19, 215, 105, 1);
-Color scheduledNotFoundElement = const Color.fromRGBO(94, 22, 23, 1);
-Color zoneColor = Colors.blueAccent;
-Color arrowColor = const Color.fromRGBO(247, 247, 247, 1);
-Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
-Color navColor = const Color.fromRGBO(200, 217, 184, 1);
-Color lightBackground = const Color.fromRGBO(253, 255, 252, 1);
-Color redColor = const Color.fromRGBO(219, 49, 13, 1);
-Color titleColor = const Color.fromRGBO(14, 45, 9, 1);
-Color subtitleColor =  Colors.black87;
-Color overlayColor = const Color.fromRGBO(161, 180, 156, 0.3568627450980392);
-Color sectionDefaultColor = Colors.blueAccent;
-Color registerDefaultColor = Colors.deepPurpleAccent;
-Color lotDefaultColor = Colors.black38;
-Color lotDefaultColorChip = Colors.black45;
-Color catchmentDefaultColor = Colors.pink;
-Color baseContainerG1 = const Color.fromRGBO(174, 213, 129, 0.25);
-Color baseContainerG2 = const Color.fromRGBO(174, 213, 129, 0.30);
-Color baseBackgroundG1 = primarySwatch[400]!;
-Color baseBackgroundG2 = const Color(0xFF2a3611);
-Color boxContainerBorder = const Color(0xFF4f4f4f);
-
 MaterialColor primarySwatch = const MaterialColor(
   0xFF52a716,
   <int, Color>{
@@ -41,6 +16,37 @@ MaterialColor primarySwatch = const MaterialColor(
     900: Color(0xFF31640d), // Tono 900
   },
 );
+
+Color baseColor = const Color.fromRGBO(200, 217, 184, 0.25);
+Color softGrey = const Color.fromRGBO(88, 87, 89, 0.15);
+Color scheduledNotInspectionedElement = const Color.fromRGBO(203, 35, 30, 1);
+Color scheduledInspectionedElement = const Color.fromRGBO(19, 215, 105, 1);
+Color scheduledNotFoundElement = const Color.fromRGBO(94, 22, 23, 1);
+Color zoneColor = Colors.blueAccent;
+Color arrowColor = const Color.fromRGBO(247, 247, 247, 1);
+Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
+Color navColor = const Color.fromRGBO(200, 217, 184, 1);
+Color lightBackground = const Color.fromRGBO(253, 255, 252, 1);
+Color lightGrayBackground = const Color.fromRGBO(238, 238, 238, 0.486);
+Color redColor = const Color.fromRGBO(219, 49, 13, 1);
+Color titleColor = const Color.fromRGBO(14, 45, 9, 1);
+Color subtitleColor = Colors.black87;
+Color overlayColor = const Color.fromRGBO(161, 180, 156, 0.3568627450980392);
+Color sectionDefaultColor = Colors.blueAccent;
+Color registerDefaultColor = Colors.deepPurpleAccent;
+Color lotDefaultColor = Colors.black38;
+Color lotDefaultColorChip = Colors.black45;
+Color catchmentDefaultColor = Colors.pink;
+Color baseContainerG1 = const Color.fromRGBO(174, 213, 129, 0.25);
+Color baseContainerG2 = const Color.fromRGBO(174, 213, 129, 0.30);
+Color baseBackgroundG1 = const Color.fromRGBO(236, 238, 212, 0.35);
+Color baseBackgroundG2 = baseBackgroundG1;
+Color nav1 = primarySwatch[300]!;
+Color nav2 = primarySwatch[300]!;
+Color dashboardBackground = const Color.fromRGBO(245, 245, 245, 1);
+Color bucketDelete = redColor.withOpacity(0.95);
+Color boxContainerBorder = const Color(0xFF4f4f4f);
+Color colorAvatarSheduledItem = const Color.fromRGBO(118, 0, 99, 1);
 
 ThemeData defaultTheme = ThemeData(
   useMaterial3: false,

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/section_data.dart';
 import '../services/section_service.dart';
+import '../utils/common_utils.dart';
 
 class SectionViewModel extends ChangeNotifier {
   final SectionService _sectionService = SectionService();
@@ -43,7 +44,7 @@ class SectionViewModel extends ChangeNotifier {
       }
       return responseListSection;
     } catch (error) {
-      print(error);
+      printOnDebug(error);
       _error = true;
       throw Exception('Error al obtener los datos: $error');
     } finally {
@@ -65,9 +66,7 @@ class SectionViewModel extends ChangeNotifier {
       return responseSection;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print('Error al obtener tramos: $error');
-      }
+      printOnDebug('Error al obtener tramos: $error');
       rethrow;
     } finally {
       _isLoading = false;

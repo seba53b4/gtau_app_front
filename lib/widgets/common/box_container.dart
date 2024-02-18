@@ -30,19 +30,17 @@ class BoxContainer extends StatelessWidget {
           BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             gradient: RadialGradient(
-              center: Alignment.center,
+              // center: Alignment.center,
               radius: 2.5,
               focalRadius: 2,
-              // begin: Alignment.center,
-              // end: Alignment.centerRight,
               colors: [
-                baseContainerG1,
-                baseContainerG2,
+                dashboardBackground,
+                dashboardBackground,
               ],
             ),
             border: Border.all(
-              color: primarySwatch[100]!,
-              width: 1.0,
+              color: lightBackground,
+              width: 4.0,
             ),
           ),
       width: width,

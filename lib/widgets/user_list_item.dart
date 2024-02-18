@@ -9,6 +9,7 @@ import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
 
@@ -34,8 +35,10 @@ class UserListItem extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: lightBackground,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+              side: BorderSide(width: 1.0),
+              borderRadius: BorderRadius.all(Radius.circular(24.0))),
           child: SizedBox(
             width: 700,
             height: 536,
@@ -72,7 +75,7 @@ class UserListItem extends StatelessWidget {
           color: lightBackground,
           boxShadow: const [
             BoxShadow(
-              color: Color.fromRGBO(200, 217, 184, 0.5),
+              color: Color.fromRGBO(128, 128, 128, 0.49),
               spreadRadius: 3,
               blurRadius: 7,
               offset: Offset(0, 3),
@@ -136,11 +139,13 @@ class UserListItem extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appLocalizations.list_item_firstname + user!.getFirstname!,
+                                appLocalizations.list_item_firstname +
+                                    user!.getFirstname!,
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                               Text(
-                                appLocalizations.list_item_lastname + user!.getLastname!,
+                                appLocalizations.list_item_lastname +
+                                    user!.getLastname!,
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                             ],
@@ -175,7 +180,7 @@ class UserListItem extends StatelessWidget {
                     onPressed: () async {
                       await _showDeleteConfirmationDialog(context);
                     },
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(Icons.delete, color: bucketDelete),
                   ),
                 ),
               ],
@@ -201,14 +206,14 @@ class UserListItem extends StatelessWidget {
         bool result = await _deleteUser(context, user!.id!);
 
         if (result) {
-          print('Usuario ha sido eliminado correctamente');
+          printOnDebug('Usuario ha sido eliminado correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          print('No se pudo eliminar el usuario');
+          printOnDebug('No se pudo eliminar el usuario');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,

@@ -16,6 +16,7 @@ import '../../../models/scheduled/zone.dart';
 import '../../../models/task_status.dart';
 import '../../../providers/user_provider.dart';
 import '../../../utils/date_utils.dart';
+import '../../../utils/messagesUtils.dart';
 import '../../../viewmodels/scheduled_viewmodel.dart';
 import '../../../viewmodels/zone_load_viewmodel.dart';
 import '../../scheduled_map_component.dart';
@@ -105,7 +106,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         .fetchTaskScheduled(token, widget.scheduledId!)
         .catchError((error) async {
       // Manejo de error
-      showGenericModalError();
+      showGenericModalError(context: context);
       return null;
     });
     loadInfoFromTaskScheduledResponse(taskScheduled);
@@ -260,19 +261,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
     }
   }
 
-  void showGenericModalError({Function? onAcceptPressed}) async {
-    await showCustomMessageDialog(
-      context: context,
-      onAcceptPressed: () {
-        if (onAcceptPressed != null) {
-          onAcceptPressed();
-        }
-      },
-      customText: AppLocalizations.of(context)!.error_generic_text,
-      messageType: DialogMessageType.error,
-    );
-  }
-
   Future<void> manageLoadZoneProcess(
       TaskScheduled taskScheduledResponse) async {
     setState(() {
@@ -367,11 +355,11 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                 ? 730 + heightToAddOnCreate
                                 : widget.isEdit
                                     ? kIsWeb
-                                        ? 808
-                                        : 847
+                                        ? 814
+                                        : 853
                                     : 706,
                         width: widthRow * 1.15,
-                        padding: const EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(kIsWeb ? 12 : 4),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -702,6 +690,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                               ),
                                             ),
                                             InfoIcon(
+                                                iconColor: primarySwatch[700]!,
                                                 message: appLocalizations
                                                     .info_icon_msg_file_upload),
                                           ],
@@ -744,6 +733,10 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                   ),
                                   const SizedBox(height: 12),
                                   CustomElevatedButton(
+                                    backgroundColors: [
+                                      primarySwatch[700]!,
+                                      primarySwatch[700]!
+                                    ],
                                     onPressed: () async {
                                       _showMapElement(context);
                                     },

@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/auth_data.dart';
 import '../models/user_info.dart';
+import '../utils/common_utils.dart';
 
 class AuthResult {
   final AuthData? authData;
@@ -25,6 +25,14 @@ class AuthService {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization':
           "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
+    };
+  }
+
+  Map<String, String> _getHeaders_forgotpass() {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization':
+          "Bearer  ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
     };
   }
 
@@ -49,9 +57,33 @@ class AuthService {
         return AuthResult(null, response.statusCode);
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error en fetchAuth: $error');
+      printOnDebug('Error en fetchAuth: $error');
+      rethrow;
+    }
+  }
+
+  Future<bool> recoverPassword(String email, Map<String, dynamic> body) async {
+    try {
+      Map<String, String> headersAlt = {
+        'Content-Type': 'application/json',
+      };
+
+      final String jsonBody = jsonEncode(body);
+      String url =
+          "${dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND')}/usuarios/forgot-password";
+      final response =
+          await http.post(Uri.parse(url), headers: headersAlt, body: jsonBody);
+
+      if (response.statusCode == 200) {
+        printOnDebug('Se ha enviado mail de recuperacion de contrasena');
+        return true;
+      } else {
+        printOnDebug('No se pudieron traer datos');
+        return false;
       }
+    } catch (error) {
+      printOnDebug('Error in recoverPassword: $error');
+
       rethrow;
     }
   }
@@ -77,9 +109,8 @@ class AuthService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error en getUserRole: $error');
-      }
+      printOnDebug('Error en getUserRole: $error');
+
       rethrow;
     }
   }
@@ -100,9 +131,8 @@ class AuthService {
         return AuthResult(null, response.statusCode);
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error en refreshAccessToken: $error');
-      }
+      printOnDebug('Error en refreshAccessToken: $error');
+
       rethrow;
     }
   }

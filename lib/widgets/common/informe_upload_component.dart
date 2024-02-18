@@ -3,19 +3,23 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/informe_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../utils/common_utils.dart';
 import 'custom_elevated_button.dart';
 
 class InformeUploadComponent extends StatefulWidget {
   // final Function(List<Map<String, dynamic>>) onFileAdded;
-  final int? idTask; 
+  final int? idTask;
 
-  const InformeUploadComponent({Key? key, this.idTask/*, required this.onFileAdded*/})
+  const InformeUploadComponent(
+      {Key? key, this.idTask /*, required this.onFileAdded*/
+      })
       : super(key: key);
 
   @override
@@ -28,7 +32,7 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
 
   @override
   void setState(fn) {
-    if(mounted) {
+    if (mounted) {
       super.setState(fn);
     }
   }
@@ -48,7 +52,8 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
   }
 
   void _initializeData() async {
-    List<Map<String, dynamic>> informeBase64Received = await _fetchTaskInformes(context, widget.idTask!);
+    List<Map<String, dynamic>> informeBase64Received =
+        await _fetchTaskInformes(context, widget.idTask!);
     setState(() {
       informeBase64 = informeBase64Received;
     });
@@ -69,21 +74,21 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
     if (result != null) {
       String base64 = base64Encode(result.files.first.bytes!);
       setState(() {
-        informeBase64.add({
-          "base64": base64,
-          "fileName": result.files.first.name
-        });
+        informeBase64
+            .add({"base64": base64, "fileName": result.files.first.name});
       });
-      String url = await _uploadTaskInformes(context, widget.idTask!, informeBase64.elementAt(0));
+      String url = await _uploadTaskInformes(
+          context, widget.idTask!, informeBase64.elementAt(0));
       informeBase64.elementAt(0)['url'] = url;
     } else {
-      print('Selección de archivo cancelada.');
+      printOnDebug('Selección de archivo cancelada.');
     }
   }
 
-  _removeInforme() async{
-    bool canRemove = await _removeTaskInformes(context, widget.idTask!, informeBase64.elementAt(0)['url']);
-    if(canRemove){
+  _removeInforme() async {
+    bool canRemove = await _removeTaskInformes(
+        context, widget.idTask!, informeBase64.elementAt(0)['url']);
+    if (canRemove) {
       setState(() {
         informeBase64 = [];
       });
@@ -115,8 +120,9 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
               Visibility(
                 visible: informeBase64.isEmpty,
                 child: CustomElevatedButton(
-                    onPressed: _pickAFile,
-                    text: AppLocalizations.of(context)!.file_upload_btn,
+                  backgroundColors: [primarySwatch[700]!, primarySwatch[700]!],
+                  onPressed: _pickAFile,
+                  text: AppLocalizations.of(context)!.file_upload_btn,
                 ),
               ),
               const SizedBox(height: 8),
@@ -130,16 +136,22 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
                       spacing: 8.0,
                       runSpacing: 4.0,
                       children: [
-                          CustomElevatedButton(
-                            onPressed: () => downloadInforme(informeBase64.elementAt(0)['url']),
-                            text: AppLocalizations.of(context)!.download_informe_btn,
-                          ),
-                          CustomElevatedButton(
-                            messageType: MessageType.error,
-                            onPressed: _removeInforme,
-                            text: AppLocalizations.of(context)!.delete_informe_btn,
-                          ),
-
+                        CustomElevatedButton(
+                          backgroundColors: [
+                            primarySwatch[700]!,
+                            primarySwatch[700]!
+                          ],
+                          onPressed: () => downloadInforme(
+                              informeBase64.elementAt(0)['url']),
+                          text: AppLocalizations.of(context)!
+                              .download_informe_btn,
+                        ),
+                        CustomElevatedButton(
+                          messageType: MessageType.error,
+                          onPressed: _removeInforme,
+                          text:
+                              AppLocalizations.of(context)!.delete_informe_btn,
+                        ),
                       ],
                     ),
                   ],
@@ -154,35 +166,41 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
   }
 }
 
-Future<List<Map<String, dynamic>>> _fetchTaskInformes(BuildContext context, int idTask) async {
+Future<List<Map<String, dynamic>>> _fetchTaskInformes(
+    BuildContext context, int idTask) async {
   final token = Provider.of<UserProvider>(context, listen: false).getToken;
-  final informeViewModel = Provider.of<InformeViewModel>(context, listen: false);
+  final informeViewModel =
+      Provider.of<InformeViewModel>(context, listen: false);
   try {
     return await informeViewModel.fetchTaskInformes(token!, idTask);
   } catch (error) {
-    print(error);
+    printOnDebug(error);
     throw Exception('Error al obtener los datos');
   }
 }
 
-Future<String> _uploadTaskInformes(BuildContext context, int idTask, Map<String, dynamic> informe) async {
+Future<String> _uploadTaskInformes(
+    BuildContext context, int idTask, Map<String, dynamic> informe) async {
   final token = Provider.of<UserProvider>(context, listen: false).getToken;
-  final informeViewModel = Provider.of<InformeViewModel>(context, listen: false);
+  final informeViewModel =
+      Provider.of<InformeViewModel>(context, listen: false);
   try {
     return await informeViewModel.uploadInforme(token!, idTask, informe);
   } catch (error) {
-    print(error);
+    printOnDebug(error);
     throw Exception('Error al subir el informe}');
   }
 }
 
-Future<bool> _removeTaskInformes(BuildContext context, int idTask, String url) async {
+Future<bool> _removeTaskInformes(
+    BuildContext context, int idTask, String url) async {
   final token = Provider.of<UserProvider>(context, listen: false).getToken;
-  final informeViewModel = Provider.of<InformeViewModel>(context, listen: false);
+  final informeViewModel =
+      Provider.of<InformeViewModel>(context, listen: false);
   try {
     return await informeViewModel.deleteInforme(token!, idTask, url);
   } catch (error) {
-    print(error);
+    printOnDebug(error);
     throw Exception('Error al subir el informe}');
   }
 }
@@ -194,4 +212,3 @@ Future<void> downloadInforme(String url) async {
     throw 'Could not launch $url';
   }
 }
-

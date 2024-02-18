@@ -16,6 +16,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 import '../viewmodels/images_viewmodel.dart';
 import 'common/custom_elevated_button.dart';
 
@@ -38,6 +39,7 @@ class _TaskImageGalleryModalState extends State<TaskImageGalleryModal> {
   @override
   Widget build(BuildContext context) {
     return CustomElevatedButton(
+      backgroundColors: [primarySwatch[600]!, primarySwatch[600]!],
       onPressed: () {
         Navigator.push(
           context,
@@ -253,14 +255,14 @@ class _GelleryShowState extends State<_GelleryShow> {
         bool result = await _deleteSelectedImages(photos);
 
         if (result == true) {
-          /*print('Imagen ha sido eliminada correctamente');*/
+          printOnDebug('Imagen ha sido eliminada correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          /*print('No se pudo eliminar la imagen');*/
+          printOnDebug('No se pudo eliminar la imagen');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,
@@ -352,9 +354,9 @@ class _GelleryShowState extends State<_GelleryShow> {
       }
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
-      print('Error al seleccionar la imagen: $e');
+      printOnDebug('Error al seleccionar la imagen: $e');
     } catch (error) {
-      print('Error inesperado: $error');
+      printOnDebug('Error inesperado: $error');
     }
   }
 
@@ -368,7 +370,7 @@ class _GelleryShowState extends State<_GelleryShow> {
         final response = await imagesViewModel.uploadImage(
             token!, widget.idTask!, temporaryFileToUpload.path);
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
       } finally {}
       setState(() {
@@ -396,7 +398,7 @@ class _GelleryShowState extends State<_GelleryShow> {
           });
         }
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
       }
     }
@@ -420,7 +422,7 @@ class _GelleryShowState extends State<_GelleryShow> {
           deleteImage = deleteImage &&
               await imagesViewModel.deleteImage(
                   token!, this.idTask!, photo.url);
-          print('resultado interno: $deleteImage');
+          printOnDebug('resultado interno: $deleteImage');
           /*if (deleteImage == false) {
             photo.isSelected = false;
           }*/
@@ -445,7 +447,7 @@ Future<List<String>> _fetchTaskImages(BuildContext context, int idTask) async {
   try {
     return await imagesViewModel.fetchTaskImages(token!, idTask);
   } catch (error) {
-    print(error);
+    printOnDebug(error);
     throw Exception('Error al obtener los datos');
   }
 }

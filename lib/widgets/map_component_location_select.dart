@@ -69,7 +69,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
     try {
       if (selectedItemsProvider.inspectionPosition.latitude == 0 &&
           selectedItemsProvider.inspectionPosition.longitude == 0) {
-        getCurrentLocation();
+        if (!kIsWeb) getCurrentLocation();
       } else {
         setState(() {
           final locationGPS = selectedItemsProvider.inspectionPosition;
