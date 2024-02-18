@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,15 +59,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _clearPref();
 
     return Scaffold(
-      body: Container(
-        color: lightBackground,
+      body: BackgroundGradient(
         child: Center(
           child: Container(
               width: MediaQuery.of(context).size.width,
               height: kIsWeb
                   ? MediaQuery.of(context).size.height * 0.78
                   : MediaQuery.of(context).size.height - 72,
-              color: lightBackground,
+              color: Colors.transparent,
               child: _constraintBoxTaskDashboard(context, _enteredUsername)),
         ),
       ),
@@ -74,8 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           _showFilterModal(context);
         },
-        foregroundColor: null,
-        backgroundColor: primarySwatch[200]!,
+        foregroundColor: primarySwatch[700]!,
+        backgroundColor: Colors.white,
         shape: null,
         child: const Icon(Icons.filter_alt_rounded),
       ),
@@ -106,6 +106,7 @@ Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
           ? (MediaQuery.of(context).size.width - widthDashboard) / 2
           : 0;
   return Container(
+    color: Colors.transparent,
     margin: kIsWeb
         ? EdgeInsets.symmetric(horizontal: paddingDashboard)
         : const EdgeInsets.symmetric(horizontal: 0),

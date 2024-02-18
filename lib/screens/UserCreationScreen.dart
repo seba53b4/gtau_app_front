@@ -5,6 +5,7 @@ import 'package:gtau_app_front/models/user_data.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
+import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -350,7 +351,9 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       return LoadingOverlay(
         isLoading: userListViewModel.isLoading,
         child: Scaffold(
+          backgroundColor: Colors.transparent,
           body: Container(
+            color: Colors.transparent,
             margin:
                 const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
             child: Column(
@@ -361,7 +364,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                     visible: true,
                     child: Form(
                       key: _formKey,
-                      child: BoxContainer(
+                      child: Container(
                         width: widthRow * 1.15,
                         padding: const EdgeInsets.all(24),
                         child: Column(

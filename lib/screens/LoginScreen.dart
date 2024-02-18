@@ -206,9 +206,11 @@ class _LoginScreenState extends State<LoginScreen> {
       if (kIsWeb) {
         return Scaffold(
           body: BackgroundGradient(
+            colors: [primarySwatch[400]!, primarySwatch[600]!],
             child: Center(
               child: FittedBox(
                 child: BoxContainerWhite(
+                  withBorder: false,
                   padding: const EdgeInsets.all(8.0),
                   alignment: Alignment.center,
                   child: Column(

@@ -19,15 +19,15 @@ void showElementModal(
             borderRadius: BorderRadius.circular(20.0),
           ),
           title: Container(
-            color: const Color.fromRGBO(96, 166, 27, 1),
+            color: primarySwatch[200],
             height: 50,
             child: Container(
               height: 24,
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.component_detail_title,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      color: Color.fromRGBO(14, 45, 9, 1),
+                  style: TextStyle(
+                      color: lightBackground,
                       letterSpacing: 1,
                       fontWeight: FontWeight.bold,
                       fontSize: 18)),

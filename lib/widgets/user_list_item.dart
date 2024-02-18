@@ -35,8 +35,10 @@ class UserListItem extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: lightBackground,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+              side: BorderSide(width: 1.0),
+              borderRadius: BorderRadius.all(Radius.circular(24.0))),
           child: SizedBox(
             width: 700,
             height: 536,
@@ -73,7 +75,7 @@ class UserListItem extends StatelessWidget {
           color: lightBackground,
           boxShadow: const [
             BoxShadow(
-              color: Color.fromRGBO(200, 217, 184, 0.5),
+              color: Color.fromRGBO(128, 128, 128, 0.49),
               spreadRadius: 3,
               blurRadius: 7,
               offset: Offset(0, 3),
@@ -178,7 +180,7 @@ class UserListItem extends StatelessWidget {
                     onPressed: () async {
                       await _showDeleteConfirmationDialog(context);
                     },
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(Icons.delete, color: bucketDelete),
                   ),
                 ),
               ],

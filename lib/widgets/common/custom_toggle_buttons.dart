@@ -64,7 +64,8 @@ class CustomToggleButton extends StatelessWidget {
   final double width;
   final double height;
 
-  const CustomToggleButton({super.key,
+  const CustomToggleButton({
+    super.key,
     required this.text,
     required this.index,
     required this.isSelected,

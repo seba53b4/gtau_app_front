@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
@@ -65,7 +65,7 @@ class TaskListItem extends StatelessWidget {
           color: lightBackground,
           boxShadow: const [
             BoxShadow(
-              color: Color.fromRGBO(200, 217, 184, 0.5),
+              color: Color.fromRGBO(128, 128, 128, 0.49),
               spreadRadius: 3,
               blurRadius: 7,
               offset: Offset(0, 3),
@@ -79,14 +79,17 @@ class TaskListItem extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: primarySwatch[900],
                 radius: 20,
-                child: Text(
-                  'I',
-                  style: GoogleFonts.merriweather(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                child: Stack(children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 18,
+                      child: const Icon(GtauIcons.tasksInspection,
+                          size: 20, color: Colors.white),
+                    ),
                   ),
-                ),
+                ]),
               ),
             ),
             Expanded(
@@ -163,7 +166,7 @@ class TaskListItem extends StatelessWidget {
                     onPressed: () async {
                       await _showDeleteConfirmationDialog(context);
                     },
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(Icons.delete, color: bucketDelete),
                   ),
                 ),
               ],
