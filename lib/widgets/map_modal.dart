@@ -103,7 +103,7 @@ class MapModal extends StatelessWidget {
     selectedItemsProvider.activateMultipleSelection();
     final color = primarySwatch[300];
     return Material(
-      color: Colors.white,
+      color: baseBackgroundG1,
       child: Center(
         child: Ink(
           decoration: ShapeDecoration(
@@ -112,7 +112,7 @@ class MapModal extends StatelessWidget {
           ),
           child: IconButton(
             icon: const Icon(Icons.add_circle_outline_rounded),
-            color: Colors.white,
+            color: lightBackground,
             onPressed: () {
               _showMapModal(context);
             },
