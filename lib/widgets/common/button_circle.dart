@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 
 class ButtonCircle extends StatefulWidget {
   final IconData icon;
@@ -6,7 +7,10 @@ class ButtonCircle extends StatefulWidget {
   final VoidCallback onPressed;
 
   const ButtonCircle(
-      {Key? key, required this.icon, required this.onPressed, required this.size})
+      {Key? key,
+      required this.icon,
+      required this.onPressed,
+      required this.size})
       : super(key: key);
 
   @override
@@ -24,9 +28,7 @@ class _ButtonCircleState extends State<ButtonCircle> {
 
   @override
   Widget build(BuildContext context) {
-    final circleColor = isHovered
-        ? const Color.fromRGBO(253, 255, 252, 0.45)
-        : const Color.fromRGBO(96, 166, 27, 1);
+    final circleColor = isHovered ? primarySwatch[100]! : primarySwatch[400]!;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       height: widget.size,
@@ -43,7 +45,7 @@ class _ButtonCircleState extends State<ButtonCircle> {
         child: Icon(
           widget.icon,
           size: 28,
-          color: const Color.fromRGBO(14, 45, 9, 1),
+          color: lightBackground,
         ),
       ),
     );

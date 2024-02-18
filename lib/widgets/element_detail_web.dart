@@ -35,7 +35,7 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
     return Column(
       children: [
         Container(
-          color: primarySwatch,
+          color: primarySwatch[400],
           height: 50,
           child: Row(
             children: [
@@ -53,9 +53,9 @@ class _ElementDetailWebState extends State<ElementDetailWeb> {
                     AppLocalizations.of(context)!.component_detail_title,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        color: titleColor,
+                        color: lightBackground,
                         letterSpacing: 1,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w300,
                         fontSize: 18)),
               ),
             ],

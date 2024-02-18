@@ -118,7 +118,7 @@ class _ReportComponentState extends State<ReportComponent> {
                         ),
                       ),
                     ),
-                    if (isHovered)
+                    if (isHovered && report == null)
                       Container(
                         decoration: BoxDecoration(
                           color: primarySwatch[900]!.withOpacity(0.8),
@@ -130,9 +130,7 @@ class _ReportComponentState extends State<ReportComponent> {
                             downloadReport();
                           },
                           child: Text(
-                            report == null
-                                ? appLocalizations.report_not_processed
-                                : appLocalizations.download_informe_btn,
+                            appLocalizations.report_not_processed,
                             style: TextStyle(color: lightBackground),
                           ),
                         ),
