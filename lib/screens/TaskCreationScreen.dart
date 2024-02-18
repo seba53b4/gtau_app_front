@@ -10,11 +10,8 @@ import 'package:gtau_app_front/viewmodels/lot_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/register_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
-import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
-import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
-import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:gtau_app_front/widgets/common/informe_upload_component.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -578,170 +575,363 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
           child: Scaffold(
             body: SingleChildScrollView(
               controller: _scrollController,
-              child: Center(
-                child: BackgroundGradient(
-                  decoration: kIsWeb ? null : BoxDecoration(
-                                color: lightBackground,
-                                borderRadius: const BorderRadius.all(Radius.circular(0),
-                                ),
-                              ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Visibility(
-                        visible: widget.detail && selectedIndex == 1 && kIsWeb,
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
-                            child: FloatingActionButton(
-                              foregroundColor: primarySwatch,
-                              backgroundColor: lightBackground,
-                              onPressed: () {
-                                handleCancel();
-                              },
-                              tooltip: AppLocalizations.of(context)!
-                                  .placeholder_back_button,
-                              child: const Icon(Icons.arrow_back),
-                            ),
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 12.0, vertical: 12.0),
+                child: Column(
+                  children: [
+                    Visibility(
+                      visible: widget.detail && selectedIndex == 1 && kIsWeb,
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 0, 0),
+                          child: FloatingActionButton(
+                            foregroundColor: primarySwatch,
+                            backgroundColor: lightBackground,
+                            onPressed: () {
+                              handleCancel();
+                            },
+                            tooltip: AppLocalizations.of(context)!
+                                .placeholder_back_button,
+                            child: const Icon(Icons.arrow_back),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12.0),
-                      Visibility(
-                        visible: !widget.detail,
-                        child: CustomToggleButtons(
-                          onPressedList: [
-                            () {
-                              setState(() {
-                                selectedIndex = 0;
-                              });
-                            },
-                            () {
-                              setState(() {
-                                selectedIndex = 1;
-                              });
-                            }
-                          ],
-                        ),
+                    ),
+                    const SizedBox(height: 12.0),
+                    Visibility(
+                      visible: !widget.detail,
+                      child: CustomToggleButtons(
+                        onPressedList: [
+                          () {
+                            setState(() {
+                              selectedIndex = 0;
+                            });
+                          },
+                          () {
+                            setState(() {
+                              selectedIndex = 1;
+                            });
+                          }
+                        ],
                       ),
-                      const SizedBox(height: 20.0),
-                      Visibility(
-                        visible: selectedIndex == 1 && kIsWeb,
-                        child: Form(
-                          key: _formKey,
-                          child: BoxContainerWhite(
-                            width: widthRow * 1.15,
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)!
-                                      .taskInformationTitle,
-                                  style: const TextStyle(fontSize: 32.0),
-                                ),
-                                const SizedBox(height: 24.0),
-                                // Primera fila
+                    ),
+                    const SizedBox(height: 20.0),
+                    Visibility(
+                      visible: selectedIndex == 1 && kIsWeb,
+                      child: Form(
+                        key: _formKey,
+                        child: BoxContainer(
+                          width: widthRow * 1.15,
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .taskInformationTitle,
+                                style: const TextStyle(fontSize: 32.0),
+                              ),
+                              const SizedBox(height: 24.0),
+                              // Primera fila
 
-                                SizedBox(
-                                  height: heightRow,
-                                  width: widthRow,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              style:
-                                                  const TextStyle(fontSize: 16.0),
-                                            ),
-                                            const SizedBox(
-                                                height:
-                                                    AppConstants.taskColumnSpace),
-                                            CustomTextFormField(
-                                              readOnly: widget.detail,
-                                              hintText: AppLocalizations.of(
-                                                      context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              controller: numWorkController,
-                                              textInputType: TextInputType.number,
-                                            ),
-                                          ],
-                                        ),
-                                        Column(
-                                          children: [
-                                            const SizedBox(
-                                                width: AppConstants.taskRowSpace),
-                                            Column(
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!
-                                                      .createTaskPage_assignedUserTitle,
-                                                  style: const TextStyle(
-                                                      fontSize: 16.0),
-                                                ),
-                                                const SizedBox(height: 12.0),
-                                                CustomDropdown(
-                                                  value: (listUsers.contains(
-                                                              userAssigned) ==
-                                                          true)
-                                                      ? userAssigned
-                                                      : notAssigned,
-                                                  items: listUsers,
-                                                  onChanged: (String? value) {
-                                                    setState(() {
-                                                      userAssigned = value!;
-                                                    });
-                                                  },
-                                                ),
-                                                const SizedBox(
-                                                    height: AppConstants
-                                                        .taskColumnSpace),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        Column(children: [
+                              SizedBox(
+                                height: heightRow,
+                                width: widthRow,
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                        children: [
                                           Text(
                                             AppLocalizations.of(context)!
-                                                .editTaskPage_statusTitle,
+                                                .createTaskPage_numberWorkTitle,
                                             style:
                                                 const TextStyle(fontSize: 16.0),
-                                          ),
-                                          const SizedBox(height: 12.0),
-                                          CustomDropdown(
-                                            isStatus: true,
-                                            value: taskStatus,
-                                            onChanged: (String? value) {
-                                              setState(() {
-                                                taskStatus = value!;
-                                              });
-                                            },
-                                            items: TaskStatus.values
-                                                .map((status) => status.value)
-                                                .toList(),
                                           ),
                                           const SizedBox(
                                               height:
                                                   AppConstants.taskColumnSpace),
-                                        ]),
+                                          CustomTextFormField(
+                                            readOnly: widget.detail,
+                                            hintText: AppLocalizations.of(
+                                                    context)!
+                                                .createTaskPage_numberWorkTitle,
+                                            controller: numWorkController,
+                                            textInputType: TextInputType.number,
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        children: [
+                                          const SizedBox(
+                                              width: AppConstants.taskRowSpace),
+                                          Column(
+                                            children: [
+                                              Text(
+                                                AppLocalizations.of(context)!
+                                                    .createTaskPage_assignedUserTitle,
+                                                style: const TextStyle(
+                                                    fontSize: 16.0),
+                                              ),
+                                              const SizedBox(height: 12.0),
+                                              CustomDropdown(
+                                                value: (listUsers.contains(
+                                                            userAssigned) ==
+                                                        true)
+                                                    ? userAssigned
+                                                    : notAssigned,
+                                                items: listUsers,
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    userAssigned = value!;
+                                                  });
+                                                },
+                                              ),
+                                              const SizedBox(
+                                                  height: AppConstants
+                                                      .taskColumnSpace),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Column(children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .editTaskPage_statusTitle,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        CustomDropdown(
+                                          isStatus: true,
+                                          value: taskStatus,
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              taskStatus = value!;
+                                            });
+                                          },
+                                          items: TaskStatus.values
+                                              .map((status) => status.value)
+                                              .toList(),
+                                        ),
+                                        const SizedBox(
+                                            height:
+                                                AppConstants.taskColumnSpace),
                                       ]),
+                                    ]),
+                              ),
+                              // Segunda fila
+                              SizedBox(
+                                height: heightRow,
+                                width: widthRow,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .createTaskPage_startDateTitle,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        SizedBox(
+                                          width: AppConstants.textFieldWidth,
+                                          child: InkWell(
+                                            overlayColor:
+                                                MaterialStateColor.resolveWith(
+                                                    (states) =>
+                                                        Colors.transparent),
+                                            onTap: () async {
+                                              final DateTime? pickedDate =
+                                                  await showCustomDatePicker(
+                                                      context, startDate!);
+                                              if (pickedDate != null) {
+                                                handleStartDateChange(
+                                                    pickedDate);
+                                              }
+                                            },
+                                            child: IgnorePointer(
+                                              child: CustomTextFormField(
+                                                width:
+                                                    AppConstants.taskRowSpace,
+                                                hintText: AppLocalizations.of(
+                                                        context)!
+                                                    .createTaskPage_startDateTitle,
+
+                                                controller: addDateController,
+                                                // enabled: false,
+                                                // readOnly: true,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                        width: AppConstants.taskRowSpace),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .createTaskPage_solicitantTitle,
+                                          style:
+                                              const TextStyle(fontSize: 16.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        CustomTextFormField(
+                                          width:
+                                              AppConstants.textFieldWidth * 2 +
+                                                  AppConstants.taskRowSpace,
+                                          hintText: AppLocalizations.of(
+                                                  context)!
+                                              .createTaskPage_solicitantPlaceholder,
+                                          controller: applicantController,
+                                        ),
+                                      ],
+                                    )
+                                  ],
                                 ),
-                                // Segunda fila
-                                SizedBox(
-                                  height: heightRow,
+                              ),
+                              //const SizedBox(height: 20.0),
+                              // Tercera fila
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!
+                                        .createTaskPage_selectAddressTitle,
+                                    style: const TextStyle(fontSize: 16.0),
+                                  ),
+                                  const SizedBox(height: 12.0),
+                                  CustomTextFormField(
+                                    width: widthRow,
+                                    hintText: AppLocalizations.of(context)!
+                                        .createTaskPage_selectAddressplaceholder,
+                                    controller: locationController,
+                                  ),
+                                  const SizedBox(
+                                      width: AppConstants.taskRowSpace),
+                                  Text(
+                                    AppLocalizations.of(context)!
+                                        .default_descriptionTitle,
+                                    style: const TextStyle(fontSize: 16.0),
+                                  ),
+                                  const SizedBox(height: 12.0),
+                                  CustomTextFormField(
+                                    isTextBox: true,
+                                    maxLines: 10,
+                                    width: widthRow,
+                                    height: heightRow,
+                                    hintText: AppLocalizations.of(context)!
+                                        .default_descriptionPlaceholder,
+                                    controller: descriptionController,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: selectedIndex == 1 && !kIsWeb,
+                      child: Form(
+                        key: _formKey,
+                        child: BoxContainer(
+                          width: widthRow * 1.15,
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context)!
+                                    .taskInformationTitle,
+                                style: const TextStyle(fontSize: 24.0),
+                              ),
+                              const SizedBox(height: 16.0),
+                              // Primera fila
+                              SizedBox(
+                                height: 100,
+                                width: widthRow,
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!
+                                                .createTaskPage_numberWorkTitle,
+                                            style:
+                                                const TextStyle(fontSize: 12.0),
+                                          ),
+                                          const SizedBox(
+                                              height:
+                                                  AppConstants.taskColumnSpace),
+                                          CustomTextFormField(
+                                            width: 148,
+                                            height: 54,
+                                            fontSize: 12,
+                                            readOnly: widget.detail,
+                                            hintText: AppLocalizations.of(
+                                                    context)!
+                                                .createTaskPage_numberWorkTitle,
+                                            controller: numWorkController,
+                                            textInputType: TextInputType.number,
+                                          ),
+                                        ],
+                                      ),
+                                      Column(children: [
+                                        Text(
+                                          AppLocalizations.of(context)!
+                                              .editTaskPage_statusTitle,
+                                          style:
+                                              const TextStyle(fontSize: 12.0),
+                                        ),
+                                        const SizedBox(height: 12.0),
+                                        CustomDropdown(
+                                          isStatus: true,
+                                          width: 148,
+                                          //height: 54,
+                                          fontSize: 12,
+                                          value: taskStatus,
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              taskStatus = value!;
+                                            });
+                                          },
+                                          items: TaskStatus.values
+                                              .map((status) => status.value)
+                                              .toList(),
+                                        ),
+                                        // const SizedBox(
+                                        //     height: AppConstants.taskColumnSpace),
+                                      ]),
+                                    ]),
+                              ),
+                              const SizedBox(height: 20.0),
+                              // Segunda fila
+                              SizedBox(
+                                  height: 100,
                                   width: widthRow,
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Column(
                                         children: [
@@ -749,16 +939,15 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                             AppLocalizations.of(context)!
                                                 .createTaskPage_startDateTitle,
                                             style:
-                                                const TextStyle(fontSize: 16.0),
+                                                const TextStyle(fontSize: 12.0),
                                           ),
                                           const SizedBox(height: 12.0),
                                           SizedBox(
-                                            width: AppConstants.textFieldWidth,
+                                            width: 148,
                                             child: InkWell(
-                                              overlayColor:
-                                                  MaterialStateColor.resolveWith(
-                                                      (states) =>
-                                                          Colors.transparent),
+                                              overlayColor: MaterialStateColor
+                                                  .resolveWith((states) =>
+                                                      Colors.transparent),
                                               onTap: () async {
                                                 final DateTime? pickedDate =
                                                     await showCustomDatePicker(
@@ -770,8 +959,9 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                               },
                                               child: IgnorePointer(
                                                 child: CustomTextFormField(
-                                                  width:
-                                                      AppConstants.taskRowSpace,
+                                                  width: 128,
+                                                  height: 54,
+                                                  fontSize: 12,
                                                   hintText: AppLocalizations.of(
                                                           context)!
                                                       .createTaskPage_startDateTitle,
@@ -785,21 +975,61 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                          width: AppConstants.taskRowSpace),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!
+                                                .createTaskPage_assignedUserTitle,
+                                            style:
+                                                const TextStyle(fontSize: 12.0),
+                                          ),
+                                          const SizedBox(height: 12.0),
+                                          CustomDropdown(
+                                              width: 148,
+                                              //height: 54,
+                                              fontSize: 12,
+                                              value: (listUsers.contains(
+                                                          userAssigned) ==
+                                                      true)
+                                                  ? userAssigned
+                                                  : notAssigned,
+                                              items: listUsers,
+                                              onChanged: (String? value) {
+                                                setState(() {
+                                                  userAssigned = value!;
+                                                });
+                                              }),
+                                          const SizedBox(
+                                              width:
+                                                  AppConstants.taskColumnSpace),
+                                        ],
+                                      ),
+                                    ],
+                                  )),
+                              const SizedBox(height: 20.0),
+                              // Tercera columna
+                              SizedBox(
+                                height: 120,
+                                width: widthRow,
+                                child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
                                       Column(
                                         children: [
                                           Text(
                                             AppLocalizations.of(context)!
                                                 .createTaskPage_solicitantTitle,
                                             style:
-                                                const TextStyle(fontSize: 16.0),
+                                                const TextStyle(fontSize: 14.0),
                                           ),
                                           const SizedBox(height: 12.0),
                                           CustomTextFormField(
-                                            width:
-                                                AppConstants.textFieldWidth * 2 +
-                                                    AppConstants.taskRowSpace,
+                                            width: widthRow + 24,
+                                            height: 80,
+                                            fontSize: 12,
                                             hintText: AppLocalizations.of(
                                                     context)!
                                                 .createTaskPage_solicitantPlaceholder,
@@ -807,464 +1037,76 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           ),
                                         ],
                                       )
-                                    ],
+                                    ]),
+                              ),
+                              // const SizedBox(height: 8),
+                              // Cuarta columna
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!
+                                        .createTaskPage_selectAddressTitle,
+                                    style: const TextStyle(fontSize: 14.0),
                                   ),
-                                ),
-                                //const SizedBox(height: 20.0),
-                                // Tercera fila
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .createTaskPage_selectAddressTitle,
-                                      style: const TextStyle(fontSize: 16.0),
-                                    ),
-                                    const SizedBox(height: 12.0),
-                                    CustomTextFormField(
-                                      width: widthRow,
-                                      hintText: AppLocalizations.of(context)!
-                                          .createTaskPage_selectAddressplaceholder,
-                                      controller: locationController,
-                                    ),
-                                    const SizedBox(
-                                        width: AppConstants.taskRowSpace),
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .default_descriptionTitle,
-                                      style: const TextStyle(fontSize: 16.0),
-                                    ),
-                                    const SizedBox(height: 12.0),
-                                    CustomTextFormField(
-                                      isTextBox: true,
-                                      maxLines: 10,
-                                      width: widthRow,
-                                      height: heightRow,
-                                      hintText: AppLocalizations.of(context)!
-                                          .default_descriptionPlaceholder,
-                                      controller: descriptionController,
-                                    ),
-                                    const SizedBox(height: 24.0),
-                                    Visibility(
-                                      visible: widget.detail,
-                                      child: Container(
-                                        width: widthRow * 1.15,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!.taskInspectionTitle,
-                                              style:
-                                                  const TextStyle(fontSize: kIsWeb ? 32.0 : 24),
-                                            ),
-                                            const SizedBox(height: 24.0),
-                                            kIsWeb
-                                                ? SizedBox(
-                                                    height: 128,
-                                                    width: widthRow,
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.spaceBetween,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment.center,
-                                                      children: [
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              AppLocalizations.of(context)!
-                                                                  .createTaskPage_realizationDateTitle,
-                                                              style: const TextStyle(
-                                                                  fontSize: 16.0),
-                                                            ),
-                                                            const SizedBox(height: 10.0),
-                                                            SizedBox(
-                                                              width:
-                                                                  AppConstants.textFieldWidth,
-                                                              child: InkWell(
-                                                                overlayColor: MaterialStateColor
-                                                                    .resolveWith((states) =>
-                                                                        Colors.transparent),
-                                                                onTap: () async {
-                                                                  final DateTime? pickedDate =
-                                                                      await showCustomDatePicker(
-                                                                          context, startDate!);
-                                                                  if (pickedDate != null) {
-                                                                    handleReleasedDateChange(
-                                                                        pickedDate);
-                                                                  }
-                                                                },
-                                                                child: IgnorePointer(
-                                                                  child: CustomTextFormField(
-                                                                    useValidation: false,
-                                                                    width: AppConstants
-                                                                        .textFieldWidth,
-                                                                    hintText: AppLocalizations
-                                                                            .of(context)!
-                                                                        .default_datepicker_hint,
-                                                                    controller:
-                                                                        releasedDateController,
-                                                                    //enabled: false,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              AppLocalizations.of(context)!
-                                                                  .createTaskPage_longitudeTitle,
-                                                              style: const TextStyle(
-                                                                  fontSize: 16.0),
-                                                            ),
-                                                            const SizedBox(height: 10.0),
-                                                            CustomTextFormField(
-                                                              useValidation: false,
-                                                              width:
-                                                                  AppConstants.textFieldWidth,
-                                                              textInputType:
-                                                                  TextInputType.number,
-                                                              hintText: AppLocalizations.of(
-                                                                      context)!
-                                                                  .createTaskPage_longitudeTitle,
-                                                              controller: lengthController,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              AppLocalizations.of(context)!
-                                                                  .createTaskPage_materialTitle,
-                                                              style: const TextStyle(
-                                                                  fontSize: 16.0),
-                                                            ),
-                                                            const SizedBox(height: 10.0),
-                                                            CustomTextFormField(
-                                                              useValidation: false,
-                                                              width:
-                                                                  AppConstants.textFieldWidth,
-                                                              hintText: AppLocalizations.of(
-                                                                      context)!
-                                                                  .createTaskPage_materialTitle,
-                                                              controller: materialController,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )
-                                                : SizedBox(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.spaceBetween,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment.center,
-                                                      children: [
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              AppLocalizations.of(context)!
-                                                                  .createTaskPage_realizationDateTitle,
-                                                              style: const TextStyle(
-                                                                  fontSize: 16.0),
-                                                            ),
-                                                            const SizedBox(height: 10.0),
-                                                            SizedBox(
-                                                              width: 148,
-                                                              child: InkWell(
-                                                                overlayColor: MaterialStateColor
-                                                                    .resolveWith((states) =>
-                                                                        Colors.transparent),
-                                                                onTap: () async {
-                                                                  final DateTime? pickedDate =
-                                                                      await showCustomDatePicker(
-                                                                          context, startDate!);
-                                                                  if (pickedDate != null) {
-                                                                    handleReleasedDateChange(
-                                                                        pickedDate);
-                                                                  }
-                                                                },
-                                                                child: IgnorePointer(
-                                                                  child: CustomTextFormField(
-                                                                    useValidation: false,
-                                                                    width: 128,
-                                                                    height: 54,
-                                                                    fontSize: 12,
-                                                                    hintText: AppLocalizations
-                                                                            .of(context)!
-                                                                        .default_datepicker_hint,
-                                                                    controller:
-                                                                        releasedDateController,
-                                                                    //enabled: false,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 10.0),
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              AppLocalizations.of(context)!
-                                                                  .createTaskPage_longitudeTitle,
-                                                              style: const TextStyle(
-                                                                  fontSize: 16.0),
-                                                            ),
-                                                            const SizedBox(height: 10.0),
-                                                            CustomTextFormField(
-                                                              useValidation: false,
-                                                              width: 148,
-                                                              height: 54,
-                                                              fontSize: 12,
-                                                              textInputType:
-                                                                  TextInputType.number,
-                                                              hintText: AppLocalizations.of(
-                                                                      context)!
-                                                                  .createTaskPage_longitudeTitle,
-                                                              controller: lengthController,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(height: 10.0),
-                                                        Column(
-                                                          children: [
-                                                            Text(
-                                                              AppLocalizations.of(context)!
-                                                                  .createTaskPage_materialTitle,
-                                                              style: const TextStyle(
-                                                                  fontSize: 16.0),
-                                                            ),
-                                                            const SizedBox(height: 10.0),
-                                                            CustomTextFormField(
-                                                              useValidation: false,
-                                                              width: 148,
-                                                              height: 54,
-                                                              fontSize: 12,
-                                                              hintText: AppLocalizations.of(
-                                                                      context)!
-                                                                  .createTaskPage_materialTitle,
-                                                              controller: materialController,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                            const SizedBox(
-                                                height: AppConstants.taskColumnSpace),
-
-                                            // Elementos seleccionados
-                                            ElementsSelected(widget: widget),
-                                            const SizedBox(height: 10.0),
-                                            // Button elementos a seleccionar
-                                            InspectionLocationSelect(
-                                                selectedItemsProvider: selectedItemsProvider),
-                                            const SizedBox(height: 10.0),
-                                            if (widget.detail)
-                                              Column(
-                                                children: [
-                                                  const SizedBox(height: 10.0),
-                                                  Text(
-                                                    AppLocalizations.of(context)!
-                                                        .createTaskPage_observationsTitle,
-                                                    style: const TextStyle(fontSize: 16.0),
-                                                  ),
-                                                  const SizedBox(height: 10.0),
-                                                  CustomTextFormField(
-                                                    useValidation: false,
-                                                    isTextBox: true,
-                                                    maxLines: 10,
-                                                    width: widthRow,
-                                                    height: heightRow,
-                                                    hintText: AppLocalizations.of(context)!
-                                                        .default_observationsPlaceholder,
-                                                    controller: observationsController,
-                                                  ),
-                                                  const SizedBox(height: 10.0),
-                                                  Text(
-                                                    AppLocalizations.of(context)!
-                                                        .createTaskPage_conclusionsTitle,
-                                                    style: const TextStyle(fontSize: 16.0),
-                                                  ),
-                                                  const SizedBox(height: 10.0),
-                                                  CustomTextFormField(
-                                                    useValidation: false,
-                                                    isTextBox: true,
-                                                    maxLines: 10,
-                                                    width: widthRow,
-                                                    height: heightRow,
-                                                    hintText: AppLocalizations.of(context)!
-                                                        .default_conclusionsPlaceholder,
-                                                    controller: conclusionsController,
-                                                  ),
-                                                ],
-                                              ),
-                                            const SizedBox(height: 10.0),
-                                            Text(
-                                              AppLocalizations.of(context)!.images_title,
-                                              style: const TextStyle(fontSize: 16.0),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.all(12),
-                                              width: widthRow,
-                                              child: Column(
-                                                children: [
-                                                  TaskImageGalleryModal(idTask: widget.idTask!),
-                                                ],
-                                              ),
-                                            ),
-                                            Text(
-                                              AppLocalizations.of(context)!.informe_title,
-                                              style: const TextStyle(fontSize: 16.0),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.all(12),
-                                              width: widthRow,
-                                              child: Column(children: [
-                                                InformeUploadComponent(idTask: widget.idTask!)
-                                              ]),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 50.0,
-                                      margin: const EdgeInsets.symmetric(vertical: 20.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          if (widget.detail)
-                                            CustomElevatedButton(
-                                              messageType: MessageType.error,
-                                              onPressed: handleCancel,
-                                              text: AppLocalizations.of(context)!
-                                                  .buttonCancelLabel,
-                                            ),
-                                          const SizedBox(width: 12.0),
-                                          CustomElevatedButton(
-                                            onPressed: () {
-                                              if (_formKey.currentState!.validate()) {
-                                                if (widget.detail) {
-                                                  handleEditTask();
-                                                } else {
-                                                  // Se quita acción de creación en Programada
-                                                  if (selectedIndex == 1) {
-                                                    handleSubmit();
-                                                  }
-                                                }
-                                              } else {
-                                                scrollToTopScrollView();
-                                              }
-                                            },
-                                            text: widget.detail
-                                                ? AppLocalizations.of(context)!
-                                                    .buttonAcceptLabel
-                                                : AppLocalizations.of(context)!
-                                                    .createTaskPage_submitButton,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  const SizedBox(height: 12.0),
+                                  CustomTextFormField(
+                                    width: widthRow + 24,
+                                    height: 80,
+                                    fontSize: 12,
+                                    hintText: AppLocalizations.of(context)!
+                                        .createTaskPage_selectAddressplaceholder,
+                                    controller: locationController,
+                                  ),
+                                  //      const SizedBox(height: 12.0),
+                                  Text(
+                                    AppLocalizations.of(context)!
+                                        .default_descriptionTitle,
+                                    style: const TextStyle(fontSize: 14.0),
+                                  ),
+                                  const SizedBox(height: 12.0),
+                                  CustomTextFormField(
+                                    isTextBox: true,
+                                    maxLines: 10,
+                                    fontSize: 12,
+                                    width: widthRow,
+                                    height: heightRow,
+                                    hintText: AppLocalizations.of(context)!
+                                        .default_descriptionPlaceholder,
+                                    controller: descriptionController,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20.0),
+                            ],
                           ),
                         ),
                       ),
-                      Visibility(
-                        visible: selectedIndex == 1 && !kIsWeb,
-                        child: Form(
-                          key: _formKey,
-                          child: BoxContainerWhite(
-                            decoration: BoxDecoration(
-                                color: lightBackground,
-                                borderRadius: const BorderRadius.all(Radius.circular(0),
-                                ),
-                              ),
-                            width: widthRow * 1.15,
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)!
-                                      .taskInformationTitle,
-                                  style: const TextStyle(fontSize: 24.0),
-                                ),
-                                const SizedBox(height: 16.0),
-                                // Primera fila
-                                SizedBox(
-                                  height: 100,
-                                  width: widthRow,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              style:
-                                                  const TextStyle(fontSize: 12.0),
-                                            ),
-                                            const SizedBox(
-                                                height:
-                                                    AppConstants.taskColumnSpace),
-                                            CustomTextFormField(
-                                              width: 148,
-                                              height: 54,
-                                              fontSize: 12,
-                                              readOnly: widget.detail,
-                                              hintText: AppLocalizations.of(
-                                                      context)!
-                                                  .createTaskPage_numberWorkTitle,
-                                              controller: numWorkController,
-                                              textInputType: TextInputType.number,
-                                            ),
-                                          ],
-                                        ),
-                                        Column(children: [
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .editTaskPage_statusTitle,
-                                            style:
-                                                const TextStyle(fontSize: 12.0),
-                                          ),
-                                          const SizedBox(height: 12.0),
-                                          CustomDropdown(
-                                            isStatus: true,
-                                            width: 148,
-                                            //height: 54,
-                                            fontSize: 12,
-                                            value: taskStatus,
-                                            onChanged: (String? value) {
-                                              setState(() {
-                                                taskStatus = value!;
-                                              });
-                                            },
-                                            items: TaskStatus.values
-                                                .map((status) => status.value)
-                                                .toList(),
-                                          ),
-                                          // const SizedBox(
-                                          //     height: AppConstants.taskColumnSpace),
-                                        ]),
-                                      ]),
-                                ),
-                                const SizedBox(height: 20.0),
-                                // Segunda fila
-                                SizedBox(
-                                    height: 100,
+                    ),
+                    Visibility(
+                        visible: selectedIndex == 0,
+                        child: ScheduledComponent(
+                          isEdit: widget.detail,
+                          scheduledId: widget.idTask!,
+                        )),
+                    Visibility(
+                      visible: widget.detail && selectedIndex == 1,
+                      child: Container(
+                        width: widthRow * 1.15,
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!.taskInspectionTitle,
+                              style:
+                                  const TextStyle(fontSize: kIsWeb ? 32.0 : 24),
+                            ),
+                            const SizedBox(height: 24.0),
+                            kIsWeb
+                                ? SizedBox(
+                                    height: 128,
                                     width: widthRow,
                                     child: Row(
                                       mainAxisAlignment:
@@ -1276,11 +1118,105 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                           children: [
                                             Text(
                                               AppLocalizations.of(context)!
-                                                  .createTaskPage_startDateTitle,
-                                              style:
-                                                  const TextStyle(fontSize: 12.0),
+                                                  .createTaskPage_realizationDateTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
                                             ),
-                                            const SizedBox(height: 12.0),
+                                            const SizedBox(height: 10.0),
+                                            SizedBox(
+                                              width:
+                                                  AppConstants.textFieldWidth,
+                                              child: InkWell(
+                                                overlayColor: MaterialStateColor
+                                                    .resolveWith((states) =>
+                                                        Colors.transparent),
+                                                onTap: () async {
+                                                  final DateTime? pickedDate =
+                                                      await showCustomDatePicker(
+                                                          context, startDate!);
+                                                  if (pickedDate != null) {
+                                                    handleReleasedDateChange(
+                                                        pickedDate);
+                                                  }
+                                                },
+                                                child: IgnorePointer(
+                                                  child: CustomTextFormField(
+                                                    useValidation: false,
+                                                    width: AppConstants
+                                                        .textFieldWidth,
+                                                    hintText: AppLocalizations
+                                                            .of(context)!
+                                                        .default_datepicker_hint,
+                                                    controller:
+                                                        releasedDateController,
+                                                    //enabled: false,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createTaskPage_longitudeTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                            const SizedBox(height: 10.0),
+                                            CustomTextFormField(
+                                              useValidation: false,
+                                              width:
+                                                  AppConstants.textFieldWidth,
+                                              textInputType:
+                                                  TextInputType.number,
+                                              hintText: AppLocalizations.of(
+                                                      context)!
+                                                  .createTaskPage_longitudeTitle,
+                                              controller: lengthController,
+                                            ),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createTaskPage_materialTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                            const SizedBox(height: 10.0),
+                                            CustomTextFormField(
+                                              useValidation: false,
+                                              width:
+                                                  AppConstants.textFieldWidth,
+                                              hintText: AppLocalizations.of(
+                                                      context)!
+                                                  .createTaskPage_materialTitle,
+                                              controller: materialController,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createTaskPage_realizationDateTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                            const SizedBox(height: 10.0),
                                             SizedBox(
                                               width: 148,
                                               child: InkWell(
@@ -1292,101 +1228,75 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                                                       await showCustomDatePicker(
                                                           context, startDate!);
                                                   if (pickedDate != null) {
-                                                    handleStartDateChange(
+                                                    handleReleasedDateChange(
                                                         pickedDate);
                                                   }
                                                 },
                                                 child: IgnorePointer(
                                                   child: CustomTextFormField(
+                                                    useValidation: false,
                                                     width: 128,
                                                     height: 54,
                                                     fontSize: 12,
-                                                    hintText: AppLocalizations.of(
-                                                            context)!
-                                                        .createTaskPage_startDateTitle,
-
-                                                    controller: addDateController,
-                                                    // enabled: false,
-                                                    // readOnly: true,
+                                                    hintText: AppLocalizations
+                                                            .of(context)!
+                                                        .default_datepicker_hint,
+                                                    controller:
+                                                        releasedDateController,
+                                                    //enabled: false,
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                            )
                                           ],
                                         ),
+                                        const SizedBox(height: 10.0),
                                         Column(
                                           children: [
                                             Text(
                                               AppLocalizations.of(context)!
-                                                  .createTaskPage_assignedUserTitle,
-                                              style:
-                                                  const TextStyle(fontSize: 12.0),
+                                                  .createTaskPage_longitudeTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
                                             ),
-                                            const SizedBox(height: 12.0),
-                                            CustomDropdown(
-                                                width: 148,
-                                                //height: 54,
-                                                fontSize: 12,
-                                                value: (listUsers.contains(
-                                                            userAssigned) ==
-                                                        true)
-                                                    ? userAssigned
-                                                    : notAssigned,
-                                                items: listUsers,
-                                                onChanged: (String? value) {
-                                                  setState(() {
-                                                    userAssigned = value!;
-                                                  });
-                                                }),
-                                            const SizedBox(
-                                                width:
-                                                    AppConstants.taskColumnSpace),
-                                          ],
-                                        ),
-                                      ],
-                                    )),
-                                const SizedBox(height: 20.0),
-                                // Tercera columna
-                                SizedBox(
-                                  height: 120,
-                                  width: widthRow,
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              AppLocalizations.of(context)!
-                                                  .createTaskPage_solicitantTitle,
-                                              style:
-                                                  const TextStyle(fontSize: 14.0),
-                                            ),
-                                            const SizedBox(height: 12.0),
+                                            const SizedBox(height: 10.0),
                                             CustomTextFormField(
-                                              width: widthRow + 24,
-                                              height: 80,
+                                              useValidation: false,
+                                              width: 148,
+                                              height: 54,
+                                              fontSize: 12,
+                                              textInputType:
+                                                  TextInputType.number,
+                                              hintText: AppLocalizations.of(
+                                                      context)!
+                                                  .createTaskPage_longitudeTitle,
+                                              controller: lengthController,
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10.0),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!
+                                                  .createTaskPage_materialTitle,
+                                              style: const TextStyle(
+                                                  fontSize: 16.0),
+                                            ),
+                                            const SizedBox(height: 10.0),
+                                            CustomTextFormField(
+                                              useValidation: false,
+                                              width: 148,
+                                              height: 54,
                                               fontSize: 12,
                                               hintText: AppLocalizations.of(
                                                       context)!
-                                                  .createTaskPage_solicitantPlaceholder,
-                                              controller: applicantController,
+                                                  .createTaskPage_materialTitle,
+                                              controller: materialController,
                                             ),
                                           ],
-                                        )
-                                      ]),
-                                ),
-                                // const SizedBox(height: 8),
-                                // Cuarta columna
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .createTaskPage_selectAddressTitle,
-                                      style: const TextStyle(fontSize: 14.0),
+                                        ),
+                                      ],
                                     ),
                                   ),
                             const SizedBox(
@@ -1445,20 +1355,72 @@ class _TaskCreationScreenState extends State<TaskCreationScreen> {
                               AppLocalizations.of(context)!.images_title,
                               style: const TextStyle(fontSize: 16.0),
                             ),
-                          ),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              width: widthRow,
+                              child: Column(
+                                children: [
+                                  TaskImageGalleryModal(idTask: widget.idTask!),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              AppLocalizations.of(context)!.informe_title,
+                              style: const TextStyle(fontSize: 16.0),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              width: widthRow,
+                              child: Column(children: [
+                                InformeUploadComponent(idTask: widget.idTask!)
+                              ]),
+                            ),
+                          ],
                         ),
                       ),
-                      Visibility(
-                          visible: selectedIndex == 0,
-                          child: ScheduledComponent(
-                            isEdit: widget.detail,
-                            scheduledId: widget.idTask!,
-                          )),
-                      const Visibility(
-                          visible: kIsWeb,
-                          child: SizedBox(height: 40.0)),
-                    ],
-                  ),
+                    ),
+                    Visibility(
+                      visible: selectedIndex == 1,
+                      child: Container(
+                        height: 50.0,
+                        margin: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (widget.detail)
+                              CustomElevatedButton(
+                                messageType: MessageType.error,
+                                onPressed: handleCancel,
+                                text: AppLocalizations.of(context)!
+                                    .buttonCancelLabel,
+                              ),
+                            const SizedBox(width: 12.0),
+                            CustomElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  if (widget.detail) {
+                                    handleEditTask();
+                                  } else {
+                                    // Se quita acción de creación en Programada
+                                    if (selectedIndex == 1) {
+                                      handleSubmit();
+                                    }
+                                  }
+                                } else {
+                                  scrollToTopScrollView();
+                                }
+                              },
+                              text: widget.detail
+                                  ? AppLocalizations.of(context)!
+                                      .buttonAcceptLabel
+                                  : AppLocalizations.of(context)!
+                                      .createTaskPage_submitButton,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
