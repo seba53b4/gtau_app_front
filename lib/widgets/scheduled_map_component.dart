@@ -602,7 +602,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
                           if (kIsWeb) const SizedBox(height: 6),
                           SingleSelectDropdown(
                             onChanged: (int value) {
-                              handleZoneIconSelected(value - 1);
+                              handleZoneIconSelected(value);
                             },
                             onClose: () {
                               onCloseSingleDropDown();
