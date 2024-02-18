@@ -2,12 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
-import 'package:gtau_app_front/models/task_status.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
-import 'package:gtau_app_front/widgets/task_list.dart';
-import 'package:gtau_app_front/widgets/task_list_scheduled.dart';
 import 'package:gtau_app_front/widgets/user_list.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,20 +66,29 @@ class _UserDashboard extends State<UserDashboard>
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
         GlobalKey<ScaffoldState>();
     return SizedBox(
-        width: 120,
-        child: Scaffold(
-            key: scaffoldKeyDashboard,
-            body: Consumer<UserListViewModel>(
+      width: 120,
+      child: Scaffold(
+        key: scaffoldKeyDashboard,
+        body: BackgroundGradient(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: RadialGradient(
+                center: Alignment.center,
+                radius: 2,
+                focalRadius: 2,
+                // begin: Alignment.center,
+                // end: Alignment.centerRight,
+                colors: [dashboardBackground, dashboardBackground],
+              ),
+            ),
+            child: Consumer<UserListViewModel>(
                 builder: (context, userListViewModel, child) {
               return LoadingOverlay(
                   isLoading: userListViewModel.isLoading,
                   child: _buildTabContent(scaffoldKeyDashboard));
-              // taskFilterProvider.inspectionTypeFilter
-              //         ?.allMatches('Programada') !=
-              //     null));
             })),
-      );
-    
+      ),
+    );
   }
 
   Future<void> resetScrollPosition() async {
@@ -98,48 +105,45 @@ class _UserDashboard extends State<UserDashboard>
     }
   }
 
-  Widget _buildTabContent(
-      GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
+  Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
     switch (_currentIndex) {
       case 0:
-        return _buildTaskList(
-            'ACTIVE', _scaffoldKeyDashboard);
+        return _buildTaskList('ACTIVE', _scaffoldKeyDashboard);
       default:
         return Text(AppLocalizations.of(context)!.see_more);
     }
   }
 
   void updateUserListState(String status) async {
-      final userName = Provider.of<TaskFilterProvider>(context, listen: false)
-          .userNameFilter;
-      final userListViewModel =
-          Provider.of<UserListViewModel>(context, listen: false);
-      userListViewModel.clearListByStatus(status);
-      await userListViewModel
-          .initializeUsers(context, status, userName)
-          .catchError((error) async {
-        // Manejo de error
-        await showCustomMessageDialog(
-          context: context,
-          onAcceptPressed: () {},
-          customText: AppLocalizations.of(context)!.error_generic_text,
-          messageType: DialogMessageType.error,
-        );
-        return null;
-      });
-    
+    final userName =
+        Provider.of<TaskFilterProvider>(context, listen: false).userNameFilter;
+    final userListViewModel =
+        Provider.of<UserListViewModel>(context, listen: false);
+    userListViewModel.clearListByStatus(status);
+    await userListViewModel
+        .initializeUsers(context, status, userName)
+        .catchError((error) async {
+      // Manejo de error
+      await showCustomMessageDialog(
+        context: context,
+        onAcceptPressed: () {},
+        customText: AppLocalizations.of(context)!.error_generic_text,
+        messageType: DialogMessageType.error,
+      );
+      return null;
+    });
   }
 
-  Widget _buildTaskList(String status,
-      GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
+  Widget _buildTaskList(
+      String status, GlobalKey<ScaffoldState> _scaffoldKeyDashboard) {
     return FadeTransition(
       key: ValueKey<int>(_currentIndex),
       opacity: const AlwaysStoppedAnimation(1.0),
       child: Center(
         child: UserList(
-                status: status,
-                scaffoldKey: _scaffoldKeyDashboard,
-              ),
+          status: status,
+          scaffoldKey: _scaffoldKeyDashboard,
+        ),
       ),
     );
   }
