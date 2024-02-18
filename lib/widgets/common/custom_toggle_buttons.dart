@@ -64,7 +64,8 @@ class CustomToggleButton extends StatelessWidget {
   final double width;
   final double height;
 
-  const CustomToggleButton({super.key,
+  const CustomToggleButton({
+    super.key,
     required this.text,
     required this.index,
     required this.isSelected,
@@ -82,19 +83,18 @@ class CustomToggleButton extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: isSelected ? primarySwatch[50] : lightBackground,
+          color: isSelected ? primarySwatch[500] : primarySwatch[50],
           borderRadius: BorderRadius.circular(circularBorder),
           border: Border.all(
-            width: 4,
-            color: boxContainerBorder,
+            width: 1,
+            color: primarySwatch[100]!,
           ),
         ),
         alignment: Alignment.center,
         child: Text(
           text,
           style: TextStyle(
-            color: isSelected ? primarySwatch[900] : boxContainerBorder,
-            fontWeight: isSelected ? FontWeight.w700 : null,
+            color: lightBackground,
           ),
         ),
       ),

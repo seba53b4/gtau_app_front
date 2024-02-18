@@ -40,9 +40,8 @@ Color catchmentDefaultColor = Colors.pink;
 Color baseContainerG1 = const Color.fromRGBO(174, 213, 129, 0.25);
 Color baseContainerG2 = const Color.fromRGBO(174, 213, 129, 0.30);
 Color baseBackgroundG1 =
-    Color.fromRGBO(232, 247, 217, 0.35); // Color(0xFFe0f5d9);
-Color baseBackgroundG2 =
-    Color.fromRGBO(232, 247, 217, 0.1); //Color(0xffb9e79f);
+    Color.fromRGBO(236, 238, 212, 0.35); // Color(0xFFe0f5d9);
+Color baseBackgroundG2 = baseBackgroundG1; //Color(0xffb9e79f);
 Color nav1 = primarySwatch[300]!; //Color.fromRGBO(72, 138, 49, 1);
 Color nav2 = primarySwatch[300]!; //Color.fromRGBO(72, 138, 49, 1);
 Color dashboardBackground = Color.fromRGBO(217, 217, 217, 0.4);

@@ -30,7 +30,6 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
     super.dispose();
   }
 
-
   Future<bool> _clearPref() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.clear();
@@ -41,11 +40,10 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-              side: BorderSide(width: 6.0, color: boxContainerBorder),
-              borderRadius: const BorderRadius.all(Radius.circular(50.0))),
+          backgroundColor: lightBackground,
+          shape: const RoundedRectangleBorder(
+              side: BorderSide(width: 1.0),
+              borderRadius: BorderRadius.all(Radius.circular(24.0))),
           child: SizedBox(
             width: 700,
             height: 536,
@@ -88,19 +86,10 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
                 color: Colors.transparent,
                 child: Center(
                   child: Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
+                    width: MediaQuery.of(context).size.width,
                     height: kIsWeb
-                        ? MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.78
-                        : MediaQuery
-                        .of(context)
-                        .size
-                        .height - 72,
+                        ? MediaQuery.of(context).size.height * 0.78
+                        : MediaQuery.of(context).size.height - 72,
                     color: Colors.transparent,
                     child: _constraintBoxUserDashboard(context),
                   ),
@@ -131,10 +120,7 @@ void _showFilterModal(BuildContext context) {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(50.0))),
         child: SizedBox(
-          width: kIsWeb ? 640 : MediaQuery
-              .of(context)
-              .size
-              .width,
+          width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
           height: 600,
           child: const UserFilter(),
         ),
@@ -146,38 +132,23 @@ void _showFilterModal(BuildContext context) {
 Widget _constraintBoxUserDashboard(BuildContext context) {
   double widthDashboard = 980;
   double paddingDashboard =
-  (MediaQuery
-      .of(context)
-      .size
-      .width - widthDashboard) > 0 && kIsWeb
-      ? (MediaQuery
-      .of(context)
-      .size
-      .width - widthDashboard) / 2
-      : 0;
+      (MediaQuery.of(context).size.width - widthDashboard) > 0 && kIsWeb
+          ? (MediaQuery.of(context).size.width - widthDashboard) / 2
+          : 0;
   return BoxContainerWhite(
     decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(20),
+    ),
     margin: kIsWeb
         ? EdgeInsets.symmetric(horizontal: paddingDashboard)
         : const EdgeInsets.symmetric(horizontal: 0),
     child: ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery
-            .of(context)
-            .size
-            .width,
+        maxWidth: MediaQuery.of(context).size.width,
         maxHeight: kIsWeb
-            ? MediaQuery
-            .of(context)
-            .size
-            .height * 0.78
-            : MediaQuery
-            .of(context)
-            .size
-            .height - 164,
+            ? MediaQuery.of(context).size.height * 0.78
+            : MediaQuery.of(context).size.height - 164,
       ),
       child: const UserDashboard(),
     ),
