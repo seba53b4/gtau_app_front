@@ -14,6 +14,7 @@ import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
+import 'package:gtau_app_front/widgets/forgotpass_modal.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
@@ -166,6 +167,27 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showForgotPassModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12.0))),
+          child: SizedBox(
+            width: kIsWeb ? 400 : MediaQuery.of(context).size.width,
+            height: kIsWeb ? 300 : 306,
+            child: const ForgotPassModal(),
+          ),
+        );
+      },
+    );
+  }
+
+  void onForgotPressed(BuildContext context) {
+    _showForgotPassModal(context);
+  }
+
   void _submitForm(BuildContext context) {
     if (kIsWeb) {
       setState(() {
@@ -174,8 +196,6 @@ class _LoginScreenState extends State<LoginScreen> {
       onLogInPressed(context);
     }
   }
-
-  void onForgotPressed(BuildContext context) {}
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: SvgPicture.asset(
                           'lib/assets/tunnel_logo_final.svg',
                           width: 200,
