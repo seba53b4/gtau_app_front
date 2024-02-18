@@ -28,10 +28,12 @@ class CustomElevatedButtonLength extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomElevatedButtonLengthState createState() => _CustomElevatedButtonLengthState();
+  _CustomElevatedButtonLengthState createState() =>
+      _CustomElevatedButtonLengthState();
 }
 
-class _CustomElevatedButtonLengthState extends State<CustomElevatedButtonLength> {
+class _CustomElevatedButtonLengthState
+    extends State<CustomElevatedButtonLength> {
   bool _isLoading = false;
 
   @override
@@ -43,7 +45,7 @@ class _CustomElevatedButtonLengthState extends State<CustomElevatedButtonLength>
           colors = [primarySwatch[300]!, primarySwatch[300]!];
           break;
         case MessageType.error:
-          colors = [Colors.red[400]!, Colors.red[300]!];
+          colors = [bucketDelete, bucketDelete];
           break;
         case MessageType.warning:
           colors = [Colors.orange, Colors.orangeAccent];
