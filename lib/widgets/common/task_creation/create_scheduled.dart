@@ -1,13 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/models/scheduled/task_scheduled.dart';
 import 'package:gtau_app_front/providers/task_filters_provider.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/box_container.dart';
-import 'package:gtau_app_front/widgets/common/box_container_white.dart';
-import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
 import 'package:gtau_app_front/widgets/common/reports_components.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -351,13 +348,16 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                 Center(
                   child: Column(
                     children: [
-                      BoxContainerWhite(
-                        decoration: kIsWeb ? null : BoxDecoration(
-                              color: lightBackground,
-                              borderRadius: const BorderRadius.all(Radius.circular(0),
-                              ),
-                            ),
-                        
+                      BoxContainer(
+                        height: creatingScheduledError
+                            ? 890
+                            : creatingScheduled
+                                ? 730 + heightToAddOnCreate
+                                : widget.isEdit
+                                    ? kIsWeb
+                                        ? 808
+                                        : 847
+                                    : 706,
                         width: widthRow * 1.15,
                         padding: const EdgeInsets.all(24),
                         child: Form(
@@ -1012,7 +1012,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 12),
                               Visibility(
                                 visible: creatingScheduledError,
                                 child: Container(
@@ -1056,48 +1055,29 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                   ),
                                 ),
                               ),
-                              Visibility(
-                                visible: kIsWeb && !creatingScheduled &&
-                                    isAdmin &&
-                                    !creatingScheduledError,
-                                child: CustomElevatedButton(
-                                  onPressed: () async {
-                                    if (geojsonFromFile.isEmpty) {
-                                      setState(() {
-                                        errorFileUpload = true;
-                                      });
-                                    }
-                                    if (_formKey.currentState!.validate()) {
-                                      widget.isEdit ? handleEdit() : handleSubmit();
-                                    }
-                                  },
-                                  text: widget.isEdit
-                                      ? appLocalizations.buttonAcceptLabel
-                                      : appLocalizations.createTaskPage_submitButton,
-                                ),
-                              ),
-                              Visibility(
-                                visible: !kIsWeb && !creatingScheduled &&
-                                    isAdmin &&
-                                    !creatingScheduledError,
-                                child: CustomElevatedButtonLength(
-                                  onPressed: () async {
-                                    if (geojsonFromFile.isEmpty) {
-                                      setState(() {
-                                        errorFileUpload = true;
-                                      });
-                                    }
-                                    if (_formKey.currentState!.validate()) {
-                                      widget.isEdit ? handleEdit() : handleSubmit();
-                                    }
-                                  },
-                                  text: widget.isEdit
-                                      ? appLocalizations.buttonAcceptLabel
-                                      : appLocalizations.createTaskPage_submitButton,
-                                ),
-                              ),
                             ],
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: AppConstants.taskColumnSpace),
+                      Visibility(
+                        visible: !creatingScheduled &&
+                            isAdmin &&
+                            !creatingScheduledError,
+                        child: CustomElevatedButton(
+                          onPressed: () async {
+                            if (geojsonFromFile.isEmpty) {
+                              setState(() {
+                                errorFileUpload = true;
+                              });
+                            }
+                            if (_formKey.currentState!.validate()) {
+                              widget.isEdit ? handleEdit() : handleSubmit();
+                            }
+                          },
+                          text: widget.isEdit
+                              ? appLocalizations.buttonAcceptLabel
+                              : appLocalizations.createTaskPage_submitButton,
                         ),
                       ),
                     ],
