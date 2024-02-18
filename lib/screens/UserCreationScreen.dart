@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
@@ -15,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/app_constants.dart';
 import '../providers/selected_items_provider.dart';
+import '../utils/common_utils.dart';
 import '../widgets/common/customDialog.dart';
 import '../widgets/common/custom_dropdown.dart';
 import '../widgets/common/custom_elevated_button.dart';
@@ -126,7 +126,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
 
       return true;
     } catch (error) {
-      //print(error);
+      printOnDebug(error.toString());
       throw Exception('Error al obtener los datos');
     }
   }
@@ -135,27 +135,21 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     try {
       final response = await userListViewModel.createUser(token!, body);
       if (response) {
-        if (kDebugMode) {
-          print('Usuario ha sido creado correctamente');
-        }
+        printOnDebug('Usuario ha sido creado correctamente');
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
         await showCustomMessageDialog(
-        context: context,
-        customText: AppLocalizations.of(context)!.createuser_error_message,
-        onAcceptPressed: () {},
-        messageType: DialogMessageType.error,
+          context: context,
+          customText: AppLocalizations.of(context)!.createuser_error_message,
+          onAcceptPressed: () {},
+          messageType: DialogMessageType.error,
         );
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error.toString());
       throw Exception('Error al obtener los datos');
     }
   }
@@ -171,27 +165,24 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
           await userListViewModel.updateUser(token!, widget.idUser!, body);
 
       if (response) {
-        if (kDebugMode) {
-          print('Usuario ha sido actualizado correctamente');
-        }
+        printOnDebug('Usuario ha sido actualizado correctamente');
+
         await showMessageDialog(DialogMessageType.success);
         return true;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
+
         await showCustomMessageDialog(
-        context: context,
-        customText: AppLocalizations.of(context)!.createuser_error_message,
-        onAcceptPressed: () {},
-        messageType: DialogMessageType.error,
+          context: context,
+          customText: AppLocalizations.of(context)!.createuser_error_message,
+          onAcceptPressed: () {},
+          messageType: DialogMessageType.error,
         );
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
+
       throw Exception('Error al obtener los datos');
     }
   }
@@ -260,47 +251,19 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
     }
   }
 
-  Map<String, dynamic> createBodyToCreate() {
-    var roleFinal = '';
-    if (roleController.text ==
-        AppLocalizations.of(context)!.createUserPage_roleValueOperator) {
-      roleFinal = 'OPERADOR';
-    } else if (roleController.text ==
-        AppLocalizations.of(context)!.createUserPage_roleValueAdmin) {
-      roleFinal = 'ADMINISTRADOR';
-    }
+  Map<String, dynamic> createBody() {
     final Map<String, dynamic> requestBody = {
       "email": emailController.text,
       "firstName": firstnameController.text,
       "lastName": lastnameController.text,
       "username": usernameController.text,
-      "rol": roleFinal
-    };
-    return requestBody;
-  }
-
-  Map<String, dynamic> createBodyToUpdate() {
-    var roleFinal = '';
-    var contr = roleController.text;
-    if (roleController.text ==
-        AppLocalizations.of(context)!.createUserPage_roleValueOperator) {
-      roleFinal = 'OPERADOR';
-    } else if (roleController.text ==
-        AppLocalizations.of(context)!.createUserPage_roleValueAdmin) {
-      roleFinal = 'ADMINISTRADOR';
-    }
-    final Map<String, dynamic> requestBody = {
-      "email": emailController.text,
-      "firstName": firstnameController.text,
-      "lastName": lastnameController.text,
-      "username": usernameController.text,
-      "rol": roleFinal
+      "rol": userRole.toUpperCase()
     };
     return requestBody;
   }
 
   Future handleAcceptOnShowDialogEditUser() async {
-    Map<String, dynamic> requestBody = createBodyToUpdate();
+    Map<String, dynamic> requestBody = createBody();
     bool isUpdated = await _updateUser(requestBody);
     if (isUpdated == true) {
       reset();
@@ -309,7 +272,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
   }
 
   Future handleAcceptOnShowDialogCreateUser() async {
-    Map<String, dynamic> requestBody = createBodyToCreate();
+    Map<String, dynamic> requestBody = createBody();
     bool isUpdated = await _createUser(requestBody);
     if (isUpdated == true) {
       reset();
@@ -339,19 +302,19 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
       );
     } else {
       showCustomDialog(
-      context: context,
-      title: AppLocalizations.of(context)!.dialogWarning,
-      content: AppLocalizations.of(context)!.dialogContent,
-      onDisablePressed: () {
-        Navigator.of(context).pop();
-      },
-      onEnablePressed: () async {
-        Navigator.of(context).pop();
-        await handleAcceptOnShowDialogEditUser();
-        await updateUserListState(context);
-      },
-      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
-      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+        context: context,
+        title: AppLocalizations.of(context)!.dialogWarning,
+        content: AppLocalizations.of(context)!.dialogContent,
+        onDisablePressed: () {
+          Navigator.of(context).pop();
+        },
+        onEnablePressed: () async {
+          Navigator.of(context).pop();
+          await handleAcceptOnShowDialogEditUser();
+          await updateUserListState(context);
+        },
+        acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+        cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
       );
     }
   }
@@ -452,6 +415,7 @@ class _UserCreationScreenState extends State<UserCreationScreen> {
                                             onChanged: (String? value) {
                                               setState(() {
                                                 roleController.text = value!;
+                                                userRole = value;
                                               });
                                             },
                                           ),

@@ -71,28 +71,24 @@ class SelectedItemsProvider with ChangeNotifier {
   void setSections(Set<PolylineId>? sections) {
     if (sections != null) {
       _currentSelectedSections = sections;
-      notifyListeners();
     }
   }
 
   void setCatchments(Set<CircleId>? catchments) {
     if (catchments != null) {
       _currentSelectedCatchments = catchments;
-      notifyListeners();
     }
   }
 
   void setRegisters(Set<CircleId>? registers) {
     if (registers != null) {
       _currentSelectedRegisters = registers;
-      notifyListeners();
     }
   }
 
   void setLots(Set<PolylineId>? lots) {
     if (lots != null) {
       _currentSelectedLots = lots;
-      notifyListeners();
     }
   }
 
@@ -112,6 +108,7 @@ class SelectedItemsProvider with ChangeNotifier {
     setCatchments(catchments);
     setRegisters(registers);
     setInspectionPosition(position);
+    notifyListeners();
   }
 
   void restoreInitialValues() {

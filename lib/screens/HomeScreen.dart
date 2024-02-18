@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
 import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/common/background_gradient.dart';
-import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,15 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: BackgroundGradient(
-            child: Center(
-              child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: kIsWeb
-                      ? MediaQuery.of(context).size.height * 0.78
-                      : MediaQuery.of(context).size.height - 72,
-                  color: Colors.transparent,
-                  child: _constraintBoxTaskDashboard(context, _enteredUsername)),
-            ),
+        child: Center(
+          child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: kIsWeb
+                  ? MediaQuery.of(context).size.height * 0.78
+                  : MediaQuery.of(context).size.height - 72,
+              color: Colors.transparent,
+              child: _constraintBoxTaskDashboard(context, _enteredUsername)),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -79,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: primarySwatch[700]!,
         backgroundColor: Colors.white,
         shape: null,
-        child: const Icon(GtauIcons.tasksFilter),
+        child: const Icon(Icons.filter_alt_rounded),
       ),
     );
   }

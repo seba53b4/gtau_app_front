@@ -19,6 +19,7 @@ import '../../../models/scheduled/zone.dart';
 import '../../../models/task_status.dart';
 import '../../../providers/user_provider.dart';
 import '../../../utils/date_utils.dart';
+import '../../../utils/messagesUtils.dart';
 import '../../../viewmodels/scheduled_viewmodel.dart';
 import '../../../viewmodels/zone_load_viewmodel.dart';
 import '../../scheduled_map_component.dart';
@@ -108,7 +109,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         .fetchTaskScheduled(token, widget.scheduledId!)
         .catchError((error) async {
       // Manejo de error
-      showGenericModalError();
+      showGenericModalError(context: context);
       return null;
     });
     loadInfoFromTaskScheduledResponse(taskScheduled);
@@ -261,19 +262,6 @@ class _CreateScheduledState extends State<ScheduledComponent> {
         });
       }
     }
-  }
-
-  void showGenericModalError({Function? onAcceptPressed}) async {
-    await showCustomMessageDialog(
-      context: context,
-      onAcceptPressed: () {
-        if (onAcceptPressed != null) {
-          onAcceptPressed();
-        }
-      },
-      customText: AppLocalizations.of(context)!.error_generic_text,
-      messageType: DialogMessageType.error,
-    );
   }
 
   Future<void> manageLoadZoneProcess(

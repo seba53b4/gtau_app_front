@@ -13,8 +13,8 @@ import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../assets/font/gtauicons.dart';
+import '../utils/messagesUtils.dart';
 import '../viewmodels/user_list_viewmodel.dart';
-import '../widgets/common/customMessageDialog.dart';
 import '../widgets/common/custom_elevated_button.dart';
 import 'LoginScreen.dart';
 
@@ -48,26 +48,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final resp = await userListViewModel
         .fetchUserByUsername(token, username)
         .catchError((error) async {
-      showGenericModalError();
+      showGenericModalError(context: context);
       return null;
     });
 
     setState(() {
       userData = resp;
     });
-  }
-
-  void showGenericModalError({Function? onAcceptPressed}) async {
-    await showCustomMessageDialog(
-      context: context,
-      onAcceptPressed: () {
-        if (onAcceptPressed != null) {
-          onAcceptPressed();
-        }
-      },
-      customText: AppLocalizations.of(context)!.error_generic_text,
-      messageType: DialogMessageType.error,
-    );
   }
 
   void handleLogOutPress(BuildContext context) async {

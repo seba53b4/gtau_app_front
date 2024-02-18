@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/auth_data.dart';
 import '../models/user_info.dart';
+import '../utils/common_utils.dart';
 
 class AuthResult {
   final AuthData? authData;
@@ -24,7 +24,7 @@ class AuthService {
     return {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization':
-          "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
+      "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
     };
   }
 
@@ -49,9 +49,7 @@ class AuthService {
         return AuthResult(null, response.statusCode);
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error en fetchAuth: $error');
-      }
+      printOnDebug('Error en fetchAuth: $error');
       rethrow;
     }
   }
@@ -64,7 +62,8 @@ class AuthService {
       };
 
       String url =
-          "${dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND')}/usuarios/me";
+          "${dotenv.get(
+          'GATEWAY_API_BASE', fallback: 'NOT_FOUND')}/usuarios/me";
       final response = await http.get(
         Uri.parse(url),
         headers: headers,
@@ -77,9 +76,8 @@ class AuthService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error en getUserRole: $error');
-      }
+      printOnDebug('Error en getUserRole: $error');
+
       rethrow;
     }
   }
@@ -100,9 +98,8 @@ class AuthService {
         return AuthResult(null, response.statusCode);
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error en refreshAccessToken: $error');
-      }
+      printOnDebug('Error en refreshAccessToken: $error');
+
       rethrow;
     }
   }

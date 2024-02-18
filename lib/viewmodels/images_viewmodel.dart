@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/enums/element_type.dart';
 import '../services/images_service.dart';
+import '../utils/common_utils.dart';
 import '../widgets/photo.dart';
 
 class ImagesViewModel extends ChangeNotifier {
@@ -38,9 +39,7 @@ class ImagesViewModel extends ChangeNotifier {
         _photos = parsePhotos(responseTask);
       } else {
         _photos = [];
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
       }
 
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
@@ -51,9 +50,7 @@ class ImagesViewModel extends ChangeNotifier {
       return responseTask;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     }
   }
@@ -224,9 +221,7 @@ class ImagesViewModel extends ChangeNotifier {
 
       if (!response) {
         _error = true;
-        if (kDebugMode) {
-          print('Error al eliminar la imagen');
-        }
+        printOnDebug('Error al eliminar la imagen');
       }
 
       // Se usa Future.microtask para retrasar la llamada a notifyListeners()
@@ -238,9 +233,8 @@ class ImagesViewModel extends ChangeNotifier {
       return response;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
+
       throw Exception('Error al eliminar imagen');
     }
   }

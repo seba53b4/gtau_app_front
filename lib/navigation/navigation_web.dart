@@ -7,6 +7,7 @@ import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/MapScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
+import 'package:gtau_app_front/screens/UpdateElementsScreen.dart';
 import 'package:gtau_app_front/screens/UserDashboardScreen.dart';
 
 import '../constants/theme_constants.dart';
@@ -48,6 +49,11 @@ class _NavigationWeb extends State<NavigationWeb> {
         icon: Icon(GtauIcons.taskAdd, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
+    NavigationRailDestination navInfoUpdate = _buildCircularDestination(
+        icon: Icon(Icons.file_upload_sharp, size: iconSize * 1.45),
+        label: Text(
+            AppLocalizations.of(context)!.navigation_label_update_elements));
+
     NavigationRailDestination navListUser = _buildCircularDestination(
         icon: Icon(GtauIcons.userList, size: iconSize),
         label: Text(AppLocalizations.of(context)!.listuser_title));
@@ -64,6 +70,7 @@ class _NavigationWeb extends State<NavigationWeb> {
       optionsNav = [
         navHome,
         navAddTask,
+        navInfoUpdate,
         navListUser,
         navMap,
         navProfile,
@@ -75,6 +82,7 @@ class _NavigationWeb extends State<NavigationWeb> {
           TaskCreationScreen(
             type: '',
           ),
+          const UpdateElementsScreen(),
           const UserDashboardScreen(),
           const MapScreen(),
           const ProfileScreen(),

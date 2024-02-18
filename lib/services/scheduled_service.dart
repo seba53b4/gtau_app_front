@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/scheduled/report.dart';
 import '../models/scheduled/zone.dart';
+import '../utils/common_utils.dart';
 
 class ScheduledElements {
   List<RegisterScheduled> registers;
@@ -84,15 +85,12 @@ class ScheduledService {
           catchments: catchmentList,
         );
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in fetchTaskScheduledEntities: $error');
-      }
+      printOnDebug('Error in fetchTaskScheduledEntities: $error');
+
       rethrow;
     }
   }
@@ -112,9 +110,7 @@ class ScheduledService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener tramos: $error');
-      }
+      printOnDebug('Error al obtener tramos: $error');
       rethrow;
     }
   }
@@ -127,16 +123,15 @@ class ScheduledService {
       final response =
           await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
-        print('Tramo en programada ha sido actualizado correctamente');
+        printOnDebug('Tramo en programada ha sido actualizado correctamente');
         return true;
       } else {
-        print('Error al actualizar tramo en programada');
+        printOnDebug('Error al actualizar tramo en programada');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in updateSectionScheduledById: $error');
-      }
+      printOnDebug('Error in updateSectionScheduledById: $error');
+
       rethrow;
     }
   }
@@ -156,9 +151,7 @@ class ScheduledService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener registro en programada: $error');
-      }
+      printOnDebug('Error al obtener registro en programada: $error');
       rethrow;
     }
   }
@@ -171,16 +164,15 @@ class ScheduledService {
       final response =
           await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
-        print('Registro en programada ha sido actualizado correctamente');
+        printOnDebug(
+            'Registro en programada ha sido actualizado correctamente');
         return true;
       } else {
-        print('Error al actualizar registro en programada');
+        printOnDebug('Error al actualizar registro en programada');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in updateRegisterScheduled: $error');
-      }
+      printOnDebug('Error in updateRegisterScheduled: $error');
       rethrow;
     }
   }
@@ -200,9 +192,7 @@ class ScheduledService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener captacion en programada: $error');
-      }
+      printOnDebug('Error al obtener captacion en programada: $error');
       rethrow;
     }
   }
@@ -215,16 +205,15 @@ class ScheduledService {
       final response =
           await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
-        print('Captacion en programada ha sido actualizado correctamente');
+        printOnDebug(
+            'Captacion en programada ha sido actualizado correctamente');
         return true;
       } else {
-        print('Error al actualizar captacion en programada');
+        printOnDebug('Error al actualizar captacion en programada');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in updateCatchmentScheduled: $error');
-      }
+      printOnDebug('Error in updateCatchmentScheduled: $error');
       rethrow;
     }
   }
@@ -244,13 +233,12 @@ class ScheduledService {
           return TaskScheduled.fromJson(json: taskScheduledData);
         }).toList();
       } else {
-        print('Error getScheduledTasks re null');
+        printOnDebug('Error getScheduledTasks re null');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in getScheduledTasks: $error');
-      }
+      printOnDebug('Error in getScheduledTasks: $error');
+
       rethrow;
     }
   }
@@ -264,16 +252,16 @@ class ScheduledService {
           await http.post(url, headers: _getHeaders(token), body: jsonBody);
 
       if (response.statusCode == 201) {
-        print('Tarea ha sido creada correctamente');
+        printOnDebug('Tarea ha sido creada correctamente');
         final data = json.decode(response.body);
         return TaskScheduled.fromJson(json: data);
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error in createTask: $error');
+        printOnDebug('Error in createTask: $error');
       }
       rethrow;
     }
@@ -288,13 +276,13 @@ class ScheduledService {
         return TaskScheduled.fromJson(json: taskData);
       } else {
         if (kDebugMode) {
-          print('No se pudieron traer datos');
+          printOnDebug('No se pudieron traer datos');
         }
         return null;
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error in fetchTaskScheduled: $error');
+        printOnDebug('Error in fetchTaskScheduled: $error');
       }
       rethrow;
     }
@@ -308,15 +296,15 @@ class ScheduledService {
       final response =
           await http.put(url, headers: _getHeaders(token), body: jsonBody);
       if (response.statusCode == 200) {
-        print('Tarea ha sido actualizada correctamente');
+        printOnDebug('Tarea ha sido actualizada correctamente');
         return true;
       } else {
-        print('Error en update de tarea');
+        printOnDebug('Error en update de tarea');
         return false;
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error in updateTaskScheduled: $error');
+        printOnDebug('Error in updateTaskScheduled: $error');
       }
       rethrow;
     }
@@ -329,7 +317,7 @@ class ScheduledService {
       return response.statusCode == 204;
     } catch (error) {
       if (kDebugMode) {
-        print('Error in deleteTaskScheduled: $error');
+        printOnDebug('Error in deleteTaskScheduled: $error');
       }
       rethrow;
     }
@@ -350,7 +338,7 @@ class ScheduledService {
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error in createTask: $error');
+        printOnDebug('Error in createTask: $error');
       }
       rethrow;
     }
@@ -372,7 +360,7 @@ class ScheduledService {
       }
     } catch (error) {
       if (kDebugMode) {
-        print('Error al obtener zone: $error');
+        printOnDebug('Error al obtener zone: $error');
       }
       rethrow;
     }
@@ -393,13 +381,12 @@ class ScheduledService {
           return TaskScheduled.fromJson(json: taskScheduledData);
         }).toList();
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in searchTasksScheduled: $error');
-      }
+      printOnDebug('Error in searchTasksScheduled: $error');
+
       rethrow;
     }
   }

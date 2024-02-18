@@ -1,11 +1,13 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class ZoneWebSocketService {
+import '../utils/common_utils.dart';
+
+class WebSocketService {
   late WebSocketChannel _webSocketChannel;
   bool _isConnected = false;
 
-  ZoneWebSocketService(
+  WebSocketService(
       {required Function(dynamic) onMessage,
       required Function() onDone,
       required Function(dynamic) onError}) {
@@ -24,7 +26,7 @@ class ZoneWebSocketService {
       (event) {
         if (!_isConnected) {
           _isConnected = true;
-          print('WebSocket Connected!');
+          printOnDebug('WebSocket Connected!');
         }
         onMessage(event);
       },
@@ -57,7 +59,7 @@ class ZoneWebSocketService {
       required Function() onDone,
       required Function(dynamic) onError}) {
     if (!_isConnected) {
-      print('WebSocket connection is not fully open yet.');
+      printOnDebug('WebSocket connection is not fully open yet.');
       return;
     }
 
@@ -66,12 +68,12 @@ class ZoneWebSocketService {
         onMessage(event);
       },
       onDone: () {
-        print(
+        printOnDebug(
             'WebSocket connection closed with code: ${_webSocketChannel.closeCode}');
         onDone();
       },
       onError: (error) {
-        print('WebSocket Error: $error');
+        printOnDebug('WebSocket Error: $error');
         onError(error);
       },
       cancelOnError: true,
@@ -82,7 +84,7 @@ class ZoneWebSocketService {
     if (_isConnected) {
       _webSocketChannel.sink.add(message);
     } else {
-      print(
+      printOnDebug(
           'WebSocket connection is not fully open yet. Unable to send message.');
     }
   }

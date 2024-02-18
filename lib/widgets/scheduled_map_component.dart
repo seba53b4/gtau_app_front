@@ -17,6 +17,7 @@ import '../models/scheduled/register_scheduled.dart';
 import '../models/scheduled/zone.dart';
 import '../providers/user_provider.dart';
 import '../services/scheduled_service.dart';
+import '../utils/common_utils.dart';
 import '../utils/map_functions.dart';
 import '../viewmodels/scheduled_viewmodel.dart';
 import 'common/button_circle.dart';
@@ -142,7 +143,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
         ),
       );
     } catch (e) {
-      print(e.toString());
+      printOnDebug(e.toString());
     }
   }
 

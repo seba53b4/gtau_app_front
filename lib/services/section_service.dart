@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/enums/section_color_enum.dart';
 import '../models/section_data.dart';
+import '../utils/common_utils.dart';
 
 class SectionService {
   final String baseUrl;
@@ -38,7 +38,7 @@ class SectionService {
           Map<String, dynamic> geoJson = section['geoJSON'];
           List<dynamic> multiLineCoordinates = geoJson['coordinates'];
           String tipoTra = section['tipotra'];
-          int ogcFid = section['ogcFid'];
+          int ogcFid = (section['ogcFid'] as double).toInt();
           List<LatLng> latLngList = [];
 
           for (var coordinatesList in multiLineCoordinates) {
@@ -63,9 +63,7 @@ class SectionService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener tramos: $error');
-      }
+      printOnDebug('Error al obtener tramos: $error');
       rethrow;
     }
   }
@@ -101,9 +99,7 @@ class SectionService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener tramos: $error');
-      }
+      printOnDebug('Error al obtener tramos: $error');
       rethrow;
     }
   }

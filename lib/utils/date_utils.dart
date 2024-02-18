@@ -33,14 +33,6 @@ String parseDateTime(DateTime? dt) {
   return format.format(dt);
 }
 
-// String formattedDate(String dateString) {
-//   DateFormat inputFormat = DateFormat(formatDate);
-//   DateTime date = inputFormat.parse(dateString);
-//
-//   String formattedDate = date.toLocal().toIso8601String();
-//   return formattedDate;
-// }
-
 String formattedDate(String dateString) {
   // Define el formato de entrada de la fecha
   DateFormat inputFormat = DateFormat(formatDate);
@@ -48,16 +40,12 @@ String formattedDate(String dateString) {
   // Analiza la cadena de fecha en un objeto DateTime
   DateTime date = inputFormat.parse(dateString);
 
-  // Crea un objeto de zona horaria para Uruguay (UTC-3)
-  final uruguayTimeZone = DateTime.now().timeZoneOffset;
-  final uruguayOffset = Duration(hours: uruguayTimeZone.inHours);
-
-  // Ajusta la zona horaria a Uruguay (UTC-3)
-  DateTime uruguayDateTime = date.add(uruguayOffset);
+  // Convierte la fecha a la zona horaria local
+  DateTime localDateTime = date.toLocal();
 
   // Formatea la fecha en el formato deseado
   DateFormat outputFormat = DateFormat(formatDateBackendCompatible);
-  String formattedDateStr = outputFormat.format(uruguayDateTime);
+  String formattedDateStr = outputFormat.format(localDateTime);
   return formattedDateStr;
 }
 
