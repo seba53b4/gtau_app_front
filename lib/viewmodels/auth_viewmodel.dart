@@ -91,12 +91,13 @@ class AuthViewModel extends ChangeNotifier {
       _error = false;
       notifyListeners();
 
-      final authDataResponse = await _authService.refreshAuthData(refreshToken);
+      AuthResult? authDataResponse =
+          await _authService.refreshAuthData(refreshToken);
 
       if (authDataResponse.authData != null) {
         return authDataResponse;
       }
-      return null;
+      return authDataResponse;
     } catch (error) {
       _error = true;
       return null;
