@@ -7,6 +7,7 @@ class CustomElevatedButton extends StatefulWidget {
   final VoidCallback onPressed;
   final String text;
   final Color? backgroundColor;
+  final List<Color>? backgroundColors;
   final Color? textColor;
   final MessageType? messageType;
   final double? width;
@@ -27,6 +28,7 @@ class CustomElevatedButton extends StatefulWidget {
     this.loadingDuration = 0,
     this.showLoading = false,
     this.maxWidth,
+    this.backgroundColors,
   }) : super(key: key);
 
   @override
@@ -39,7 +41,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
   @override
   Widget build(BuildContext context) {
     List<Color> colors = [primarySwatch[900]!, primarySwatch[900]!];
-    if (widget.backgroundColor == null) {
+    if (widget.backgroundColors == null && widget.backgroundColor == null) {
       switch (widget.messageType) {
         case MessageType.success:
           colors = [primarySwatch[300]!, primarySwatch[300]!];
@@ -54,7 +56,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
           colors = [primarySwatch[300]!, primarySwatch[300]!];
       }
     } else {
-      colors = [lightBackground, lightBackground];
+      colors = widget.backgroundColors ?? [lightBackground, lightBackground];
     }
 
     return ElevatedButton(

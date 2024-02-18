@@ -262,8 +262,10 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                               ),
                               if (shapeLoadViewModel.linesError.isNotEmpty)
                                 InfoIcon(
-                                    message: appLocalizations
-                                        .info_icon_msg_file_upload),
+                                  iconColor: primarySwatch[700]!,
+                                  message: appLocalizations
+                                      .info_icon_msg_file_upload,
+                                ),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -383,6 +385,7 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                                 : appLocalizations.shape_laod_with_errors),
                             const SizedBox(width: 6),
                             InfoIcon(
+                                iconColor: primarySwatch[700]!,
                                 message:
                                     appLocalizations.shape_load_error_info),
                           ],
@@ -404,13 +407,12 @@ class _UpdateElementsScreenState extends State<UpdateElementsScreen> {
                             return Container(
                               margin: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.045),
+                                color: bucketDelete.withOpacity(0.045),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               child: ListTile(
-                                iconColor: Colors.red,
-                                leading:
-                                    const Icon(Icons.error, color: Colors.red),
+                                iconColor: bucketDelete,
+                                leading: Icon(Icons.error, color: bucketDelete),
                                 textColor: Colors.black87,
                                 title: Text(
                                   errorsLines[index],

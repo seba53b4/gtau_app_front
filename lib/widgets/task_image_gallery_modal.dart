@@ -39,6 +39,7 @@ class _TaskImageGalleryModalState extends State<TaskImageGalleryModal> {
   @override
   Widget build(BuildContext context) {
     return CustomElevatedButton(
+      backgroundColors: [primarySwatch[600]!, primarySwatch[600]!],
       onPressed: () {
         Navigator.push(
           context,

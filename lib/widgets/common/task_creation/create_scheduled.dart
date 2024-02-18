@@ -690,6 +690,7 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                               ),
                                             ),
                                             InfoIcon(
+                                                iconColor: primarySwatch[700]!,
                                                 message: appLocalizations
                                                     .info_icon_msg_file_upload),
                                           ],

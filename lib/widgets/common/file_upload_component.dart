@@ -107,6 +107,7 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
           ),
           const SizedBox(height: 8),
           CustomElevatedButton(
+            backgroundColors: [primarySwatch[700]!, primarySwatch[700]!],
             onPressed: _pickAFile,
             text: geoJsonSrc.isEmpty
                 ? AppLocalizations.of(context)!.file_upload_btn

@@ -32,7 +32,7 @@
     "default_conclusionsPlaceholder": "Ingrese conclusiones",
     "default_selectPlaceholder": "Seleccione una opción",
     "default_input_username_hint": "Nombre de Usuario",
-    "default_input_password_hint": "Constraseña",
+    "default_input_password_hint": "Contraseña",
     "default_login_button": "Ingresar",
     "default_logout_button": "Cerrar sesión",
     "default_forgot_password": "¿Olvidaste tu contraseña?",

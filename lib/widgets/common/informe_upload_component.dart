@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/informe_viewmodel.dart';
@@ -119,6 +120,7 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
               Visibility(
                 visible: informeBase64.isEmpty,
                 child: CustomElevatedButton(
+                  backgroundColors: [primarySwatch[700]!, primarySwatch[700]!],
                   onPressed: _pickAFile,
                   text: AppLocalizations.of(context)!.file_upload_btn,
                 ),
@@ -135,6 +137,10 @@ class _InformeUploadComponentState extends State<InformeUploadComponent> {
                       runSpacing: 4.0,
                       children: [
                         CustomElevatedButton(
+                          backgroundColors: [
+                            primarySwatch[700]!,
+                            primarySwatch[700]!
+                          ],
                           onPressed: () => downloadInforme(
                               informeBase64.elementAt(0)['url']),
                           text: AppLocalizations.of(context)!
