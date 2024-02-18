@@ -91,13 +91,13 @@ class _AuthCheckState extends State<AuthCheck> {
 
   void logoutSession() async {
     userStateProvider.logout();
-    await _showWrongCredentialsToast(context);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => LoginScreen()),
     );
+    await _showExpiredSessionToast(context);
   }
 
-  _showWrongCredentialsToast(BuildContext context) {
+  _showExpiredSessionToast(BuildContext context) {
     CustomToast.show(
       context,
       title: AppLocalizations.of(context)!.warning,

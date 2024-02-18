@@ -30,7 +30,7 @@ class BoxContainer extends StatelessWidget {
           BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             gradient: RadialGradient(
-              center: Alignment.center,
+              // center: Alignment.center,
               radius: 2.5,
               focalRadius: 2,
               colors: [
@@ -39,8 +39,8 @@ class BoxContainer extends StatelessWidget {
               ],
             ),
             border: Border.all(
-              color: primarySwatch[50]!,
-              width: 2.0,
+              color: lightBackground,
+              width: 4.0,
             ),
           ),
       width: width,

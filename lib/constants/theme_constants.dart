@@ -27,7 +27,7 @@ Color arrowColor = const Color.fromRGBO(247, 247, 247, 1);
 Color baseBorderColor = const Color.fromRGBO(200, 217, 184, 1);
 Color navColor = const Color.fromRGBO(200, 217, 184, 1);
 Color lightBackground = const Color.fromRGBO(253, 255, 252, 1);
-Color lightGrayBackground = Color.fromRGBO(238, 238, 238, 0.486);
+Color lightGrayBackground = const Color.fromRGBO(238, 238, 238, 0.486);
 Color redColor = const Color.fromRGBO(219, 49, 13, 1);
 Color titleColor = const Color.fromRGBO(14, 45, 9, 1);
 Color subtitleColor = Colors.black87;
@@ -39,14 +39,14 @@ Color lotDefaultColorChip = Colors.black45;
 Color catchmentDefaultColor = Colors.pink;
 Color baseContainerG1 = const Color.fromRGBO(174, 213, 129, 0.25);
 Color baseContainerG2 = const Color.fromRGBO(174, 213, 129, 0.30);
-Color baseBackgroundG1 =
-    Color.fromRGBO(236, 238, 212, 0.35); // Color(0xFFe0f5d9);
-Color baseBackgroundG2 = baseBackgroundG1; //Color(0xffb9e79f);
-Color nav1 = primarySwatch[300]!; //Color.fromRGBO(72, 138, 49, 1);
-Color nav2 = primarySwatch[300]!; //Color.fromRGBO(72, 138, 49, 1);
-Color dashboardBackground = Color.fromRGBO(217, 217, 217, 0.4);
-Color bucketDelete = redColor.withOpacity(0.95); //Colors.red.withOpacity(0.90);
+Color baseBackgroundG1 = const Color.fromRGBO(236, 238, 212, 0.35);
+Color baseBackgroundG2 = baseBackgroundG1;
+Color nav1 = primarySwatch[300]!;
+Color nav2 = primarySwatch[300]!;
+Color dashboardBackground = const Color.fromRGBO(245, 245, 245, 1);
+Color bucketDelete = redColor.withOpacity(0.95);
 Color boxContainerBorder = const Color(0xFF4f4f4f);
+Color colorAvatarSheduledItem = const Color.fromRGBO(118, 0, 99, 1);
 
 ThemeData defaultTheme = ThemeData(
   useMaterial3: false,

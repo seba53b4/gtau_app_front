@@ -42,24 +42,23 @@ class _BottomNavigationState extends State<BottomNavigation> {
           height: 72,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
+              begin: Alignment.center,
+              end: Alignment.centerRight,
               colors: [
-                lightBackground,
-                lightBackground,
+                nav1,
+                nav2,
               ],
             ),
           ),
           child: BottomNavigationBar(
               elevation: 0,
               type: BottomNavigationBarType.fixed,
-              selectedItemColor: primarySwatch[500]!,
-              unselectedIconTheme: const IconThemeData(color: Colors.black26),
-              selectedIconTheme: IconThemeData(color: primarySwatch[500]!),
+              selectedItemColor: lightBackground,
+              unselectedIconTheme: IconThemeData(color: primarySwatch[900]),
+              selectedIconTheme: IconThemeData(color: lightBackground),
               selectedLabelStyle: GoogleFonts.sora(
-                  color: primarySwatch[500]!, fontWeight: FontWeight.w500),
-              unselectedLabelStyle: GoogleFonts.sora(
-                  color: Colors.black26),
+                  color: primarySwatch[600]!, fontWeight: FontWeight.w500),
+              unselectedLabelStyle: GoogleFonts.sora(color: Colors.black26),
               backgroundColor: Colors.transparent,
               currentIndex: myCurrentIndex,
               onTap: (value) {

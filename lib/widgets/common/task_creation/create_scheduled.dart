@@ -355,11 +355,11 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                 ? 730 + heightToAddOnCreate
                                 : widget.isEdit
                                     ? kIsWeb
-                                        ? 808
-                                        : 847
+                                        ? 814
+                                        : 853
                                     : 706,
                         width: widthRow * 1.15,
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(kIsWeb ? 12 : 4),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -733,6 +733,10 @@ class _CreateScheduledState extends State<ScheduledComponent> {
                                   ),
                                   const SizedBox(height: 12),
                                   CustomElevatedButton(
+                                    backgroundColors: [
+                                      primarySwatch[700]!,
+                                      primarySwatch[700]!
+                                    ],
                                     onPressed: () async {
                                       _showMapElement(context);
                                     },
