@@ -11,12 +11,10 @@ import 'package:gtau_app_front/navigation/navigation.dart';
 import 'package:gtau_app_front/navigation/navigation_web.dart';
 import 'package:gtau_app_front/providers/user_provider.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
-import 'package:gtau_app_front/widgets/common/box_container.dart';
-import 'package:gtau_app_front/widgets/forgotpass_modal.dart';
 import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/common/box_container_white.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button_length.dart';
-
+import 'package:gtau_app_front/widgets/forgotpass_modal.dart';
 import 'package:provider/provider.dart';
 
 import '../models/enums/message_type.dart';
@@ -175,10 +173,10 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (BuildContext context) {
         return Dialog(
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(50.0))),
+              borderRadius: BorderRadius.all(Radius.circular(12.0))),
           child: SizedBox(
-            width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
-            height: kIsWeb ? 516 : MediaQuery.of(context).size.height,
+            width: kIsWeb ? 400 : MediaQuery.of(context).size.width,
+            height: kIsWeb ? 300 : 306,
             child: const ForgotPassModal(),
           ),
         );
@@ -217,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: SvgPicture.asset(
                           'lib/assets/tunnel_logo_final.svg',
                           width: 200,

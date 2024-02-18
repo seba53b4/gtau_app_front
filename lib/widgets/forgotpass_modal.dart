@@ -1,14 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:gtau_app_front/models/enums/message_type.dart';
 import 'package:gtau_app_front/viewmodels/auth_viewmodel.dart';
-import 'package:gtau_app_front/widgets/common/box_container.dart';
 import 'package:gtau_app_front/widgets/common/customDialog.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/common/custom_elevated_button.dart';
 import 'package:gtau_app_front/widgets/common/custom_text_form_field.dart';
+import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
+
+import '../constants/theme_constants.dart';
+import '../utils/common_utils.dart';
+import 'common/button_circle.dart';
 
 class ForgotPassModal extends StatefulWidget {
   const ForgotPassModal({
@@ -30,11 +33,11 @@ class _ForgotPassModalState extends State<ForgotPassModal> {
 
   Future<bool> _recoverPassword(BuildContext context) async {
     try {
-      //final response = await taskListViewModel.createTask(token!, body);
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-      final response = await authViewModel.recoverPassword(emailController.text, createBodyToChangePass());
+      final response = await authViewModel.recoverPassword(
+          emailController.text, createBodyToChangePass());
       if (response) {
-        print('Se ha enviado mail de recuperacion de cuenta');
+        printOnDebug('Se ha enviado mail de recuperacion de cuenta');
         await showCustomMessageDialog(
           context: context,
           customText: AppLocalizations.of(context)!.passwordrecovery_success,
@@ -49,11 +52,11 @@ class _ForgotPassModalState extends State<ForgotPassModal> {
           onAcceptPressed: () {},
           messageType: DialogMessageType.error,
         );
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     }
   }
@@ -84,57 +87,86 @@ class _ForgotPassModalState extends State<ForgotPassModal> {
   }
 
   Map<String, dynamic> createBodyToChangePass() {
-    final Map<String, dynamic> requestBody = {
-      "email": emailController.text
-    };
+    final Map<String, dynamic> requestBody = {"email": emailController.text};
     return requestBody;
   }
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: AppBar(
-          title: Padding(
-        padding: const EdgeInsets.only(right: 80),
-        child: Center(
-            child: Text(
-          appLocalizations.passwordrecovery_title,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: kIsWeb ? 18 : 22),
-        )),
-      )),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FittedBox(
-            fit: BoxFit.fill,
-              child: BoxContainer(
-              width: widthRow,
-              alignment: Alignment.center,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const SizedBox(height: 24.0),
-                    Column(
-                     mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                        Text(
-                          AppLocalizations.of(context)!.passwordrecovery_description,
-                          style: const TextStyle(fontSize: 16.0),
-                        ),
-                        const SizedBox(height: 18.0),
-                        CustomTextFormField(
-                          width: widthRow,
-                          hintText: AppLocalizations.of(context)!.createUserPage_emailTitle,
-                          controller: emailController,
-                        ),
-                      ],
+
+    return Consumer<AuthViewModel>(
+      builder: (context, authviewModel, child) {
+        bool isLoading = authviewModel.isLoading;
+        return LoadingOverlay(
+          isLoading: isLoading,
+          child: Container(
+            color: Colors.transparent,
+            width: MediaQuery.of(context).size.width * 0.95,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: primarySwatch[400],
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(12),
+                      topLeft: Radius.circular(12),
                     ),
-                    const SizedBox(height: 16),
+                  ),
+                  child: Row(
+                    children: [
+                      ButtonCircle(
+                        icon: Icons.close,
+                        size: 50,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      Container(
+                        width: kIsWeb ? 350 : 250,
+                        padding: const EdgeInsetsDirectional.symmetric(
+                          horizontal: kIsWeb ? 20 : 12,
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          appLocalizations.passwordrecovery_title,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: lightBackground,
+                            letterSpacing: 1,
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        appLocalizations.passwordrecovery_description,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24.0),
+                    CustomTextFormField(
+                      width: kIsWeb
+                          ? 280
+                          : MediaQuery.of(context).size.width * 0.75,
+                      hintText: appLocalizations.createUserPage_emailTitle,
+                      controller: emailController,
+                    ),
+                    const SizedBox(height: 12),
                     CustomElevatedButton(
                       onPressed: () {
                         handleSubmit();
@@ -142,14 +174,14 @@ class _ForgotPassModalState extends State<ForgotPassModal> {
                       },
                       text: appLocalizations.buttonApplyLabel,
                     ),
-                    const SizedBox(height: 24.0),
+                    const SizedBox(height: 12.0),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -24,7 +24,7 @@ class AuthService {
     return {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization':
-      "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
+          "Basic ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
     };
   }
 
@@ -66,7 +66,6 @@ class AuthService {
     try {
       Map<String, String> headersAlt = {
         'Content-Type': 'application/json',
-        'Authorization': "Bearer ${dotenv.get('API_AUTHORIZATION', fallback: 'NOT_FOUND')}",
       };
 
       final String jsonBody = jsonEncode(body);
@@ -75,20 +74,16 @@ class AuthService {
       final response =
           await http.post(Uri.parse(url), headers: headersAlt, body: jsonBody);
 
-      final codigo = response.statusCode;
-      print('code: $codigo');
-
-      if (response.statusCode == 201) {
-        print('Se ha enviado mail de recuperacion de contrasena');
+      if (response.statusCode == 200) {
+        printOnDebug('Se ha enviado mail de recuperacion de contrasena');
         return true;
       } else {
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error in recoverPassword: $error');
-      }
+      printOnDebug('Error in recoverPassword: $error');
+
       rethrow;
     }
   }
@@ -101,8 +96,7 @@ class AuthService {
       };
 
       String url =
-          "${dotenv.get(
-          'GATEWAY_API_BASE', fallback: 'NOT_FOUND')}/usuarios/me";
+          "${dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND')}/usuarios/me";
       final response = await http.get(
         Uri.parse(url),
         headers: headers,

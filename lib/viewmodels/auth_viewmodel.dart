@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gtau_app_front/services/auth_service.dart';
 
 import '../models/user_info.dart';
+import '../utils/common_utils.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -50,7 +51,7 @@ class AuthViewModel extends ChangeNotifier {
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
