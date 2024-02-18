@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/lot_data.dart';
 import '../services/lot_service.dart';
+import '../utils/common_utils.dart';
 
 class LotViewModel extends ChangeNotifier {
   final LotService _LotService = LotService();
@@ -45,7 +46,7 @@ class LotViewModel extends ChangeNotifier {
       return responseListSection;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos: $error');
     } finally {
       _isLoading = false;
@@ -67,9 +68,7 @@ class LotViewModel extends ChangeNotifier {
       return responseLot;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print('Error al obtener captaciones: $error');
-      }
+      printOnDebug('Error al obtener captaciones: $error');
       rethrow;
     } finally {
       _isLoading = false;

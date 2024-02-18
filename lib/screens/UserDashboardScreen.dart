@@ -19,7 +19,6 @@ class UserDashboardScreen extends StatefulWidget {
 
 class _UserDashboardScreen extends State<UserDashboardScreen> {
   final TextEditingController _searchController = TextEditingController();
-  String _enteredUsername = '';
   Timer? _debounce;
 
   @override
@@ -29,21 +28,6 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
     super.dispose();
   }
 
-  void _updateSearch(String value) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(seconds: 2), () {
-      setState(() {
-        _enteredUsername = value;
-      });
-    });
-  }
-
-  void _updateSearchByEnter(String value) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    setState(() {
-      _enteredUsername = value;
-    });
-  }
 
   Future<bool> _clearPref() async {
     final prefs = await SharedPreferences.getInstance();
@@ -59,7 +43,7 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
               borderRadius: BorderRadius.all(Radius.circular(50.0))),
           child: SizedBox(
             width: 700,
-            height: 516,
+            height: 536,
             child: UserCreationScreen(),
           ),
         );
@@ -98,10 +82,19 @@ class _UserDashboardScreen extends State<UserDashboardScreen> {
                 color: lightBackground,
                 child: Center(
                   child: Container(
-                    width: MediaQuery.of(context).size.width,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
                     height: kIsWeb
-                        ? MediaQuery.of(context).size.height * 0.78
-                        : MediaQuery.of(context).size.height - 72,
+                        ? MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.78
+                        : MediaQuery
+                        .of(context)
+                        .size
+                        .height - 72,
                     color: lightBackground,
                     child: _constraintBoxUserDashboard(context),
                   ),
@@ -132,7 +125,10 @@ void _showFilterModal(BuildContext context) {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(50.0))),
         child: SizedBox(
-          width: kIsWeb ? 640 : MediaQuery.of(context).size.width,
+          width: kIsWeb ? 640 : MediaQuery
+              .of(context)
+              .size
+              .width,
           height: 600,
           child: const UserFilter(),
         ),
@@ -144,19 +140,34 @@ void _showFilterModal(BuildContext context) {
 Widget _constraintBoxUserDashboard(BuildContext context) {
   double widthDashboard = 980;
   double paddingDashboard =
-      (MediaQuery.of(context).size.width - widthDashboard) > 0 && kIsWeb
-          ? (MediaQuery.of(context).size.width - widthDashboard) / 2
-          : 0;
+  (MediaQuery
+      .of(context)
+      .size
+      .width - widthDashboard) > 0 && kIsWeb
+      ? (MediaQuery
+      .of(context)
+      .size
+      .width - widthDashboard) / 2
+      : 0;
   return Container(
     margin: kIsWeb
         ? EdgeInsets.symmetric(horizontal: paddingDashboard)
         : const EdgeInsets.symmetric(horizontal: 0),
     child: ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width,
+        maxWidth: MediaQuery
+            .of(context)
+            .size
+            .width,
         maxHeight: kIsWeb
-            ? MediaQuery.of(context).size.height * 0.78
-            : MediaQuery.of(context).size.height - 164,
+            ? MediaQuery
+            .of(context)
+            .size
+            .height * 0.78
+            : MediaQuery
+            .of(context)
+            .size
+            .height - 164,
       ),
       child: const UserDashboard(),
     ),

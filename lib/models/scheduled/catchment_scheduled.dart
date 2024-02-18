@@ -6,6 +6,7 @@ import 'common.dart';
 class CatchmentScheduled extends PointDataScheduled {
   final String? tipo;
   final int? idCaptacion;
+  final bool? notFound;
   final String? catastro;
   final String? estadoConexion;
   final String? estadoLlamada;
@@ -22,6 +23,7 @@ class CatchmentScheduled extends PointDataScheduled {
   CatchmentScheduled(
       {this.tipo,
       this.idCaptacion,
+      this.notFound,
       this.catastro,
       this.estadoConexion,
       this.estadoLlamada,
@@ -41,8 +43,10 @@ class CatchmentScheduled extends PointDataScheduled {
   factory CatchmentScheduled.fromJson(
       {required Map<String, dynamic> json, bool isFetch = false}) {
     return CatchmentScheduled(
-        ogcFid: json['ogcFid'] as int?,
+        ogcFid:
+            (json['ogcFid'] is num) ? (json['ogcFid'] as num).toInt() : null,
         tipo: json['tipo'] as String?,
+        notFound: json['notFound'] as bool?,
         idCaptacion: json['idCaptacion'] as int?,
         catastro: json['catastro'] as String?,
         estadoConexion: json['estadoConexion'] as String?,
@@ -59,6 +63,9 @@ class CatchmentScheduled extends PointDataScheduled {
             : null,
         username: json['username'] as String?,
         type: PointType.catchment,
-        point: isFetch ? null : buildCircle(json, PointType.catchment));
+        point: isFetch
+            ? null
+            : buildCircle(
+                json, PointType.catchment, json['notFound'] ?? false));
   }
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,6 +7,7 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/catchment_data.dart';
+import '../utils/common_utils.dart';
 
 class CatchmentService {
   final String baseUrl;
@@ -35,6 +35,7 @@ class CatchmentService {
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
+        //print("resp catchm: " + jsonResponse.toString());
         return jsonResponse.map<Catchment>((catchment) {
           Map<String, dynamic> geoJson = catchment['geoJSON'];
           List<dynamic> coordenates = geoJson['coordinates'];
@@ -53,7 +54,7 @@ class CatchmentService {
               fillColor: Colors.black);
 
           return Catchment(
-              ogcFid: catchment['ogcFid'],
+              ogcFid: (catchment['ogcFid'] as double).toInt(),
               tipo: catchment['tipo'],
               tipoboca: catchment['tipBoca'],
               point: circle);
@@ -62,9 +63,7 @@ class CatchmentService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener captaciones: $error');
-      }
+      printOnDebug('Error al obtener captaciones: $error');
       rethrow;
     }
   }
@@ -102,9 +101,7 @@ class CatchmentService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener registros: $error');
-      }
+      printOnDebug('Error al obtener registros: $error');
       rethrow;
     }
   }

@@ -61,8 +61,7 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
     int actualPage = prefs.getInt("actual_page") ?? 0;
-    
-    if (newTasksLength == (value * actualPage) - actualPage) {
+    if (newTasksLength == (value * actualPage) - 1) {
       nextPage = true;
     }
   }
@@ -72,8 +71,7 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
     final SharedPreferences prefs = await _prefs;
     int value = prefs.getInt("tasks_length") ?? 0;
     int actualPage = prefs.getInt("actual_page") ?? 0;
-    
-    if (newTasksLength == (value * actualPage) - actualPage) {
+    if (newTasksLength == value - 1) {
       return false;
     }
     return true;
@@ -157,7 +155,7 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                   var position = snapshot.data?[0] as double;
                   var isFiltered = snapshot.data?[1] ?? false;
                   var actualPage = snapshot.data?[3] as int;
-                  var isLoading = snapshot.data?[4] as bool;
+                  //var isLoading = snapshot.data?[4] as bool;
                   return Consumer<TaskListScheduledViewModel>(
                     builder: (context, taskListScheduledViewModel, child) {
                       var tasks =
@@ -170,24 +168,26 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                           ScrollController(initialScrollOffset: position);
                       controller.addListener(_ScrollPosition);
                       controller.addListener(() {
-                        if ((controller.position.maxScrollExtent ==
-                                controller.offset) &&
-                            tasks!.length % taskListSize! == 0 &&
-                            nextPage) {
-                          if (isFiltered == true) {
-                            setState(() {
-                               final encodedBodyFiltered =
-                                   snapshot.data?[2] as String;
-                               updateTaskListFilteredState(
-                                   context, encodedBodyFiltered);
-                            });
-                          } else {
-                            setState(() {
-                              updateTaskListState(context);
-                            });
-                          }
+                        if(controller.hasClients == true){
+                          if ((controller.position.maxScrollExtent ==
+                                  controller.offset) &&
+                              tasks!.length % taskListSize! == 0 &&
+                              nextPage) {
+                            if (isFiltered == true) {
+                              setState(() {
+                                final encodedBodyFiltered =
+                                    snapshot.data?[2] as String;
+                                updateTaskListFilteredState(
+                                    context, encodedBodyFiltered);
+                              });
+                            } else {
+                              setState(() {
+                                updateTaskListState(context);
+                              });
+                            }
 
-                          _SetActualTasksLength(tasksLength);
+                            _SetActualTasksLength(tasksLength);
+                          }
                         }
                       });
                       return Column(
@@ -195,6 +195,7 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                           Expanded(
                             child: ListView.builder(
                               controller: controller,
+                              shrinkWrap: true,
                               padding: const EdgeInsets.all(8),
                               itemCount: tasksLength,
                               itemBuilder: (context, index) {
@@ -206,7 +207,7 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                 } else {
                                   if (tasksLength == 1) {
                                     return Visibility(
-                                      visible: !isLoading,
+                                      visible: true,
                                       child: Padding(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 15),
@@ -266,10 +267,31 @@ class _TaskListScheduledComponentState extends State<TaskListScheduled> {
                                                     )));
                                               } else {
                                                 _SetFilteredValue(false);
-                                                return const Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 0));
+                                                return Visibility(
+                                                  visible: !isLoadingNow,
+                                                  child:Padding(
+                                                    padding: const EdgeInsets.symmetric(
+                                                        vertical: 5),
+                                                    child: Center(
+                                                        child:
+                                                            Column(children: <Widget>[
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                                vertical: 10),
+                                                        child: SvgPicture.asset(
+                                                            'lib/assets/taskslist_empty.svg',
+                                                            width: 50,
+                                                            height: 50),
+                                                      ),
+                                                      Text(
+                                                          AppLocalizations.of(context)!
+                                                              .no_more_tasks_found,
+                                                          style: TextStyle(
+                                                              color: Colors.black
+                                                                  .withOpacity(0.6),
+                                                              fontSize: 15)),
+                                                    ]))));
                                               }
                                             } else {
                                               return const LoadingWidget();

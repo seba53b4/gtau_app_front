@@ -15,10 +15,14 @@ import 'package:gtau_app_front/widgets/common/top_status_scheduled.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
+import '../../models/enums/element_type.dart';
+import '../../models/scheduled/element_found.dart';
 import '../../providers/user_provider.dart';
+import '../../utils/common_utils.dart';
 import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
 import '../loading_overlay.dart';
+import '../scheduled_image_gallery_modal.dart';
 import 'chip_registered_element.dart';
 import 'container_scheduled_info.dart';
 import 'customDialog.dart';
@@ -69,6 +73,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   late String token;
   late ScheduledViewModel? scheduledViewModel;
   late UserProvider userStateProvider;
+  String elementFound = FoundStatusType.Found.toLabel();
 
   @override
   void initState() {
@@ -94,7 +99,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadSectionInfo();
+    _loadRegisterInfo();
   }
 
   @override
@@ -112,7 +117,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
     super.dispose();
   }
 
-  void _loadSectionInfo() async {
+  void _loadRegisterInfo() async {
     RegisterScheduled? registerScheduledResponse =
         await scheduledViewModel?.fetchRegisterScheduledById(
             token, widget.scheduledId, widget.registerId);
@@ -128,6 +133,10 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
   void _loadInfoFromResponse(RegisterScheduled registerScheduled) {
     _typeController.text = registerScheduled.tipoPto ?? '';
     _cotaController.text = registerScheduled.cotaTapa ?? '';
+    setState(() {
+      elementFound =
+          parseElementFoundLabel(registerScheduled.notFound ?? false);
+    });
     if (registerScheduled.inspectioned) {
       _depthController.text = registerScheduled.profundidad ?? '';
       aperture = registerScheduled.apertura ??
@@ -156,6 +165,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
     final Map<String, dynamic> requestBody = {
       "tipo": _typeController.text,
       "tipoPavimento": paviment,
+      "notFound": isElementNotFound(elementFound) ?? false,
       "estadoRegistro": registerStatus,
       "cotaTapa": _cotaController.text,
       "profundidad": _depthController.text,
@@ -179,7 +189,7 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
 
       showMessageOnScreen(result);
     } catch (error) {
-      print("Error: $error");
+      printOnDebug("Error: $error");
       showMessageErrorOnFetch();
     }
   }
@@ -302,6 +312,24 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                                   DateTime.now(),
                         ),
                       ),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_element_found),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: elementFound,
+                            items: [
+                              FoundStatusType.Found.toLabel(),
+                              FoundStatusType.NotFound.toLabel()
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                elementFound = str;
+                              });
+                            }),
+                        const SizedBox(height: 8)
+                      ]),
                       ContainerBottomDivider(children: [
                         ScheduledFormTitle(
                             titleText: AppLocalizations.of(context)!
@@ -457,6 +485,26 @@ class _ScheduledFormRegisterState extends State<ScheduledFormRegister> {
                           },
                         ),
                       ]),
+                      const SizedBox(height: 10.0),
+                      ContainerBottomDivider(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.images_title,
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                ScheduledImageGalleryModal(
+                                    scheduledId: widget.scheduledId,
+                                    elementId: widget.registerId,
+                                    elementType: ElementType.register),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       // Estado de la tapa - END
                       const SizedBox(height: 10.0),
                       ScheduledFormTitle(

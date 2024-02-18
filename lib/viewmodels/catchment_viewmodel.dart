@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/catchment_data.dart';
 import '../services/catchment_service.dart';
+import '../utils/common_utils.dart';
 
 class CatchmentViewModel extends ChangeNotifier {
   final CatchmentService _catchmentService = CatchmentService();
@@ -45,7 +46,7 @@ class CatchmentViewModel extends ChangeNotifier {
       return responseListSection;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos: $error');
     } finally {
       _isLoading = false;
@@ -68,9 +69,7 @@ class CatchmentViewModel extends ChangeNotifier {
       return responseCatchment;
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print('Error al obtener captaciones: $error');
-      }
+      printOnDebug('Error al obtener captaciones: $error');
       rethrow;
     } finally {
       _isLoading = false;

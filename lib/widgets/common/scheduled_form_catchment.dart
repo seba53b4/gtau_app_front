@@ -10,12 +10,16 @@ import 'package:gtau_app_front/widgets/common/top_status_scheduled.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
+import '../../models/enums/element_type.dart';
 import '../../models/enums/message_type.dart';
+import '../../models/scheduled/element_found.dart';
 import '../../providers/user_provider.dart';
+import '../../utils/common_utils.dart';
 import '../../utils/date_utils.dart';
 import '../../utils/element_functions.dart';
 import '../../viewmodels/scheduled_viewmodel.dart';
 import '../loading_overlay.dart';
+import '../scheduled_image_gallery_modal.dart';
 import 'chip_registered_element.dart';
 import 'container_divider.dart';
 import 'container_scheduled_info.dart';
@@ -72,6 +76,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
   String? catchmentSlab = null;
   String? catchmentPartition = null;
   String? catchmentDeposit = null;
+  String elementFound = FoundStatusType.Found.toLabel();
 
   @override
   void initState() {
@@ -97,7 +102,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _loadSectionInfo();
+    _loadCatchmentInfo();
   }
 
   @override
@@ -115,7 +120,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
     super.dispose();
   }
 
-  void _loadSectionInfo() async {
+  void _loadCatchmentInfo() async {
     CatchmentScheduled? catchmentScheduledResponse =
         await scheduledViewModel?.fetchCatchmentScheduledById(
             token, widget.scheduledId, widget.catchmentId);
@@ -130,6 +135,10 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
 
   void _loadInfoFromResponse(CatchmentScheduled catchmentScheduled) {
     _typeController.text = catchmentScheduled.tipo ?? '';
+    setState(() {
+      elementFound =
+          parseElementFoundLabel(catchmentScheduled.notFound ?? false);
+    });
     if (catchmentScheduled.inspectioned) {
       setState(() {
         cadastre = catchmentScheduled.catastro ??
@@ -164,6 +173,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
     final Map<String, dynamic> requestBody = {
       "tipo": _typeController.text,
       "catastro": cadastre,
+      "notFound": isElementNotFound(elementFound) ?? false,
       "estadoConexion": catchmentConn,
       "estadoLlamada": catchmentCallStatus,
       "estadoLosa": catchmentSlab,
@@ -190,7 +200,7 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
 
       showMessageOnScreen(result);
     } catch (error) {
-      print("Error: $error");
+      printOnDebug("Error: $error");
       showMessageErrorOnFetch();
     }
   }
@@ -313,6 +323,24 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                                   DateTime.now(),
                         ),
                       ),
+                      ContainerBottomDivider(children: [
+                        ScheduledFormTitle(
+                            titleText: AppLocalizations.of(context)!
+                                .form_scheduled_element_found),
+                        CustomDropdown(
+                            fontSize: 12,
+                            value: elementFound,
+                            items: [
+                              FoundStatusType.Found.toLabel(),
+                              FoundStatusType.NotFound.toLabel()
+                            ],
+                            onChanged: (str) {
+                              setState(() {
+                                elementFound = str;
+                              });
+                            }),
+                        const SizedBox(height: 8)
+                      ]),
                       ContainerBottomDivider(children: [
                         ScheduledFormTitle(
                             titleText: AppLocalizations.of(context)!
@@ -520,6 +548,26 @@ class _ScheduledFormCatchment extends State<ScheduledFormCatchment> {
                           },
                         ),
                       ]),
+                      const SizedBox(height: 10.0),
+                      ContainerBottomDivider(
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.images_title,
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                ScheduledImageGalleryModal(
+                                    scheduledId: widget.scheduledId,
+                                    elementId: widget.catchmentId,
+                                    elementType: ElementType.catchment),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       // Estado de la tapa - END
                       const SizedBox(height: 10.0),
                       ScheduledFormTitle(

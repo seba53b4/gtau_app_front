@@ -71,10 +71,10 @@ class _UserDashboard extends State<UserDashboard>
         width: 120,
         child: Scaffold(
             key: scaffoldKeyDashboard,
-            body: Consumer<TaskListViewModel>(
-                builder: (context, taskListViewModel, child) {
+            body: Consumer<UserListViewModel>(
+                builder: (context, userListViewModel, child) {
               return LoadingOverlay(
-                  isLoading: taskListViewModel.isLoading,
+                  isLoading: userListViewModel.isLoading,
                   child: _buildTabContent(scaffoldKeyDashboard));
               // taskFilterProvider.inspectionTypeFilter
               //         ?.allMatches('Programada') !=

@@ -12,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   final double? width;
   final FocusNode? focusNode;
   final bool? readOnly;
+  final Function(String)? onSubmitted;
 
   CustomTextField({
     required this.controller,
@@ -24,6 +25,7 @@ class CustomTextField extends StatelessWidget {
     this.width,
     this.focusNode,
     this.readOnly,
+    this.onSubmitted,
   });
 
   @override
@@ -47,7 +49,7 @@ class CustomTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderSide:
-                  const BorderSide(color: Color.fromRGBO(96, 166, 27, 1)),
+              const BorderSide(color: Color.fromRGBO(96, 166, 27, 1)),
               borderRadius: BorderRadius.circular(24.0),
             ),
             errorBorder: OutlineInputBorder(
@@ -62,6 +64,7 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
+        onSubmitted: onSubmitted,
       ),
     );
   }

@@ -241,7 +241,7 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
             token = userProvider.getToken ?? '';
             _loadFromStorage();
             return Center(
-              child: isScheduled
+              child: taskFilterProvider.isScheduled!
                   ? TaskListScheduled(
                       status: status,
                       scaffoldKey: _scaffoldKeyDashboard,
@@ -262,8 +262,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         child: Text(
           text,
           style: TextStyle(
-            fontSize: kIsWeb ? 20 : 13,
+            fontSize: kIsWeb ? 20 : 10,
             color: isSelected ? Colors.white : Colors.white60,
+            fontWeight: kIsWeb ? null : FontWeight.w500,
             height: 1.0,
           ),
         ),

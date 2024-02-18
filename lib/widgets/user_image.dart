@@ -13,6 +13,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../utils/common_utils.dart';
+
 class UserImage extends StatefulWidget {
   final Function(List<ImageDataDTO> files) onFileChanged;
   int? idTask = 0;
@@ -205,9 +207,9 @@ class _UserImageState extends State<UserImage> {
       }
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
-      print('Error al seleccionar la imagen: $e');
+      printOnDebug('Error al seleccionar la imagen: $e');
     } catch (error) {
-      print('Error inesperado: $error');
+      printOnDebug('Error inesperado: $error');
     }
   }
 

@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/scheduled/task_scheduled.dart';
 import '../services/scheduled_service.dart';
+import '../utils/common_utils.dart';
 
 class TaskListScheduledViewModel extends ChangeNotifier {
   final ScheduledService _scheduledService = ScheduledService();
@@ -78,7 +81,7 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos fetchScheduledTasks');
     } finally {
       _isLoading = false;
@@ -105,10 +108,39 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<List<TaskScheduled>?> fetchTasksFromFilters(
+      String token, String status, Map<String, dynamic> body) async {
+    try {
+      _isLoading = true;
+      _SetIsLoadingPrefValue(true);
+      _error = false;
+      notifyListeners();
+      String encodedMap = json.encode(body);
+      _SetBodyPrefValue(encodedMap);
+
+      final responseListTask = await _scheduledService.searchTasksScheduled(
+          token!, body, page, size);
+
+      _tasks[status] = responseListTask!;
+
+      return responseListTask;
+    } catch (error) {
+      _error = true;
+      _SetIsLoadingPrefValue(false);
+      printOnDebug(error);
+      throw Exception('Error al obtener los datos');
+    } finally {
+      _isLoading = false;
+      _SetIsLoadingPrefValue(false);
+      page++;
       notifyListeners();
     }
   }
@@ -118,11 +150,10 @@ class TaskListScheduledViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      /*Map<String,dynamic> body = json.decode(encodedBody);*/
+      Map<String, dynamic> body = json.decode(encodedBody);
 
-      //Se esta esperando que se implemente el search scheduled en el backend
       final responseListTask =
-          await _scheduledService.getScheduledTasks(token, page, size, status);
+          await _scheduledService.searchTasksScheduled(token, body, page, size);
 
       _tasks[status]?.addAll(responseListTask!);
       final size_list = responseListTask?.length ?? 0;
@@ -134,7 +165,7 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -155,12 +186,12 @@ class TaskListScheduledViewModel extends ChangeNotifier {
         return response;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return null;
       }
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error createScheduledTask');
     } finally {
       _isLoading = false;
@@ -178,17 +209,14 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       if (responseTask != null) {
         return responseTask;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
         _error = true;
         return null;
       }
     } catch (error) {
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
+
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -205,12 +233,12 @@ class TaskListScheduledViewModel extends ChangeNotifier {
       final response =
           await _scheduledService.updateTaskScheduled(token, scheduledId, body);
       if (response) {
-        print('Tarea ha sido actualizada correctamente');
+        printOnDebug('Tarea ha sido actualizada correctamente');
         notifyListeners();
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {

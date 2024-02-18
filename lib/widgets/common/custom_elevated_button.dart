@@ -10,6 +10,7 @@ class CustomElevatedButton extends StatefulWidget {
   final Color? textColor;
   final MessageType? messageType;
   final double? width;
+  final double? maxWidth;
   final double? height;
   final int loadingDuration;
   final bool showLoading;
@@ -25,6 +26,7 @@ class CustomElevatedButton extends StatefulWidget {
     this.height,
     this.loadingDuration = 0,
     this.showLoading = false,
+    this.maxWidth,
   }) : super(key: key);
 
   @override
@@ -52,12 +54,12 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
           colors = [primarySwatch[300]!, primarySwatch[100]!];
       }
     } else {
-      colors = [Colors.grey, Colors.grey[400]!];
+      colors = [lightBackground, lightBackground];
     }
 
     return ElevatedButton(
       onPressed:
-          _isLoading || widget.showLoading ? null : () => _handleButtonPress(),
+      _isLoading || widget.showLoading ? null : () => _handleButtonPress(),
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24.0),
@@ -77,24 +79,24 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
           constraints: BoxConstraints(
               minHeight: widget.height ?? 32,
               minWidth: widget.width ?? 78,
-              maxWidth: 96,
+              maxWidth: widget.maxWidth ?? 96,
               maxHeight: 42),
           padding: const EdgeInsets.all(4),
           child: _isLoading || widget.showLoading
               ? Center(
-                  child: LoadingAnimationWidget.waveDots(
-                    color: lightBackground,
-                    size: 32,
-                  ),
-                )
+            child: LoadingAnimationWidget.waveDots(
+              color: lightBackground,
+              size: 32,
+            ),
+          )
               : Center(
-                  child: Text(
-                    widget.text,
-                    style: TextStyle(
-                      color: widget.textColor ?? Colors.white,
-                    ),
-                  ),
-                ),
+            child: Text(
+              widget.text,
+              style: TextStyle(
+                color: widget.textColor ?? Colors.white,
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -9,6 +9,7 @@ import 'package:gtau_app_front/viewmodels/user_list_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
 
@@ -38,7 +39,7 @@ class UserListItem extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(50.0))),
           child: SizedBox(
             width: 700,
-            height: 516,
+            height: 536,
             child: UserCreationScreen(
               detail: true,
               idUser: user!.getId,
@@ -136,11 +137,13 @@ class UserListItem extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appLocalizations.list_item_firstname + user!.getFirstname!,
+                                appLocalizations.list_item_firstname +
+                                    user!.getFirstname!,
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                               Text(
-                                appLocalizations.list_item_lastname + user!.getLastname!,
+                                appLocalizations.list_item_lastname +
+                                    user!.getLastname!,
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                             ],
@@ -201,14 +204,14 @@ class UserListItem extends StatelessWidget {
         bool result = await _deleteUser(context, user!.id!);
 
         if (result) {
-          print('Usuario ha sido eliminado correctamente');
+          printOnDebug('Usuario ha sido eliminado correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          print('No se pudo eliminar el usuario');
+          printOnDebug('No se pudo eliminar el usuario');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,

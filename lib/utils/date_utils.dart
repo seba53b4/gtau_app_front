@@ -11,6 +11,12 @@ String parseDateTimeOnFormat(DateTime dt) {
   return DateFormat(formatDate).format(dt);
 }
 
+String formatDateTime(DateTime dt, String formatDate) {
+  // Formatea el DateTime en la cadena de fecha y hora deseada
+  DateFormat format = DateFormat(formatDate);
+  return format.format(dt);
+}
+
 String parseDateTimeOnFormatHour(DateTime? dt) {
   if (dt == null) {
     return "";
@@ -28,11 +34,19 @@ String parseDateTime(DateTime? dt) {
 }
 
 String formattedDate(String dateString) {
+  // Define el formato de entrada de la fecha
   DateFormat inputFormat = DateFormat(formatDate);
+
+  // Analiza la cadena de fecha en un objeto DateTime
   DateTime date = inputFormat.parse(dateString);
 
-  String formattedDate = date.toUtc().toIso8601String();
-  return formattedDate;
+  // Convierte la fecha a la zona horaria local
+  DateTime localDateTime = date.toLocal();
+
+  // Formatea la fecha en el formato deseado
+  DateFormat outputFormat = DateFormat(formatDateBackendCompatible);
+  String formattedDateStr = outputFormat.format(localDateTime);
+  return formattedDateStr;
 }
 
 String getCurrentHour() {

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,6 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _enteredUsername = '';
   Timer? _debounce;
+  bool isSwitched = false;
+  late TaskListViewModel taskListViewModel;
+  late TaskListScheduledViewModel taskListScheduledViewModel;
 
   @override
   void dispose() {
@@ -51,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     _clearPref();
+
     return Scaffold(
       body: Container(
         color: lightBackground,
@@ -69,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _showFilterModal(context);
         },
         foregroundColor: null,
-        backgroundColor: null,
+        backgroundColor: primarySwatch[200]!,
         shape: null,
         child: const Icon(Icons.filter_alt_rounded),
       ),

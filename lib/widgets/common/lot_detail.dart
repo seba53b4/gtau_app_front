@@ -37,7 +37,7 @@ class LotDetail extends StatelessWidget {
                 "categoria", (lotDetail?.categoria ?? DEFAULT).toString()),
             buildInfoRow("subCategoria",
                 (lotDetail?.subCategoria ?? DEFAULT).toString()),
-            buildInfoRow(
+            buildInfoMultiRow(
                 "areaDifer", (lotDetail?.areaDifer ?? DEFAULT).toString()),
             buildInfoRow(
                 "cortado_rn", (lotDetail?.cortado_rn ?? DEFAULT).toString()),

@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import '../constants/theme_constants.dart';
 import '../models/lot_data.dart';
+import '../utils/common_utils.dart';
 
 class LotService {
   final String baseUrl;
@@ -37,16 +37,16 @@ class LotService {
         return jsonResponse.map<Lot>((lot) {
           Map<String, dynamic> geoJson = lot['geoJSON'];
           List<dynamic> multiLineCoordinatesWrapper = geoJson['coordinates'];
-          int ogcFid = lot['ogcFid'];
+          int ogcFid = (lot['ogcFid'] as double).toInt();
           List<LatLng> latLngList = [];
 
-          List<dynamic> multiLineCoordinates =
-              multiLineCoordinatesWrapper.first;
-          for (var coordinatesList in multiLineCoordinates) {
-            for (var coord in coordinatesList) {
-              double latitude = coord[1];
-              double longitude = coord[0];
-              latLngList.add(LatLng(latitude, longitude));
+          for (var polygonCoordinates in multiLineCoordinatesWrapper) {
+            for (var coordinatesList in polygonCoordinates) {
+              for (var coord in coordinatesList) {
+                double latitude = coord[1];
+                double longitude = coord[0];
+                latLngList.add(LatLng(latitude, longitude));
+              }
             }
           }
 
@@ -63,9 +63,7 @@ class LotService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener captaciones: $error');
-      }
+      printOnDebug('Error al obtener captaciones: $error');
       rethrow;
     }
   }
@@ -110,9 +108,7 @@ class LotService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener parcelas: $error');
-      }
+      printOnDebug('Error al obtener parcelas: $error');
       rethrow;
     }
   }

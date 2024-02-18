@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +17,7 @@ import '../models/scheduled/register_scheduled.dart';
 import '../models/scheduled/zone.dart';
 import '../providers/user_provider.dart';
 import '../services/scheduled_service.dart';
+import '../utils/common_utils.dart';
 import '../utils/map_functions.dart';
 import '../viewmodels/scheduled_viewmodel.dart';
 import 'common/button_circle.dart';
@@ -43,7 +43,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     with TickerProviderStateMixin {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
-  MapType _currentMapType = MapType.satellite;
+  MapType _currentMapType = MapType.hybrid;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   Set<Circle> circles = {};
@@ -80,7 +80,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     _mapController = Completer<GoogleMapController>();
     selectedItemsProvider = context.read<SelectedItemsProvider>();
     scheduledViewModel = context.read<ScheduledViewModel>();
-    token = context.read<UserProvider>().getToken!;
+    token = context
+        .read<UserProvider>()
+        .getToken!;
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 5),
@@ -93,7 +95,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    mapInit = MediaQuery.of(context).size.width;
+    mapInit = MediaQuery
+        .of(context)
+        .size
+        .width;
     setState(() {
       mapWidth = mapInit;
     });
@@ -138,26 +143,26 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
         ),
       );
     } catch (e) {
-      print(e.toString());
+      printOnDebug(e.toString());
     }
   }
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
     double? latitude, longitude;
-    int radio = 200;
+    int? radio = kIsWeb ? null : 200;
     if (!kIsWeb) {
-      latitude = location?.latitude;
-      longitude = location?.longitude;
+      latitude = location?.latitude ?? initLocation.latitude;
+      longitude = location?.longitude ?? initLocation.latitude;
     }
     ScheduledElements? entities = await scheduledViewModel
         .fetchScheduledElements(
-            token: token,
-            scheduledId: widget.idSheduled!,
-            originLatitude: latitude,
-            originLongitude: longitude,
-            radiusMeters: radio,
-            subzone:
-                widget.scheduledZone!.subZones!.elementAt(selectedSubZone).id!)
+        token: token,
+        scheduledId: widget.idSheduled!,
+        originLatitude: latitude,
+        originLongitude: longitude,
+        radiusMeters: radio,
+        subzone:
+        widget.scheduledZone!.subZones!.elementAt(selectedSubZone).id!)
         .catchError((error) async {
       // Manejo de error
       await showCustomMessageDialog(
@@ -181,29 +186,43 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
         section.line!.polylineId, ElementType.section)) {
       return selectedColor;
     }
-    return section.inspectioned
-        ? scheduledInspectionedElement
-        : scheduledNotInspectionedElement;
+    if (section.notFound ?? false) {
+      return scheduledNotFoundElement;
+    } else {
+      return section.inspectioned
+          ? scheduledInspectionedElement
+          : scheduledNotInspectionedElement;
+    }
   }
 
   Color _onColorParamBehaviorCatchment(CatchmentScheduled catchment) {
-    return _commonColorBehaviorOnCircle(catchment.point!.circleId,
-        catchment.inspectioned, ElementType.catchment);
+    return _commonColorBehaviorOnCircle(
+        catchment.point!.circleId,
+        catchment.inspectioned,
+        catchment.notFound ?? false,
+        ElementType.catchment);
   }
 
   Color _onColorParamBehaviorRegister(RegisterScheduled register) {
     return _commonColorBehaviorOnCircle(
-        register.point!.circleId, register.inspectioned, ElementType.register);
+        register.point!.circleId,
+        register.inspectioned,
+        register.notFound ?? false,
+        ElementType.register);
   }
 
-  Color _commonColorBehaviorOnCircle(
-      CircleId circleId, bool inspectioned, ElementType type) {
+  Color _commonColorBehaviorOnCircle(CircleId circleId, bool inspectioned,
+      bool notFound, ElementType type) {
     if (selectedItemsProvider.isCircleSelected(circleId, type)) {
       return selectedColor;
     }
-    return inspectioned
-        ? scheduledInspectionedElement
-        : scheduledNotInspectionedElement;
+    if (notFound) {
+      return scheduledNotFoundElement;
+    } else {
+      return inspectioned
+          ? scheduledInspectionedElement
+          : scheduledNotInspectionedElement;
+    }
   }
 
   void _onTapParamBehaviorPolyline(int ogcFid, Polyline? line) async {
@@ -228,8 +247,8 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     }
   }
 
-  void _onTapParamBehaviorCircle(
-      int ogcFid, Circle? point, ElementType type) async {
+  void _onTapParamBehaviorCircle(int ogcFid, Circle? point,
+      ElementType type) async {
     if (selectedItemsProvider.isCircleSelected(point!.circleId, type)) {
       selectedItemsProvider.toggleCircleSelected(point.circleId, type);
       openFormElementWeb(false);
@@ -291,10 +310,9 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     );
   }
 
-  Future<void> updateElementsOnMap(
-      {bool isCache = true,
-      bool isNewLocation = false,
-      ScheduledElements? scheduledElements}) async {
+  Future<void> updateElementsOnMap({bool isCache = true,
+    bool isNewLocation = false,
+    ScheduledElements? scheduledElements}) async {
     List<SectionScheduled>? sections;
     List<RegisterScheduled>? registers;
     List<CatchmentScheduled>? catchments;
@@ -454,231 +472,242 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
 
     return Consumer<ScheduledViewModel>(
         builder: (context, scheduledViewModel, child) {
-      bool isLoading = scheduledViewModel.isLoading;
-      return Scaffold(
-        body: Row(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  AnimatedContainer(
-                    duration: _animationController.duration ??
-                        const Duration(milliseconds: 100),
-                    width: viewDetailElementInfo
-                        ? mapWidth - modalWidth
-                        : mapWidth,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: GoogleMap(
-                        mapType: _currentMapType,
-                        initialCameraPosition: CameraPosition(
-                          target: initLocation,
-                          zoom: zoomMap,
-                        ),
-                        onCameraMove: (CameraPosition cameraPosition) {
-                          setState(() {
-                            zoomMap = cameraPosition.zoom;
-                          });
-                        },
-                        circles: circles,
-                        polylines: polylines,
-                        markers: markers,
-                        onMapCreated: (GoogleMapController controller) {
-                          if (location != null &&
-                              _mapController.isCompleted &&
-                              !(false)) {
-                            controller.moveCamera(
-                                CameraUpdate.newLatLngZoom(location!, zoomMap));
-                          }
-                          if (!_mapController.isCompleted) {
-                            _mapController.complete(controller);
-                          }
-                        },
-                        onTap: (LatLng latLng) {},
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: kIsWeb ? 0 : null,
-                    left: MediaQuery.of(context).size.width / 2 -
-                        (kIsWeb ? 180 : 100),
-                    bottom: kIsWeb ? null : 0,
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                      child: Container(
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.8),
-                          borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(kIsWeb ? 24.0 : 0.0),
-                              bottomRight: Radius.circular(kIsWeb ? 24.0 : 0.0),
-                              topLeft: Radius.circular(!kIsWeb ? 24.0 : 0.0),
-                              topRight: Radius.circular(!kIsWeb ? 24.0 : 0.0)),
-                        ),
-                        child: Text(
-                          '${widget.scheduledZone!.name} - ${widget.scheduledZone!.subZones!.elementAt(selectedSubZone).cuenca}',
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: kIsWeb ? 26 : 18),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 16.0,
-                    top: 50,
-                    bottom: null,
-                    right: null,
-                    child: MenuElevatedButton(
-                      colorChangeOnPress: false,
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      tooltipMessage: appLocalizations.placeholder_back_button,
-                      icon: Icons.arrow_back,
-                    ),
-                  ),
-                  LoadingOverlay(
-                    isLoading: isLoading,
-                    child: Positioned(
-                      top: kIsWeb ? null : 50,
-                      right: kIsWeb ? null : 16,
-                      bottom: kIsWeb ? 80 : null,
-                      left: kIsWeb ? 16 : null,
-                      child: Column(
-                        children: [
-                          MenuElevatedButton(
-                            colorChangeOnPress: true,
-                            onPressed: () {
+          bool isLoading = scheduledViewModel.isLoading;
+          return Scaffold(
+            body: Row(
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      AnimatedContainer(
+                        duration: _animationController.duration ??
+                            const Duration(milliseconds: 100),
+                        width: viewDetailElementInfo
+                            ? mapWidth - modalWidth
+                            : mapWidth,
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: GoogleMap(
+                            mapType: _currentMapType,
+                            initialCameraPosition: CameraPosition(
+                              target: initLocation,
+                              zoom: zoomMap,
+                            ),
+                            onCameraMove: (CameraPosition cameraPosition) {
                               setState(() {
-                                _currentMapType =
-                                    _currentMapType == MapType.normal
-                                        ? MapType.satellite
-                                        : MapType.normal;
+                                zoomMap = cameraPosition.zoom;
                               });
                             },
-                            tooltipMessage:
-                                appLocalizations.map_component_map_view_tooltip,
-                            icon: _currentMapType == MapType.normal
-                                ? Icons.map
-                                : Icons.satellite,
-                          ),
-                          if (kIsWeb) const SizedBox(height: 6),
-                          MenuElevatedButton(
-                              onPressed: () async {
-                                setState(() {
-                                  markers.clear();
-                                });
-                                await getCurrentLocation();
-                              },
-                              icon: Icons.my_location,
-                              tooltipMessage:
-                                  appLocalizations.map_component_get_location),
-                          if (kIsWeb) const SizedBox(height: 6),
-                          MultiSelectPopupMenuButton(
-                            texts: [
-                              appLocalizations.sections,
-                              appLocalizations.registers,
-                              appLocalizations.catchments
-                            ],
-                            onClose: () {
-                              updateElementsOnMapOnFilter();
+                            circles: circles,
+                            polylines: polylines,
+                            markers: markers,
+                            onMapCreated: (GoogleMapController controller) {
+                              if (location != null &&
+                                  _mapController.isCompleted &&
+                                  !(false)) {
+                                controller.moveCamera(
+                                    CameraUpdate.newLatLngZoom(
+                                        location!, zoomMap));
+                              }
+                              if (!_mapController.isCompleted) {
+                                _mapController.complete(controller);
+                              }
+                              controller.setMapStyle(customMapStyle);
                             },
-                            selectedIndices: selectedIndices,
-                            onIconsSelected: handleIconsSelected,
+                            onTap: (LatLng latLng) {},
                           ),
-                          if (kIsWeb) const SizedBox(height: 6),
-                          SingleSelectDropdown(
-                            onChanged: (int value) {
-                              handleZoneIconSelected(value);
-                            },
-                            onClose: () {
-                              onCloseSingleDropDown();
-                            },
-                            icon: Icons.map_outlined,
-                            items: widget.scheduledZone!.subZones!.map((e) {
-                              return e.cuenca!;
-                            }).toList(),
-                            selectedItemIndex: selectedSubZone,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Visibility(
-              visible: kIsWeb && viewDetailElementInfo,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: AnimatedContainer(
-                  duration: _animationController?.duration ??
-                      const Duration(milliseconds: 100),
-                  onEnd: () {},
-                  curve: Curves.easeIn,
-                  width: viewDetailElementInfo ? modalWidth : 0,
-                  child: Container(
-                    width: viewDetailElementInfo ? modalWidth : 0,
-                    color: const Color.fromRGBO(253, 255, 252, 1),
-                    child: Column(
-                      children: [
-                        Container(
-                          color: primarySwatch,
-                          height: 50,
-                          child: Row(
+                      Positioned(
+                        top: kIsWeb ? 0 : null,
+                        left: MediaQuery
+                            .of(context)
+                            .size
+                            .width / 2 -
+                            (kIsWeb ? 180 : 100),
+                        bottom: kIsWeb ? null : 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.8),
+                            borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(
+                                    kIsWeb ? 24.0 : 0.0),
+                                bottomRight: Radius.circular(
+                                    kIsWeb ? 24.0 : 0.0),
+                                topLeft: Radius.circular(!kIsWeb ? 24.0 : 0.0),
+                                topRight: Radius.circular(
+                                    !kIsWeb ? 24.0 : 0.0)),
+                          ),
+                          child: Text(
+                            '${widget.scheduledZone!.name} - ${widget
+                                .scheduledZone!.subZones!.elementAt(
+                                selectedSubZone).cuenca}',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: kIsWeb ? 26 : 18),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 16.0,
+                        top: 50,
+                        bottom: null,
+                        right: null,
+                        child: MenuElevatedButton(
+                          colorChangeOnPress: false,
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          tooltipMessage: appLocalizations
+                              .placeholder_back_button,
+                          icon: Icons.arrow_back,
+                        ),
+                      ),
+                      LoadingOverlay(
+                        isLoading: isLoading,
+                        child: Positioned(
+                          top: kIsWeb ? null : 50,
+                          right: kIsWeb ? null : 16,
+                          bottom: kIsWeb ? 80 : null,
+                          left: kIsWeb ? 16 : null,
+                          child: Column(
                             children: [
-                              ButtonCircle(
-                                  icon: Icons.close,
-                                  size: 50,
-                                  onPressed: () {
-                                    openFormElementWeb(false);
-                                    resetSelectionsOnMap();
-                                  }),
-                              Container(
-                                width: 250,
-                                padding: const EdgeInsetsDirectional.symmetric(
-                                    horizontal: 20),
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                    appLocalizations.component_detail_title,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: titleColor,
-                                        letterSpacing: 1,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18)),
+                              MenuElevatedButton(
+                                colorChangeOnPress: true,
+                                onPressed: () {
+                                  setState(() {
+                                    _currentMapType =
+                                    _currentMapType == MapType.normal
+                                        ? MapType.hybrid
+                                        : MapType.normal;
+                                  });
+                                },
+                                tooltipMessage:
+                                appLocalizations.map_component_map_view_tooltip,
+                                icon: _currentMapType == MapType.normal
+                                    ? Icons.map
+                                    : Icons.satellite,
+                              ),
+                              if (kIsWeb) const SizedBox(height: 6),
+                              if (!kIsWeb)
+                                MenuElevatedButton(
+                                    onPressed: () async {
+                                      setState(() {
+                                        markers.clear();
+                                      });
+                                      await getCurrentLocation();
+                                    },
+                                    icon: Icons.my_location,
+                                    tooltipMessage: appLocalizations
+                                        .map_component_get_location),
+                              if (kIsWeb) const SizedBox(height: 6),
+                              MultiSelectPopupMenuButton(
+                                texts: [
+                                  appLocalizations.sections,
+                                  appLocalizations.registers,
+                                  appLocalizations.catchments
+                                ],
+                                onClose: () {
+                                  updateElementsOnMapOnFilter();
+                                },
+                                selectedIndices: selectedIndices,
+                                onIconsSelected: handleIconsSelected,
+                              ),
+                              if (kIsWeb) const SizedBox(height: 6),
+                              SingleSelectDropdown(
+                                onChanged: (int value) {
+                                  handleZoneIconSelected(value);
+                                },
+                                onClose: () {
+                                  onCloseSingleDropDown();
+                                },
+                                icon: Icons.map_outlined,
+                                items: widget.scheduledZone!.subZones!.map((e) {
+                                  return e.cuenca!;
+                                }).toList(),
+                                selectedItemIndex: selectedSubZone,
                               ),
                             ],
                           ),
                         ),
-                        Expanded(
-                          child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 4),
-                              child: ScheduledFormWidget(
-                                  key: _scheduledFormWidgetKey,
-                                  onAccept: () async {
-                                    openFormElementWeb(false);
-                                    resetSelectionsOnMap();
-                                    await _initializeSheduledElements();
-                                  },
-                                  onCancel: () {
-                                    openFormElementWeb(false);
-                                    resetSelectionsOnMap();
-                                  },
-                                  elementType: elementType,
-                                  elementId: elementId,
-                                  scheduledid: widget.idSheduled!)),
+                      )
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: kIsWeb && viewDetailElementInfo,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: AnimatedContainer(
+                      duration: _animationController?.duration ??
+                          const Duration(milliseconds: 100),
+                      onEnd: () {},
+                      curve: Curves.easeIn,
+                      width: viewDetailElementInfo ? modalWidth : 0,
+                      child: Container(
+                        width: viewDetailElementInfo ? modalWidth : 0,
+                        color: const Color.fromRGBO(253, 255, 252, 1),
+                        child: Column(
+                          children: [
+                            Container(
+                              color: primarySwatch,
+                              height: 50,
+                              child: Row(
+                                children: [
+                                  ButtonCircle(
+                                      icon: Icons.close,
+                                      size: 50,
+                                      onPressed: () {
+                                        openFormElementWeb(false);
+                                        resetSelectionsOnMap();
+                                      }),
+                                  Container(
+                                    width: 250,
+                                    padding: const EdgeInsetsDirectional
+                                        .symmetric(
+                                        horizontal: 20),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                        appLocalizations.component_detail_title,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: titleColor,
+                                            letterSpacing: 1,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 4),
+                                  child: ScheduledFormWidget(
+                                      key: _scheduledFormWidgetKey,
+                                      onAccept: () async {
+                                        openFormElementWeb(false);
+                                        resetSelectionsOnMap();
+                                        await _initializeSheduledElements();
+                                      },
+                                      onCancel: () {
+                                        openFormElementWeb(false);
+                                        resetSelectionsOnMap();
+                                      },
+                                      elementType: elementType,
+                                      elementId: elementId,
+                                      scheduledid: widget.idSheduled!)),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      );
-    });
+          );
+        });
   }
 }

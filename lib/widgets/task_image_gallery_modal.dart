@@ -6,35 +6,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gallery_image_viewer/gallery_image_viewer.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/dto/image_data.dart';
 import 'package:gtau_app_front/widgets/common/customDialog.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/photo.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 import '../viewmodels/images_viewmodel.dart';
 import 'common/custom_elevated_button.dart';
 
-class ImageGalleryModal extends StatefulWidget {
+class TaskImageGalleryModal extends StatefulWidget {
   final int? idTask;
 
-  const ImageGalleryModal({super.key, this.idTask});
+  const TaskImageGalleryModal({super.key, this.idTask});
 
   @override
-  State<ImageGalleryModal> createState() => _ImageGalleryModalState(idTask, []);
+  State<TaskImageGalleryModal> createState() =>
+      _TaskImageGalleryModalState(idTask, []);
 }
 
-class _ImageGalleryModalState extends State<ImageGalleryModal> {
+class _TaskImageGalleryModalState extends State<TaskImageGalleryModal> {
   int? idTask;
   List<Photo> photos;
 
-  _ImageGalleryModalState(this.idTask, this.photos);
+  _TaskImageGalleryModalState(this.idTask, this.photos);
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +128,7 @@ class _GelleryShowState extends State<_GelleryShow> {
                 floatingActionButton: FloatingActionButton(
                   onPressed: () => _selectPhoto(),
                   foregroundColor: null,
-                  backgroundColor: null,
+                  backgroundColor: primarySwatch[200]!,
                   shape: null,
                   child: const Icon(Icons.add),
                 )));
@@ -254,14 +254,14 @@ class _GelleryShowState extends State<_GelleryShow> {
         bool result = await _deleteSelectedImages(photos);
 
         if (result == true) {
-          /*print('Imagen ha sido eliminada correctamente');*/
+          printOnDebug('Imagen ha sido eliminada correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          /*print('No se pudo eliminar la imagen');*/
+          printOnDebug('No se pudo eliminar la imagen');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,
@@ -353,9 +353,9 @@ class _GelleryShowState extends State<_GelleryShow> {
       }
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
-      print('Error al seleccionar la imagen: $e');
+      printOnDebug('Error al seleccionar la imagen: $e');
     } catch (error) {
-      print('Error inesperado: $error');
+      printOnDebug('Error inesperado: $error');
     }
   }
 
@@ -369,7 +369,7 @@ class _GelleryShowState extends State<_GelleryShow> {
         final response = await imagesViewModel.uploadImage(
             token!, widget.idTask!, temporaryFileToUpload.path);
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
       } finally {}
       setState(() {
@@ -397,7 +397,7 @@ class _GelleryShowState extends State<_GelleryShow> {
           });
         }
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
       }
     }
@@ -421,7 +421,7 @@ class _GelleryShowState extends State<_GelleryShow> {
           deleteImage = deleteImage &&
               await imagesViewModel.deleteImage(
                   token!, this.idTask!, photo.url);
-          print('resultado interno: $deleteImage');
+          printOnDebug('resultado interno: $deleteImage');
           /*if (deleteImage == false) {
             photo.isSelected = false;
           }*/
@@ -440,77 +440,13 @@ class _GelleryShowState extends State<_GelleryShow> {
   }
 }
 
-class Photo {
-  String url;
-  bool isSelected;
-
-  Photo({required this.url, this.isSelected = false});
-}
-
-class PhotoViewPage extends StatelessWidget {
-  final List<Photo> photos;
-  final int index;
-
-  const PhotoViewPage({
-    Key? key,
-    required this.photos,
-    required this.index,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: PhotoViewGallery.builder(
-        itemCount: photos.length,
-        builder: (context, index) => PhotoViewGalleryPageOptions.customChild(
-          child: CachedNetworkImage(
-            imageUrl: photos[index].url,
-            placeholder: (context, url) => Container(
-              color: softGrey,
-            ),
-            errorWidget: (context, url, error) => Container(
-              color: Colors.red.shade400,
-            ),
-          ),
-          minScale: PhotoViewComputedScale.covered,
-          heroAttributes: PhotoViewHeroAttributes(tag: photos[index]),
-        ),
-        pageController: PageController(initialPage: index),
-        enableRotation: true,
-      ),
-    );
-  }
-}
-
-class CustomImageProvider extends EasyImageProvider {
-  @override
-  final int initialIndex;
-  final List<String> imageUrls;
-
-  CustomImageProvider({required this.imageUrls, this.initialIndex = 0})
-      : super();
-
-  @override
-  ImageProvider<Object> imageBuilder(BuildContext context, int index) {
-    return NetworkImage(imageUrls[index]);
-  }
-
-  @override
-  int get imageCount => imageUrls.length;
-}
-
 Future<List<String>> _fetchTaskImages(BuildContext context, int idTask) async {
   final token = Provider.of<UserProvider>(context, listen: false).getToken;
   final imagesViewModel = Provider.of<ImagesViewModel>(context, listen: false);
   try {
     return await imagesViewModel.fetchTaskImages(token!, idTask);
   } catch (error) {
-    print(error);
+    printOnDebug(error);
     throw Exception('Error al obtener los datos');
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 
+import '../../utils/common_utils.dart';
 import 'custom_elevated_button.dart';
 
 class FileUploadComponent extends StatefulWidget {
@@ -52,7 +53,7 @@ class _FileUploadComponentState extends State<FileUploadComponent> {
       });
       widget.onFileAdded(geoJsonMap);
     } else {
-      print('Selección de archivo cancelada.');
+      printOnDebug('Selección de archivo cancelada.');
     }
   }
 

@@ -27,7 +27,7 @@ class AuthViewModel extends ChangeNotifier {
         return authDataResponse;
       }
       _error = true;
-      return null;
+      return authDataResponse;
     } catch (error) {
       _error = true;
       throw Exception('Error al obtener los datos de autenticación');
@@ -98,7 +98,7 @@ class AuthViewModel extends ChangeNotifier {
       return null;
     } catch (error) {
       _error = true;
-      throw Exception('Error al obtener los datos de refresh auth');
+      return null;
     } finally {
       _isLoading = false;
       notifyListeners();
