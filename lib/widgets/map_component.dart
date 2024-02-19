@@ -641,7 +641,11 @@ class _MapComponentState extends State<MapComponent> {
                           child: Positioned(
                             top: kIsWeb ? null : 50,
                             right: kIsWeb ? null : 16,
-                            bottom: kIsWeb ? 80 : null,
+                            bottom: kIsWeb
+                                ? widget.isModal
+                                    ? 140
+                                    : 80
+                                : null,
                             left: kIsWeb ? 16 : null,
                             child: Column(
                               children: [
