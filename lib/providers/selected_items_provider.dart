@@ -116,8 +116,11 @@ class SelectedItemsProvider with ChangeNotifier {
     _currentSelectedRegisters = Set<CircleId>.from(_initialSelectedRegisters);
     _currentSelectedCatchments = Set<CircleId>.from(_initialSelectedCatchments);
     _currentSelectedLots = Set<PolylineId>.from(_initialSelectedLots);
-    _currentInspectionPosition = const LatLng(0, 0);
     notifyListeners();
+  }
+
+  void restoreLocation() {
+    _currentInspectionPosition = const LatLng(0, 0);
   }
 
   void saveCurrentSelectionsAsInitial() {
@@ -125,6 +128,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters = Set<CircleId>.from(_currentSelectedRegisters);
     _initialSelectedCatchments = Set<CircleId>.from(_currentSelectedCatchments);
     _initialSelectedLots = Set<PolylineId>.from(_currentSelectedLots);
+    _initialInspectionPosition = _currentInspectionPosition;
     notifyListeners();
   }
 

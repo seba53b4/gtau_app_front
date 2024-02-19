@@ -70,6 +70,7 @@ void _showMapModal(BuildContext context) {
                   CustomElevatedButton(
                     onPressed: () {
                       selectedItemsProvider.restoreInitialValues();
+                      selectedItemsProvider.restoreLocation();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.error,
