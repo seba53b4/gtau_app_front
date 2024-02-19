@@ -626,6 +626,10 @@ class _MapComponentState extends State<MapComponent> {
                                     _getMarkers();
                                     location = LatLng(
                                         latLng.latitude, latLng.longitude);
+                                    if (widget.isModal) {
+                                      selectedItemsProvider
+                                          .setInspectionPosition(location!);
+                                    }
                                   });
                                 }
                               },
