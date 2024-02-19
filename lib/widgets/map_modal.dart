@@ -80,6 +80,7 @@ void _showMapModal(BuildContext context) {
                   CustomElevatedButton(
                     onPressed: () {
                       selectedItemsProvider.saveCurrentSelectionsAsInitial();
+                      selectedItemsProvider.saveCurrentPositionAsInitial();
                       Navigator.of(context).pop();
                     },
                     messageType: MessageType.success,
