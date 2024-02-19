@@ -196,6 +196,7 @@ class SelectedItemsProvider with ChangeNotifier {
   void reset() {
     clearAllElements();
     _letMultipleItemsSelected = false;
+    _initialInspectionPosition = const LatLng(0, 0);
     _currentInspectionPosition = const LatLng(0, 0);
   }
 }
