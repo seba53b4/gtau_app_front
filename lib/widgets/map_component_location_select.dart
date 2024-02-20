@@ -225,9 +225,9 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                                     _getMarkers();
                                     location = LatLng(
                                         latLng.latitude, latLng.longitude);
-                                    selectedItemsProvider
-                                        .setInspectionPosition(location!);
                                   });
+                                  selectedItemsProvider
+                                      .setInspectionPosition(location!);
                                 }
                               },
                             ),

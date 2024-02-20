@@ -103,6 +103,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedCatchments = Set<CircleId>.from(catchments ?? {});
     _initialSelectedLots = Set<PolylineId>.from(lots ?? {});
     _initialInspectionPosition = position;
+    _currentInspectionPosition = position;
     setLots(lots);
     setSections(sections);
     setCatchments(catchments);
@@ -116,7 +117,12 @@ class SelectedItemsProvider with ChangeNotifier {
     _currentSelectedRegisters = Set<CircleId>.from(_initialSelectedRegisters);
     _currentSelectedCatchments = Set<CircleId>.from(_initialSelectedCatchments);
     _currentSelectedLots = Set<PolylineId>.from(_initialSelectedLots);
+    _currentInspectionPosition = _initialInspectionPosition;
     notifyListeners();
+  }
+
+  void restoreLocation() {
+    _currentInspectionPosition = _initialInspectionPosition;
   }
 
   void saveCurrentSelectionsAsInitial() {
@@ -124,6 +130,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters = Set<CircleId>.from(_currentSelectedRegisters);
     _initialSelectedCatchments = Set<CircleId>.from(_currentSelectedCatchments);
     _initialSelectedLots = Set<PolylineId>.from(_currentSelectedLots);
+    _initialInspectionPosition = _currentInspectionPosition;
     notifyListeners();
   }
 
@@ -189,6 +196,7 @@ class SelectedItemsProvider with ChangeNotifier {
   void reset() {
     clearAllElements();
     _letMultipleItemsSelected = false;
+    _initialInspectionPosition = const LatLng(0, 0);
     _currentInspectionPosition = const LatLng(0, 0);
   }
 }
