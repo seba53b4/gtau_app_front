@@ -1,0 +1,453 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:gtau_app_front/dto/image_data.dart';
+import 'package:gtau_app_front/widgets/common/customDialog.dart';
+import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
+import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/photo.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
+import '../viewmodels/images_viewmodel.dart';
+import 'common/custom_elevated_button.dart';
+
+class TaskImageGalleryModal extends StatefulWidget {
+  final int? idTask;
+
+  const TaskImageGalleryModal({super.key, this.idTask});
+
+  @override
+  State<TaskImageGalleryModal> createState() =>
+      _TaskImageGalleryModalState(idTask, []);
+}
+
+class _TaskImageGalleryModalState extends State<TaskImageGalleryModal> {
+  int? idTask;
+  List<Photo> photos;
+
+  _TaskImageGalleryModalState(this.idTask, this.photos);
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomElevatedButton(
+      backgroundColors: [primarySwatch[600]!, primarySwatch[600]!],
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => _GelleryShow(idTask, photos)),
+        );
+      },
+      text: AppLocalizations.of(context)!.see_images,
+    );
+  }
+}
+
+class _GelleryShow extends StatefulWidget {
+  int? idTask;
+  List<Photo> photos;
+
+  _GelleryShow(this.idTask, this.photos);
+
+  @override
+  State<StatefulWidget> createState() => _GelleryShowState(idTask, this.photos);
+}
+
+class _GelleryShowState extends State<_GelleryShow> {
+  int? idTask;
+  List<Photo> photos;
+
+  _GelleryShowState(this.idTask, this.photos);
+
+  final ImagePicker _picker = ImagePicker();
+  ImagesViewModel? imagesViewModel;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _initializeData();
+    imagesViewModel = Provider.of<ImagesViewModel>(context, listen: false);
+  }
+
+  @override
+  void dispose() {
+    imagesViewModel?.reset();
+    super.dispose();
+  }
+
+  void _initializeData() async {
+    List<String> urls = await _fetchTaskImages(context, widget.idTask!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ImagesViewModel>(
+        builder: (context, imagesViewModel, child) {
+      photos = imagesViewModel.photos;
+
+      if (photos.isEmpty) {
+        return LoadingOverlay(
+            isLoading: imagesViewModel.isLoading,
+            child: Scaffold(
+                appBar: AppBar(
+                  title: Text(AppLocalizations.of(context)!.images_title),
+                  centerTitle: true,
+                ),
+                body: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Center(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 25, horizontal: 15),
+                            child: SvgPicture.asset(
+                                'lib/assets/empty_gallery.svg',
+                                width: 128,
+                                height: 128,
+                                semanticsLabel: 'Empty Gallery'),
+                          ),
+                          Text(
+                              AppLocalizations.of(context)!.empty_image_gallery,
+                              style: TextStyle(
+                                  color: Colors.black.withOpacity(0.6),
+                                  fontSize: 20)),
+                        ]))),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat,
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () => _selectPhoto(),
+                  foregroundColor: null,
+                  backgroundColor: primarySwatch[200]!,
+                  shape: null,
+                  child: const Icon(Icons.add),
+                )));
+      } else {
+        return LoadingOverlay(
+            isLoading: imagesViewModel.isLoading,
+            child: Scaffold(
+              appBar: AppBar(
+                  title: Text(AppLocalizations.of(context)!.images_title),
+                  centerTitle: true),
+              body: GridView.builder(
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                padding: const EdgeInsets.all(1),
+                itemCount: photos.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                ),
+                itemBuilder: ((context, index) {
+                  return Container(
+                    padding: const EdgeInsets.all(0.5),
+                    decoration: BoxDecoration(
+                      border: photos[index].isSelected
+                          ? Border.all(color: Colors.blue, width: 3)
+                          : null,
+                    ),
+                    child: InkWell(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              PhotoViewPage(photos: photos, index: index),
+                        ),
+                      ),
+                      onLongPress: () {
+                        setState(() {
+                          photos[index].isSelected = !photos[index].isSelected;
+                        });
+                      },
+                      onDoubleTap: () {
+                        setState(() {
+                          photos[index].isSelected = !photos[index].isSelected;
+                        });
+                      },
+                      child: Hero(
+                        tag: photos[index],
+                        child: CachedNetworkImage(
+                          color: Colors.black
+                              .withOpacity(photos[index].isSelected ? 1 : 0),
+                          colorBlendMode: BlendMode.color,
+                          imageUrl: photos[index].url,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              Container(color: softGrey),
+                          errorWidget: (context, url, error) => Container(
+                            color: !photos[index].isSelected
+                                ? Colors.red.shade400
+                                : Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: FloatingActionButton(
+                onPressed: () => _selectPhoto(),
+                foregroundColor: null,
+                backgroundColor: null,
+                shape: null,
+                child: const Icon(Icons.add),
+              ),
+              bottomNavigationBar: photos.any((photo) => photo.isSelected)
+                  ? BottomNavigationBar(
+                      items: [
+                        BottomNavigationBarItem(
+                          icon: const Icon(Icons.cleaning_services),
+                          label: AppLocalizations.of(context)!
+                              .modal_image_delete_selection,
+                        ),
+                        BottomNavigationBarItem(
+                          icon: const Icon(Icons.delete),
+                          label:
+                              AppLocalizations.of(context)!.deleteButtonLabel,
+                        ),
+                      ],
+                      onTap: (index) {
+                        if (index == 0) {
+                          setState(() {
+                            photos.forEach(
+                                (element) => element.isSelected = false);
+                            this.photos = photos;
+                          });
+                        } else if (index == 1) {
+                          _showDeleteConfirmationDialog(context);
+                        }
+                      },
+                      // Habilita o deshabilita el botón "Eliminar" según si hay imágenes seleccionadas o no
+                      currentIndex: 1,
+                    )
+                  : null,
+            ));
+      }
+    });
+  }
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    final showDialogContext = context;
+
+    await showCustomDialog(
+      context: showDialogContext,
+      title: AppLocalizations.of(showDialogContext)!.dialogWarning,
+      content:
+          AppLocalizations.of(showDialogContext)!.dialogContent_deleteImage,
+      onDisablePressed: () {
+        Navigator.of(showDialogContext).pop();
+      },
+      onEnablePressed: () async {
+        Navigator.of(showDialogContext).pop();
+        bool result = await _deleteSelectedImages(photos);
+
+        if (result == true) {
+          printOnDebug('Imagen ha sido eliminada correctamente');
+          await showCustomMessageDialog(
+            context: showDialogContext,
+            messageType: DialogMessageType.success,
+            onAcceptPressed: () {},
+          );
+        } else {
+          printOnDebug('No se pudo eliminar la imagen');
+          await showCustomMessageDialog(
+            context: showDialogContext,
+            messageType: DialogMessageType.error,
+            onAcceptPressed: () {},
+          );
+        }
+      },
+      acceptButtonLabel: AppLocalizations.of(context)!.dialogAcceptButton,
+      cancelbuttonLabel: AppLocalizations.of(context)!.dialogCancelButton,
+    );
+  }
+
+  void _selectPhoto() async {
+    if (kIsWeb) {
+      await _pickImage(ImageSource.gallery);
+    } else {
+      await showModalBottomSheet(
+          context: context,
+          builder: (context) => BottomSheet(
+                builder: (context) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                        leading: const Icon(Icons.camera),
+                        title: Text(AppLocalizations.of(context)!.from_camera),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await _pickImage(ImageSource.camera);
+                        }),
+                    ListTile(
+                        leading: const Icon(Icons.filter),
+                        title: Text(AppLocalizations.of(context)!.pick_a_file),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await _pickImage(ImageSource.gallery);
+                        }),
+                  ],
+                ),
+                onClosing: () {},
+              ));
+    }
+  }
+
+  Future updateImageViewState(BuildContext context) async {
+    final token = Provider.of<UserProvider>(context, listen: false).getToken;
+    await imagesViewModel!.fetchTaskImages(token, idTask!);
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      if (source == ImageSource.camera) {
+        XFile? pickedFile =
+            await _picker.pickImage(source: source, imageQuality: 50);
+        if (pickedFile == null) {
+          // Manejo de caso en el que no se seleccionó ningún archivo.
+          return;
+        }
+        Image temporaryfile = kIsWeb
+            ? Image.network(pickedFile.path)
+            : Image.file(File(pickedFile.path));
+        ImageDataDTO imageDataDTO = ImageDataDTO(
+            image: temporaryfile, path: pickedFile.path, fromBlob: false);
+        setState(() {
+          processImageSingular(imageDataDTO);
+        });
+      } else {
+        final List<XFile> images =
+            await _picker.pickMultiImage(imageQuality: 50);
+        if (images.isEmpty) {
+          // Manejo de caso en el que no se seleccionó ningún archivo.
+          return;
+        }
+
+        List<ImageDataDTO>? temporaryFiles = images
+            .map((val) => kIsWeb
+                ? ImageDataDTO(
+                    image: Image.network(val.path),
+                    path: val.path,
+                    fromBlob: false)
+                : ImageDataDTO(
+                    image: Image.file(File(val.path)),
+                    path: val.path,
+                    fromBlob: false))
+            .toList();
+
+        setState(() {
+          processImages(temporaryFiles);
+        });
+      }
+      // Resto del código para comprimir y establecer la imagen.
+    } on PlatformException catch (e) {
+      printOnDebug('Error al seleccionar la imagen: $e');
+    } catch (error) {
+      printOnDebug('Error inesperado: $error');
+    }
+  }
+
+  void processImageSingular(ImageDataDTO temporaryFileToUpload) async {
+    if (temporaryFileToUpload != null) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final imagesViewModel =
+          Provider.of<ImagesViewModel>(context, listen: false);
+
+      try {
+        final response = await imagesViewModel.uploadImage(
+            token!, widget.idTask!, temporaryFileToUpload.path);
+      } catch (error) {
+        printOnDebug(error);
+        throw Exception('Error al subir imagen');
+      } finally {}
+      setState(() {
+        updateImageViewState(context);
+      });
+    }
+  }
+
+  void processImages(List<ImageDataDTO> temporaryFilesToUpload) async {
+    final oldPhotosLength = photos.length;
+    if (temporaryFilesToUpload != null) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final imagesViewModel =
+          Provider.of<ImagesViewModel>(context, listen: false);
+
+      List<String> list = [];
+      final tempFilesPaths =
+          temporaryFilesToUpload.map((image) => list.add(image.path)).toList();
+      try {
+        final response =
+            await imagesViewModel.uploadImages(token!, widget.idTask!, list);
+        if (response == true) {
+          setState(() {
+            updateImageViewState(context);
+          });
+        }
+      } catch (error) {
+        printOnDebug(error);
+        throw Exception('Error al subir imagen');
+      }
+    }
+  }
+
+  Future<bool> _deleteSelectedImages(List<Photo> photos) async {
+    bool isLoadingDelete;
+    bool deleteImage = true;
+    final selectedImages = photos.where((photo) => photo.isSelected).toList();
+    if (selectedImages.isNotEmpty) {
+      final token = Provider.of<UserProvider>(context, listen: false).getToken;
+      final imagesViewModel =
+          Provider.of<ImagesViewModel>(context, listen: false);
+
+      final len = photos.length;
+      int cont = 0;
+      isLoadingDelete = true;
+      for (var photo in photos) {
+        cont++;
+        if (photo.isSelected) {
+          deleteImage = deleteImage &&
+              await imagesViewModel.deleteImage(
+                  token!, this.idTask!, photo.url);
+          printOnDebug('resultado interno: $deleteImage');
+          /*if (deleteImage == false) {
+            photo.isSelected = false;
+          }*/
+        }
+        /*if(cont == len){
+          return deleteImage;
+        }*/
+      }
+      isLoadingDelete = false;
+      setState(() {
+        photos.removeWhere((photo) => photo.isSelected);
+      });
+      return deleteImage;
+    }
+    return false;
+  }
+}
+
+Future<List<String>> _fetchTaskImages(BuildContext context, int idTask) async {
+  final token = Provider.of<UserProvider>(context, listen: false).getToken;
+  final imagesViewModel = Provider.of<ImagesViewModel>(context, listen: false);
+  try {
+    return await imagesViewModel.fetchTaskImages(token!, idTask);
+  } catch (error) {
+    printOnDebug(error);
+    throw Exception('Error al obtener los datos');
+  }
+}

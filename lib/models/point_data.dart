@@ -8,3 +8,11 @@ class PointData {
 
   PointData({required this.ogcFid, this.point, required this.type});
 }
+
+class PointDataScheduled {
+  late final int? ogcFid;
+  final Circle? point;
+  final PointType type;
+
+  PointDataScheduled({required this.ogcFid, this.point, required this.type});
+}

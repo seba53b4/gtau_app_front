@@ -56,6 +56,7 @@ class SelectedItemsProvider with ChangeNotifier {
   }
 
   void toggleCircleSelected(CircleId circleId, ElementType type) {
+
     var circleList = getCircleList(type);
     if (circleList.contains(circleId)) {
       circleList.remove(circleId);
@@ -70,28 +71,24 @@ class SelectedItemsProvider with ChangeNotifier {
   void setSections(Set<PolylineId>? sections) {
     if (sections != null) {
       _currentSelectedSections = sections;
-      notifyListeners();
     }
   }
 
   void setCatchments(Set<CircleId>? catchments) {
     if (catchments != null) {
       _currentSelectedCatchments = catchments;
-      notifyListeners();
     }
   }
 
   void setRegisters(Set<CircleId>? registers) {
     if (registers != null) {
       _currentSelectedRegisters = registers;
-      notifyListeners();
     }
   }
 
   void setLots(Set<PolylineId>? lots) {
     if (lots != null) {
       _currentSelectedLots = lots;
-      notifyListeners();
     }
   }
 
@@ -106,11 +103,13 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedCatchments = Set<CircleId>.from(catchments ?? {});
     _initialSelectedLots = Set<PolylineId>.from(lots ?? {});
     _initialInspectionPosition = position;
+    _currentInspectionPosition = position;
     setLots(lots);
     setSections(sections);
     setCatchments(catchments);
     setRegisters(registers);
     setInspectionPosition(position);
+    notifyListeners();
   }
 
   void restoreInitialValues() {
@@ -118,7 +117,12 @@ class SelectedItemsProvider with ChangeNotifier {
     _currentSelectedRegisters = Set<CircleId>.from(_initialSelectedRegisters);
     _currentSelectedCatchments = Set<CircleId>.from(_initialSelectedCatchments);
     _currentSelectedLots = Set<PolylineId>.from(_initialSelectedLots);
+    _currentInspectionPosition = _initialInspectionPosition;
     notifyListeners();
+  }
+
+  void restoreLocation() {
+    _currentInspectionPosition = _initialInspectionPosition;
   }
 
   void saveCurrentSelectionsAsInitial() {
@@ -126,6 +130,7 @@ class SelectedItemsProvider with ChangeNotifier {
     _initialSelectedRegisters = Set<CircleId>.from(_currentSelectedRegisters);
     _initialSelectedCatchments = Set<CircleId>.from(_currentSelectedCatchments);
     _initialSelectedLots = Set<PolylineId>.from(_currentSelectedLots);
+    _initialInspectionPosition = _currentInspectionPosition;
     notifyListeners();
   }
 
@@ -191,6 +196,7 @@ class SelectedItemsProvider with ChangeNotifier {
   void reset() {
     clearAllElements();
     _letMultipleItemsSelected = false;
+    _initialInspectionPosition = const LatLng(0, 0);
     _currentInspectionPosition = const LatLng(0, 0);
   }
 }

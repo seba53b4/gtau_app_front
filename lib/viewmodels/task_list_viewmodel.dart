@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 
 class TaskListViewModel extends ChangeNotifier {
   final TaskService _taskService = TaskService();
@@ -31,7 +32,6 @@ class TaskListViewModel extends ChangeNotifier {
   int page = 0;
   int size = kIsWeb ? 12 : 10;
 
-
   void _SetBodyPrefValue(String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString("bodyFiltered", value);
@@ -53,8 +53,8 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  void setPage(int newPage){
-    page=newPage;
+  void setPage(int newPage) {
+    page = newPage;
   }
 
   void clearListByStatus(String status) {
@@ -72,9 +72,10 @@ class TaskListViewModel extends ChangeNotifier {
     return await fetchNextPageTasksFromUser(context, status, user);
   }
 
-  Future<List<Task>?> nextPageFilteredListByStatus(
-      BuildContext context, String status, String? user, String encodedBody) async {
-    return await fetchNextPageFilteredTasksFromUser(context, status, user, encodedBody);
+  Future<List<Task>?> nextPageFilteredListByStatus(BuildContext context,
+      String status, String? user, String encodedBody) async {
+    return await fetchNextPageFilteredTasksFromUser(
+        context, status, user, encodedBody);
   }
 
   Future<List<Task>?> fetchTasksFromUser(
@@ -90,19 +91,17 @@ class TaskListViewModel extends ChangeNotifier {
       _SetIsLoadingPrefValue(true);
       _error = false;
       _isLoading = true;
-      
 
       notifyListeners();
       final responseListTask =
           await _taskService.getTasks(token!, userName!, page, size, status);
 
       _tasks[status] = responseListTask!;
-      
 
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       _SetIsLoadingPrefValue(false);
       throw Exception('Error al obtener los datos');
     } finally {
@@ -117,7 +116,7 @@ class TaskListViewModel extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt("actual_page", page);
   }
-  
+
   Future<List<Task>?> fetchNextPageTasksFromUser(
       BuildContext context, String status, String? user) async {
     final token = context.read<UserProvider>().getToken;
@@ -144,7 +143,7 @@ class TaskListViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -152,8 +151,8 @@ class TaskListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<List<Task>?> fetchNextPageFilteredTasksFromUser(
-      BuildContext context, String status, String? user, String encodedBody) async {
+  Future<List<Task>?> fetchNextPageFilteredTasksFromUser(BuildContext context,
+      String status, String? user, String encodedBody) async {
     final token = context.read<UserProvider>().getToken;
     String? userName;
     if (user == null) {
@@ -164,7 +163,7 @@ class TaskListViewModel extends ChangeNotifier {
     try {
       _isLoading = true;
       _error = false;
-      Map<String,dynamic> body = json.decode(encodedBody);
+      Map<String, dynamic> body = json.decode(encodedBody);
 
       final responseListTask =
           await _taskService.searchTasks(token!, body, page, size);
@@ -179,7 +178,7 @@ class TaskListViewModel extends ChangeNotifier {
       return responseListTask;
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -207,7 +206,7 @@ class TaskListViewModel extends ChangeNotifier {
     } catch (error) {
       _error = true;
       _SetIsLoadingPrefValue(false);
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;
@@ -225,15 +224,15 @@ class TaskListViewModel extends ChangeNotifier {
       final response = await _taskService.deleteTask(token, id);
 
       if (response) {
-        print('Tarea ha sido eliminada correctamente');
+        printOnDebug('Tarea ha sido eliminada correctamente');
         return true;
       } else {
-        print('No se pudo eliminar la tarea');
+        printOnDebug('No se pudo eliminar la tarea');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al eliminar la tarea');
     } finally {
       _isLoading = false;
@@ -251,18 +250,15 @@ class TaskListViewModel extends ChangeNotifier {
       if (responseTask != null) {
         return responseTask;
       } else {
-        if (kDebugMode) {
-          print('No se pudieron traer datos');
-        }
+        printOnDebug('No se pudieron traer datos');
+
         _error = true;
         return null;
       }
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;
-      if (kDebugMode) {
-        print(error);
-      }
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
@@ -280,18 +276,18 @@ class TaskListViewModel extends ChangeNotifier {
       notifyListeners();
       final response = await _taskService.updateTask(token, idTask, body);
       if (response) {
-        print('Tarea ha sido actualizada correctamente');
+        printOnDebug('Tarea ha sido actualizada correctamente');
         notifyListeners();
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
       _SetIsLoadingPrefValue(false);
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _SetIsLoadingPrefValue(false);
@@ -307,17 +303,17 @@ class TaskListViewModel extends ChangeNotifier {
       notifyListeners();
       final response = await _taskService.createTask(token, body);
       if (response) {
-        print('Tarea ha sido creada correctamente');
+        printOnDebug('Tarea ha sido creada correctamente');
         notifyListeners();
         return true;
       } else {
         _error = true;
-        print('No se pudieron traer datos');
+        printOnDebug('No se pudieron traer datos');
         return false;
       }
     } catch (error) {
       _error = true;
-      print(error);
+      printOnDebug(error);
       throw Exception('Error al obtener los datos');
     } finally {
       _isLoading = false;

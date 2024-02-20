@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/models/task.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../providers/task_filters_provider.dart';
 import '../providers/user_provider.dart';
 import '../utils/date_utils.dart';
+import '../utils/task_utils.dart';
 import '../viewmodels/task_list_viewmodel.dart';
 import 'common/customDialog.dart';
 import 'common/customMessageDialog.dart';
@@ -37,12 +38,20 @@ class TaskListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAdmin = context.read<UserProvider>().isAdmin;
-    double fontSize = kIsWeb ? 15 : 12;
+    double fontSize = kIsWeb ? 12 : 10;
     double fontSizeInfo = kIsWeb ? 12 : 9;
     double titleSpace = kIsWeb ? 200 : 120;
     double dividerHeight = kIsWeb ? 32 : 24;
     double taskInfoSpace = kIsWeb ? 150 : 115;
     double iconSize = kIsWeb ? 26 : 24;
+    final appLocalizations = AppLocalizations.of(context)!;
+
+    if (!kIsWeb) {
+      final widthScreen = MediaQuery.of(context).size.width;
+      if (widthScreen < 400) {
+        titleSpace = widthScreen * 0.25;
+      }
+    }
 
     return InkWell(
       onTap: () {
@@ -56,7 +65,7 @@ class TaskListItem extends StatelessWidget {
           color: lightBackground,
           boxShadow: const [
             BoxShadow(
-              color: Color.fromRGBO(200, 217, 184, 0.5),
+              color: Color.fromRGBO(128, 128, 128, 0.49),
               spreadRadius: 3,
               blurRadius: 7,
               offset: Offset(0, 3),
@@ -70,14 +79,17 @@ class TaskListItem extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: primarySwatch[900],
                 radius: 20,
-                child: Text(
-                  'I',
-                  style: GoogleFonts.merriweather(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                child: Stack(children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 18,
+                      child: const Icon(GtauIcons.tasksInspection,
+                          size: 20, color: Colors.white),
+                    ),
                   ),
-                ),
+                ]),
               ),
             ),
             Expanded(
@@ -89,7 +101,7 @@ class TaskListItem extends StatelessWidget {
                         padding: const EdgeInsetsDirectional.symmetric(
                             horizontal: 8),
                         child: Text(
-                          '${task!.getWorkNumber}',
+                          getParsedText(task!.location!, kIsWeb ? 74 : 56),
                           style: TextStyle(fontSize: fontSize),
                         ),
                       )),
@@ -114,11 +126,12 @@ class TaskListItem extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                parseDateTimeOnFormatHour(task!.getAddDate!),
+                                '${appLocalizations.list_item_date}         ${parseDateTime(task!.getAddDate!)}',
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                               Text(
-                                task!.getUser!,
+                                appLocalizations.list_item_user +
+                                    task!.getUser!,
                                 style: TextStyle(fontSize: fontSizeInfo),
                               ),
                             ],
@@ -153,7 +166,7 @@ class TaskListItem extends StatelessWidget {
                     onPressed: () async {
                       await _showDeleteConfirmationDialog(context);
                     },
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(Icons.delete, color: bucketDelete),
                   ),
                 ),
               ],
@@ -179,14 +192,12 @@ class TaskListItem extends StatelessWidget {
         bool result = await _deleteTask(context, task!.id!);
 
         if (result) {
-          print('Tarea ha sido eliminada correctamente');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          print('No se pudo eliminar la tarea');
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,

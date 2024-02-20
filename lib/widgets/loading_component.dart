@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoadingWidget extends StatelessWidget {
   final double? widthRatio;
@@ -13,11 +15,13 @@ class LoadingWidget extends StatelessWidget {
     return SizedBox(
       width: widthRatio != null ? screenWidth * widthRatio! : screenWidth,
       height: heightRatio != null ? screenHeight * heightRatio! : screenHeight,
-      child: const Center(
-        child: CircularProgressIndicator(
-          color: Color.fromRGBO(96, 166, 27, 1),
-        ),
-      ),
+      child: Center(
+          child: LoadingAnimationWidget.discreteCircle(
+        color: primarySwatch[400]!,
+        secondRingColor: primarySwatch[300]!,
+        thirdRingColor: primarySwatch[100]!,
+        size: 42,
+      )),
     );
   }
 }

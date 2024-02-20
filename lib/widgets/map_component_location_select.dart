@@ -14,6 +14,7 @@ import 'package:gtau_app_front/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/theme_constants.dart';
+import '../utils/map_functions.dart';
 import 'common/menu_button_map.dart';
 
 class MapComponentLocationSelect extends StatefulWidget {
@@ -29,7 +30,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
   LatLng? location;
   static const LatLng initLocation = LatLng(-34.88773, -56.13955);
   String? errorMsg;
-  final MapType _currentMapType = MapType.satellite;
+  final MapType _currentMapType = MapType.hybrid;
   Set<Marker> markers = {};
   Set<Marker> markersGPS = {};
   bool locationManual = false;
@@ -68,7 +69,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
     try {
       if (selectedItemsProvider.inspectionPosition.latitude == 0 &&
           selectedItemsProvider.inspectionPosition.longitude == 0) {
-        getCurrentLocation();
+        if (!kIsWeb) getCurrentLocation();
       } else {
         setState(() {
           final locationGPS = selectedItemsProvider.inspectionPosition;
@@ -208,6 +209,7 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                                 if (!_mapController.isCompleted) {
                                   _mapController.complete(controller);
                                 }
+                                controller.setMapStyle(customMapStyle);
                               },
                               onTap: (LatLng latLng) {
                                 if (locationManual) {
@@ -223,9 +225,9 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                                     _getMarkers();
                                     location = LatLng(
                                         latLng.latitude, latLng.longitude);
-                                    selectedItemsProvider
-                                        .setInspectionPosition(location!);
                                   });
+                                  selectedItemsProvider
+                                      .setInspectionPosition(location!);
                                 }
                               },
                             ),
@@ -234,25 +236,26 @@ class _MapComponentState extends State<MapComponentLocationSelect> {
                         LoadingOverlay(
                           isLoading: isMapLoading,
                           child: Positioned(
-                            top: kIsWeb ? null : 80,
+                            top: kIsWeb ? null : 50,
                             right: kIsWeb ? null : 16,
                             bottom: kIsWeb ? 80 : null,
                             left: kIsWeb ? 16 : null,
                             child: Column(
                               children: [
-                                MenuElevatedButton(
-                                    onPressed: () {
-                                      markersGPS.clear();
-                                      getCurrentLocation();
-                                      _getMarkers();
-                                      setState(() {
-                                        locationManual = false;
-                                      });
-                                    },
-                                    icon: Icons.my_location,
-                                    tooltipMessage:
-                                        AppLocalizations.of(context)!
-                                            .map_component_get_location),
+                                if (!kIsWeb)
+                                  MenuElevatedButton(
+                                      onPressed: () {
+                                        markersGPS.clear();
+                                        getCurrentLocation();
+                                        _getMarkers();
+                                        setState(() {
+                                          locationManual = false;
+                                        });
+                                      },
+                                      icon: Icons.my_location,
+                                      tooltipMessage:
+                                          AppLocalizations.of(context)!
+                                              .map_component_get_location),
                                 if (kIsWeb) const SizedBox(height: 6),
                                 MenuElevatedButton(
                                   colorChangeOnPress: true,

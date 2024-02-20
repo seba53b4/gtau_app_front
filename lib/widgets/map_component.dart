@@ -44,7 +44,7 @@ class _MapComponentState extends State<MapComponent> {
   int distanceSelected = 0;
   int lastDistanceSelected = 8;
   LatLng? lastLocation;
-  MapType _currentMapType = MapType.satellite;
+  MapType _currentMapType = MapType.hybrid;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   Set<Circle> circles = {};
@@ -58,7 +58,7 @@ class _MapComponentState extends State<MapComponent> {
   double zoomMap = 16;
   late Completer<GoogleMapController> _mapController;
   bool viewDetailElementInfo = false;
-  double modalWidth = 300.0;
+  double modalWidth = 320.0;
   late double mapWidth;
   late double mapInit;
   late SelectedItemsProvider selectedItemsProvider;
@@ -110,9 +110,6 @@ class _MapComponentState extends State<MapComponent> {
           }
         }
       });
-      setState(() {
-        lastDistanceSelected = 0;
-      });
     }
   }
 
@@ -138,7 +135,7 @@ class _MapComponentState extends State<MapComponent> {
     try {
       if (selectedItemsProvider.inspectionPosition.latitude == 0 &&
           selectedItemsProvider.inspectionPosition.longitude == 0) {
-        getCurrentLocation();
+        if (!kIsWeb) getCurrentLocation();
       } else {
         setState(() {
           final locationGPS = selectedItemsProvider.inspectionPosition;
@@ -613,6 +610,7 @@ class _MapComponentState extends State<MapComponent> {
                                 if (!_mapController.isCompleted) {
                                   _mapController.complete(controller);
                                 }
+                                controller.setMapStyle(customMapStyle);
                               },
                               onTap: (LatLng latLng) {
                                 if (locationManual) {
@@ -628,6 +626,10 @@ class _MapComponentState extends State<MapComponent> {
                                     _getMarkers();
                                     location = LatLng(
                                         latLng.latitude, latLng.longitude);
+                                    if (widget.isModal) {
+                                      selectedItemsProvider
+                                          .setInspectionPosition(location!);
+                                    }
                                   });
                                 }
                               },
@@ -637,9 +639,13 @@ class _MapComponentState extends State<MapComponent> {
                         LoadingOverlay(
                           isLoading: isMapLoading && !viewDetailElementInfo,
                           child: Positioned(
-                            top: kIsWeb ? null : 80,
+                            top: kIsWeb ? null : 50,
                             right: kIsWeb ? null : 16,
-                            bottom: kIsWeb ? 80 : null,
+                            bottom: kIsWeb
+                                ? widget.isModal
+                                    ? 140
+                                    : 80
+                                : null,
                             left: kIsWeb ? 16 : null,
                             child: Column(
                               children: [
@@ -648,9 +654,9 @@ class _MapComponentState extends State<MapComponent> {
                                   onPressed: () {
                                     setState(() {
                                       _currentMapType =
-                                          _currentMapType == MapType.normal
-                                              ? MapType.satellite
-                                              : MapType.normal;
+                                          _currentMapType == MapType.hybrid
+                                              ? MapType.normal
+                                              : MapType.hybrid;
                                     });
                                   },
                                   tooltipMessage: AppLocalizations.of(context)!
@@ -669,26 +675,30 @@ class _MapComponentState extends State<MapComponent> {
                                   icon: Icons.area_chart_outlined,
                                 ),
                                 if (kIsWeb) const SizedBox(height: 6),
-                                MenuElevatedButton(
-                                    onPressed: () {
-                                      markersGPS.clear();
-                                      getCurrentLocation();
-                                      _getMarkers();
-                                      setState(() {
-                                        polylines = {};
-                                        circles = {};
-                                      });
-                                    },
-                                    icon: Icons.my_location,
-                                    tooltipMessage:
-                                        AppLocalizations.of(context)!
-                                            .map_component_get_location),
+                                if (!kIsWeb)
+                                  MenuElevatedButton(
+                                      onPressed: () {
+                                        markersGPS.clear();
+                                        getCurrentLocation();
+                                        _getMarkers();
+                                        setState(() {
+                                          polylines = {};
+                                          circles = {};
+                                        });
+                                      },
+                                      icon: Icons.my_location,
+                                      tooltipMessage:
+                                          AppLocalizations.of(context)!
+                                              .map_component_get_location),
                                 if (kIsWeb) const SizedBox(height: 6),
                                 MenuElevatedButton(
                                   colorChangeOnPress: true,
                                   onPressed: () {
                                     setState(() {
-                                      selectedItemsProvider.clearAllElements();
+                                      if (!widget.isModal) {
+                                        selectedItemsProvider
+                                            .clearAllElements();
+                                      }
                                       locationManualSelected =
                                           locationManualSelected || true;
                                       isDetailsButtonVisible = false;

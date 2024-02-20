@@ -20,6 +20,7 @@ class CustomTextFormField extends StatelessWidget {
   final bool useValidation;
   final bool readOnly;
   final VoidCallback? onTap;
+  final bool obscureText;
 
   const CustomTextFormField({
     this.controller,
@@ -37,6 +38,7 @@ class CustomTextFormField extends StatelessWidget {
     this.useValidation = true,
     this.readOnly = false,
     this.onTap,
+    this.obscureText = false,
   }) : super(key: key);
 
   String? _validateInput(BuildContext context, String? value) {
@@ -97,6 +99,7 @@ class CustomTextFormField extends StatelessWidget {
         validator:
             useValidation ? (value) => _validateInput(context, value) : null,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        obscureText: obscureText,
       ),
     );
   }

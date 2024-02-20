@@ -5,9 +5,16 @@ import '../constants/theme_constants.dart';
 
 const formatDate = 'dd-MM-yyyy';
 const formatDateHour = 'dd-MM-yyyy HH:mm:ss';
+const formatDateBackendCompatible = 'yyyy-MM-ddTHH:mm:ss.SSSZ';
 
 String parseDateTimeOnFormat(DateTime dt) {
   return DateFormat(formatDate).format(dt);
+}
+
+String formatDateTime(DateTime dt, String formatDate) {
+  // Formatea el DateTime en la cadena de fecha y hora deseada
+  DateFormat format = DateFormat(formatDate);
+  return format.format(dt);
 }
 
 String parseDateTimeOnFormatHour(DateTime? dt) {
@@ -18,12 +25,44 @@ String parseDateTimeOnFormatHour(DateTime? dt) {
   return format.format(dt);
 }
 
-String formattedDateToUpdate(String dateString) {
+String parseDateTimeOnFormatHourUy(DateTime? dt) {
+  if (dt == null) {
+    return "";
+  }
+  DateFormat format = DateFormat(formatDateHour);
+  DateTime utcMinus3 = dt.toUtc().add(Duration(hours: -3));
+  return format.format(utcMinus3);
+}
+
+String parseDateTime(DateTime? dt) {
+  if (dt == null) {
+    return "";
+  }
+  DateFormat format = DateFormat(formatDate);
+  return format.format(dt);
+}
+
+String formattedDate(String dateString) {
+  // Define el formato de entrada de la fecha
   DateFormat inputFormat = DateFormat(formatDate);
+
+  // Analiza la cadena de fecha en un objeto DateTime
   DateTime date = inputFormat.parse(dateString);
 
-  String formattedDate = date.toUtc().toIso8601String();
-  return formattedDate;
+  // Convierte la fecha a la zona horaria local
+  DateTime localDateTime = date.toLocal();
+
+  // Formatea la fecha en el formato deseado
+  DateFormat outputFormat = DateFormat(formatDateBackendCompatible);
+  String formattedDateStr = outputFormat.format(localDateTime);
+  return formattedDateStr;
+}
+
+String getCurrentHour() {
+  DateTime now = DateTime.now();
+  String formattedDateHour =
+      DateFormat(formatDateBackendCompatible).format(now);
+  return formattedDateHour;
 }
 
 Future<DateTime?> showCustomDatePicker(

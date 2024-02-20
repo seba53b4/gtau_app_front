@@ -2,17 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gtau_app_front/providers/user_provider.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/MapScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/screens/TaskCreationScreen.dart';
-import 'package:provider/provider.dart';
+import 'package:gtau_app_front/screens/UpdateElementsScreen.dart';
+import 'package:gtau_app_front/screens/UserDashboardScreen.dart';
 
 import '../constants/theme_constants.dart';
 
 class NavigationWeb extends StatefulWidget {
-  const NavigationWeb({super.key});
+  final bool isAdmin;
+
+  const NavigationWeb({super.key, this.isAdmin = false});
 
   @override
   State<NavigationWeb> createState() => _NavigationWeb();
@@ -25,8 +28,8 @@ class _NavigationWeb extends State<NavigationWeb> {
   bool isNavRailExtended = false;
 
   List screens = [
-    HomeScreen(),
-    HomeScreen(),
+    const HomeScreen(),
+    const HomeScreen(),
     const MapScreen(),
     const ProfileScreen(),
   ];
@@ -38,37 +41,49 @@ class _NavigationWeb extends State<NavigationWeb> {
   }
 
   void _updateOptionsNav() {
-    final userStateProvider = Provider.of<UserProvider>(context, listen: false);
     NavigationRailDestination navHome = _buildCircularDestination(
-        icon: Icon(Icons.home, size: iconSize),
+        icon: Icon(GtauIcons.home, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_home));
 
     NavigationRailDestination navAddTask = _buildCircularDestination(
-        icon: Icon(Icons.add, size: iconSize),
+        icon: Icon(GtauIcons.taskAdd, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_task_add));
 
+    NavigationRailDestination navInfoUpdate = _buildCircularDestination(
+        icon: Icon(Icons.file_upload_sharp, size: iconSize * 1.45),
+        label: Text(
+            AppLocalizations.of(context)!.navigation_label_update_elements));
+
+    NavigationRailDestination navListUser = _buildCircularDestination(
+        icon: Icon(GtauIcons.userList, size: iconSize),
+        label: Text(AppLocalizations.of(context)!.listuser_title));
+
     NavigationRailDestination navMap = _buildCircularDestination(
-        icon: Icon(Icons.map, size: iconSize),
+        icon: Icon(GtauIcons.worldMap, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_map));
 
     NavigationRailDestination navProfile = _buildCircularDestination(
-        icon: Icon(Icons.person, size: iconSize),
+        icon: Icon(GtauIcons.userProfile, size: iconSize),
         label: Text(AppLocalizations.of(context)!.navigation_label_profile));
 
-    if (userStateProvider.isAdmin!) {
+    if (widget.isAdmin) {
       optionsNav = [
         navHome,
         navAddTask,
+        navInfoUpdate,
+        navListUser,
         navMap,
         navProfile,
       ];
       setState(() {
         screens = [
-          HomeScreen(),
-          HomeScreen(),
+          const HomeScreen(),
+          const HomeScreen(),
           TaskCreationScreen(
             type: '',
           ),
+          const UpdateElementsScreen(),
+          const UserDashboardScreen(),
           const MapScreen(),
           const ProfileScreen(),
         ];
@@ -93,16 +108,19 @@ class _NavigationWeb extends State<NavigationWeb> {
                 begin: Alignment.center,
                 end: Alignment.centerRight,
                 colors: [
-                  primarySwatch[100]!,
-                  primarySwatch[50]!,
+                  nav1,
+                  nav2,
                 ],
               ),
             ),
             child: NavigationRail(
+              selectedIconTheme: const IconThemeData(
+                color: Colors.white,
+              ),
               extended: isNavRailExtended,
               backgroundColor: Colors.transparent,
               useIndicator: true,
-              indicatorColor: lightBackground,
+              indicatorColor: primarySwatch[100]!,
               selectedLabelTextStyle: GoogleFonts.sora(
                 textStyle: TextStyle(
                     color: lightBackground,

@@ -3,14 +3,16 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
+import 'package:gtau_app_front/viewmodels/task_list_scheduled_viewmodel.dart';
+import 'package:gtau_app_front/viewmodels/task_list_viewmodel.dart';
+import 'package:gtau_app_front/widgets/common/background_gradient.dart';
 import 'package:gtau_app_front/widgets/task_status_dashboard.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/filter_tasks.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key});
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -20,6 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _enteredUsername = '';
   Timer? _debounce;
+  bool isSwitched = false;
+  late TaskListViewModel taskListViewModel;
+  late TaskListScheduledViewModel taskListScheduledViewModel;
 
   @override
   void dispose() {
@@ -52,16 +57,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     _clearPref();
+
     return Scaffold(
-      body: Container(
-        color: lightBackground,
+      body: BackgroundGradient(
         child: Center(
           child: Container(
               width: MediaQuery.of(context).size.width,
               height: kIsWeb
                   ? MediaQuery.of(context).size.height * 0.78
                   : MediaQuery.of(context).size.height - 72,
-              color: lightBackground,
+              color: Colors.transparent,
               child: _constraintBoxTaskDashboard(context, _enteredUsername)),
         ),
       ),
@@ -69,8 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           _showFilterModal(context);
         },
-        foregroundColor: null,
-        backgroundColor: null,
+        foregroundColor: primarySwatch[700]!,
+        backgroundColor: Colors.white,
         shape: null,
         child: const Icon(Icons.filter_alt_rounded),
       ),
@@ -101,6 +106,7 @@ Widget _constraintBoxTaskDashboard(BuildContext context, String userName) {
           ? (MediaQuery.of(context).size.width - widthDashboard) / 2
           : 0;
   return Container(
+    color: Colors.transparent,
     margin: kIsWeb
         ? EdgeInsets.symmetric(horizontal: paddingDashboard)
         : const EdgeInsets.symmetric(horizontal: 0),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gtau_app_front/assets/font/gtauicons.dart';
 import 'package:gtau_app_front/screens/HomeScreen.dart';
 import 'package:gtau_app_front/screens/ProfileScreen.dart';
 import 'package:gtau_app_front/widgets/map_component.dart';
@@ -17,21 +18,21 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   int myCurrentIndex = 0;
 
-  List screens = [HomeScreen(), MapMobile(), ProfileScreen()];
+  List screens = [const HomeScreen(), const MapMobile(), const ProfileScreen()];
 
   @override
   Widget build(BuildContext context) {
     late List<BottomNavigationBarItem> optionsNav = [
       _buildCircularDestination(
-        icon: const Icon(Icons.home),
+        icon: const Icon(GtauIcons.home),
         label: AppLocalizations.of(context)!.navigation_label_home,
       ),
       _buildCircularDestination(
-        icon: const Icon(Icons.map),
+        icon: const Icon(GtauIcons.worldMap),
         label: AppLocalizations.of(context)!.navigation_label_map,
       ),
       _buildCircularDestination(
-        icon: const Icon(Icons.person),
+        icon: const Icon(GtauIcons.userProfile),
         label: AppLocalizations.of(context)!.navigation_label_profile,
       )
     ];
@@ -41,11 +42,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
           height: 72,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
+              begin: Alignment.center,
+              end: Alignment.centerRight,
               colors: [
-                primarySwatch[100]!,
-                primarySwatch[200]!,
+                nav1,
+                nav2,
               ],
             ),
           ),
@@ -53,9 +54,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
               elevation: 0,
               type: BottomNavigationBarType.fixed,
               selectedItemColor: lightBackground,
+              unselectedIconTheme: IconThemeData(color: primarySwatch[900]),
               selectedIconTheme: IconThemeData(color: lightBackground),
               selectedLabelStyle: GoogleFonts.sora(
-                  color: lightBackground, fontWeight: FontWeight.w500),
+                  color: primarySwatch[600]!, fontWeight: FontWeight.w500),
+              unselectedLabelStyle: GoogleFonts.sora(color: Colors.black26),
               backgroundColor: Colors.transparent,
               currentIndex: myCurrentIndex,
               onTap: (value) {

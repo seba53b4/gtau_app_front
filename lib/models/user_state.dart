@@ -4,7 +4,6 @@ class UserState {
   late String? username;
   late bool? isLoggedIn;
   late bool? isAdmin;
-  late String? jwt;
   AuthData? authData;
 
   UserState({this.username, this.isLoggedIn, this.authData, this.isAdmin});
@@ -27,26 +26,19 @@ class UserState {
 
   AuthData? get getAuthData => authData;
 
-  set setAuthData(AuthData? value) {
-    authData = value;
+  void setAuthData(AuthData? value) {
     if (value != null) {
-      jwt = value.accessToken;
-    } else {
-      jwt = null;
+      authData = value;
     }
   }
 
   void reset() {
     username = null;
     isLoggedIn = false;
-    jwt = null;
     authData = null;
   }
 
   bool get isUserDataEmpty {
-    return username == null &&
-        isLoggedIn == false &&
-        jwt == null &&
-        isAdmin == null;
+    return username == null && isLoggedIn == false && isAdmin == null;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gtau_app_front/constants/theme_constants.dart';
 
 import '../../models/enums/message_type.dart';
 
@@ -21,7 +22,7 @@ class CustomToast {
     switch (type) {
       case MessageType.error:
         icon = const Icon(Icons.error, color: Colors.white);
-        backgroundColor = Colors.red;
+        backgroundColor = bucketDelete;
         break;
       case MessageType.warning:
         icon = const Icon(Icons.warning, color: Colors.white);

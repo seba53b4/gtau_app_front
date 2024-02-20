@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,6 +7,7 @@ import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/catchment_data.dart';
+import '../utils/common_utils.dart';
 
 class CatchmentService {
   final String baseUrl;
@@ -15,7 +15,7 @@ class CatchmentService {
 
   CatchmentService({String? baseUrl})
       : baseUrl =
-            baseUrl ?? dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND');
+      baseUrl ?? dotenv.get('GATEWAY_API_BASE', fallback: 'NOT_FOUND');
 
   Map<String, String> _getHeaders(String token) {
     return {
@@ -24,8 +24,8 @@ class CatchmentService {
     };
   }
 
-  Future<List<Catchment>?> fetchCatchmentsByRadius(
-      String token, double longitude, double latitude, int radiusMtr) async {
+  Future<List<Catchment>?> fetchCatchmentsByRadius(String token,
+      double longitude, double latitude, int radiusMtr) async {
     try {
       final url = Uri.parse(
           '$baseUrl/$sourcePath/searchOnRadius?=origin_longitude=$longitude&origin_latitude=$latitude&radius_mtr=$radiusMtr');
@@ -35,6 +35,7 @@ class CatchmentService {
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
+
         return jsonResponse.map<Catchment>((catchment) {
           Map<String, dynamic> geoJson = catchment['geoJSON'];
           List<dynamic> coordenates = geoJson['coordinates'];
@@ -53,7 +54,7 @@ class CatchmentService {
               fillColor: Colors.black);
 
           return Catchment(
-              ogcFid: catchment['ogcFid'],
+              ogcFid: (catchment['ogcFid'] as double).toInt(),
               tipo: catchment['tipo'],
               tipoboca: catchment['tipBoca'],
               point: circle);
@@ -62,9 +63,7 @@ class CatchmentService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener captaciones: $error');
-      }
+      printOnDebug('Error al obtener captaciones: $error');
       rethrow;
     }
   }
@@ -102,9 +101,7 @@ class CatchmentService {
         return null;
       }
     } catch (error) {
-      if (kDebugMode) {
-        print('Error al obtener registros: $error');
-      }
+      printOnDebug('Error al obtener registros: $error');
       rethrow;
     }
   }

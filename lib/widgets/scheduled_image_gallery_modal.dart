@@ -6,43 +6,57 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gallery_image_viewer/gallery_image_viewer.dart';
 import 'package:gtau_app_front/constants/theme_constants.dart';
 import 'package:gtau_app_front/dto/image_data.dart';
+import 'package:gtau_app_front/models/enums/element_type.dart';
 import 'package:gtau_app_front/widgets/common/customDialog.dart';
 import 'package:gtau_app_front/widgets/common/customMessageDialog.dart';
 import 'package:gtau_app_front/widgets/loading_overlay.dart';
+import 'package:gtau_app_front/widgets/photo.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/user_provider.dart';
+import '../utils/common_utils.dart';
 import '../viewmodels/images_viewmodel.dart';
 import 'common/custom_elevated_button.dart';
 
-class ImageGalleryModal extends StatefulWidget {
-  final int? idTask;
+class ScheduledImageGalleryModal extends StatefulWidget {
+  final int scheduledId;
+  final int elementId;
+  final ElementType elementType;
 
-  const ImageGalleryModal({super.key, this.idTask});
+  const ScheduledImageGalleryModal(
+      {super.key,
+      required this.scheduledId,
+      required this.elementId,
+      required this.elementType});
 
   @override
-  State<ImageGalleryModal> createState() => _ImageGalleryModalState(idTask, []);
+  State<ScheduledImageGalleryModal> createState() =>
+      _ScheduledImageGalleryModalState(scheduledId, elementId, elementType, []);
 }
 
-class _ImageGalleryModalState extends State<ImageGalleryModal> {
-  int? idTask;
+class _ScheduledImageGalleryModalState
+    extends State<ScheduledImageGalleryModal> {
+  final int scheduledId;
+  final int elementId;
+  final ElementType elementType;
   List<Photo> photos;
 
-  _ImageGalleryModalState(this.idTask, this.photos);
+  _ScheduledImageGalleryModalState(
+      this.scheduledId, this.elementId, this.elementType, this.photos);
 
   @override
   Widget build(BuildContext context) {
     return CustomElevatedButton(
+      backgroundColors: [primarySwatch[600]!, primarySwatch[600]!],
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => _GelleryShow(idTask, photos)),
+          MaterialPageRoute(
+              builder: (context) => _ScheduledGelleryShow(
+                  scheduledId, elementId, elementType, photos)),
         );
       },
       text: AppLocalizations.of(context)!.see_images,
@@ -50,32 +64,46 @@ class _ImageGalleryModalState extends State<ImageGalleryModal> {
   }
 }
 
-class _GelleryShow extends StatefulWidget {
-  int? idTask;
+class _ScheduledGelleryShow extends StatefulWidget {
+  final int scheduledId;
+  final int elementId;
+  final ElementType elementType;
   List<Photo> photos;
 
-  _GelleryShow(this.idTask, this.photos);
+  _ScheduledGelleryShow(
+      this.scheduledId, this.elementId, this.elementType, this.photos);
 
   @override
-  State<StatefulWidget> createState() => _GelleryShowState(idTask, this.photos);
+  State<StatefulWidget> createState() => _ScheduledGelleryShowState(
+      scheduledId, elementId, elementType, this.photos);
 }
 
-class _GelleryShowState extends State<_GelleryShow> {
-  int? idTask;
+class _ScheduledGelleryShowState extends State<_ScheduledGelleryShow> {
+  final int scheduledId;
+  final int elementId;
+  final ElementType elementType;
   List<Photo> photos;
 
-  _GelleryShowState(this.idTask, this.photos);
+  _ScheduledGelleryShowState(
+      this.scheduledId, this.elementId, this.elementType, this.photos);
 
   final ImagePicker _picker = ImagePicker();
   ImagesViewModel? imagesViewModel;
+  late String token;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _initializeData();
+  void initState() {
+    super.initState();
+    token = Provider.of<UserProvider>(context, listen: false).getToken!;
     imagesViewModel = Provider.of<ImagesViewModel>(context, listen: false);
+    _getImagesData();
   }
+
+  //
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  // }
 
   @override
   void dispose() {
@@ -83,8 +111,8 @@ class _GelleryShowState extends State<_GelleryShow> {
     super.dispose();
   }
 
-  void _initializeData() async {
-    List<String> urls = await _fetchTaskImages(context, widget.idTask!);
+  void _getImagesData() async {
+    List<String>? urls = await _fetchTaskImages();
   }
 
   @override
@@ -126,7 +154,9 @@ class _GelleryShowState extends State<_GelleryShow> {
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerFloat,
                 floatingActionButton: FloatingActionButton(
-                  onPressed: () => _selectPhoto(),
+                  onPressed: () {
+                    _selectPhoto();
+                  },
                   foregroundColor: null,
                   backgroundColor: null,
                   shape: null,
@@ -198,7 +228,9 @@ class _GelleryShowState extends State<_GelleryShow> {
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerFloat,
               floatingActionButton: FloatingActionButton(
-                onPressed: () => _selectPhoto(),
+                onPressed: () {
+                  _selectPhoto();
+                },
                 foregroundColor: null,
                 backgroundColor: null,
                 shape: null,
@@ -254,14 +286,12 @@ class _GelleryShowState extends State<_GelleryShow> {
         bool result = await _deleteSelectedImages(photos);
 
         if (result == true) {
-          /*print('Imagen ha sido eliminada correctamente');*/
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.success,
             onAcceptPressed: () {},
           );
         } else {
-          /*print('No se pudo eliminar la imagen');*/
           await showCustomMessageDialog(
             context: showDialogContext,
             messageType: DialogMessageType.error,
@@ -305,10 +335,10 @@ class _GelleryShowState extends State<_GelleryShow> {
     }
   }
 
-  Future updateImageViewState(BuildContext context) async {
-    final token = Provider.of<UserProvider>(context, listen: false).getToken;
-    await imagesViewModel!.fetchTaskImages(token, idTask!);
-  }
+  // Future updateImageViewState() async {
+  //   await imagesViewModel!.fetchImagesScheduledElement(
+  //       token, widget.scheduledId, widget.elementId, widget.elementType);
+  // }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -324,9 +354,7 @@ class _GelleryShowState extends State<_GelleryShow> {
             : Image.file(File(pickedFile.path));
         ImageDataDTO imageDataDTO = ImageDataDTO(
             image: temporaryfile, path: pickedFile.path, fromBlob: false);
-        setState(() {
-          processImageSingular(imageDataDTO);
-        });
+        processImageSingular(imageDataDTO);
       } else {
         final List<XFile> images =
             await _picker.pickMultiImage(imageQuality: 50);
@@ -346,58 +374,49 @@ class _GelleryShowState extends State<_GelleryShow> {
                     path: val.path,
                     fromBlob: false))
             .toList();
-
-        setState(() {
-          processImages(temporaryFiles);
-        });
+        processImages(temporaryFiles);
       }
       // Resto del código para comprimir y establecer la imagen.
     } on PlatformException catch (e) {
-      print('Error al seleccionar la imagen: $e');
+      printOnDebug('Error al seleccionar la imagen: $e');
     } catch (error) {
-      print('Error inesperado: $error');
+      printOnDebug('Error inesperado: $error');
     }
   }
 
   void processImageSingular(ImageDataDTO temporaryFileToUpload) async {
     if (temporaryFileToUpload != null) {
-      final token = Provider.of<UserProvider>(context, listen: false).getToken;
-      final imagesViewModel =
-          Provider.of<ImagesViewModel>(context, listen: false);
-
       try {
-        final response = await imagesViewModel.uploadImage(
-            token!, widget.idTask!, temporaryFileToUpload.path);
+        final response = await imagesViewModel?.scheduledUploadImage(
+            token,
+            widget.scheduledId,
+            widget.elementId,
+            temporaryFileToUpload.path,
+            widget.elementType);
+        setState(() {});
+        _getImagesData();
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
-      } finally {}
-      setState(() {
-        updateImageViewState(context);
-      });
+      }
     }
+    ;
   }
 
   void processImages(List<ImageDataDTO> temporaryFilesToUpload) async {
     final oldPhotosLength = photos.length;
     if (temporaryFilesToUpload != null) {
-      final token = Provider.of<UserProvider>(context, listen: false).getToken;
-      final imagesViewModel =
-          Provider.of<ImagesViewModel>(context, listen: false);
-
       List<String> list = [];
       final tempFilesPaths =
           temporaryFilesToUpload.map((image) => list.add(image.path)).toList();
       try {
-        final response =
-            await imagesViewModel.uploadImages(token!, widget.idTask!, list);
-        if (response == true) {
-          setState(() {
-            updateImageViewState(context);
-          });
-        }
+        final response = {};
+        await imagesViewModel?.scheduledUploadImages(
+            token, widget.scheduledId, widget.elementId, list, elementType);
+        setState(() {});
+        _getImagesData();
       } catch (error) {
-        print(error);
+        printOnDebug(error);
         throw Exception('Error al subir imagen');
       }
     }
@@ -408,20 +427,15 @@ class _GelleryShowState extends State<_GelleryShow> {
     bool deleteImage = true;
     final selectedImages = photos.where((photo) => photo.isSelected).toList();
     if (selectedImages.isNotEmpty) {
-      final token = Provider.of<UserProvider>(context, listen: false).getToken;
-      final imagesViewModel =
-          Provider.of<ImagesViewModel>(context, listen: false);
-
       final len = photos.length;
       int cont = 0;
       isLoadingDelete = true;
       for (var photo in photos) {
         cont++;
         if (photo.isSelected) {
-          deleteImage = deleteImage &&
-              await imagesViewModel.deleteImage(
-                  token!, this.idTask!, photo.url);
-          print('resultado interno: $deleteImage');
+          deleteImage = await imagesViewModel?.deleteImageScheduled(
+                  token, widget.scheduledId, photo.url) ??
+              deleteImage;
           /*if (deleteImage == false) {
             photo.isSelected = false;
           }*/
@@ -438,79 +452,14 @@ class _GelleryShowState extends State<_GelleryShow> {
     }
     return false;
   }
-}
 
-class Photo {
-  String url;
-  bool isSelected;
-
-  Photo({required this.url, this.isSelected = false});
-}
-
-class PhotoViewPage extends StatelessWidget {
-  final List<Photo> photos;
-  final int index;
-
-  const PhotoViewPage({
-    Key? key,
-    required this.photos,
-    required this.index,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: PhotoViewGallery.builder(
-        itemCount: photos.length,
-        builder: (context, index) => PhotoViewGalleryPageOptions.customChild(
-          child: CachedNetworkImage(
-            imageUrl: photos[index].url,
-            placeholder: (context, url) => Container(
-              color: softGrey,
-            ),
-            errorWidget: (context, url, error) => Container(
-              color: Colors.red.shade400,
-            ),
-          ),
-          minScale: PhotoViewComputedScale.covered,
-          heroAttributes: PhotoViewHeroAttributes(tag: photos[index]),
-        ),
-        pageController: PageController(initialPage: index),
-        enableRotation: true,
-      ),
-    );
-  }
-}
-
-class CustomImageProvider extends EasyImageProvider {
-  @override
-  final int initialIndex;
-  final List<String> imageUrls;
-
-  CustomImageProvider({required this.imageUrls, this.initialIndex = 0})
-      : super();
-
-  @override
-  ImageProvider<Object> imageBuilder(BuildContext context, int index) {
-    return NetworkImage(imageUrls[index]);
-  }
-
-  @override
-  int get imageCount => imageUrls.length;
-}
-
-Future<List<String>> _fetchTaskImages(BuildContext context, int idTask) async {
-  final token = Provider.of<UserProvider>(context, listen: false).getToken;
-  final imagesViewModel = Provider.of<ImagesViewModel>(context, listen: false);
-  try {
-    return await imagesViewModel.fetchTaskImages(token!, idTask);
-  } catch (error) {
-    print(error);
-    throw Exception('Error al obtener los datos');
+  Future<List<String>?> _fetchTaskImages() async {
+    try {
+      return await imagesViewModel?.fetchImagesScheduledElement(
+          token, widget.scheduledId, widget.elementId, widget.elementType);
+    } catch (error) {
+      printOnDebug(error);
+      throw Exception('Error al obtener los datos');
+    }
   }
 }

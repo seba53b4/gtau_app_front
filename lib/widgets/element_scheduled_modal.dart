@@ -19,8 +19,14 @@ _parseTitle(BuildContext context, ElementType elementType) {
   }
 }
 
-void showScheduledElementModal(BuildContext context, ElementType elementType,
-    OnCloseCallback? onClose) async {
+void showScheduledElementModal(
+    {required BuildContext context,
+    required ElementType elementType,
+    OnCloseCallback? onClose,
+    required int scheduledId,
+    required int elementId,
+    Function()? onCancel,
+    Function()? onAccept}) async {
   double dialogWidth = MediaQuery.of(context).size.width * 0.82;
   double scrollHeight = MediaQuery.of(context).size.height * 0.75;
 
@@ -60,22 +66,14 @@ void showScheduledElementModal(BuildContext context, ElementType elementType,
           content: SizedBox(
             height: scrollHeight,
             width: dialogWidth,
-            child: ScheduledFormWidget(elementType: elementType),
+            child: ScheduledFormWidget(
+                onCancel: onCancel,
+                onAccept: onAccept,
+                elementType: elementType,
+                elementId: elementId,
+                scheduledid: scheduledId),
           ),
           actions: null,
-          // actions: <Widget>[
-          //   TextButton(
-          //     onPressed: () {
-          //       Navigator.of(context).pop();
-          //       onClose!();
-          //     },
-          //     child: Text(
-          //       AppLocalizations.of(context)!.dialogCloseButton,
-          //       style: const TextStyle(
-          //           fontSize: 18, color: Color.fromRGBO(96, 166, 27, 1)),
-          //     ),
-          //   ),
-          // ],
           backgroundColor: lightBackground);
     },
   );
