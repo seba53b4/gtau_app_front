@@ -25,6 +25,15 @@ String parseDateTimeOnFormatHour(DateTime? dt) {
   return format.format(dt);
 }
 
+String parseDateTimeOnFormatHourUy(DateTime? dt) {
+  if (dt == null) {
+    return "";
+  }
+  DateFormat format = DateFormat(formatDateHour);
+  DateTime utcMinus3 = dt.toUtc().add(Duration(hours: -3));
+  return format.format(utcMinus3);
+}
+
 String parseDateTime(DateTime? dt) {
   if (dt == null) {
     return "";
