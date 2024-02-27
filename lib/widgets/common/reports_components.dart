@@ -142,7 +142,7 @@ class _ReportComponentState extends State<ReportComponent> {
           ),
           if (report != null)
             Text(
-              '${appLocalizations.report_date_msg} ${parseDateTimeOnFormatHour(report!.date!)}',
+              '${appLocalizations.report_date_msg} ${parseDateTimeOnFormatHourUy(report!.date!)}',
               style: const TextStyle(fontSize: 14.0),
             ),
           const SizedBox(height: 8),

@@ -19,8 +19,10 @@ import 'common/customMessageDialog.dart';
 
 class TaskStatusDashboard extends StatefulWidget {
   final String? userName;
+  final bool isScheduled;
 
-  const TaskStatusDashboard({super.key, this.userName});
+  const TaskStatusDashboard(
+      {super.key, this.userName, this.isScheduled = false});
 
   @override
   _TaskStatusDashboard createState() => _TaskStatusDashboard();
@@ -52,8 +54,13 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
 
   void _loadFromStorage() {
     if (token.isNotEmpty && !alreadyUpdated) {
+      late TaskFilterProvider taskFilterProvider = context.read<
+          TaskFilterProvider>();
+
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        updateTaskListState(TaskStatus.Pending.value, false);
+        updateTaskListState(TaskStatus.Pending.value,
+            taskFilterProvider.isScheduled != null &&
+                taskFilterProvider.isScheduled!);
       });
     }
   }
@@ -83,31 +90,124 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
   Widget build(BuildContext context) {
     taskFilterProvider.setUserNameFilter(widget.userName);
     final GlobalKey<ScaffoldState> scaffoldKeyDashboard =
-        GlobalKey<ScaffoldState>();
+    GlobalKey<ScaffoldState>();
     return Consumer<TaskFilterProvider>(
         builder: (context, taskFilterProvider, child) {
-      var newIndex = taskFilterProvider.getCurrentIndex();
-      if (_currentIndex != newIndex) {
-        _currentIndex = newIndex;
-        _tabController.animateTo(_currentIndex);
-      }
-      bool isScheduled =
-          taskFilterProvider.inspectionTypeFilter?.allMatches('SCHEDULED') !=
-              null;
+          var newIndex = taskFilterProvider.getCurrentIndex();
+          if (_currentIndex != newIndex) {
+            _currentIndex = newIndex;
+            _tabController.animateTo(_currentIndex);
+          }
+          bool isScheduled =
+              taskFilterProvider.inspectionTypeFilter?.allMatches(
+                  'SCHEDULED') !=
+                  null;
 
-      if (kIsWeb) {
-        return BoxContainerWhite(
-          decoration: kIsWeb
-              ? const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                )
-              : null,
-          child: Padding(
-            padding: kIsWeb
-                ? const EdgeInsets.only(top: 6.0)
-                : const EdgeInsets.only(top: 0.0),
-            child: SizedBox(
+          if (kIsWeb) {
+            return BoxContainerWhite(
+              decoration: kIsWeb
+                  ? const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              )
+                  : null,
+              child: Padding(
+                padding: kIsWeb
+                    ? const EdgeInsets.only(top: 6.0)
+                    : const EdgeInsets.only(top: 0.0),
+                child: SizedBox(
+                  width: 120,
+                  child: Scaffold(
+                    key: scaffoldKeyDashboard,
+                    appBar: AppBar(
+                      backgroundColor: lightBackground,
+                      elevation: kIsWeb ? 0.0 : null,
+                      //controla el shadow de los tabs
+                      toolbarHeight: 0,
+                      bottom: TabBar(
+                        controller: _tabController,
+                        indicator: ShapeDecoration(
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: kIsWeb
+                                    ? BorderRadius.only(
+                                    topRight: Radius.circular(20),
+                                    topLeft: Radius.circular(20))
+                                    : BorderRadius.only(
+                                    topRight: Radius.circular(0),
+                                    topLeft: Radius.circular(0))),
+                            color: primarySwatch[600]),
+                        labelColor: Colors.white,
+                        labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
+                        unselectedLabelColor: Colors.black38,
+                        tabs: [
+                          _buildCustomTab(
+                            text: AppLocalizations.of(context)!
+                                .task_status_pendingTitle,
+                            isSelected: _currentIndex == 0,
+                          ),
+                          _buildCustomTab(
+                            text: AppLocalizations.of(context)!
+                                .task_status_doingTitle,
+                            isSelected: _currentIndex == 1,
+                          ),
+                          _buildCustomTab(
+                            text: AppLocalizations.of(context)!
+                                .task_status_blockedTitle,
+                            isSelected: _currentIndex == 2,
+                          ),
+                          _buildCustomTab(
+                            text:
+                            AppLocalizations.of(context)!.task_status_doneTitle,
+                            isSelected: _currentIndex == 3,
+                          ),
+                        ],
+                        onTap: (index) {
+                          if (_currentIndex != index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                            _clearPref();
+                            String status = getTaskStatusSelected(index);
+                            taskFilterProvider.setLastStatus(status);
+                            updateTaskListState(status, isScheduled);
+                          }
+                        },
+                      ),
+                    ),
+                    body: BackgroundGradient(
+                        decoration: BoxDecoration(
+                          borderRadius: kIsWeb
+                              ? const BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          )
+                              : null,
+                          gradient: RadialGradient(
+                            center: Alignment.center,
+                            radius: 2,
+                            focalRadius: 2,
+                            // begin: Alignment.center,
+                            // end: Alignment.centerRight,
+                            colors: [
+                              dashboardBackground,
+                              dashboardBackground
+                              //Color.fromRGBO(217, 217, 217, 1)
+                            ],
+                          ),
+                        ),
+                        child: Consumer<TaskListViewModel>(
+                            builder: (context, taskListViewModel, child) {
+                              return LoadingOverlay(
+                                  isLoading: taskListViewModel.isLoading,
+                                  child: _buildTabContent(
+                                      scaffoldKeyDashboard, isScheduled));
+                            })),
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return SizedBox(
               width: 120,
               child: Scaffold(
                 key: scaffoldKeyDashboard,
@@ -122,19 +222,19 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                         shape: const RoundedRectangleBorder(
                             borderRadius: kIsWeb
                                 ? BorderRadius.only(
-                                    topRight: Radius.circular(20),
-                                    topLeft: Radius.circular(20))
+                                topRight: Radius.circular(20),
+                                topLeft: Radius.circular(20))
                                 : BorderRadius.only(
-                                    topRight: Radius.circular(0),
-                                    topLeft: Radius.circular(0))),
+                                topRight: Radius.circular(20),
+                                topLeft: Radius.circular(20))),
                         color: primarySwatch[600]),
                     labelColor: Colors.white,
                     labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
                     unselectedLabelColor: Colors.black38,
                     tabs: [
                       _buildCustomTab(
-                        text: AppLocalizations.of(context)!
-                            .task_status_pendingTitle,
+                        text:
+                        AppLocalizations.of(context)!.task_status_pendingTitle,
                         isSelected: _currentIndex == 0,
                       ),
                       _buildCustomTab(
@@ -143,13 +243,13 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                         isSelected: _currentIndex == 1,
                       ),
                       _buildCustomTab(
-                        text: AppLocalizations.of(context)!
-                            .task_status_blockedTitle,
+                        text:
+                        AppLocalizations.of(context)!.task_status_blockedTitle,
                         isSelected: _currentIndex == 2,
                       ),
                       _buildCustomTab(
-                        text:
-                            AppLocalizations.of(context)!.task_status_doneTitle,
+                        text: AppLocalizations.of(context)!
+                            .task_status_doneTitle,
                         isSelected: _currentIndex == 3,
                       ),
                     ],
@@ -170,9 +270,9 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                     decoration: BoxDecoration(
                       borderRadius: kIsWeb
                           ? const BorderRadius.only(
-                              bottomLeft: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
-                            )
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      )
                           : null,
                       gradient: RadialGradient(
                         center: Alignment.center,
@@ -189,105 +289,16 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
                     ),
                     child: Consumer<TaskListViewModel>(
                         builder: (context, taskListViewModel, child) {
-                      return LoadingOverlay(
-                          isLoading: taskListViewModel.isLoading,
-                          child: _buildTabContent(
-                              scaffoldKeyDashboard, isScheduled));
-                    })),
+                          return LoadingOverlay(
+                              isLoading: taskListViewModel.isLoading,
+                              child:
+                              _buildTabContent(
+                                  scaffoldKeyDashboard, isScheduled));
+                        })),
               ),
-            ),
-          ),
-        );
-      } else {
-        return SizedBox(
-          width: 120,
-          child: Scaffold(
-            key: scaffoldKeyDashboard,
-            appBar: AppBar(
-              backgroundColor: lightBackground,
-              elevation: kIsWeb ? 0.0 : null,
-              //controla el shadow de los tabs
-              toolbarHeight: 0,
-              bottom: TabBar(
-                controller: _tabController,
-                indicator: ShapeDecoration(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: kIsWeb
-                            ? BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                topLeft: Radius.circular(20))
-                            : BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                topLeft: Radius.circular(20))),
-                    color: primarySwatch[600]),
-                labelColor: Colors.white,
-                labelStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
-                unselectedLabelColor: Colors.black38,
-                tabs: [
-                  _buildCustomTab(
-                    text:
-                        AppLocalizations.of(context)!.task_status_pendingTitle,
-                    isSelected: _currentIndex == 0,
-                  ),
-                  _buildCustomTab(
-                    text: AppLocalizations.of(context)!.task_status_doingTitle,
-                    isSelected: _currentIndex == 1,
-                  ),
-                  _buildCustomTab(
-                    text:
-                        AppLocalizations.of(context)!.task_status_blockedTitle,
-                    isSelected: _currentIndex == 2,
-                  ),
-                  _buildCustomTab(
-                    text: AppLocalizations.of(context)!.task_status_doneTitle,
-                    isSelected: _currentIndex == 3,
-                  ),
-                ],
-                onTap: (index) {
-                  if (_currentIndex != index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                    _clearPref();
-                    String status = getTaskStatusSelected(index);
-                    taskFilterProvider.setLastStatus(status);
-                    updateTaskListState(status, isScheduled);
-                  }
-                },
-              ),
-            ),
-            body: BackgroundGradient(
-                decoration: BoxDecoration(
-                  borderRadius: kIsWeb
-                      ? const BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                        )
-                      : null,
-                  gradient: RadialGradient(
-                    center: Alignment.center,
-                    radius: 2,
-                    focalRadius: 2,
-                    // begin: Alignment.center,
-                    // end: Alignment.centerRight,
-                    colors: [
-                      dashboardBackground,
-                      dashboardBackground
-                      //Color.fromRGBO(217, 217, 217, 1)
-                    ],
-                  ),
-                ),
-                child: Consumer<TaskListViewModel>(
-                    builder: (context, taskListViewModel, child) {
-                  return LoadingOverlay(
-                      isLoading: taskListViewModel.isLoading,
-                      child:
-                          _buildTabContent(scaffoldKeyDashboard, isScheduled));
-                })),
-          ),
-        );
-      }
-    });
+            );
+          }
+        });
   }
 
   Future<void> resetScrollPosition() async {
@@ -310,8 +321,8 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
     }
   }
 
-  Widget _buildTabContent(
-      GlobalKey<ScaffoldState> _scaffoldKeyDashboard, bool isScheduled) {
+  Widget _buildTabContent(GlobalKey<ScaffoldState> _scaffoldKeyDashboard,
+      bool isScheduled) {
     switch (_currentIndex) {
       case 0:
         return _buildTaskList(
@@ -349,10 +360,11 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
         return null;
       });
     } else {
-      final userName = Provider.of<TaskFilterProvider>(context, listen: false)
+      final userName = Provider
+          .of<TaskFilterProvider>(context, listen: false)
           .userNameFilter;
       final taskListViewModel =
-          Provider.of<TaskListViewModel>(context, listen: false);
+      Provider.of<TaskListViewModel>(context, listen: false);
       taskListViewModel.clearListByStatus(status);
       await taskListViewModel
           .initializeTasks(context, status, userName)
@@ -381,13 +393,13 @@ class _TaskStatusDashboard extends State<TaskStatusDashboard>
             return Center(
               child: taskFilterProvider.isScheduled!
                   ? TaskListScheduled(
-                      status: status,
-                      scaffoldKey: _scaffoldKeyDashboard,
-                    )
+                status: status,
+                scaffoldKey: _scaffoldKeyDashboard,
+              )
                   : TaskList(
-                      status: status,
-                      scaffoldKey: _scaffoldKeyDashboard,
-                    ),
+                status: status,
+                scaffoldKey: _scaffoldKeyDashboard,
+              ),
             );
           },
         ));
