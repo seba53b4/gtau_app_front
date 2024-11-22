@@ -42,7 +42,7 @@ class ScheduledMapComponent extends StatefulWidget {
 class _ScheduledMapComponentState extends State<ScheduledMapComponent>
     with TickerProviderStateMixin {
   LatLng? location;
-  static const LatLng initLocation = LatLng(-34.88773, -56.13955);
+  static const LatLng initLocation = LatLng(-34.836231, -56.184510);
   MapType _currentMapType = MapType.hybrid;
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
@@ -115,10 +115,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
         return;
       }
 
-      Position currentPosition = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
+      // Position currentPosition = await Geolocator.getCurrentPosition(
+      //     desiredAccuracy: LocationAccuracy.best);
       setState(() {
-        location = LatLng(currentPosition.latitude, currentPosition.longitude);
+        location = LatLng(initLocation.latitude, initLocation.longitude);
 
         final Marker newMarker = Marker(
           markerId: const MarkerId('current_gps_location'),
@@ -132,7 +132,7 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
       controller.moveCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
-            target: LatLng(currentPosition.latitude, currentPosition.longitude),
+            target: LatLng(initLocation.latitude, initLocation.longitude),
             zoom: zoomMap,
           ),
         ),
@@ -144,10 +144,10 @@ class _ScheduledMapComponentState extends State<ScheduledMapComponent>
 
   Future<void> _initializeSheduledElements({bool isNewLocation = false}) async {
     double? latitude, longitude;
-    int? radio = kIsWeb ? null : 200;
+    int? radio = kIsWeb ? null : 250;
     if (!kIsWeb) {
-      latitude = location?.latitude ?? initLocation.latitude;
-      longitude = location?.longitude ?? initLocation.latitude;
+      latitude = initLocation.latitude;
+      longitude = initLocation.longitude;
     }
     ScheduledElements? entities = await scheduledViewModel
         .fetchScheduledElements(
